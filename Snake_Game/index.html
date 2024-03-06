@@ -10,23 +10,67 @@
     <style>
         .box_main {
             box-shadow: 0 0 10px 5px #000;
+            height: 455px;
+            width: 455px;
+            overflow: hidden;
         }
 
-        .box{
+        .position_box {
             height: 15px;
             width: 15px;
-            background-color: #ec0000;
+            margin: 5px;
+
         }
-        
+
+        .position_box_color {
+            background-color: #b6b6b6;
+        }
+
+        .box {
+            height: 15px;
+            width: 15px;
+            margin: 5px;
+        }
+
+        .box_snake {
+            background-color: #ec0000 !important;
+        }
+
+        .box_food {
+            background-color: #ec0000 !important;
+            animation: food 1s infinite;
+        }
+
+        @keyframes food {
+            0% {
+                background-color: #ec0000;
+                opacity: 1;
+                scale: 1;
+            }
+
+            50% {
+                background-color: #ec0000;
+                opacity: 0.5;
+                scale: 1.5;
+            }
+
+            100% {
+                background-color: #ec0000;
+                opacity: 1;
+                scale: 1;
+            }
+        }
+
+        .flex {
+            display: flex;
+        }
     </style>
 </head>
 
 <body class="bg-[#151C39]">
-    
+
     <div class="flex items-center justify-center h-screen">
-        <div class="h-1/2 w-[30rem] bg-gray-300 box_main p-px">
-            <div id="box" class="box"></div>
-        </div>
+        <div class="bg-gray-300 box_main p-px"></div>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
