@@ -45,6 +45,8 @@ const randomSankePosition = () => {
 };
 
 snake.push({ i: 5, j: 11 });
+snake.push({ i: 5, j: 12 });
+snake.push({ i: 5, j: 13 });
 
 const handleSnake = () => {
     const length = snake.length;
@@ -73,7 +75,7 @@ const autoMoveSnake = () => {
 
         snake.unshift({ i: head.i, j: head.j - 1 });
         const id = `#box_${snake.i}_${snake.j -1}`;
-        $(id).removeClass('position_box_color').addClass('box_head');
+        $(id).removeClass('position_box_color').addClass('box_body');
 
 
         handleSnake();
