@@ -52,15 +52,16 @@ const handleSnake = () => {
     const length = snake.length;
     snake.forEach((snake, index) => {
         const id = `#box_${snake.i}_${snake.j}`;
+        const prev_id = `#box_${snake.i}_${snake.j - 1}`;
         const lastindex = length - 1;
-        console.log(index, lastindex);
         if (index === 0) {
-            $(id).removeClass('position_box_color').addClass('box_head');
+            $(id).removeClass().addClass('position_box box_head');
         } else if (index === lastindex) {
-            $(id).removeClass('position_box_color').addClass('box_tail');
+            // $(id).removeClass().addClass('position_box box_tail');
+            $(id).removeClass().addClass('position_box position_box_color');
         }
         else {
-            $(id).removeClass('position_box_color').addClass('box_body');
+            $(id).removeClass().addClass('position_box box_body');
         }
     });
 
@@ -71,14 +72,11 @@ const autoMoveSnake = () => {
     setInterval(() => {
         const head = snake[0];
         const tail = snake[snake.length - 1];
-        console.log(head, tail);
 
         snake.unshift({ i: head.i, j: head.j - 1 });
-        const id = `#box_${snake.i}_${snake.j -1}`;
-        $(id).removeClass('position_box_color').addClass('box_body');
-
-
+        snake.pop();
         handleSnake();
+
         // snake.pop();
         
 
