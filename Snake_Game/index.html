@@ -4,7 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="description" content="Snake Game">
+
+    <link href="./src/output.css" rel="stylesheet">
     <title>Snake Game</title>
 
     <style>
@@ -13,6 +15,7 @@
             height: 455px;
             width: 455px;
             overflow: hidden;
+            border-radius: 2px;
         }
 
         .position_box {
@@ -26,6 +29,11 @@
             background-color: #c8c8c8;
         }
 
+        .translation_box_25px {
+            transform: translate(25px, 0);
+            transition-duration: 1000ms;
+        }
+
         .box {
             height: 15px;
             width: 15px;
@@ -34,6 +42,7 @@
 
         .box_snake {
             background-color: #ec0000 !important;
+            transition-duration: 500ms;
         }
 
         .box_food {
@@ -88,10 +97,12 @@
 
         .box_body {
             background-color: #015d08 !important;
+            transition-duration: 500ms;
         }
 
         .box_tail {
             background-color: #ab3b3b !important;
+            transition-duration: 500ms;
         }
 
         @keyframes food {

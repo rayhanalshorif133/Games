@@ -3,7 +3,8 @@ var position_top = 0;
 var position_left = 0;
 var position_right = 0;
 var position_bottom = 0;
-const snake = [];
+var snake = [];
+var snake_path = [];
 // any key
 document.addEventListener("keydown", function (event) {
     direction = event.key;
@@ -31,13 +32,13 @@ const setAutoPath = () => {
         }
     }
 
-    randomSankePosition();
+    randomSankeFood();
     handleSnake();
     autoMoveSnake();
 };
 
 
-const randomSankePosition = () => {
+const randomSankeFood = () => {
     const random_i = Math.floor(Math.random() * 18) + 1;
     const random_j = Math.floor(Math.random() * 18) + 1;
     const id = `#box_${random_i}_${random_j}`;
@@ -52,13 +53,11 @@ const handleSnake = () => {
     const length = snake.length;
     snake.forEach((snake, index) => {
         const id = `#box_${snake.i}_${snake.j}`;
-        const prev_id = `#box_${snake.i}_${snake.j - 1}`;
         const lastindex = length - 1;
         if (index === 0) {
             $(id).removeClass().addClass('position_box box_head');
         } else if (index === lastindex) {
-            // $(id).removeClass().addClass('position_box box_tail');
-            $(id).removeClass().addClass('position_box position_box_color');
+            $(id).removeClass().addClass('position_box box_tail');
         }
         else {
             $(id).removeClass().addClass('position_box box_body');
@@ -68,19 +67,25 @@ const handleSnake = () => {
     
 };
 
+const handleSnakePath = () => {
+    snake_path.forEach((snake, index) => {
+        const id = `#box_${snake.i}_${snake.j}`;
+        $(id).removeClass().addClass('position_box position_box_color');
+    });
+};
+
 const autoMoveSnake = () => {
+    var position = 0; 
     setInterval(() => {
-        const head = snake[0];
-        const tail = snake[snake.length - 1];
-
-        snake.unshift({ i: head.i, j: head.j - 1 });
-        snake.pop();
-        handleSnake();
-
-        // snake.pop();
-        
-
-    }, 2000);
+        snake.forEach((item, index) => {
+            const id = `#box_${item.i}_${item.j}`;
+            position = position + 10;
+            $(id).css({
+                transform: `translate(${position}px, 0px)`,
+                transition: "all 2s"
+            })
+        });
+    }, 250);
 };
 
 
