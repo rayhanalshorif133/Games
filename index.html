@@ -21,10 +21,12 @@
   <script>
     $(document).ready(function(){
       var marginTop = 0;
-      setInterval(function(){
-        marginTop = marginTop + 20;
-        $(".block_box").css("margin-top", marginTop);
-      }, 1000);
+      if(marginTop != 460){
+        setInterval(function(){
+          marginTop = marginTop + 20;
+          $(".block_box").css("margin-top", marginTop);
+        }, 1000);
+      }
     });
   </script>
 </body>
