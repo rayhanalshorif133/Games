@@ -1,3 +1,15 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+
+@layer components {
+    .active_battle_icon {
+        @apply border-b-2 border-white relative cursor-pointer w-44 h-10  rounded-md text-center mx-auto ;
+    }
+
+    .inactive_battle_icon {
+        @apply border border-gray-500 relative cursor-pointer w-44 h-10 rounded-md text-center mx-auto;
+    }
+}
