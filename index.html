@@ -59,7 +59,9 @@
 
   <script>
     const cross = '<i class="fa-solid fa-xmark text-white text-[1.6rem] text-center mx-auto ml-1"></i>';
+    const greenCross = '<i class="fa-solid fa-xmark transition-all ease-in-out duration-300	 text-green-600 text-3xl text-center mx-auto ml-1"></i>';
     const circle = '<i class="fa-regular fa-circle text-white text-[1.6rem] text-center mx-auto"></i>';
+    const greenCircle = '<i class="fa-regular fa-circle text-green-600 text-[1.6rem] text-center mx-auto"></i>';
     var battleIcon = 'corss';
     $(document).ready(function () {
       $(".select_battle_icon").click(function () {
@@ -106,8 +108,10 @@
       $(".input_battle_box_item").each((index, item) => {
         if (parseInt($(item).attr('data-position')) - 1 == data[randomIndex]) {
           $(item).html(circle);
+          $(item).attr("data-value", 'circle');
         }
       });
+      checkPointMaintain();
     }
 
 
@@ -147,7 +151,12 @@
         return match;
       } else {
         sessionStorage.setItem('match_positions', match);
-        handleUIMatchPosition(position);
+        handleUIMatchPosition(match);
+
+        // setTimeout(() => {
+        //   $('.input_battle_box_item').addClass('hidden').removeClass('input_battle_box_item');
+        // }, 500);
+
         return true;
       }
     }
@@ -157,9 +166,8 @@
       position.map(function (value) {
         $(".input_battle_box_item").each((index, item) => {
           if (value == parseInt($(item).attr('data-position'))) {
-            $(item).addClass('relative');
-            $(item).addClass('line_through');
-          }
+            $(item).html(greenCross);
+          }          
         });
       });
     };
