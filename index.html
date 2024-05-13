@@ -14,11 +14,11 @@
 <body class="bg-gray-400">
   <div class="h-screen flex items-center justify-center">
     <div class="relative h-[480px] w-[480px] flex items-center bg-black shadow-lg border-[3px] border-white p-1">
-      <div class="absolute top-[10%] left-[37px] space-x-10 flex select_battle_icon">
-        <div class="active_battle_icon select_battle_icon">
+      <div class="absolute top-[10%] left-[37px] space-x-10 flex">
+        <div class="active_battle_icon select_battle_icon" data-battle_icon="corss" id="cross">
           <i class="fa-solid fa-xmark text-white text-[1.6rem] text-center mx-auto mt-[6px]"></i>
         </div>
-        <div class="inactive_battle_icon select_battle_icon">
+        <div class="inactive_battle_icon select_battle_icon" data-battle_icon="circle" id="circle">
           <i class="fa-regular fa-circle text-white text-[1.6rem] text-center mx-auto mt-[6px]"></i>
         </div>
       </div>
@@ -35,33 +35,46 @@
       <!-- box position -->
       <div class="absolute space-y-5 top-[38%] left-[36%]">
         <div class="flex space-x-5">
-          <div class="w-6 h-6  cursor-pointer"></div>
-          <div class="w-6 h-6 bg-white cursor-pointer"></div>
-          <div class="w-6 h-6 bg-white cursor-pointer"></div>
+          <div class="w-6 h-6 cursor-pointer input_battle_box_item"></div>
+          <div class="w-6 h-6 cursor-pointer input_battle_box_item"></div>
+          <div class="w-6 h-6 cursor-pointer input_battle_box_item"></div>
         </div>
         <div class="flex space-x-5">
-          <div class="w-6 h-6 bg-white cursor-pointer"></div>
-          <div class="w-6 h-6 bg-white cursor-pointer"></div>
-          <div class="w-6 h-6 bg-white cursor-pointer"></div>
+          <div class="w-6 h-6 cursor-pointer input_battle_box_item"></div>
+          <div class="w-6 h-6 cursor-pointer input_battle_box_item"></div>
+          <div class="w-6 h-6 cursor-pointer input_battle_box_item"></div>
         </div>
         <div class="flex space-x-5">
-          <div class="w-6 h-6 bg-white cursor-pointer"></div>
-          <div class="w-6 h-6 bg-white cursor-pointer"></div>
-          <div class="w-6 h-6 bg-white cursor-pointer"></div>
+          <div class="w-6 h-6 cursor-pointer input_battle_box_item"></div>
+          <div class="w-6 h-6 cursor-pointer input_battle_box_item"></div>
+          <div class="w-6 h-6 cursor-pointer input_battle_box_item"></div>
         </div>
       </div>
     </div>
   </div>
 
   <script>
-    $(document).ready(function() {
-      $(".select_battle_icon").click(function(){
-        $(this).hasClass("inactive_battle_icon").addClass("active_battle_icon");
+    const cross = '<i class="fa-solid fa-xmark text-white text-[1.6rem] text-center mx-auto ml-1"></i>';
+    const circle = '<i class="fa-regular fa-circle text-white text-[1.6rem] text-center mx-auto"></i>';
+    var battleIcon = 'corss';
+    $(document).ready(function () {
+      $(".select_battle_icon").click(function () {
+        $(".select_battle_icon").removeClass().addClass("select_battle_icon inactive_battle_icon");
+        $(this).removeClass("inactive_battle_icon").addClass("active_battle_icon");
+        battleIcon = $(this).attr("data-battle_icon");
       });
-      $(".active_battle_icon").click(function(){
-        $(this).removeClass("active_battle_icon").addClass("inactive_battle_icon");
+      
+      
+      $(".input_battle_box_item").click(function () {
+        if (battleIcon == 'corss') {
+          $(this).html(cross);
+        } else {
+          $(this).html(circle);
+        }
       });
+
     });
+    
   </script>
 </body>
 
