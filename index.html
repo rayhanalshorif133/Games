@@ -35,7 +35,8 @@
       <!-- box position -->
       <div class="absolute space-y-5 top-[38%] left-[36%]">
         <div class="flex space-x-5">
-          <div class="w-6 h-6 cursor-pointer input_battle_box_item" data-position="1"></div>
+          <div class="w-6 h-6 cursor-pointer input_battle_box_item" data-position="1">
+          </div>
           <div class="w-6 h-6 cursor-pointer input_battle_box_item" data-position="2"></div>
           <div class="w-6 h-6 cursor-pointer input_battle_box_item" data-position="3"></div>
         </div>
@@ -76,9 +77,35 @@
         }
         $(this).attr("data-value", battleIcon);
         checkPointMaintain();
+        randomeZeroAssign();
       });
 
     });
+
+    const randomeZeroAssign = function () {
+      var GETEmptyINDEX = [];
+      $(".input_battle_box_item").each((index, item) => {
+        if (!$(item).attr('data-value')) {
+          GETEmptyINDEX.push(index + 1);
+        }
+      });
+
+      setTimeout(() => {
+        pickRandomNumber(GETEmptyINDEX);
+      }, 500);
+    };
+
+    function pickRandomNumber(data) {
+      // Generate a random index within the range of the array length
+      const randomIndex = Math.floor(Math.random() * data.length);
+
+      // Return the element at the random index
+      $(".input_battle_box_item").each((index, item) => {
+        if (parseInt($(item).attr('data-position')) == data[randomIndex]) {
+          $(item).html(circle);
+        }
+      });
+    }
 
 
 
@@ -113,13 +140,26 @@
     const isItFinished = function (position) {
       const match = arraysMatch(position, [1, 2, 3]) || arraysMatch(position, [1, 4, 7]) || arraysMatch(position, [1, 5, 9]) || arraysMatch(position, [2, 5, 8]) || arraysMatch(position, [3, 6, 9]) || arraysMatch(position, [3, 5, 7]) || arraysMatch(position, [4, 5, 6]) || arraysMatch(position, [7, 8, 9]);
 
-      if(match == false) {
+      if (match == false) {
         return match;
-      }else{
+      } else {
         sessionStorage.setItem('match_positions', match);
+        handleUIMatchPosition(position);
         return true;
       }
     }
+
+
+    const handleUIMatchPosition = function (position) {
+      position.map(function (value) {
+        $(".input_battle_box_item").each((index, item) => {
+          if (value == parseInt($(item).attr('data-position'))) {
+            $(item).addClass('relative');
+            $(item).addClass('line_through');
+          }
+        });
+      });
+    };
 
 
     function arraysMatch(position, assingArray) {
@@ -139,9 +179,9 @@
         }
       }
 
-      if(matchingValues.length == 3){
+      if (matchingValues.length == 3) {
         return assingArray;
-      }else{
+      } else {
         return false;
       }
 

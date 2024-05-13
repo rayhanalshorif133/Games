@@ -606,6 +606,14 @@ video {
   text-align: center;
 }
 
+.line_through {
+  position: absolute;
+  height: 0.5rem;
+  width: 2.5rem;
+  --tw-bg-opacity: 1;
+  background-color: rgb(248 113 113 / var(--tw-bg-opacity));
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -677,8 +685,8 @@ video {
   inset: -0.25rem;
 }
 
-.bottom-3 {
-  bottom: 0.75rem;
+.bottom-4 {
+  bottom: 1rem;
 }
 
 .end-1 {
@@ -701,6 +709,10 @@ video {
   left: 43%;
 }
 
+.left-\[44\%\] {
+  left: 44%;
+}
+
 .top-\[10\%\] {
   top: 10%;
 }
@@ -711,18 +723,6 @@ video {
 
 .top-\[38\%\] {
   top: 38%;
-}
-
-.left-1\/2 {
-  left: 50%;
-}
-
-.left-\[44\%\] {
-  left: 44%;
-}
-
-.bottom-4 {
-  bottom: 1rem;
 }
 
 .isolate {
