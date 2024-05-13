@@ -35,19 +35,19 @@
       <!-- box position -->
       <div class="absolute space-y-5 top-[38%] left-[36%]">
         <div class="flex space-x-5">
-          <div class="w-6 h-6 cursor-pointer input_battle_box_item"></div>
-          <div class="w-6 h-6 cursor-pointer input_battle_box_item"></div>
-          <div class="w-6 h-6 cursor-pointer input_battle_box_item"></div>
+          <div class="w-6 h-6 cursor-pointer input_battle_box_item" data-position="1"></div>
+          <div class="w-6 h-6 cursor-pointer input_battle_box_item" data-position="2"></div>
+          <div class="w-6 h-6 cursor-pointer input_battle_box_item" data-position="3"></div>
         </div>
         <div class="flex space-x-5">
-          <div class="w-6 h-6 cursor-pointer input_battle_box_item"></div>
-          <div class="w-6 h-6 cursor-pointer input_battle_box_item"></div>
-          <div class="w-6 h-6 cursor-pointer input_battle_box_item"></div>
+          <div class="w-6 h-6 cursor-pointer input_battle_box_item" data-position="4"></div>
+          <div class="w-6 h-6 cursor-pointer input_battle_box_item" data-position="5"></div>
+          <div class="w-6 h-6 cursor-pointer input_battle_box_item" data-position="6"></div>
         </div>
         <div class="flex space-x-5">
-          <div class="w-6 h-6 cursor-pointer input_battle_box_item"></div>
-          <div class="w-6 h-6 cursor-pointer input_battle_box_item"></div>
-          <div class="w-6 h-6 cursor-pointer input_battle_box_item"></div>
+          <div class="w-6 h-6 cursor-pointer input_battle_box_item" data-position="7"></div>
+          <div class="w-6 h-6 cursor-pointer input_battle_box_item" data-position="8"></div>
+          <div class="w-6 h-6 cursor-pointer input_battle_box_item" data-position="9"></div>
         </div>
       </div>
     </div>
@@ -63,18 +63,61 @@
         $(this).removeClass("inactive_battle_icon").addClass("active_battle_icon");
         battleIcon = $(this).attr("data-battle_icon");
       });
-      
-      
+
+
       $(".input_battle_box_item").click(function () {
         if (battleIcon == 'corss') {
           $(this).html(cross);
         } else {
           $(this).html(circle);
         }
+        $(this).attr("data-value", battleIcon);
+        checkPointMaintain();
       });
 
     });
-    
+
+
+
+    const checkPointMaintain = function () {
+      console.clear();
+      var position = [];
+      var crossPosition = [];
+      var circlePosition = [];
+      $(".input_battle_box_item").each((index,item)=>{
+        if($(item).attr('data-value')){
+          const GET_POSITION = parseInt($(item).attr('data-position'));
+          const GET_VALUE = $(item).attr('data-value');
+          if (GET_VALUE == 'corss') {
+            crossPosition.push(GET_POSITION);
+          }else{
+            circlePosition.push(GET_POSITION);
+          }
+        }
+      });
+
+      console.log(crossPosition,circlePosition);
+
+    };
+
+
+
+    function findOccurrences(arr, target) {
+      const occurrences = [];
+      for (let i = 0; i < arr.length; i++) {
+        var flag = false;
+        for (let j = 0; j < arr[i].length; j++) {
+          if (arr[i][j] === target) {
+            flag = true;
+          }
+        }
+        if (flag == true) {
+          occurrences.push(arr[i]);
+        }
+      }
+      return occurrences;
+    }
+
   </script>
 </body>
 
