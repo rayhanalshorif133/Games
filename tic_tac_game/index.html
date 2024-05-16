@@ -1,33 +1,219 @@
 <!doctype html>
 <html>
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="./src/output.css" rel="stylesheet">
   <title>Tic-Tac-Toe</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" />
   <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 
 </head>
+
 <body class="bg-gray-400">
   <div class="h-screen flex items-center justify-center">
     <div class="relative h-[480px] w-[480px] flex items-center bg-black shadow-lg border-[3px] border-white p-1">
-        <div class="absolute left-[30%] space-y-10">
-          <div class="h-1 w-40 bg-white"></div>
-          <div class="h-1 w-40 bg-white"></div>
-        </div> 
-        <div class="absolute top-[34%] left-[43%] space-x-10 flex">
-          <div class="h-40 w-1 bg-white"></div>
-          <div class="h-40 w-1 bg-white"></div>
-        </div> 
-
-        <!-- box position -->
-        <div class="absolute">
-          <div class="w-6 h-6 bg-white cursor-pointer"></div>
+      <div class="absolute top-[10%] left-[37px] space-x-10 flex">
+        <div class="active_battle_icon select_battle_icon" data-battle_icon="corss" id="cross">
+          <i class="fa-solid fa-xmark text-white text-[1.6rem] text-center mx-auto mt-[6px]"></i>
         </div>
+        <div class="inactive_battle_icon select_battle_icon" data-battle_icon="circle" id="circle">
+          <i class="fa-regular fa-circle text-white text-[1.6rem] text-center mx-auto mt-[6px]"></i>
+        </div>
+      </div>
+
+      <div class="absolute left-[30%] space-y-10">
+        <div class="h-1 w-40 bg-white"></div>
+        <div class="h-1 w-40 bg-white"></div>
+      </div>
+      <div class="absolute top-[34%] left-[43%] space-x-10 flex">
+        <div class="h-40 w-1 bg-white"></div>
+        <div class="h-40 w-1 bg-white"></div>
+      </div>
+
+      <!-- box position -->
+      <div class="absolute space-y-5 top-[38%] left-[36%]">
+        <div class="flex space-x-5">
+          <div class="w-6 h-6 cursor-pointer input_battle_box_item" data-position="1">
+          </div>
+          <div class="w-6 h-6 cursor-pointer input_battle_box_item" data-position="2"></div>
+          <div class="w-6 h-6 cursor-pointer input_battle_box_item" data-position="3"></div>
+        </div>
+        <div class="flex space-x-5">
+          <div class="w-6 h-6 cursor-pointer input_battle_box_item" data-position="4"></div>
+          <div class="w-6 h-6 cursor-pointer input_battle_box_item" data-position="5"></div>
+          <div class="w-6 h-6 cursor-pointer input_battle_box_item" data-position="6"></div>
+        </div>
+        <div class="flex space-x-5">
+          <div class="w-6 h-6 cursor-pointer input_battle_box_item" data-position="7"></div>
+          <div class="w-6 h-6 cursor-pointer input_battle_box_item" data-position="8"></div>
+          <div class="w-6 h-6 cursor-pointer input_battle_box_item" data-position="9"></div>
+        </div>
+      </div>
+      <div class="absolute bottom-4 left-[44%] hidden" id="status">
+        <h3 class="text-white font-bold text-sm">Match</h3>
+      </div>
     </div>
   </div>
 
   <script>
+    const cross = '<i class="fa-solid fa-xmark text-white text-[1.6rem] text-center mx-auto ml-1"></i>';
+    const greenCross = '<i class="fa-solid fa-xmark transition-all ease-in-out duration-300	 text-green-600 text-3xl text-center mx-auto ml-1"></i>';
+    const circle = '<i class="fa-regular fa-circle text-white text-[1.6rem] text-center mx-auto"></i>';
+    const greenCircle = '<i class="fa-regular fa-circle text-green-600 text-[1.6rem] text-center mx-auto"></i>';
+    var battleIcon = 'corss';
+    $(document).ready(function () {
+      $(".select_battle_icon").click(function () {
+        $(".select_battle_icon").removeClass().addClass("select_battle_icon inactive_battle_icon");
+        $(this).removeClass("inactive_battle_icon").addClass("active_battle_icon");
+        battleIcon = $(this).attr("data-battle_icon");
+      });
+
+
+      $(".input_battle_box_item").click(function () {
+        if (!$(this).attr('data-value')) {
+          if (battleIcon == 'corss') {
+            $(this).html(cross);
+          } else {
+            $(this).html(circle);
+          }
+          $(this).attr("data-value", battleIcon);
+          checkPointMaintain();
+          randomeZeroAssign();
+        }
+
+      });
+
+    });
+
+    const randomeZeroAssign = function () {
+      var GETEmptyINDEX = [];
+      $(".input_battle_box_item").each((index, item) => {
+        if (!$(item).attr('data-value')) {
+          GETEmptyINDEX.push(index);
+        }
+      });
+
+      setTimeout(() => {
+        pickRandomNumber(GETEmptyINDEX);
+      }, 500);
+    };
+
+    function pickRandomNumber(data) {
+      // Generate a random index within the range of the array length
+      const randomIndex = Math.floor(Math.random() * data.length);
+
+      // Return the element at the random index
+      $(".input_battle_box_item").each((index, item) => {
+        if (parseInt($(item).attr('data-position')) - 1 == data[randomIndex]) {
+          $(item).html(circle);
+          $(item).attr("data-value", 'circle');
+        }
+      });
+      checkPointMaintain();
+    }
+
+
+
+    const checkPointMaintain = function () {
+      console.clear();
+      var position = [];
+      var crossPosition = [];
+      var circlePosition = [];
+      $(".input_battle_box_item").each((index, item) => {
+        if ($(item).attr('data-value')) {
+          const GET_POSITION = parseInt($(item).attr('data-position'));
+          const GET_VALUE = $(item).attr('data-value');
+          if (GET_VALUE == 'corss') {
+            crossPosition.push(GET_POSITION);
+          } else {
+            circlePosition.push(GET_POSITION);
+          }
+        }
+      });
+
+      // console.log(crossPosition,circlePosition);
+      const crossPositionFinished = isItFinished(crossPosition);
+
+      crossPositionFinished == true && $('#status').removeClass('hidden');
+
+      const circlePositionFinished = isItFinished(circlePosition);
+      circlePositionFinished == true && $('#status').removeClass('hidden');
+
+    };
+
+
+    const isItFinished = function (position) {
+      const match = arraysMatch(position, [1, 2, 3]) || arraysMatch(position, [1, 4, 7]) || arraysMatch(position, [1, 5, 9]) || arraysMatch(position, [2, 5, 8]) || arraysMatch(position, [3, 6, 9]) || arraysMatch(position, [3, 5, 7]) || arraysMatch(position, [4, 5, 6]) || arraysMatch(position, [7, 8, 9]);
+
+      if (match == false) {
+        return match;
+      } else {
+        sessionStorage.setItem('match_positions', match);
+        handleUIMatchPosition(match);
+
+        return true;
+      }
+    }
+
+
+    const handleUIMatchPosition = function (position) {
+      position.map(function (value) {
+        $(".input_battle_box_item").each((index, item) => {
+          if (value == parseInt($(item).attr('data-position'))) {
+            $(item).html(greenCross);
+          }          
+        });
+      });
+    };
+
+
+    function arraysMatch(position, assingArray) {
+
+      if (position.length < 3) {
+        return false;
+      }
+      const matchingValues = [];
+
+      // Loop through array1
+      for (let i = 0; i < position.length; i++) {
+        const value = position[i];
+
+        // Check if the value exists in array2
+        if (assingArray.includes(value)) {
+          matchingValues.push(value);
+        }
+      }
+
+      if (matchingValues.length == 3) {
+        return assingArray;
+      } else {
+        return false;
+      }
+
+
+    }
+
+
+    function findMatchingValues(arr1, arr2) {
+      const matchingValues = [];
+
+      // Loop through array1
+      for (let i = 0; i < arr1.length; i++) {
+        const value = arr1[i];
+
+        // Check if the value exists in array2
+        if (arr2.includes(value)) {
+          matchingValues.push(value);
+        }
+      }
+
+      return matchingValues;
+    }
+
+
   </script>
 </body>
+
 </html>
