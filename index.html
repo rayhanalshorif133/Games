@@ -73,28 +73,31 @@
         $(this).attr('data-value', 'player_2');
       }
 
-      checkPlaySituation();
+      const isWin = isItWin([3, 6, 9]) || isItWin([1, 2, 3]) || isItWin([1, 5, 9]) || isItWin([3, 5, 7]);
+      console.log(isWin);
     });
 
     $('.restart_game').click(function () {
       $('.box').html('');
-      $('.box').attr('data-value', '');
+      $('.box').removeAttr('data-value');
     });
   });
 
 
-  const checkPlaySituation = () =>{
-    $('.box').each(function(index,element){
-      const dataValue = $(element).attr('data-value');
-      isItWin(dataValue,[1,2,3]);
-    });
-  };
 
-  const isItWin = (itemValue,indexValues) =>{
-    indexValues.map(function(value){
-      $(`#box_4`).attr('data-value');
-      console.log(itemValue,value);
-    });
+  const isItWin = (indexValues) => {
+    value_item_1 = $(`#box_${indexValues[0]}`).attr('data-value');
+    value_item_2 = $(`#box_${indexValues[1]}`).attr('data-value');
+    value_item_3 = $(`#box_${indexValues[2]}`).attr('data-value');
+    if (value_item_1 == undefined) return false;
+    if (value_item_2 == undefined) return false;
+    if (value_item_3 == undefined) return false;
+
+    if (value_item_1 === value_item_2 && value_item_3 === value_item_2 && value_item_3 === value_item_1) {
+      return true;
+    } else {
+      return false;
+    }
   };
 </script>
 
