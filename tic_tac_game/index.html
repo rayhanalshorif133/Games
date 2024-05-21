@@ -11,209 +11,115 @@
 
 </head>
 
-<body class="bg-gray-400">
-  <div class="h-screen flex items-center justify-center">
-    <div class="relative h-[480px] w-[480px] flex items-center bg-black shadow-lg border-[3px] border-white p-1">
-      <div class="absolute top-[10%] left-[37px] space-x-10 flex">
-        <div class="active_battle_icon select_battle_icon" data-battle_icon="corss" id="cross">
-          <i class="fa-solid fa-xmark text-white text-[1.6rem] text-center mx-auto mt-[6px]"></i>
-        </div>
-        <div class="inactive_battle_icon select_battle_icon" data-battle_icon="circle" id="circle">
-          <i class="fa-regular fa-circle text-white text-[1.6rem] text-center mx-auto mt-[6px]"></i>
-        </div>
+<body class="bg-gradient-to-r from-green-400 to-blue-500 min-h-screen relative">
+  <div class="flex flex-col justify-center items-center h-full min-h-screen relative">
+    <h1 class="text-center mx-auto text-white text-3xl font-semibold">Tic-Tac-Toe</h1>
+    <div class="mt-5 space-y-2">
+      <div class="flex justify-center items-center space-x-2">
+        <div class="box" id="box_1"></div>
+        <div class="box" id="box_2"></div>
+        <div class="box" id="box_3"></div>
       </div>
-
-      <div class="absolute left-[30%] space-y-10">
-        <div class="h-1 w-40 bg-white"></div>
-        <div class="h-1 w-40 bg-white"></div>
+      <div class="flex justify-center items-center space-x-2">
+        <div class="box" id="box_4"></div>
+        <div class="box" id="box_5"></div>
+        <div class="box" id="box_6"></div>
       </div>
-      <div class="absolute top-[34%] left-[43%] space-x-10 flex">
-        <div class="h-40 w-1 bg-white"></div>
-        <div class="h-40 w-1 bg-white"></div>
+      <div class="flex justify-center items-center space-x-2">
+        <div class="box" id="box_7"></div>
+        <div class="box" id="box_8"></div>
+        <div class="box" id="box_9"></div>
       </div>
-
-      <!-- box position -->
-      <div class="absolute space-y-5 top-[38%] left-[36%]">
-        <div class="flex space-x-5">
-          <div class="w-6 h-6 cursor-pointer input_battle_box_item" data-position="1">
-          </div>
-          <div class="w-6 h-6 cursor-pointer input_battle_box_item" data-position="2"></div>
-          <div class="w-6 h-6 cursor-pointer input_battle_box_item" data-position="3"></div>
+    </div>
+    <div class="mt-10">
+      <h1 class="text-center mx-auto text-white text-3xl font-semibold player_identify_container" id="player_1">
+        Player 1's Turn (🟢)
+      </h1>
+    </div>
+    <div class="mt-10">
+      <button
+        class="py-3 px-5 bg-black hover:scale-105 transition-all duration-300 ease-in-out text-white font-bold text-3xl rounded-lg restart_game ">Restart
+        Game</button>
+    </div>
+    <div class="absolute -top-80 status_container transition-all duration-300">
+      <div class="bg-white w-96 h-auto pb-3 border-2 border-gray-200 rounded-lg shadow-lg">
+        <h3 class="text-4xl font-bold text-black mx-auto justify-center text-center py-2 game_status">
+          Win
+        </h3>
+        <div class="w-full h-px bg-gray-300"></div>
+        <div class="my-3">
+          <h4 class="text-2xl text-gray-400 font-semibold mx-auto flex justify-center text-center game_status_msg">
+            (🟢) is Win
+          </h4>
         </div>
-        <div class="flex space-x-5">
-          <div class="w-6 h-6 cursor-pointer input_battle_box_item" data-position="4"></div>
-          <div class="w-6 h-6 cursor-pointer input_battle_box_item" data-position="5"></div>
-          <div class="w-6 h-6 cursor-pointer input_battle_box_item" data-position="6"></div>
-        </div>
-        <div class="flex space-x-5">
-          <div class="w-6 h-6 cursor-pointer input_battle_box_item" data-position="7"></div>
-          <div class="w-6 h-6 cursor-pointer input_battle_box_item" data-position="8"></div>
-          <div class="w-6 h-6 cursor-pointer input_battle_box_item" data-position="9"></div>
-        </div>
-      </div>
-      <div class="absolute bottom-4 left-[44%] hidden" id="status">
-        <h3 class="text-white font-bold text-sm">Match</h3>
       </div>
     </div>
   </div>
+</body>
 
-  <script>
-    const cross = '<i class="fa-solid fa-xmark text-white text-[1.6rem] text-center mx-auto ml-1"></i>';
-    const greenCross = '<i class="fa-solid fa-xmark transition-all ease-in-out duration-300	 text-green-600 text-3xl text-center mx-auto ml-1"></i>';
-    const circle = '<i class="fa-regular fa-circle text-white text-[1.6rem] text-center mx-auto"></i>';
-    const greenCircle = '<i class="fa-regular fa-circle text-green-600 text-[1.6rem] text-center mx-auto"></i>';
-    var battleIcon = 'corss';
-    $(document).ready(function () {
-      $(".select_battle_icon").click(function () {
-        $(".select_battle_icon").removeClass().addClass("select_battle_icon inactive_battle_icon");
-        $(this).removeClass("inactive_battle_icon").addClass("active_battle_icon");
-        battleIcon = $(this).attr("data-battle_icon");
-      });
+<script>
+
+  const player_1 = `Player 1's Turn (🟢)`;
+  const player_2 = `Player 2's Turn (✖️)`;
+  const box_item_1 = `<span class="box-item">🟢</span>`;
+  const box_item_2 = `<span class="box-item">✖️</span>`;
 
 
-      $(".input_battle_box_item").click(function () {
-        if (!$(this).attr('data-value')) {
-          if (battleIcon == 'corss') {
-            $(this).html(cross);
-          } else {
-            $(this).html(circle);
-          }
-          $(this).attr("data-value", battleIcon);
-          checkPointMaintain();
-          randomeZeroAssign();
-        }
+  $(document).ready(function () {
 
-      });
+    $(".box").click(function () {
 
+      if ($(this).text()) {
+        return false;
+      }
+
+      const activePlayer = $(".player_identify_container").attr('id');
+      if (activePlayer === 'player_1') {
+        $(".player_identify_container").html(player_2);
+        $(".player_identify_container").attr('id', 'player_2');
+        $(this).html(box_item_1);
+        $(this).attr('data-value', 'player_1');
+      } else {
+        $(".player_identify_container").html(player_1);
+        $(".player_identify_container").attr('id', 'player_1');
+        $(this).html(box_item_2);
+        $(this).attr('data-value', 'player_2');
+      }
+
+      const isWin = isItWin([1, 4, 7]) || isItWin([4, 5, 6]) || isItWin([3, 6, 9]) || isItWin([7, 8, 9]) || isItWin([1, 2, 3]) || isItWin([1, 5, 9]) || isItWin([3, 5, 7] || isItWin([4, 5, 6]));
+      if(isWin == true){
+        $(".status_container").addClass('translate-y-40rem');
+      }
     });
 
-    const randomeZeroAssign = function () {
-      var GETEmptyINDEX = [];
-      $(".input_battle_box_item").each((index, item) => {
-        if (!$(item).attr('data-value')) {
-          GETEmptyINDEX.push(index);
-        }
-      });
+    $('.restart_game').click(function () {
+      $('.box').html('');
+      $('.box').removeAttr('data-value');
+      $(".status_container").removeClass('translate-y-40rem');
+    });
+  });
 
-      setTimeout(() => {
-        pickRandomNumber(GETEmptyINDEX);
-      }, 500);
-    };
 
-    function pickRandomNumber(data) {
-      // Generate a random index within the range of the array length
-      const randomIndex = Math.floor(Math.random() * data.length);
 
-      // Return the element at the random index
-      $(".input_battle_box_item").each((index, item) => {
-        if (parseInt($(item).attr('data-position')) - 1 == data[randomIndex]) {
-          $(item).html(circle);
-          $(item).attr("data-value", 'circle');
-        }
-      });
-      checkPointMaintain();
+  const isItWin = (indexValues) => {
+    value_item_1 = $(`#box_${indexValues[0]}`).attr('data-value');
+    value_item_2 = $(`#box_${indexValues[1]}`).attr('data-value');
+    value_item_3 = $(`#box_${indexValues[2]}`).attr('data-value');
+    if (value_item_1 == undefined) return false;
+    if (value_item_2 == undefined) return false;
+    if (value_item_3 == undefined) return false;
+
+    if (value_item_1 === value_item_2 && value_item_3 === value_item_2 && value_item_3 === value_item_1) {
+      if(value_item_1 == 'player_1'){
+        $(".game_status_msg").html('(🟢) is Win');
+      }else{
+        $(".game_status_msg").html('(✖️) is Win');
+      }
+      return true;
+    } else {
+      return false;
     }
-
-
-
-    const checkPointMaintain = function () {
-      console.clear();
-      var position = [];
-      var crossPosition = [];
-      var circlePosition = [];
-      $(".input_battle_box_item").each((index, item) => {
-        if ($(item).attr('data-value')) {
-          const GET_POSITION = parseInt($(item).attr('data-position'));
-          const GET_VALUE = $(item).attr('data-value');
-          if (GET_VALUE == 'corss') {
-            crossPosition.push(GET_POSITION);
-          } else {
-            circlePosition.push(GET_POSITION);
-          }
-        }
-      });
-
-      // console.log(crossPosition,circlePosition);
-      const crossPositionFinished = isItFinished(crossPosition);
-
-      crossPositionFinished == true && $('#status').removeClass('hidden');
-
-      const circlePositionFinished = isItFinished(circlePosition);
-      circlePositionFinished == true && $('#status').removeClass('hidden');
-
-    };
-
-
-    const isItFinished = function (position) {
-      const match = arraysMatch(position, [1, 2, 3]) || arraysMatch(position, [1, 4, 7]) || arraysMatch(position, [1, 5, 9]) || arraysMatch(position, [2, 5, 8]) || arraysMatch(position, [3, 6, 9]) || arraysMatch(position, [3, 5, 7]) || arraysMatch(position, [4, 5, 6]) || arraysMatch(position, [7, 8, 9]);
-
-      if (match == false) {
-        return match;
-      } else {
-        sessionStorage.setItem('match_positions', match);
-        handleUIMatchPosition(match);
-
-        return true;
-      }
-    }
-
-
-    const handleUIMatchPosition = function (position) {
-      position.map(function (value) {
-        $(".input_battle_box_item").each((index, item) => {
-          if (value == parseInt($(item).attr('data-position'))) {
-            $(item).html(greenCross);
-          }          
-        });
-      });
-    };
-
-
-    function arraysMatch(position, assingArray) {
-
-      if (position.length < 3) {
-        return false;
-      }
-      const matchingValues = [];
-
-      // Loop through array1
-      for (let i = 0; i < position.length; i++) {
-        const value = position[i];
-
-        // Check if the value exists in array2
-        if (assingArray.includes(value)) {
-          matchingValues.push(value);
-        }
-      }
-
-      if (matchingValues.length == 3) {
-        return assingArray;
-      } else {
-        return false;
-      }
-
-
-    }
-
-
-    function findMatchingValues(arr1, arr2) {
-      const matchingValues = [];
-
-      // Loop through array1
-      for (let i = 0; i < arr1.length; i++) {
-        const value = arr1[i];
-
-        // Check if the value exists in array2
-        if (arr2.includes(value)) {
-          matchingValues.push(value);
-        }
-      }
-
-      return matchingValues;
-    }
-
-
-  </script>
-</body>
+  };
+</script>
 
 </html>
