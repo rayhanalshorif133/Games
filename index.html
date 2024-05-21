@@ -16,37 +16,39 @@
     <h1 class="text-center mx-auto text-white text-3xl font-semibold">Tic-Tac-Toe</h1>
     <div class="mt-5 space-y-2">
       <div class="flex justify-center items-center space-x-2">
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
+        <div class="box" id="box_1"></div>
+        <div class="box" id="box_2"></div>
+        <div class="box" id="box_3"></div>
       </div>
       <div class="flex justify-center items-center space-x-2">
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
+        <div class="box" id="box_4"></div>
+        <div class="box" id="box_5"></div>
+        <div class="box" id="box_6"></div>
       </div>
       <div class="flex justify-center items-center space-x-2">
-        <div class="box"></div>
-        <div class="box"></div>
-        <div class="box"></div>
+        <div class="box" id="box_7"></div>
+        <div class="box" id="box_8"></div>
+        <div class="box" id="box_9"></div>
       </div>
     </div>
     <div class="mt-10">
       <h1 class="text-center mx-auto text-white text-3xl font-semibold player_identify_container" id="player_1">
-        Player 1's Turn (✔️)
+        Player 1's Turn (🟢)
       </h1>
     </div>
     <div class="mt-10">
-      <button class="py-3 px-5 bg-black text-white font-bold text-3xl rounded-lg restart_game">Restart Game</button>
+      <button
+        class="py-3 px-5 bg-black hover:scale-105 transition-all duration-300 ease-in-out text-white font-bold text-3xl rounded-lg restart_game ">Restart
+        Game</button>
     </div>
   </div>
 </body>
 
 <script>
 
-  const player_1 = `Player 1's Turn (✔️)`;
+  const player_1 = `Player 1's Turn (🟢)`;
   const player_2 = `Player 2's Turn (✖️)`;
-  const box_item_1 = `<span class="box-item">✔️</span>`;
+  const box_item_1 = `<span class="box-item">🟢</span>`;
   const box_item_2 = `<span class="box-item">✖️</span>`;
 
 
@@ -54,26 +56,46 @@
 
     $(".box").click(function () {
 
-      if($(this).text()){
+      if ($(this).text()) {
         return false;
       }
 
       const activePlayer = $(".player_identify_container").attr('id');
-      if(activePlayer === 'player_1'){
+      if (activePlayer === 'player_1') {
         $(".player_identify_container").html(player_2);
         $(".player_identify_container").attr('id', 'player_2');
         $(this).html(box_item_1);
-      }else{
+        $(this).attr('data-value', 'player_1');
+      } else {
         $(".player_identify_container").html(player_1);
         $(".player_identify_container").attr('id', 'player_1');
         $(this).html(box_item_2);
+        $(this).attr('data-value', 'player_2');
       }
+
+      checkPlaySituation();
     });
 
-    $('.restart_game').click(function(){
+    $('.restart_game').click(function () {
       $('.box').html('');
+      $('.box').attr('data-value', '');
     });
   });
+
+
+  const checkPlaySituation = () =>{
+    $('.box').each(function(index,element){
+      const dataValue = $(element).attr('data-value');
+      isItWin(dataValue,[1,2,3]);
+    });
+  };
+
+  const isItWin = (itemValue,indexValues) =>{
+    indexValues.map(function(value){
+      $(`#box_4`).attr('data-value');
+      console.log(itemValue,value);
+    });
+  };
 </script>
 
 </html>
