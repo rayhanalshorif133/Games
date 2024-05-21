@@ -7,13 +7,50 @@
 @layer components {
     
     .box{
-        @apply h-10 w-10 bg-white border border-gray-400 cursor-pointer;
+        @apply h-10 w-10 bg-white border border-gray-400 cursor-pointer hover:scale-105 transition-all duration-300 ease-in-out;
     }
     .player_box{
         @apply bg-white h-60 w-60 border-[2rem] flex flex-col space-y-10 items-center justify-center;
     }
 
+    .player_box_stand{
+        @apply h-10 w-10 rounded-full flex items-center justify-center;
+    }
+
     .win_box{
-        @apply w-[120px] h-[120px] bg-white;
+        @apply w-[120px] h-[120px] bg-white relative;
+    }
+
+    .red_coin{
+        @apply h-5 w-5 block rounded-full shadow-md border border-dotted border-gray-800 bg-red-900;
+    }
+
+    .triangle-green {
+        width: 0;
+        height: 0;
+        border-left: 60px solid transparent;
+        border-right: 60px solid transparent;
+        border-top: 60px solid #16a34a;
+    }
+    .triangle-blue {
+        width: 0;
+        height: 0;
+        border-left: 60px solid transparent;
+        border-right: 60px solid transparent;
+        border-bottom: 60px solid #2563eb;
+    }
+    .triangle-red {
+        width: 0;
+        height: 0;
+        border-left: 60px solid transparent;
+        border-right: 60px solid transparent;
+        border-bottom: 60px solid #dc2626;
+    }
+    .triangle-yellow {
+        width: 0;
+        height: 0;
+        border-left: 60px solid transparent;
+        border-right: 60px solid transparent;
+        border-bottom: 60px solid #facc15;
     }
 }
