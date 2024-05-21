@@ -11,8 +11,8 @@
 
 </head>
 
-<body class="bg-gradient-to-r from-green-400 to-blue-500 min-h-screen">
-  <div class="flex flex-col justify-center items-center h-full min-h-screen">
+<body class="bg-gradient-to-r from-green-400 to-blue-500 min-h-screen relative">
+  <div class="flex flex-col justify-center items-center h-full min-h-screen relative">
     <h1 class="text-center mx-auto text-white text-3xl font-semibold">Tic-Tac-Toe</h1>
     <div class="mt-5 space-y-2">
       <div class="flex justify-center items-center space-x-2">
@@ -40,6 +40,19 @@
       <button
         class="py-3 px-5 bg-black hover:scale-105 transition-all duration-300 ease-in-out text-white font-bold text-3xl rounded-lg restart_game ">Restart
         Game</button>
+    </div>
+    <div class="absolute -top-80 status_container transition-all duration-300">
+      <div class="bg-white w-96 h-auto pb-3 border-2 border-gray-200 rounded-lg shadow-lg">
+        <h3 class="text-4xl font-bold text-black mx-auto justify-center text-center py-2 game_status">
+          Win
+        </h3>
+        <div class="w-full h-px bg-gray-300"></div>
+        <div class="my-3">
+          <h4 class="text-2xl text-gray-400 font-semibold mx-auto flex justify-center text-center game_status_msg">
+            (🟢) is Win
+          </h4>
+        </div>
+      </div>
     </div>
   </div>
 </body>
@@ -73,13 +86,16 @@
         $(this).attr('data-value', 'player_2');
       }
 
-      const isWin = isItWin([3, 6, 9]) || isItWin([1, 2, 3]) || isItWin([1, 5, 9]) || isItWin([3, 5, 7]);
-      console.log(isWin);
+      const isWin = isItWin([1, 4, 7]) || isItWin([4, 5, 6]) || isItWin([3, 6, 9]) || isItWin([7, 8, 9]) || isItWin([1, 2, 3]) || isItWin([1, 5, 9]) || isItWin([3, 5, 7] || isItWin([4, 5, 6]));
+      if(isWin == true){
+        $(".status_container").addClass('translate-y-40rem');
+      }
     });
 
     $('.restart_game').click(function () {
       $('.box').html('');
       $('.box').removeAttr('data-value');
+      $(".status_container").removeClass('translate-y-40rem');
     });
   });
 
@@ -94,6 +110,11 @@
     if (value_item_3 == undefined) return false;
 
     if (value_item_1 === value_item_2 && value_item_3 === value_item_2 && value_item_3 === value_item_1) {
+      if(value_item_1 == 'player_1'){
+        $(".game_status_msg").html('(🟢) is Win');
+      }else{
+        $(".game_status_msg").html('(✖️) is Win');
+      }
       return true;
     } else {
       return false;

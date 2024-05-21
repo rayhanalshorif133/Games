@@ -24,4 +24,8 @@
     .box-item{
         @apply flex items-center justify-center text-black text-4xl;
     }
+
+    .translate-y-40rem{
+        @apply translate-y-[40rem];
+    }
 }
