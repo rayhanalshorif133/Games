@@ -5,121 +5,34 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="./src/output.css" rel="stylesheet">
-  <title>Tic-Tac-Toe</title>
+  <title>Ludo King ♛</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" />
   <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 
 </head>
 
-<body class="bg-gradient-to-r from-green-400 to-blue-500 min-h-screen relative">
+<body class="bg-gradient-to-r from-teal-400 to-amber-400 min-h-screen relative">
   <div class="flex flex-col justify-center items-center h-full min-h-screen relative">
-    <h1 class="text-center mx-auto text-white text-3xl font-semibold">Tic-Tac-Toe</h1>
-    <div class="mt-5 space-y-2">
-      <div class="flex justify-center items-center space-x-2">
-        <div class="box" id="box_1"></div>
-        <div class="box" id="box_2"></div>
-        <div class="box" id="box_3"></div>
-      </div>
-      <div class="flex justify-center items-center space-x-2">
-        <div class="box" id="box_4"></div>
-        <div class="box" id="box_5"></div>
-        <div class="box" id="box_6"></div>
-      </div>
-      <div class="flex justify-center items-center space-x-2">
-        <div class="box" id="box_7"></div>
-        <div class="box" id="box_8"></div>
-        <div class="box" id="box_9"></div>
-      </div>
+    <div class="flex">
+      <div class="bg-white h-60 w-60 border-[2rem] border-red-600"></div>
+      <div class="bg-white h-60 w-60 border-[2rem] border-green-600"></div>
     </div>
-    <div class="mt-10">
-      <h1 class="text-center mx-auto text-white text-3xl font-semibold player_identify_container" id="player_1">
-        Player 1's Turn (🟢)
-      </h1>
-    </div>
-    <div class="mt-10">
-      <button
-        class="py-3 px-5 bg-black hover:scale-105 transition-all duration-300 ease-in-out text-white font-bold text-3xl rounded-lg restart_game ">Restart
-        Game</button>
-    </div>
-    <div class="absolute -top-80 status_container transition-all duration-300">
-      <div class="bg-white w-96 h-auto pb-3 border-2 border-gray-200 rounded-lg shadow-lg">
-        <h3 class="text-4xl font-bold text-black mx-auto justify-center text-center py-2 game_status">
-          Win
-        </h3>
-        <div class="w-full h-px bg-gray-300"></div>
-        <div class="my-3">
-          <h4 class="text-2xl text-gray-400 font-semibold mx-auto flex justify-center text-center game_status_msg">
-            (🟢) is Win
-          </h4>
-        </div>
-      </div>
+    <div class="flex">
+      <div class="bg-white h-60 w-60 border-[2rem] border-blue-600"></div>
+      <div class="bg-white h-60 w-60 border-[2rem] border-yellow-400"></div>
     </div>
   </div>
 </body>
 
 <script>
 
-  const player_1 = `Player 1's Turn (🟢)`;
-  const player_2 = `Player 2's Turn (✖️)`;
-  const box_item_1 = `<span class="box-item">🟢</span>`;
-  const box_item_2 = `<span class="box-item">✖️</span>`;
 
 
   $(document).ready(function () {
-
-    $(".box").click(function () {
-
-      if ($(this).text()) {
-        return false;
-      }
-
-      const activePlayer = $(".player_identify_container").attr('id');
-      if (activePlayer === 'player_1') {
-        $(".player_identify_container").html(player_2);
-        $(".player_identify_container").attr('id', 'player_2');
-        $(this).html(box_item_1);
-        $(this).attr('data-value', 'player_1');
-      } else {
-        $(".player_identify_container").html(player_1);
-        $(".player_identify_container").attr('id', 'player_1');
-        $(this).html(box_item_2);
-        $(this).attr('data-value', 'player_2');
-      }
-
-      const isWin = isItWin([1, 4, 7]) || isItWin([4, 5, 6]) || isItWin([3, 6, 9]) || isItWin([7, 8, 9]) || isItWin([1, 2, 3]) || isItWin([1, 5, 9]) || isItWin([3, 5, 7] || isItWin([4, 5, 6]));
-      if(isWin == true){
-        $(".status_container").addClass('translate-y-40rem');
-      }
-    });
-
-    $('.restart_game').click(function () {
-      $('.box').html('');
-      $('.box').removeAttr('data-value');
-      $(".status_container").removeClass('translate-y-40rem');
-    });
+    console.log('Landing');
   });
 
 
-
-  const isItWin = (indexValues) => {
-    value_item_1 = $(`#box_${indexValues[0]}`).attr('data-value');
-    value_item_2 = $(`#box_${indexValues[1]}`).attr('data-value');
-    value_item_3 = $(`#box_${indexValues[2]}`).attr('data-value');
-    if (value_item_1 == undefined) return false;
-    if (value_item_2 == undefined) return false;
-    if (value_item_3 == undefined) return false;
-
-    if (value_item_1 === value_item_2 && value_item_3 === value_item_2 && value_item_3 === value_item_1) {
-      if(value_item_1 == 'player_1'){
-        $(".game_status_msg").html('(🟢) is Win');
-      }else{
-        $(".game_status_msg").html('(✖️) is Win');
-      }
-      return true;
-    } else {
-      return false;
-    }
-  };
 </script>
 
 </html>
