@@ -14,12 +14,12 @@
 <body class="bg-gradient-to-r from-teal-400 to-amber-400 min-h-screen relative">
   <div class="flex flex-col justify-center items-center h-full min-h-screen relative">
     <div class="flex space-x-[39rem] absolute top-[156px]">
-      <div class="dice_box"></div>
-      <div class="dice_box"></div>
+      <div class="dice_box dice_box_1"></div>
+      <div class="dice_box dice_box_2"></div>
     </div>
     <div class="flex space-x-[39rem] absolute bottom-[156px]">
-      <div class="dice_box"></div>
-      <div class="dice_box"></div>
+      <div class="dice_box dice_box_3"></div>
+      <div class="dice_box dice_box_4"></div>
     </div>
     <div class="flex">
       <div class="player_box border-red-600">
@@ -216,7 +216,18 @@
         <div class="flex space-x-3"><div class="dice"></div><div class="dice"></div></div>
         <div class="flex space-x-3"><div class="dice"></div><div class="dice"></div>
       </div>`; 
-    $(".dice_box").html(DICE_4);
+      const DICE_5 = `<div class="flex flex-col space-y-3">
+          <div class="flex space-x-5"><div class="dice"></div><div class="dice"></div></div>
+          <div class="flex items-center justify-center"><div class="dice"></div></div>
+          <div class="flex space-x-5"><div class="dice"></div><div class="dice"></div></div>
+        </div>`;
+
+      const DICE_6 = `<div class="flex flex-col space-y-3">
+          <div class="flex space-x-5"><div class="dice"></div><div class="dice"></div></div>
+          <div class="flex space-x-5"><div class="dice"></div><div class="dice"></div></div>
+          <div class="flex space-x-5"><div class="dice"></div><div class="dice"></div></div>
+        </div>`;
+    $(".dice_box").html(DICE_6);
   });
 
 
