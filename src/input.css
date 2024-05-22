@@ -25,6 +25,10 @@
         @apply h-5 w-5 relative block rounded-full border-2 shadow-xl shadow-gray-600 bg-red-600;
     }
 
+    .point_box{
+        @apply h-20 w-20 bg-white border-2 border-gray-500 shadow-xl cursor-pointer;
+    }
+
     .triangle-green {
         width: 0;
         height: 0;
