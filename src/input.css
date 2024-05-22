@@ -7,7 +7,7 @@
 @layer components {
     
     .box{
-        @apply h-10 w-10 bg-white border border-gray-400 cursor-pointer hover:scale-105 transition-all duration-300 ease-in-out;
+        @apply flex items-center justify-center h-10 w-10 bg-white border border-gray-400 cursor-pointer hover:scale-105 transition-all duration-300 ease-in-out;
     }
     .player_box{
         @apply bg-white h-60 w-60 border-[2rem] flex flex-col space-y-10 items-center justify-center;
@@ -22,7 +22,7 @@
     }
 
     .red_coin{
-        @apply h-5 w-5 block rounded-full shadow-md border border-dotted border-gray-800 bg-red-900;
+        @apply h-5 w-5 relative block rounded-full border-2 shadow-xl shadow-gray-600 bg-red-600;
     }
 
     .triangle-green {
