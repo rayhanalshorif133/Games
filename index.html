@@ -14,12 +14,12 @@
 <body class="bg-gradient-to-r from-teal-400 to-amber-400 min-h-screen relative">
   <div class="flex flex-col justify-center items-center h-full min-h-screen relative">
     <div class="flex space-x-[39rem] absolute top-[156px]">
-      <div class="dice_box dice_box_1"></div>
-      <div class="dice_box dice_box_2"></div>
+      <div class="dice_box active" id="dice_box_1"></div>
+      <div class="dice_box" id="dice_box_2"></div>
     </div>
     <div class="flex space-x-[39rem] absolute bottom-[156px]">
-      <div class="dice_box dice_box_3"></div>
-      <div class="dice_box dice_box_4"></div>
+      <div class="dice_box" id="dice_box_4"></div>
+      <div class="dice_box" id="dice_box_3"></div>
     </div>
     <div class="flex">
       <div class="player_box border-red-600">
@@ -227,7 +227,30 @@
           <div class="flex space-x-5"><div class="dice"></div><div class="dice"></div></div>
           <div class="flex space-x-5"><div class="dice"></div><div class="dice"></div></div>
         </div>`;
-    $(".dice_box").html(DICE_6);
+    $("#dice_box_1").html(DICE_6);
+
+    const DICE_LIST = [DICE_1, DICE_2, DICE_3, DICE_4, DICE_5, DICE_6];
+
+    $(".dice_box").click(function(){
+      if($(this).hasClass('active')){
+        const ID = $(this).attr('id').split('_').pop();
+        $(this).removeClass('active');
+        $(".dice_box").html('');
+        var NEXT = parseInt(ID) + 1;
+        if(NEXT == 5){
+          NEXT = 1;
+        }
+
+        const NEXT_ID = '#dice_box_' + NEXT;
+
+        // DICE_LIST random number
+        const randomIndex = Math.floor(Math.random() * DICE_LIST.length);
+        const GET_RANDOM_DICE = DICE_LIST[randomIndex];
+
+        $(NEXT_ID).html(GET_RANDOM_DICE);
+        $(NEXT_ID).addClass('active');
+      }
+    });
   });
 
 
