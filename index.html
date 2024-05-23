@@ -244,12 +244,12 @@
         // DICE_LIST random number
         const randomIndex = Math.floor(Math.random() * DICE_LIST.length);
         const GET_RANDOM_DICE = DICE_LIST[randomIndex];
-
+        $(this).html(GET_RANDOM_DICE);
         setTimeout(() => {
-          $(this).removeClass('active');
-          $(".dice_box").html('');
-          $(NEXT_ID).html(GET_RANDOM_DICE);
-          $(NEXT_ID).addClass('active');
+          // $(this).removeClass('active');
+          // $(".dice_box").html('');
+          // $(NEXT_ID).html(GET_RANDOM_DICE);
+          // $(NEXT_ID).addClass('active');
         }, 2000);
       }
     });
