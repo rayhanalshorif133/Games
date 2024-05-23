@@ -207,22 +207,22 @@
 
 
   $(document).ready(function () {
-    const DICE_1 = `<div class="dice"></div>`; 
-    const DICE_2 = `<div class="flex space-x-3"><div class="dice"></div><div class="dice"></div></div>`; 
+    const DICE_1 = `<div class="dice"></div>`;
+    const DICE_2 = `<div class="flex space-x-3"><div class="dice"></div><div class="dice"></div></div>`;
     const DICE_3 = `<div class="flex flex-col space-y-3"><div class="flex items-center justify-center"><div class="dice"></div></div>
         <div class="flex space-x-3"><div class="dice"></div><div class="dice"></div>
-      </div>`; 
-      const DICE_4 = `<div class="flex flex-col space-y-3">
+      </div>`;
+    const DICE_4 = `<div class="flex flex-col space-y-3">
         <div class="flex space-x-3"><div class="dice"></div><div class="dice"></div></div>
         <div class="flex space-x-3"><div class="dice"></div><div class="dice"></div>
-      </div>`; 
-      const DICE_5 = `<div class="flex flex-col space-y-3">
+      </div>`;
+    const DICE_5 = `<div class="flex flex-col space-y-3">
           <div class="flex space-x-5"><div class="dice"></div><div class="dice"></div></div>
           <div class="flex items-center justify-center"><div class="dice"></div></div>
           <div class="flex space-x-5"><div class="dice"></div><div class="dice"></div></div>
         </div>`;
 
-      const DICE_6 = `<div class="flex flex-col space-y-3">
+    const DICE_6 = `<div class="flex flex-col space-y-3">
           <div class="flex space-x-5"><div class="dice"></div><div class="dice"></div></div>
           <div class="flex space-x-5"><div class="dice"></div><div class="dice"></div></div>
           <div class="flex space-x-5"><div class="dice"></div><div class="dice"></div></div>
@@ -231,13 +231,11 @@
 
     const DICE_LIST = [DICE_1, DICE_2, DICE_3, DICE_4, DICE_5, DICE_6];
 
-    $(".dice_box").click(function(){
-      if($(this).hasClass('active')){
+    $(".dice_box").click(function () {
+      if ($(this).hasClass('active')) {
         const ID = $(this).attr('id').split('_').pop();
-        $(this).removeClass('active');
-        $(".dice_box").html('');
         var NEXT = parseInt(ID) + 1;
-        if(NEXT == 5){
+        if (NEXT == 5) {
           NEXT = 1;
         }
 
@@ -247,8 +245,12 @@
         const randomIndex = Math.floor(Math.random() * DICE_LIST.length);
         const GET_RANDOM_DICE = DICE_LIST[randomIndex];
 
-        $(NEXT_ID).html(GET_RANDOM_DICE);
-        $(NEXT_ID).addClass('active');
+        setTimeout(() => {
+          $(this).removeClass('active');
+          $(".dice_box").html('');
+          $(NEXT_ID).html(GET_RANDOM_DICE);
+          $(NEXT_ID).addClass('active');
+        }, 2000);
       }
     });
   });
