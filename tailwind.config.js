@@ -5,7 +5,10 @@ module.exports = {
     extend: {
       width:{
         "360": "360px",
-      }
+      },
+      left: {
+        "333": "333px",
+      },
     },
   },
   plugins: [],

@@ -1,33 +1,167 @@
 <!doctype html>
 <html>
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="./src/output.css" rel="stylesheet">
+  <title>Tetris Game</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" />
   <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 
 </head>
-<body class="bg-gray-400">
-  <div class="h-screen flex items-center justify-center">
-    <div class="h-[480px] w-[320px] bg-black shadow-lg border-[2px] border-white p-1">
-      <div class="flex block_box opacity-1">
-        <div class="h-4 w-4 bg-white"></div>
-        <div class="h-4 w-4 bg-white"></div>
-        <div class="h-4 w-4 bg-white"></div>
+
+<body class="bg-gradient-to-r from-slate-900 to-slate-700 min-h-screen relative">
+
+  <div class="flex flex-col items-center justify-center min-h-screen">
+    <!-- <div class="insert_box">
+      <div class="absolute line_box_container -z-10">
+        <div class="flex">
+          <div class="line_box"></div>
+          <div class="line_box"></div>
+          <div class="line_box"></div>
+        </div>
       </div>
+    </div> -->
+    <div class="flex">
+      <div class="border_box"></div>
+      <div class="border_box insert_1 relative"></div>
+      <div class="border_box insert_2"></div>
+      <div class="border_box insert_3"></div>
+      <div class="border_box insert_4"></div>
+      <div class="border_box insert_5"></div>
+      <div class="border_box insert_6"></div>
+      <div class="border_box insert_7"></div>
+      <div class="border_box insert_8"></div>
+      <div class="border_box insert_9"></div>
+      <div class="border_box insert_10"></div>
+      <div class="border_box insert_11"></div>
+      <div class="border_box insert_12"></div>
+      <div class="border_box insert_13"></div>
+      <div class="border_box"></div>
+    </div>
+    <div class="flex justify-between w-360">
+      <div class="border_box"></div>
+      <div class="border_box"></div>
+    </div>
+    <div class="flex justify-between w-360">
+      <div class="border_box"></div>
+      <div class="border_box"></div>
+    </div>
+    <div class="flex justify-between w-360">
+      <div class="border_box"></div>
+      <div class="border_box"></div>
+    </div>
+    <div class="flex justify-between w-360">
+      <div class="border_box"></div>
+      <div class="border_box"></div>
+    </div>
+    <div class="flex justify-between w-360">
+      <div class="border_box"></div>
+      <div class="border_box"></div>
+    </div>
+    <div class="flex justify-between w-360">
+      <div class="border_box"></div>
+      <div class="border_box"></div>
+    </div>
+    <div class="flex justify-between w-360">
+      <div class="border_box"></div>
+      <div class="border_box"></div>
+    </div>
+    <div class="flex justify-between w-360">
+      <div class="border_box"></div>
+      <div class="border_box"></div>
+    </div>
+    <div class="flex justify-between w-360">
+      <div class="border_box"></div>
+      <div class="border_box"></div>
+    </div>
+    <div class="flex justify-between w-360">
+      <div class="border_box"></div>
+      <div class="border_box"></div>
+    </div>
+    <div class="flex justify-between w-360">
+      <div class="border_box"></div>
+      <div class="border_box"></div>
+    </div>
+    <div class="flex justify-between w-360">
+      <div class="border_box"></div>
+      <div class="border_box"></div>
+    </div>
+    <div class="flex justify-between w-360">
+      <div class="border_box"></div>
+      <div class="border_box"></div>
+    </div>
+    <div class="flex justify-between w-360">
+      <div class="border_box"></div>
+      <div class="border_box"></div>
+    </div>
+    <div class="flex justify-between w-360">
+      <div class="border_box"></div>
+      <div class="border_box"></div>
+    </div>
+    <div class="flex justify-between w-360">
+      <div class="border_box"></div>
+      <div class="border_box"></div>
+    </div>
+    <div class="flex justify-between w-360">
+      <div class="border_box"></div>
+      <div class="border_box"></div>
+    </div>
+    <div class="flex justify-between w-360">
+      <div class="border_box"></div>
+      <div class="border_box"></div>
+    </div>
+    <div class="flex justify-between w-360">
+      <div class="border_box"></div>
+      <div class="border_box"></div>
+    </div>
+    <div class="flex justify-between w-360">
+      <div class="border_box"></div>
+      <div class="border_box"></div>
+    </div>
+    <div class="flex">
+      <div class="border_box"></div>
+      <div class="border_box"></div>
+      <div class="border_box"></div>
+      <div class="border_box"></div>
+      <div class="border_box"></div>
+      <div class="border_box"></div>
+      <div class="border_box"></div>
+      <div class="border_box"></div>
+      <div class="border_box"></div>
+      <div class="border_box"></div>
+      <div class="border_box"></div>
+      <div class="border_box"></div>
+      <div class="border_box"></div>
+      <div class="border_box"></div>
+      <div class="border_box"></div>
     </div>
   </div>
-
-  <script>
-    $(document).ready(function(){
-      var marginTop = 0;
-      if(marginTop != 460){
-        setInterval(function(){
-          marginTop = marginTop + 20;
-          $(".block_box").css("margin-top", marginTop);
-        }, 1000);
-      }
-    });
-  </script>
 </body>
+
+<script>
+  var GET_TOP = 196;
+  var GET_LEFT = 877;
+
+  $(document).ready(function () {
+
+    $(".insert_1").after('<div class="line_box"></div>');
+    $(".insert_2").after('<div class="line_box"></div>');
+
+    setInterval(() => {
+      GET_TOP = 20 + GET_TOP;
+      if (GET_TOP <= 676) {
+        $(".line_box_container").css({
+          "top": GET_TOP + "px",
+          "left": GET_LEFT + "px"
+        });
+        console.log(GET_TOP)
+      }
+    }, 1000);
+  });
+
+
+</script>
+
 </html>

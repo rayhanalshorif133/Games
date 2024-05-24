@@ -14,7 +14,7 @@
 <body class="bg-gradient-to-r from-slate-900 to-slate-700 min-h-screen relative">
 
   <div class="flex flex-col items-center justify-center min-h-screen">
-    <div class="insert_box">
+    <!-- <div class="insert_box">
       <div class="absolute line_box_container -z-10">
         <div class="flex">
           <div class="line_box"></div>
@@ -22,22 +22,22 @@
           <div class="line_box"></div>
         </div>
       </div>
-    </div>
+    </div> -->
     <div class="flex">
       <div class="border_box"></div>
-      <div class="border_box"></div>
-      <div class="border_box"></div>
-      <div class="border_box"></div>
-      <div class="border_box"></div>
-      <div class="border_box"></div>
-      <div class="border_box"></div>
-      <div class="border_box"></div>
-      <div class="border_box"></div>
-      <div class="border_box"></div>
-      <div class="border_box"></div>
-      <div class="border_box"></div>
-      <div class="border_box"></div>
-      <div class="border_box"></div>
+      <div class="border_box insert_1 relative"></div>
+      <div class="border_box insert_2"></div>
+      <div class="border_box insert_3"></div>
+      <div class="border_box insert_4"></div>
+      <div class="border_box insert_5"></div>
+      <div class="border_box insert_6"></div>
+      <div class="border_box insert_7"></div>
+      <div class="border_box insert_8"></div>
+      <div class="border_box insert_9"></div>
+      <div class="border_box insert_10"></div>
+      <div class="border_box insert_11"></div>
+      <div class="border_box insert_12"></div>
+      <div class="border_box insert_13"></div>
       <div class="border_box"></div>
     </div>
     <div class="flex justify-between w-360">
@@ -145,6 +145,9 @@
   var GET_LEFT = 877;
 
   $(document).ready(function () {
+
+    $(".insert_1").after('<div class="line_box"></div>');
+    $(".insert_2").after('<div class="line_box"></div>');
 
     setInterval(() => {
       GET_TOP = 20 + GET_TOP;
