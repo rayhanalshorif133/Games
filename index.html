@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lift Demo Simulation</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" />
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
   <link rel="stylesheet" href="./src/output.css">
 </head>
 <body class="bg-gray-200">
@@ -12,7 +14,7 @@
     <h1 class="bg-green-800 py-4 text-white uppercase shadow-green-800 shadow-sm text-2xl font-semibold w-full text-center">Lift Demo Simulation</h1>
     <div class="flex flex-col items-center justify-center mt-20 w-[22rem]">
       <div class="h-auto relative w-full border-t-8 border-x-8 border-gray-900">
-        <div class="flex flex-col absolute top-10 left-5">
+        <div class="flex flex-col absolute top-10 left-5" data-value="0">
           <i class="fa-solid text-2xl fa-square-caret-down cursor-pointer hover:text-red-500"></i>
         </div>
 
@@ -21,7 +23,7 @@
           <div class="door"></div>
           <div class="door"></div>
         </div>
-        <div class="flex flex-col absolute top-[10.5rem] left-5">
+        <div class="flex flex-col absolute top-[10.5rem] left-5" data-value="134">
           <i class="fa-solid text-2xl fa-square-caret-up cursor-pointer hover:text-red-500"></i>
           <i class="fa-solid text-2xl fa-square-caret-down cursor-pointer hover:text-red-500"></i>
         </div>
@@ -30,7 +32,7 @@
           <div class="door"></div>
           <div class="door"></div>
         </div>
-        <div class="flex flex-col absolute top-[18.5rem] left-5">
+        <div class="flex flex-col absolute top-[18.5rem] left-5" data-value="268">
           <i class="fa-solid text-2xl fa-square-caret-up cursor-pointer hover:text-red-500"></i>
           <i class="fa-solid text-2xl fa-square-caret-down cursor-pointer hover:text-red-500"></i>
         </div>
@@ -39,8 +41,8 @@
           <div class="door"></div>
           <div class="door"></div>
         </div>
-        <div class="flex flex-col absolute top-[27rem] left-5">
-          <i class="fa-solid text-2xl fa-square-caret-up cursor-pointer hover:text-red-500"></i>
+        <div class="flex flex-col absolute top-[27rem] left-5" data-value="402">
+          <i class="fa-solid text-2xl fa-square-caret-up cursor-pointer hover:text-red-500 lift_up_btn"></i>
           <i class="fa-solid text-2xl fa-square-caret-down cursor-pointer hover:text-red-500"></i>
         </div>
         <div class="w-full h-[6px] bg-gray-800 mt-32"></div>
@@ -48,16 +50,32 @@
           <div class="door"></div>
           <div class="door"></div>
         </div>
-        <div class="flex flex-col absolute top-[36.5rem] left-5">
-          <i class="fa-solid text-2xl fa-square-caret-up cursor-pointer hover:text-red-500"></i>
+        <div class="flex flex-col absolute top-[36.5rem] left-5" data-value="536">
+          <i class="fa-solid text-2xl fa-square-caret-up cursor-pointer hover:text-red-500 lift_up_btn"></i>
         </div>
         <div class="w-full h-2 bg-gray-800 mt-32"></div>
         <div class="flex absolute bottom-2 left-[7rem]">
           <div class="door"></div>
           <div class="door"></div>
         </div>
+        <div class="flex absolute transition-all duration-800 ease-in-out left-[7rem]" id="lift_box">
+          <div class="lift_door"></div>
+          <div class="lift_door"></div>
+        </div>
       </div>
     </div>
   </div>
+
+
+  <script>
+    $(document).ready(function(){
+      $(".lift_up_btn").click(function(){
+       const value = $(this).parent().attr('data-value');
+       const translate_y = 'translate-y-' + value;
+       $("#lift_box").removeClass();
+       $("#lift_box").addClass('lift_box').addClass(translate_y);
+      });
+    });
+  </script>
 </body>
 </html>

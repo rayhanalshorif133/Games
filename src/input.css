@@ -10,6 +10,14 @@
         @apply h-32 w-14 bg-gray-500 border border-gray-600;
     }
 
+    .lift_box{
+        @apply flex absolute transition-all duration-800 ease-in-out  top-0 left-[7rem];
+    }
+    
+    .lift_door{
+        @apply h-32 w-14 z-10 bg-green-700 border-2 border-green-900;
+    }
+
     .bottom_544{
         @apply bottom-[544px];
     }
