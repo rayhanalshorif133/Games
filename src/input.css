@@ -11,7 +11,7 @@
     }
 
     .lift_box{
-        @apply flex absolute transition-all duration-800 ease-in-out  top-0 left-[7rem];
+        @apply flex absolute transition-all duration-700 ease-in-out  top-0 left-[7rem];
     }
     
     .lift_door{
@@ -35,5 +35,25 @@
     .bottom_142{
         @apply bottom-[142px];
     }
+
     
+    
+    
+}
+
+
+.translate-y-134 {
+    transform: translateY(134px);
+}
+
+.translate-y-268 {
+    transform: translateY(268px);
+}
+
+.translate-y-402 {
+    transform: translateY(402px);
+}
+
+.translate-y-536 {
+    transform: translateY(536px);
 }
