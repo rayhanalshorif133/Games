@@ -15,7 +15,7 @@
     <div class="flex flex-col items-center justify-center mt-20 w-[22rem]">
       <div class="h-auto relative w-full border-t-8 border-x-8 border-gray-900">
         <div class="flex flex-col absolute top-10 left-5" data-value="0">
-          <i class="fa-solid text-2xl fa-square-caret-down cursor-pointer hover:text-red-500"></i>
+          <i class="fa-solid text-2xl fa-square-caret-down cursor-pointer hover:text-red-500 lift_down_btn"></i>
         </div>
 
         <div class="w-full h-[6px] bg-gray-800 mt-32"></div>
@@ -25,7 +25,7 @@
         </div>
         <div class="flex flex-col absolute top-[10.5rem] left-5" data-value="134">
           <i class="fa-solid text-2xl fa-square-caret-up cursor-pointer hover:text-red-500 lift_up_btn"></i>
-          <i class="fa-solid text-2xl fa-square-caret-down cursor-pointer hover:text-red-500"></i>
+          <i class="fa-solid text-2xl fa-square-caret-down cursor-pointer hover:text-red-500 lift_down_btn"></i>
         </div>
         <div class="w-full h-[6px] bg-gray-800 mt-32"></div>
         <div class="flex absolute bottom_410 left-[7rem]">
@@ -34,7 +34,7 @@
         </div>
         <div class="flex flex-col absolute top-[18.5rem] left-5" data-value="268">
           <i class="fa-solid text-2xl fa-square-caret-up cursor-pointer hover:text-red-500 lift_up_btn"></i>
-          <i class="fa-solid text-2xl fa-square-caret-down cursor-pointer hover:text-red-500"></i>
+          <i class="fa-solid text-2xl fa-square-caret-down cursor-pointer hover:text-red-500 lift_down_btn"></i>
         </div>
         <div class="w-full h-[6px] bg-gray-800 mt-32"></div>
         <div class="flex absolute bottom_276 left-[7rem]">
@@ -43,7 +43,7 @@
         </div>
         <div class="flex flex-col absolute top-[27rem] left-5" data-value="402">
           <i class="fa-solid text-2xl fa-square-caret-up cursor-pointer hover:text-red-500 lift_up_btn"></i>
-          <i class="fa-solid text-2xl fa-square-caret-down cursor-pointer hover:text-red-500"></i>
+          <i class="fa-solid text-2xl fa-square-caret-down cursor-pointer hover:text-red-500 lift_down_btn"></i>
         </div>
         <div class="w-full h-[6px] bg-gray-800 mt-32"></div>
         <div class="flex absolute bottom_142 left-[7rem]">
@@ -75,6 +75,14 @@
        $("#lift_box").removeClass();
        $("#lift_box").addClass('lift_box').addClass(translate_y);
       });
+
+      $(".lift_down_btn").click(function(){
+       const value = $(this).parent().attr('data-value');
+       const translate_y = 'translate-y-' + value;
+       $("#lift_box").removeClass();
+       $("#lift_box").addClass('lift_box').addClass(translate_y);
+      });
+
     });
   </script>
 </body>
