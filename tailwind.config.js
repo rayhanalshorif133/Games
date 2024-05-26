@@ -6,6 +6,10 @@ module.exports = {
       width:{
         "360": "360px",
       },
+      margin:{
+        "110": "110px",
+        "55" : "55px",
+      }
     },
   },
   plugins: [],

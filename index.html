@@ -20,17 +20,18 @@
 
         <div class="w-full h-[6px] bg-gray-800 mt-32"></div>
         <div class="flex absolute bottom_544 left-[7rem]">
-          <div class="door"></div>
-          <div class="door"></div>
+          <div class="door" id="door_0_left"></div>
+          <div class="door" id="door_0_right"></div>
         </div>
+        
         <div class="flex flex-col absolute top-[10.5rem] left-5" data-value="134">
           <i class="fa-solid text-2xl fa-square-caret-up cursor-pointer hover:text-red-500 lift_up_btn"></i>
           <i class="fa-solid text-2xl fa-square-caret-down cursor-pointer hover:text-red-500 lift_down_btn"></i>
         </div>
         <div class="w-full h-[6px] bg-gray-800 mt-32"></div>
         <div class="flex absolute bottom_410 left-[7rem]">
-          <div class="door"></div>
-          <div class="door"></div>
+          <div class="door" id="door_134_left"></div>
+          <div class="door" id="door_134_right"></div>
         </div>
         <div class="flex flex-col absolute top-[18.5rem] left-5" data-value="268">
           <i class="fa-solid text-2xl fa-square-caret-up cursor-pointer hover:text-red-500 lift_up_btn"></i>
@@ -38,8 +39,8 @@
         </div>
         <div class="w-full h-[6px] bg-gray-800 mt-32"></div>
         <div class="flex absolute bottom_276 left-[7rem]">
-          <div class="door"></div>
-          <div class="door"></div>
+          <div class="door" id="door_268_left"></div>
+          <div class="door" id="door_268_right"></div>
         </div>
         <div class="flex flex-col absolute top-[27rem] left-5" data-value="402">
           <i class="fa-solid text-2xl fa-square-caret-up cursor-pointer hover:text-red-500 lift_up_btn"></i>
@@ -47,20 +48,20 @@
         </div>
         <div class="w-full h-[6px] bg-gray-800 mt-32"></div>
         <div class="flex absolute bottom_142 left-[7rem]">
-          <div class="door"></div>
-          <div class="door"></div>
+          <div class="door" id="door_402_left"></div>
+          <div class="door" id="door_402_right"></div>
         </div>
         <div class="flex flex-col absolute top-[36.5rem] left-5" data-value="536">
           <i class="fa-solid text-2xl fa-square-caret-up cursor-pointer hover:text-red-500 lift_up_btn"></i>
         </div>
         <div class="w-full h-2 bg-gray-800 mt-32"></div>
         <div class="flex absolute bottom-2 left-[7rem]">
-          <div class="door"></div>
-          <div class="door"></div>
+          <div class="door" id="door_536_left"></div>
+          <div class="door" id="door_536_right"></div>
         </div>
         <div class="flex absolute transition-all duration-700 ease-in-out left-[7rem] lift_box" id="lift_box">
-          <div class="lift_door"></div>
-          <div class="lift_door"></div>
+          <div class="lift_door" id="lift_box_left"></div>
+          <div class="lift_door" id="lift_box_right"></div>
         </div>
       </div>
     </div>
@@ -68,7 +69,7 @@
 
 
   <script>
-    const interval = 5000;
+    const interval = 7000;
     var lift_queue = new Array();
     $(document).ready(function(){
       $(".lift_up_btn").click(function(){
@@ -86,13 +87,35 @@
 
       setInterval(() => {
         var GETVALUES = sessionStorage.getItem('goto_lift');
-        GETVALUES = GETVALUES.split(",");
+        if(GETVALUES){
+          GETVALUES = GETVALUES.split(",");
+        }else{
+          return false;
+        }
 
         if(GETVALUES.length > 0){
           GETVALUE = GETVALUES[0];
           const translate_y = 'translate-y-' + GETVALUE;
+          const door_left = '#door_' + GETVALUE + '_left';
+          const door_right = '#door_' + GETVALUE + '_right';
           $("#lift_box").removeClass();
           $("#lift_box").addClass('lift_box').addClass(translate_y);
+          
+          setTimeout(() => {
+            $(door_left).addClass('-ml-55');
+            $(door_right).addClass('ml-110');
+            $("#lift_box_left").addClass('-ml-55');
+            $("#lift_box_right").addClass('ml-110');
+          }, 1000);
+          
+          setTimeout(() => {
+            $(door_left).removeClass('-ml-55');
+            $(door_right).removeClass('ml-110');
+            $("#lift_box_left").removeClass('-ml-55');
+            $("#lift_box_right").removeClass('ml-110');
+          }, 5000);
+
+
           GETVALUES = GETVALUES.pop();
           lift_queue.pop();
           sessionStorage.setItem('goto_lift', GETVALUES);

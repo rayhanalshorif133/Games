@@ -7,7 +7,7 @@
 @layer components {
     
     .door{
-        @apply h-32 w-14 bg-gray-500 border border-gray-600;
+        @apply h-32 w-14 bg-gray-500 border border-gray-600 transition-all duration-700 ease-in-out;
     }
 
     .lift_box{
@@ -15,7 +15,7 @@
     }
     
     .lift_door{
-        @apply h-32 w-14 z-10 bg-green-700 border-2 border-green-900;
+        @apply h-32 w-14 z-10 bg-green-700 border-2 border-green-900 transition-all duration-700 ease-in-out;
     }
 
     .bottom_544{
@@ -57,3 +57,4 @@
 .translate-y-536 {
     transform: translateY(536px);
 }
+
