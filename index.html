@@ -114,7 +114,20 @@
 
         if (event.key === 'ArrowDown') {
           if ($("#player").hasClass('rotate-180')) {
-            $("#player").css('top', '1rem');
+
+            const classLists = $("#player").attr('class').split('top-');
+
+            if(classLists[1]){
+              const top = 'top-' + (parseInt(classLists[1]) + 1);
+              if(top == 'top-13'){
+                top = 'top-12';
+              }
+              $("#player").removeClass().addClass(classLists[0]).addClass(top);
+            }else{
+              $("#player").addClass('top-1');
+            }
+
+            
           } else {
             $("#player").removeClass().addClass('player');
             $("#player").addClass('rotate-180');
