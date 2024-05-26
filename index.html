@@ -68,20 +68,38 @@
 
 
   <script>
+    const interval = 5000;
+    var lift_queue = new Array();
     $(document).ready(function(){
       $(".lift_up_btn").click(function(){
        const value = $(this).parent().attr('data-value');
-       const translate_y = 'translate-y-' + value;
-       $("#lift_box").removeClass();
-       $("#lift_box").addClass('lift_box').addClass(translate_y);
+       lift_queue.push(value);
+       sessionStorage.setItem('goto_lift', lift_queue);       
       });
 
       $(".lift_down_btn").click(function(){
        const value = $(this).parent().attr('data-value');
-       const translate_y = 'translate-y-' + value;
-       $("#lift_box").removeClass();
-       $("#lift_box").addClass('lift_box').addClass(translate_y);
+       lift_queue.push(value);
+       sessionStorage.setItem('goto_lift', lift_queue); 
       });
+
+
+      setInterval(() => {
+        var GETVALUES = sessionStorage.getItem('goto_lift');
+        GETVALUES = GETVALUES.split(",");
+
+        if(GETVALUES.length > 0){
+          GETVALUE = GETVALUES[0];
+          const translate_y = 'translate-y-' + GETVALUE;
+          $("#lift_box").removeClass();
+          $("#lift_box").addClass('lift_box').addClass(translate_y);
+          GETVALUES = GETVALUES.pop();
+          lift_queue.pop();
+          sessionStorage.setItem('goto_lift', GETVALUES);
+
+        }
+        
+      }, interval);
 
     });
   </script>
