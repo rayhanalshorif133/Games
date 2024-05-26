@@ -1,130 +1,137 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lift Demo Simulation</title>
+  <title>Shooter Game</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" />
   <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 
   <link rel="stylesheet" href="./src/output.css">
 </head>
-<body class="bg-gray-200">
-  <div class="flex flex-col items-center justify-center">
-    <h1 class="bg-green-800 py-4 text-white uppercase shadow-green-800 shadow-sm text-2xl font-semibold w-full text-center">Lift Demo Simulation</h1>
-    <div class="flex flex-col items-center justify-center mt-20 w-[22rem]">
-      <div class="h-auto relative w-full border-t-8 border-x-8 border-gray-900">
-        <div class="flex flex-col absolute top-10 left-5" data-value="0">
-          <i class="fa-solid text-2xl fa-square-caret-down cursor-pointer hover:text-red-500 lift_down_btn"></i>
-        </div>
 
-        <div class="w-full h-[6px] bg-gray-800 mt-32"></div>
-        <div class="flex absolute bottom_544 left-[7rem]">
-          <div class="door" id="door_0_left"></div>
-          <div class="door" id="door_0_right"></div>
-        </div>
-        
-        <div class="flex flex-col absolute top-[10.5rem] left-5" data-value="134">
-          <i class="fa-solid text-2xl fa-square-caret-up cursor-pointer hover:text-red-500 lift_up_btn"></i>
-          <i class="fa-solid text-2xl fa-square-caret-down cursor-pointer hover:text-red-500 lift_down_btn"></i>
-        </div>
-        <div class="w-full h-[6px] bg-gray-800 mt-32"></div>
-        <div class="flex absolute bottom_410 left-[7rem]">
-          <div class="door" id="door_134_left"></div>
-          <div class="door" id="door_134_right"></div>
-        </div>
-        <div class="flex flex-col absolute top-[18.5rem] left-5" data-value="268">
-          <i class="fa-solid text-2xl fa-square-caret-up cursor-pointer hover:text-red-500 lift_up_btn"></i>
-          <i class="fa-solid text-2xl fa-square-caret-down cursor-pointer hover:text-red-500 lift_down_btn"></i>
-        </div>
-        <div class="w-full h-[6px] bg-gray-800 mt-32"></div>
-        <div class="flex absolute bottom_276 left-[7rem]">
-          <div class="door" id="door_268_left"></div>
-          <div class="door" id="door_268_right"></div>
-        </div>
-        <div class="flex flex-col absolute top-[27rem] left-5" data-value="402">
-          <i class="fa-solid text-2xl fa-square-caret-up cursor-pointer hover:text-red-500 lift_up_btn"></i>
-          <i class="fa-solid text-2xl fa-square-caret-down cursor-pointer hover:text-red-500 lift_down_btn"></i>
-        </div>
-        <div class="w-full h-[6px] bg-gray-800 mt-32"></div>
-        <div class="flex absolute bottom_142 left-[7rem]">
-          <div class="door" id="door_402_left"></div>
-          <div class="door" id="door_402_right"></div>
-        </div>
-        <div class="flex flex-col absolute top-[36.5rem] left-5" data-value="536">
-          <i class="fa-solid text-2xl fa-square-caret-up cursor-pointer hover:text-red-500 lift_up_btn"></i>
-        </div>
-        <div class="w-full h-2 bg-gray-800 mt-32"></div>
-        <div class="flex absolute bottom-2 left-[7rem]">
-          <div class="door" id="door_536_left"></div>
-          <div class="door" id="door_536_right"></div>
-        </div>
-        <div class="flex absolute transition-all duration-700 ease-in-out left-[7rem] lift_box" id="lift_box">
-          <div class="lift_door" id="lift_box_left"></div>
-          <div class="lift_door" id="lift_box_right"></div>
-        </div>
+<body class="bg-gray-200 flex items-center justify-center min-h-screen">
+  <div
+    class="h-[28rem] relative w-80 border-4 border-double border-gray-800 overflow-hidden flex items-center justify-center">
+    <div class="enemy">
+      <div class="flex">
+        <div class="bg-gray-700 h-4 w-4 absolute -top-4 left-4 mouth"></div>
+        <div class="bg-gray-700 h-4 w-4"></div>
+        <div class="bg-gray-700 h-4 w-4"></div>
+        <div class="bg-gray-700 h-4 w-4"></div>
+      </div>
+      <div class="flex">
+        <div class="bg-gray-700 h-4 w-4"></div>
+        <div class="bg-transparent h-4 w-4"></div>
+        <div class="bg-gray-700 h-4 w-4"></div>
       </div>
     </div>
+
+    <div class="enemy">
+      <div class="flex">
+        <div class="bg-gray-700 h-4 w-4 absolute -top-4 left-4 mouth"></div>
+        <div class="bg-gray-700 h-4 w-4"></div>
+        <div class="bg-gray-700 h-4 w-4"></div>
+        <div class="bg-gray-700 h-4 w-4"></div>
+      </div>
+      <div class="flex">
+        <div class="bg-gray-700 h-4 w-4"></div>
+        <div class="bg-transparent h-4 w-4"></div>
+        <div class="bg-gray-700 h-4 w-4"></div>
+      </div>
+    </div>
+
+    <div class="player" id="player">
+      <div class="flex">
+        <div class="bg-transparent h-4 w-4"></div>
+        <div class="bg-gray-700 h-4 w-4"></div>
+        <div class="bg-transparent h-4 w-4"></div>
+      </div>
+      <div class="flex">
+        <div class="bg-gray-700 h-4 w-4"></div>
+        <div class="bg-gray-700 h-4 w-4"></div>
+        <div class="bg-gray-700 h-4 w-4"></div>
+      </div>
+      <div class="flex">
+        <div class="bg-gray-700 h-4 w-4"></div>
+        <div class="bg-gray-700 h-4 w-4"></div>
+        <div class="bg-gray-700 h-4 w-4"></div>
+      </div>
+    </div>
+
+
   </div>
 
 
   <script>
-    const interval = 7000;
-    var lift_queue = new Array();
-    $(document).ready(function(){
-      $(".lift_up_btn").click(function(){
-       const value = $(this).parent().attr('data-value');
-       lift_queue.push(value);
-       sessionStorage.setItem('goto_lift', lift_queue);       
-      });
+    $(document).ready(function () {
+      const randomTop = ['top-10', 'top-20', 'top-30', 'top-40', 'top-50', '-top-10', '-top-20', '-top-30', '-top-40', '-top-50'];
+      const randomRotated = ['rotate-90', 'rotate-180', '-rotate-90', '-rotate-180'];
 
-      $(".lift_down_btn").click(function(){
-       const value = $(this).parent().attr('data-value');
-       lift_queue.push(value);
-       sessionStorage.setItem('goto_lift', lift_queue); 
-      });
 
+      $(".enemy").each(function (item, content) {
+        const randomNumber = Math.floor(Math.random() * randomTop.length);
+        $(content).addClass(randomTop[randomNumber]);
+      });
 
       setInterval(() => {
-        var GETVALUES = sessionStorage.getItem('goto_lift');
-        if(GETVALUES){
-          GETVALUES = GETVALUES.split(",");
-        }else{
-          return false;
+        // randomRotated
+        // const randomNumber = Math.floor(Math.random() * randomRotated.length);
+        // $(".enemy").addClass(randomRotated[randomNumber]);
+
+        $(".mouth").before('<div class="fire"></div>');
+        setTimeout(() => {
+          $(".fire").addClass('-translate-y-96');
+        }, 2000);
+
+        setTimeout(() => {
+          $(".fire").remove();
+        }, 13000);
+
+
+      }, 2000);
+
+      handlePlayerMove();
+    });
+
+
+    const handlePlayerMove = () => {
+      document.addEventListener('keydown', (event) => {
+        
+        if(event.key == ' '){
+          console.log('fire');
         }
 
-        if(GETVALUES.length > 0){
-          GETVALUE = GETVALUES[0];
-          const translate_y = 'translate-y-' + GETVALUE;
-          const door_left = '#door_' + GETVALUE + '_left';
-          const door_right = '#door_' + GETVALUE + '_right';
-          $("#lift_box").removeClass();
-          $("#lift_box").addClass('lift_box').addClass(translate_y);
-          
-          setTimeout(() => {
-            $(door_left).addClass('-ml-55');
-            $(door_right).addClass('ml-110');
-            $("#lift_box_left").addClass('-ml-55');
-            $("#lift_box_right").addClass('ml-110');
-          }, 1000);
-          
-          setTimeout(() => {
-            $(door_left).removeClass('-ml-55');
-            $(door_right).removeClass('ml-110');
-            $("#lift_box_left").removeClass('-ml-55');
-            $("#lift_box_right").removeClass('ml-110');
-          }, 5000);
+        if(event.key === 'ArrowUp') {
+          console.log('ArrowUp');
+        }
 
-
-          GETVALUES = GETVALUES.pop();
-          lift_queue.pop();
-          sessionStorage.setItem('goto_lift', GETVALUES);
-
+        if(event.key === 'ArrowDown'){
+          console.log('ArrowDown')
         }
         
-      }, interval);
-
-    });
+        if(event.key === 'ArrowRight'){
+          if($("#player").hasClass('rotate-90')){
+            $("#player").css('left', '1rem');
+          }else{
+            $("#player").removeClass().addClass('player');
+            $("#player").addClass('rotate-90');
+          }
+        }
+        
+        if(event.key === 'ArrowLeft'){
+          if($("#player").hasClass('-rotate-90')){
+            $("#player").css('right', '1rem');
+          }else{
+            $("#player").removeClass().addClass('player');
+            $("#player").addClass('-rotate-90');
+          }
+        }
+      });
+    };
   </script>
+
 </body>
-</html>          
+
+</html>

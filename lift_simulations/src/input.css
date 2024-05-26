@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
+@layer components {
+    
+    .door{
+        @apply h-32 w-14 bg-gray-500 border border-gray-600 transition-all duration-700 ease-in-out;
+    }
+
+    .lift_box{
+        @apply flex absolute transition-all duration-700 ease-in-out  top-0 left-[7rem];
+    }
+    
+    .lift_door{
+        @apply h-32 w-14 z-10 bg-green-700 border-2 border-green-900 transition-all duration-700 ease-in-out;
+    }
+
+    .bottom_544{
+        @apply bottom-[544px];
+    }
+
+    .bottom_410{
+        @apply bottom-[410px];
+    }
+
+    /* bottom-[276px] */
+    .bottom_276{
+        @apply bottom-[276px];
+    }
+
+    /* bottom-[8.9rem] */
+    .bottom_142{
+        @apply bottom-[142px];
+    }
+
+    
+    
+    
+}
+
+
+.translate-y-134 {
+    transform: translateY(134px);
+}
+
+.translate-y-268 {
+    transform: translateY(268px);
+}
+
+.translate-y-402 {
+    transform: translateY(402px);
+}
+
+.translate-y-536 {
+    transform: translateY(536px);
+}
+
