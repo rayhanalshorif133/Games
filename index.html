@@ -98,32 +98,42 @@
 
     const handlePlayerMove = () => {
       document.addEventListener('keydown', (event) => {
-        
-        if(event.key == ' '){
+
+        if (event.key == ' ') {
           console.log('fire');
         }
 
-        if(event.key === 'ArrowUp') {
-          console.log('ArrowUp');
+        if (event.key === 'ArrowUp') {
+          if ($("#player").hasClass('rotate-0')) {
+            $("#player").css('left', '1rem');
+          } else {
+            $("#player").removeClass().addClass('player');
+            $("#player").addClass('rotate-0');
+          }
         }
 
-        if(event.key === 'ArrowDown'){
-          console.log('ArrowDown')
+        if (event.key === 'ArrowDown') {
+          if ($("#player").hasClass('rotate-180')) {
+            $("#player").css('top', '1rem');
+          } else {
+            $("#player").removeClass().addClass('player');
+            $("#player").addClass('rotate-180');
+          }
         }
-        
-        if(event.key === 'ArrowRight'){
-          if($("#player").hasClass('rotate-90')){
+
+        if (event.key === 'ArrowRight') {
+          if ($("#player").hasClass('rotate-90')) {
             $("#player").css('left', '1rem');
-          }else{
+          } else {
             $("#player").removeClass().addClass('player');
             $("#player").addClass('rotate-90');
           }
         }
-        
-        if(event.key === 'ArrowLeft'){
-          if($("#player").hasClass('-rotate-90')){
+
+        if (event.key === 'ArrowLeft') {
+          if ($("#player").hasClass('-rotate-90')) {
             $("#player").css('right', '1rem');
-          }else{
+          } else {
             $("#player").removeClass().addClass('player');
             $("#player").addClass('-rotate-90');
           }
