@@ -1,0 +1,75 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
+@layer components {
+    
+    .fire{
+        @apply bg-gray-700 h-4 w-4 absolute -top-4 left-4 transition-all duration-1000 ease-in-out;
+    }
+
+    .enemy{
+        @apply flex flex-col relative;
+    }
+    
+    .player{
+        @apply flex flex-col relative;
+    }
+
+    
+    
+    
+    
+}
+
+.top-1{
+    top: 1rem!important;
+}
+
+.top-2{
+    top: 2rem!important;
+}
+
+.top-3 {
+    top: 3rem!important;
+}
+
+.top-4 {
+    top: 4rem!important;
+}
+
+.top-5 {
+    top: 5rem!important;
+}
+
+.top-6 {
+    top: 6rem!important;
+}
+
+.top-7 {
+    top: 7rem!important;
+}
+
+.top-8 {
+    top: 8rem!important;
+}
+
+.top-9 {
+    top: 9rem!important;
+}
+
+.top-10 {
+    top: 10rem!important;
+}
+
+
+
+.top-11{
+    top: 11rem!important;
+}
+
+.top-12{
+    top: 12rem!important;
+}

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="./src/output.css" rel="stylesheet">
+  <title>Bounsing Ball Game</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" />
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+</head>
+
+<body>
+  <div class="flex items-center justify-center min-h-screen">
+    <div class="h-[450px] w-[304px] border-2 border-double border-gray-800 relative">
+      <div class="absolute h-3 w-3 rounded-full bg-red-700 bouncing_ball"></div>
+      <div class="absolute h-3 w-3 rounded-full bg-red-700 bouncing_ball"></div>
+      <div class="absolute h-3 w-3 rounded-full bg-red-700 bouncing_ball"></div>
+      <div class="absolute h-3 w-3 rounded-full bg-red-700 bouncing_ball"></div>
+      <div class="absolute h-3 w-3 rounded-full bg-red-700 bouncing_ball"></div>
+      <div class="absolute h-3 w-3 rounded-full bg-red-700 bouncing_ball"></div>
+      <div class="h-2 border absolute border-double border-gray-600 w-32 bg-gray-600 rounded-xl bottom-px " id="player">
+      </div>
+    </div>
+  </div>
+
+
+  <script>
+    $(() => {
+      $("body").keydown(function (e) {
+        var leftValue = $('#player').css('left').replace('px', '');
+        if (e.keyCode == 37) { // left
+          if (leftValue > +1) {
+            $("#player").css({
+              left: "-=10"
+            });
+          }
+        }
+        else if (e.keyCode == 39) { // right
+          if (leftValue < 170) {
+            $("#player").css({
+              left: "+=10"
+            });
+          }
+        }
+      });
+
+      bounceRandomly();
+
+    });
+
+
+    function bounceRandomly() {
+      // Define the range for random horizontal and vertical positions
+      var maxX = 304 - $('.bouncing_ball').width();
+      var maxY = 450 - $('.bouncing_ball').height();
+
+      // Generate random horizontal and vertical positions
+      var randomX = Math.floor(Math.random() * maxX);
+      var randomY = Math.floor(Math.random() * maxY);
+
+      // Animate the element to the random position
+      $('.bouncing_ball').animate({
+        left: randomX + 'px',
+        top: randomY + 'px'
+      }, 1000, function () {
+        // After animation completes, call the function again for continuous bouncing
+        bounceRandomly();
+      });
+    }
+  </script>
+</body>
+
+</html>
