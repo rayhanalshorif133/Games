@@ -734,6 +734,10 @@ video {
   top: 2.5rem;
 }
 
+.top-12 {
+  top: 3rem;
+}
+
 .top-20 {
   top: 5rem;
 }
@@ -764,10 +768,6 @@ video {
 
 .top-\[36\.5rem\] {
   top: 36.5rem;
-}
-
-.top-12 {
-  top: 3rem;
 }
 
 .isolate {
