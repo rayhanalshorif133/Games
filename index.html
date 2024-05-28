@@ -14,11 +14,6 @@
   <div class="flex items-center justify-center min-h-screen">
     <div class="h-[450px] w-[304px] border-2 border-double border-gray-800 relative">
       <div class="absolute h-3 w-3 rounded-full bg-red-700 bouncing_ball"></div>
-      <div class="absolute h-3 w-3 rounded-full bg-red-700 bouncing_ball"></div>
-      <div class="absolute h-3 w-3 rounded-full bg-red-700 bouncing_ball"></div>
-      <div class="absolute h-3 w-3 rounded-full bg-red-700 bouncing_ball"></div>
-      <div class="absolute h-3 w-3 rounded-full bg-red-700 bouncing_ball"></div>
-      <div class="absolute h-3 w-3 rounded-full bg-red-700 bouncing_ball"></div>
       <div class="h-2 border absolute border-double border-gray-600 w-32 bg-gray-600 rounded-xl bottom-px " id="player">
       </div>
     </div>
@@ -45,28 +40,22 @@
         }
       });
 
-      bounceRandomly();
+      
+
+      setInterval(function () {
+        bounceRandomly(200,0);
+        bounceRandomly(100,420);
+      }, 1000);
 
     });
 
 
-    function bounceRandomly() {
-      // Define the range for random horizontal and vertical positions
-      var maxX = 304 - $('.bouncing_ball').width();
-      var maxY = 450 - $('.bouncing_ball').height();
-
-      // Generate random horizontal and vertical positions
-      var randomX = Math.floor(Math.random() * maxX);
-      var randomY = Math.floor(Math.random() * maxY);
-
+    function bounceRandomly(randomX,randomY) {
       // Animate the element to the random position
       $('.bouncing_ball').animate({
         left: randomX + 'px',
         top: randomY + 'px'
-      }, 1000, function () {
-        // After animation completes, call the function again for continuous bouncing
-        bounceRandomly();
-      });
+      }, 1000);
     }
   </script>
 </body>
