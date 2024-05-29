@@ -5,71 +5,76 @@
 
 
 @layer components {
-    
-    .fire{
-        @apply bg-gray-700 h-4 w-4 absolute -top-4 left-4 transition-all duration-1000 ease-in-out;
+
+
+    #game-box{
+        @apply h-[564px] w-[354px] border-2 border-red-800 relative;
     }
 
-    .enemy{
-        @apply flex flex-col relative;
-    }
-    
-    .player{
-        @apply flex flex-col relative;
+    .player {
+        @apply absolute h-8 w-8 flex items-center hover:scale-110 justify-center cursor-pointer border-2 border-gray-800 rounded-full bottom-px left-[160px];
     }
 
-    
-    
-    
-    
+    .active_ball {
+        @apply flex items-center absolute justify-center h-6 w-6 bg-green-800 rounded-full;
+    }
+
+    .bouncing_side_border {
+        @apply h-10 w-4 border-2 border-gray-400 bg-zinc-950 hover:scale-105 duration-300 ease-in-out transition-all;
+    }
+
+
+
+
+
 }
 
-.top-1{
-    top: 1rem!important;
+.top-1 {
+    top: 1rem !important;
 }
 
-.top-2{
-    top: 2rem!important;
+.top-2 {
+    top: 2rem !important;
 }
 
 .top-3 {
-    top: 3rem!important;
+    top: 3rem !important;
 }
 
 .top-4 {
-    top: 4rem!important;
+    top: 4rem !important;
 }
 
 .top-5 {
-    top: 5rem!important;
+    top: 5rem !important;
 }
 
 .top-6 {
-    top: 6rem!important;
+    top: 6rem !important;
 }
 
 .top-7 {
-    top: 7rem!important;
+    top: 7rem !important;
 }
 
 .top-8 {
-    top: 8rem!important;
+    top: 8rem !important;
 }
 
 .top-9 {
-    top: 9rem!important;
+    top: 9rem !important;
 }
 
 .top-10 {
-    top: 10rem!important;
+    top: 10rem !important;
 }
 
 
 
-.top-11{
-    top: 11rem!important;
+.top-11 {
+    top: 11rem !important;
 }
 
-.top-12{
-    top: 12rem!important;
+.top-12 {
+    top: 12rem !important;
 }
