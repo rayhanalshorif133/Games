@@ -1,11 +1,63 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+
+  <link href="./src/output.css" rel="stylesheet">
+  <title>Test Canvas Game</title>
+
+  <style>
+    canvas {
+      border: 1px solid #d3d3d3;
+      background-color: #f1f1f1;
+    }
+  </style>
 </head>
-<body>
-  
+
+<body class="flex items-start justify-center min-h-screen mt-40" onload="startGame()">
+
+
+
+  <script>
+
+    var myGamePiece;
+
+    function startGame() {
+      myGameArea.start();
+      myGamePiece = new component(30, 30, "red", 10, 120);
+    }
+
+    var myGameArea = {
+      canvas: document.createElement("canvas"),
+      start: function () {
+        this.canvas.width = 480;
+        this.canvas.height = 270;
+        this.context = this.canvas.getContext("2d");
+        document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+      }
+    };
+
+    function component(width, height, color, x, y) {
+  this.width = width;
+  this.height = height;
+  this.speedX = 0;
+  this.speedY = 0;
+  this.x = x;
+  this.y = y;
+  this.update = function() {
+    ctx = myGameArea.context;
+    ctx.fillStyle = color;
+    ctx.fillRect(this.x, this.y, this.width, this.height);
+  }
+  this.newPos = function() {
+    this.x += this.speedX;
+    this.y += this.speedY;
+  }
+}
+  </script>
+
 </body>
+
 </html>
