@@ -9,13 +9,12 @@ export class Player {
        
     }
     update() {
-        this.x = this.x + 1;
+        // this.x = this.x + 1;
         if(this.x > 700){
             this.x = -100;
         }
     }
     draw(context) {
-        context.fillStyle = 'red';
 
         context.drawImage(this.player, this.x, this.y, 80, 80 * this.player.height / this.player.width)
 

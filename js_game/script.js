@@ -1,4 +1,5 @@
 import {Player} from './player.js';
+import {InputHandler} from './input.js';
 
 window.addEventListener('load', function(){
     const canvas = document.getElementById('canvas_1');
@@ -15,6 +16,8 @@ window.addEventListener('load', function(){
             this.width = width;
             this.height = height;
             this.player = new Player(this);
+            this.player = new SETWALL_1(this);
+            this.input = new InputHandler(this);
         }
 
         update() {
