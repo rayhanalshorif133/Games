@@ -5,59 +5,62 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 
-  <link href="./src/output.css" rel="stylesheet">
-  <title>Test Canvas Game</title>
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 
+  <link href="./src/output.css" rel="stylesheet">
+  <title>Canvas Game</title>
   <style>
-    canvas {
-      border: 1px solid #d3d3d3;
-      background-color: #f1f1f1;
+    canvas{
+      margin: 5rem auto;
+      border: 1px solid #b9b9b9;
+      background: #ededed;
+      box-shadow:  1px 1px 2px #b9b9b9,
+             -1px 1px 2px #b9b9b9;
     }
   </style>
 </head>
 
-<body class="flex items-start justify-center min-h-screen mt-40" onload="startGame()">
+<body onload="STARTGAME()">
+  <h2 class="text-2xl uppercase font-semibold border-b-2 border-gray-300 py-3 bg-green-700 text-white text-center shadow-sm shadow-green-700">
+    Canvas Testing 
+  </h2>
 
-
+  <canvas id="canvas"></canvas>
 
   <script>
+    var player_X = 0;
+    var player_Y = 0;
+    var context = "";
+    const STARTGAME = () => {
+      const canvas = document.getElementById("canvas");
+      canvas.height = 300;
+      canvas.width = 600;
+      context = canvas.getContext("2d");
 
-    var myGamePiece;
 
-    function startGame() {
-      myGameArea.start();
-      myGamePiece = new component(30, 30, "red", 10, 120);
-    }
+      
+      $(document).on("keyup", handlePlayer)
 
-    var myGameArea = {
-      canvas: document.createElement("canvas"),
-      start: function () {
-        this.canvas.width = 480;
-        this.canvas.height = 270;
-        this.context = this.canvas.getContext("2d");
-        document.body.insertBefore(this.canvas, document.body.childNodes[0]);
-      }
+      setInterval(function(){
+        PLAYGAME();
+      },1000);
     };
 
-    function component(width, height, color, x, y) {
-  this.width = width;
-  this.height = height;
-  this.speedX = 0;
-  this.speedY = 0;
-  this.x = x;
-  this.y = y;
-  this.update = function() {
-    ctx = myGameArea.context;
-    ctx.fillStyle = color;
-    ctx.fillRect(this.x, this.y, this.width, this.height);
-  }
-  this.newPos = function() {
-    this.x += this.speedX;
-    this.y += this.speedY;
-  }
-}
-  </script>
 
+    const PLAYGAME = () => {
+      context.fillStyle = "#900C3F";
+      context.fillRect(player_X, player_Y ,20, 20);
+
+    };
+
+
+    const handlePlayer = (e) => {
+      console.log(e.code)
+      if(e.code === "ArrowDown"){
+        player_Y = player_Y + 1;
+      }
+    };
+  </script>
 </body>
 
 </html>
