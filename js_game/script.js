@@ -1,4 +1,5 @@
 import {Player} from './player.js';
+import {SETWALL_1} from './wall/1.js';
 import {InputHandler} from './input.js';
 
 window.addEventListener('load', function(){
