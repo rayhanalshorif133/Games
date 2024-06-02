@@ -6,16 +6,17 @@ export class Player{
         this.y = this.game.height /2;
         this.width = 30;
         this.height = 30;
+        this.speed = 0;
+        this.maxSpeed = 10;
     }
 
     update(playerHanlder) {
-        console.log(playerHanlder.keys)
-        if(playerHanlder.keys == 'ArrowDown') this.y += 10;
-        if(playerHanlder.keys == 'ArrowUp') this.y -= 10;
-        // this.x += 10;
-        // if(this.x == 700){
-        //     this.x = 0;
-        // }
+
+        this.y += this.speed;
+
+        if(playerHanlder.keys.includes('ArrowDown')) this.speed = this.maxSpeed;
+        else if(playerHanlder.keys.includes('ArrowUp')) this.speed = -this.maxSpeed;
+        else this.speed = 0;
     }
     draw(context) {
         context.fillStyle = 'red';

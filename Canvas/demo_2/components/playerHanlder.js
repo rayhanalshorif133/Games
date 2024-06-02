@@ -3,8 +3,15 @@ export class PlayerHanlder {
         this.keys = [];
 
         window.addEventListener('keydown', e => {
-            this.keys.push(e.key);
-            setTimeout(() => this.keys = [], 100);
+            if((e.key == 'ArrowDown' || e.key == 'ArrowUp') && !this.keys.length){
+                this.keys.push(e.key);
+            }
+        });
+
+        window.addEventListener('keyup', e => {
+            if((e.key == 'ArrowDown' || e.key == 'ArrowUp') && this.keys.length){
+               this.keys.pop();
+            }
         });
         
     }
