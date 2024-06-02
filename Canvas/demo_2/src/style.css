@@ -1,0 +1,20 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+#canvas{
+    position: absolute;
+    top: 20%;
+    left: 30%;
+    background: #f0f0f0;
+    border: 1px solid #cbcbcb;
+}
+
+.box{
+    height: 40px !important;
+    width: 40px !important;
+    background-color: red;
+    display: none;
+}
