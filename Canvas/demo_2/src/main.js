@@ -1,6 +1,7 @@
-import { Player } from '../../components/player.js';
-import { PlayerHanlder } from '../../components/playerHanlder.js';
-import { Anime } from '../../components/anime.js';
+import { Player } from '../components/player.js';
+import { PlayerHanlder } from '../components/playerHanlder.js';
+import { Anime } from '../components/Anime.js';
+import { Wall } from '../components/Wall.js';
 
 window.addEventListener('load', function (e) {
     const canvas = document.getElementById('canvas');
@@ -16,15 +17,17 @@ window.addEventListener('load', function (e) {
             this.player = new Player(this);
             this.playerHanlder = new PlayerHanlder(this);
             this.anime = new Anime(this);
+            this.wall = new Wall(this);
         }
 
-        update() {
+        update(context) {
             this.player.update(this.playerHanlder);
-            this.anime.update();
+            this.anime.update(context);
         }
         draw(context) {
             this.player.draw(context);
             this.anime.draw(context);
+            this.wall.draw(context);
         }
     }
 
@@ -39,7 +42,7 @@ window.addEventListener('load', function (e) {
 
         if (deltaTime >= delay) {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            game.update();
+            game.update(ctx);
             game.draw(ctx);
             lastTime = currentTime;
         }

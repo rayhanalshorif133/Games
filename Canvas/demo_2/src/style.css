@@ -18,3 +18,7 @@
     background-color: red;
     display: none;
 }
+
+.wall{
+    display: none !important;
+}
