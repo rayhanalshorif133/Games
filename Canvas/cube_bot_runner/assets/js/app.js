@@ -1,4 +1,9 @@
 import {Runner} from './components/runner.js';
+import {BackgroundImage} from './components/bg_image.js';
+
+
+
+
 window.addEventListener('load', function(e) {
     const canvas = document.getElementById('canvas');
     const frameRate = 70;
@@ -7,10 +12,14 @@ window.addEventListener('load', function(e) {
     canvas.height = 320;
     canvas.width = 720;
 
+
+
+
     class Game{
         constructor(height, width) {
             this.height = height;
             this.width = width;
+            this.bgImage = new BackgroundImage(this);
             this.runner = new Runner(this);
         }
 
@@ -19,6 +28,7 @@ window.addEventListener('load', function(e) {
         }
         draw(context){
             this.runner.draw(context);
+            // this.bgImage.draw(context);
         }
     }
 

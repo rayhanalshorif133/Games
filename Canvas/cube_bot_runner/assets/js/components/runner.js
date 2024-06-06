@@ -11,7 +11,7 @@ export class Runner {
     }
 
     draw(context) {
-        context.drawImage(this.image, 0,190, 150, 100);
+        context.drawImage(this.image, 10,390, 100, 50);
     }
 
     setImage() {
