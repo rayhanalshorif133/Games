@@ -1,5 +1,7 @@
 import {Runner} from './components/runner.js';
 import {BackgroundImage} from './components/bg_image.js';
+import {Cloud} from './components/cloud.js';
+import {Agg} from './components/agg.js';
 
 
 
@@ -21,14 +23,20 @@ window.addEventListener('load', function(e) {
             this.width = width;
             this.bgImage = new BackgroundImage(this);
             this.runner = new Runner(this);
+            this.cloud = new Cloud(this);
+            this.agg = new Agg(this);
         }
 
         update(){
             this.runner.update();
+            this.cloud.update();
+            this.agg.update();
         }
         draw(context){
+            this.bgImage.draw(context);
+            this.cloud.draw(context);
+            this.agg.draw(context);
             this.runner.draw(context);
-            // this.bgImage.draw(context);
         }
     }
 

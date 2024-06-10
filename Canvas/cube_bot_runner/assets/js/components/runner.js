@@ -2,7 +2,7 @@ export class Runner {
     constructor(game) {
         this.game = game;
         this.image = new Image();
-        this.image.src = 'images/cube-man/03_run/0.png'; 
+        this.image.src = 'images/cube-man/03_run/0.png';
         this.counter = 0;
     }
 
@@ -11,13 +11,13 @@ export class Runner {
     }
 
     draw(context) {
-        context.drawImage(this.image, 10,390, 100, 50);
+        context.drawImage(this.image, 0, 150, 200, 120);
     }
 
     setImage() {
-        this.counter += 1;
         this.image.src = `images/cube-man/03_run/${this.counter}.png`;
-        if(this.counter > 11){
+        this.counter += 1;
+        if (this.counter > 10) {
             this.counter = 0;
         }
     }
