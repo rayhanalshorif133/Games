@@ -1,0 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
+@layer components {
+    .w-box {
+      @apply h-10 w-10 bg-white;
+    }
+
+    .border-rb{
+        @apply border-r border-b;
+    }
+
+    .g-box {
+        @apply h-10 w-10 bg-[#E8EAF6];
+    }
+
+    .border-rb-2{
+        @apply border-b-2 border-r-2 border-[#4353B5];
+    }
+
+    .border-rbl-2{
+        @apply border-r-2 border-b-2 border-l-2  border-[#4353B5];
+    }
+    
+    .border-bl-2{
+        @apply border-b-2 border-l-2  border-[#4353B5];
+    }
+
+    .border-trb-2{
+        @apply border-t-2 border-r-2 border-b-2 border-[#4353B5];
+    }
+
+    .border-tbl-2{
+        @apply border-t-2 border-b-2 border-l-2 border-[#4353B5];
+    }
+
+    .border-tr-2{
+        @apply border-t-2 border-r-2 border-[#4353B5];
+    }
+
+    .border-trl-2{
+        @apply border-t-2 border-r-2 border-l-2 border-[#4353B5];
+    }
+
+    .border-tl-2{
+        @apply border-t-2 border-l-2 border-[#4353B5];
+    }
+
+
+    /* 9AA0CF */
+    /* ... */
+  }
