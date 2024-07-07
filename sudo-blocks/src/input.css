@@ -49,6 +49,22 @@
         @apply border-t-2 border-l-2 border-[#4353B5];
     }
 
+    .b-l{
+        @apply border-[#9AA0CF] border-l-2;
+    }
+
+    .b-r{
+        @apply border-[#9AA0CF] border-r-2;
+    }
+
+    .b-t{
+        @apply border-[#9AA0CF] border-t-2;
+    }
+
+    .b-b{
+        @apply border-[#9AA0CF] border-b-2;
+    }
+
 
     /* 9AA0CF */
     /* ... */

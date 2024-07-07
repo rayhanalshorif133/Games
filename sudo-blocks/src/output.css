@@ -628,6 +628,24 @@ video {
   border-color: rgb(67 83 181 / var(--tw-border-opacity));
 }
 
+.b-l {
+  border-left-width: 2px;
+  --tw-border-opacity: 1;
+  border-color: rgb(154 160 207 / var(--tw-border-opacity));
+}
+
+.b-r {
+  border-right-width: 2px;
+  --tw-border-opacity: 1;
+  border-color: rgb(154 160 207 / var(--tw-border-opacity));
+}
+
+.b-b {
+  border-bottom-width: 2px;
+  --tw-border-opacity: 1;
+  border-color: rgb(154 160 207 / var(--tw-border-opacity));
+}
+
 /* 9AA0CF */
 
 /* ... */
