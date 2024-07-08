@@ -17,6 +17,10 @@
         @apply h-10 w-10 bg-[#E8EAF6];
     }
 
+    .box-block{
+        @apply bg-blue-900;
+    }
+
     .border-rb-2{
         @apply border-b-2 border-r-2 border-[#4353B5];
     }

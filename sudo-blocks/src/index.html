@@ -122,7 +122,7 @@
             <div class="flex">
               <div class="w-box b-r b-b"></div>
               <div class="g-box b-r b-b"></div>
-              <div class="w-box b-b" id="droppable"></div>
+              <div class="w-box b-b"></div>
             </div>
             <div class="flex">
               <div class="g-box b-r"></div>
@@ -209,9 +209,15 @@
   <script>
     $(function () {
       $(".draggable").draggable();
-      $("#droppable").droppable({
+      $(".w-box").droppable({
         drop: function (e) {
-          $(this).find("div").toggleClass("h-4 w-4").toggleClass("h-10 w-10");
+          $(this).addClass("box-block");
+        }
+      });
+
+      $(".g-box").droppable({
+        drop: function (e) {
+          $(this).addClass("box-block");
         }
       });
 
