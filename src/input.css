@@ -1,3 +1,49 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+
+@layer components {
+
+
+    #game-box-container{
+        @apply h-[564px] w-[347px] border-2 border-red-800 relative;
+    }
+    #game-box{
+        @apply h-[544px] w-[347px] relative;
+    }
+
+    #player {
+        @apply absolute h-8 w-8 flex items-center justify-center cursor-pointer border-2 border-gray-800 rounded-full bottom-px left-[160px];
+    }
+
+    #active_ball {
+        @apply flex items-center absolute justify-center h-6 w-6 bg-green-800 rounded-full;
+    }
+
+    .bouncing_x_border {
+        @apply h-10 w-4 ;
+    }
+    
+    .bouncing_y_border {
+        @apply h-4 w-10;
+    }
+
+    .bouncing_top_border {
+        @apply h-10 w-4;
+    }
+
+    .target{
+        @apply border-2 border-dotted border-transparent absolute h-[40px] w-1 bottom-[10px];
+    }
+
+    .game_border{
+        @apply cursor-pointer border-2 border-gray-400 bg-zinc-950 hover:scale-105 duration-300 ease-in-out transition-all;
+    }
+
+
+
+
+
+}

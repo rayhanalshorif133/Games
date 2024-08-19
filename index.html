@@ -1,15 +1,20 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="./src/output.css" rel="stylesheet">
+  <title>JavaScript Game</title>
+  <link rel="stylesheet" href="./js_game/style.css">
 </head>
-<body class="bg-gray-400">
-  <div class="h-screen flex items-center justify-center">
-    <div class="h-[480px] w-[320px] bg-black shadow-lg border-[2px] border-white">
-      
-    </div>
-  </div>
+<body>
+  <canvas id="canvas_1"></canvas>
+
+  <img id="player" style="display: none;" src="./images/star_bug_sprites/0.png" height="10" width="10">
+  <img id="wall_1" style="display: none;" src="./images/metal_wall/1.png" height="10" width="10">
+  <!-- <img id="wall_2" style="display: none;" src="./images/metal_wall/2.png" height="10" width="10">
+  <img id="wall_3" style="display: none;" src="./images/metal_wall/3.png" height="10" width="10">
+  <img id="wall_4" style="display: none;" src="./images/metal_wall/4.png" height="10" width="10"> -->
+
+  <script type="module" src="./js_game/script.js"></script>
 </body>
 </html>
