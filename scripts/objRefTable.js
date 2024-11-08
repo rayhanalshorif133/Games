@@ -7,23 +7,26 @@ self.C3_GetObjectRefTable = function () {
 		C3.Behaviors.Turret,
 		C3.Behaviors.Pin,
 		C3.Plugins.Tilemap,
+		C3.Behaviors.Pathfinding,
+		C3.Behaviors.Flash,
 		C3.Plugins.Touch,
+		C3.Behaviors.solid,
 		C3.Plugins.System.Cnds.IsGroupActive,
+		C3.Plugins.System.Cnds.OnLayoutStart,
+		C3.Behaviors.Pathfinding.Acts.FindPath,
+		C3.Plugins.Sprite.Exps.X,
+		C3.Plugins.Sprite.Exps.Y,
+		C3.Plugins.System.Acts.WaitForPreviousActions,
+		C3.Behaviors.Pathfinding.Acts.StartMoving,
 		C3.Plugins.System.Cnds.Every,
 		C3.Plugins.Sprite.Acts.Spawn,
-		C3.Plugins.System.Cnds.EveryTick,
-		C3.Plugins.Sprite.Acts.MoveForward,
-		C3.Plugins.Sprite.Cnds.OnCollision,
-		C3.Plugins.Sprite.Acts.SetAngle,
 		C3.Plugins.Sprite.Cnds.CompareInstanceVar,
 		C3.Plugins.Sprite.Acts.Destroy,
-		C3.Plugins.System.Cnds.OnLayoutStart,
 		C3.Behaviors.Turret.Acts.AddTarget,
 		C3.Plugins.Touch.Cnds.OnTouchObject,
 		C3.Plugins.System.Acts.CreateObject,
-		C3.Plugins.Sprite.Exps.X,
-		C3.Plugins.Sprite.Exps.Y,
 		C3.Behaviors.Turret.Cnds.OnShoot,
+		C3.Plugins.Sprite.Cnds.OnCollision,
 		C3.Plugins.Sprite.Acts.SubInstanceVar,
 		C3.Behaviors.Bullet.Cnds.CompareTravelled
 	];
@@ -39,11 +42,17 @@ self.C3_JsPropNameTable = [
 	{bg: 0},
 	{EnemySpawner: 0},
 	{health: 0},
+	{Pathfinding: 0},
+	{Flash: 0},
 	{Enemy_1: 0},
 	{driection: 0},
 	{change_direction: 0},
-	{new_build: 0},
-	{Touch: 0}
+	{build_tower: 0},
+	{Touch: 0},
+	{Solid: 0},
+	{spr_no_access: 0},
+	{Enemy_Target: 0},
+	{bg_decoration: 0}
 ];
 
 self.InstanceType = {
@@ -54,6 +63,9 @@ self.InstanceType = {
 	EnemySpawner: class extends self.ISpriteInstance {},
 	Enemy_1: class extends self.ISpriteInstance {},
 	change_direction: class extends self.ISpriteInstance {},
-	new_build: class extends self.ISpriteInstance {},
-	Touch: class extends self.IInstance {}
+	build_tower: class extends self.ISpriteInstance {},
+	Touch: class extends self.IInstance {},
+	spr_no_access: class extends self.ISpriteInstance {},
+	Enemy_Target: class extends self.ISpriteInstance {},
+	bg_decoration: class extends self.ITilemapInstance {}
 }
