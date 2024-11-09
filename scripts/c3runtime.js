@@ -4880,10 +4880,19 @@ self.C3_ExpressionFuncs = [
 			const n0 = p._GetNode(0);
 			return () => n0.ExpObject();
 		},
+		p => {
+			const v0 = p._GetNode(0).GetVar();
+			return () => and("Score:", v0.GetValue());
+		},
 		() => "Control Enemy",
 		() => 3,
 		() => "Game",
 		() => "",
+		p => {
+			const f0 = p._GetNode(0).GetBoundMethod();
+			return () => Math.floor(f0(5, 12));
+		},
+		() => "die",
 		() => "Control Turrets & Bullets",
 		p => {
 			const n0 = p._GetNode(0);
@@ -4897,16 +4906,8 @@ self.C3_ExpressionFuncs = [
 			const n0 = p._GetNode(0);
 			return () => (n0.ExpObject() - 20);
 		},
-		p => {
-			const v0 = p._GetNode(0).GetVar();
-			return () => and("Score: ", v0.GetValue());
-		},
 		() => 100,
-		() => "Score & Coin",
-		p => {
-			const v0 = p._GetNode(0).GetVar();
-			return () => and("Score:", v0.GetValue());
-		}
+		() => "Score & Coin"
 ];
 
 

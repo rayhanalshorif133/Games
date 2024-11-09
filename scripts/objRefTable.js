@@ -21,18 +21,21 @@ self.C3_GetObjectRefTable = function () {
 		C3.Plugins.Sprite.Exps.Y,
 		C3.Plugins.System.Acts.WaitForPreviousActions,
 		C3.Behaviors.Pathfinding.Acts.StartMoving,
+		C3.Plugins.Text.Acts.SetText,
 		C3.Plugins.System.Cnds.OnLayoutStart,
 		C3.Plugins.System.Cnds.Every,
 		C3.Plugins.Sprite.Acts.Spawn,
 		C3.Plugins.Sprite.Cnds.CompareInstanceVar,
+		C3.Plugins.System.Acts.AddVar,
+		C3.Plugins.System.Exps.random,
+		C3.Behaviors.Pathfinding.Acts.SetEnabled,
+		C3.Plugins.System.Acts.Wait,
 		C3.Plugins.Sprite.Acts.Destroy,
 		C3.Plugins.Sprite.Cnds.OnCollision,
 		C3.Plugins.Touch.Cnds.OnTouchObject,
 		C3.Plugins.System.Acts.CreateObject,
 		C3.Behaviors.Turret.Cnds.OnShoot,
 		C3.Plugins.Sprite.Acts.SubInstanceVar,
-		C3.Plugins.System.Acts.AddVar,
-		C3.Plugins.Text.Acts.SetText,
 		C3.Behaviors.Turret.Acts.AddTarget,
 		C3.Behaviors.Bullet.Cnds.CompareTravelled
 	];
@@ -50,6 +53,7 @@ self.C3_JsPropNameTable = [
 	{Flash: 0},
 	{Enemy_1: 0},
 	{Enemy_2: 0},
+	{Enemy_Ants: 0},
 	{P_dir_left: 0},
 	{P_dir_down: 0},
 	{P_dir_right: 0},
@@ -65,6 +69,7 @@ self.C3_JsPropNameTable = [
 	{Player_Tower: 0},
 	{score: 0},
 	{Score: 0},
+	{Sprite: 0},
 	{anemy_movment_speed: 0},
 	{Count_Score: 0}
 ];
@@ -75,6 +80,7 @@ self.InstanceType = {
 	torrent_1: class extends self.ISpriteInstance {},
 	Enemy_1: class extends self.ISpriteInstance {},
 	Enemy_2: class extends self.ISpriteInstance {},
+	Enemy_Ants: class extends self.ISpriteInstance {},
 	P_dir_left: class extends self.ISpriteInstance {},
 	P_dir_down: class extends self.ISpriteInstance {},
 	P_dir_right: class extends self.ISpriteInstance {},
@@ -87,5 +93,6 @@ self.InstanceType = {
 	Enemy_Target: class extends self.ISpriteInstance {},
 	bg_decoration: class extends self.ITilemapInstance {},
 	Player_Tower: class extends self.ISpriteInstance {},
-	Score: class extends self.ITextInstance {}
+	Score: class extends self.ITextInstance {},
+	Sprite: class extends self.ISpriteInstance {}
 }
