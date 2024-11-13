@@ -161,12 +161,6 @@ JOB_WORKER_SCRIPT_NAME;const jobWorker=await this._runtimeInterface.CreateWorker
 return outputChannel.port1}GetPortData(){return{"inputPort":this._inputPort,"outputPort":this._outputPort,"maxNumWorkers":this._maxNumWorkers}}GetPortTransferables(){return[this._inputPort,this._outputPort]}}};
 
 
-// scripts/plugins/Touch/dom/domSide.js
-'use strict';{const DOM_COMPONENT_ID="touch";const HANDLER_CLASS=class TouchDOMHandler extends self.DOMHandler{constructor(iRuntime){super(iRuntime,DOM_COMPONENT_ID);this.AddRuntimeMessageHandler("request-permission",e=>this._OnRequestPermission(e))}async _OnRequestPermission(e){const type=e["type"];let result=true;if(type===0)result=await this._RequestOrientationPermission();else if(type===1)result=await this._RequestMotionPermission();this.PostToRuntime("permission-result",{"type":type,"result":result})}async _RequestOrientationPermission(){if(!self["DeviceOrientationEvent"]||
-!self["DeviceOrientationEvent"]["requestPermission"])return true;try{const state=await self["DeviceOrientationEvent"]["requestPermission"]();return state==="granted"}catch(err){console.warn("[Touch] Failed to request orientation permission: ",err);return false}}async _RequestMotionPermission(){if(!self["DeviceMotionEvent"]||!self["DeviceMotionEvent"]["requestPermission"])return true;try{const state=await self["DeviceMotionEvent"]["requestPermission"]();return state==="granted"}catch(err){console.warn("[Touch] Failed to request motion permission: ",
-err);return false}}};self.RuntimeInterface.AddDOMHandlerClass(HANDLER_CLASS)};
-
-
 // scripts/plugins/Audio/dom/domSide.js
 'use strict';{const R_TO_D=180/Math.PI;const DOM_COMPONENT_ID="audio";self.AudioDOMHandler=class AudioDOMHandler extends self.DOMHandler{constructor(iRuntime){super(iRuntime,DOM_COMPONENT_ID);this._audioContext=null;this._destinationNode=null;this._hasUnblocked=false;this._hasAttachedUnblockEvents=false;this._unblockFunc=()=>this._UnblockAudioContext();this._audioBuffers=[];this._audioInstances=[];this._lastAudioInstance=null;this._lastPlayedTags=[];this._loadedAudioUrls=new Set;this._lastTickCount=
 -1;this._pendingTags=new Map;this._masterVolume=1;this._isSilent=false;this._timeScaleMode=0;this._timeScale=1;this._gameTime=0;this._panningModel="HRTF";this._distanceModel="inverse";this._refDistance=600;this._maxDistance=1E4;this._rolloffFactor=1;this._lastListenerPos=[0,0,0];this._lastListenerOrientation=[0,0,-1,0,1,0];this._playMusicAsSound=false;this._hasAnySoftwareDecodedMusic=false;this._supportsWebMOpus=this._iRuntime.IsAudioFormatSupported("audio/webm; codecs=opus");this._effects=new Map;
@@ -334,6 +328,17 @@ e["prop"];const selector=e["selector"];try{const elem=document.querySelector(sel
 if(enabled)window.addEventListener("beforeunload",this._beforeunload_handler);else window.removeEventListener("beforeunload",this._beforeunload_handler)}};self.RuntimeInterface.AddDOMHandlerClass(HANDLER_CLASS)};
 
 
+// scripts/plugins/Touch/dom/domSide.js
+'use strict';{const DOM_COMPONENT_ID="touch";const HANDLER_CLASS=class TouchDOMHandler extends self.DOMHandler{constructor(iRuntime){super(iRuntime,DOM_COMPONENT_ID);this.AddRuntimeMessageHandler("request-permission",e=>this._OnRequestPermission(e))}async _OnRequestPermission(e){const type=e["type"];let result=true;if(type===0)result=await this._RequestOrientationPermission();else if(type===1)result=await this._RequestMotionPermission();this.PostToRuntime("permission-result",{"type":type,"result":result})}async _RequestOrientationPermission(){if(!self["DeviceOrientationEvent"]||
+!self["DeviceOrientationEvent"]["requestPermission"])return true;try{const state=await self["DeviceOrientationEvent"]["requestPermission"]();return state==="granted"}catch(err){console.warn("[Touch] Failed to request orientation permission: ",err);return false}}async _RequestMotionPermission(){if(!self["DeviceMotionEvent"]||!self["DeviceMotionEvent"]["requestPermission"])return true;try{const state=await self["DeviceMotionEvent"]["requestPermission"]();return state==="granted"}catch(err){console.warn("[Touch] Failed to request motion permission: ",
+err);return false}}};self.RuntimeInterface.AddDOMHandlerClass(HANDLER_CLASS)};
+
+
+// scripts/plugins/Mouse/dom/domSide.js
+'use strict';{const DOM_COMPONENT_ID="mouse";const HANDLER_CLASS=class MouseDOMHandler extends self.DOMHandler{constructor(iRuntime){super(iRuntime,DOM_COMPONENT_ID);this.AddRuntimeMessageHandlers([["cursor",e=>this._OnChangeCursorStyle(e)],["request-pointer-lock",e=>this._OnRequestPointerLock(e)],["release-pointer-lock",()=>this._OnReleasePointerLock()]]);document.addEventListener("pointerlockchange",e=>this._OnPointerLockChange());document.addEventListener("pointerlockerror",e=>this._OnPointerLockError())}_OnChangeCursorStyle(e){document.documentElement.style.cursor=
+e}_OnRequestPointerLock(opts){this._iRuntime.GetMainCanvas().requestPointerLock(opts)}_OnReleasePointerLock(){document.exitPointerLock()}_OnPointerLockChange(){this.PostToRuntime("pointer-lock-change",{"has-pointer-lock":!!document.pointerLockElement})}_OnPointerLockError(){this.PostToRuntime("pointer-lock-error",{"has-pointer-lock":!!document.pointerLockElement})}};self.RuntimeInterface.AddDOMHandlerClass(HANDLER_CLASS)};
+
+
 // start-export.js
-'use strict';{if(window["C3_Is_Supported"]){const enableWorker=true;window["c3_runtimeInterface"]=new self.RuntimeInterface({useWorker:enableWorker,workerMainUrl:"workermain.js",runtimeScriptList:["scripts/c3main.js"],scriptFolder:"scripts/",exportType:"html5"})}};
+'use strict';{if(window["C3_Is_Supported"]){const enableWorker=false;window["c3_runtimeInterface"]=new self.RuntimeInterface({useWorker:enableWorker,workerMainUrl:"workermain.js",runtimeScriptList:["scripts/c3main.js"],scriptFolder:"scripts/",exportType:"html5"})}};
 
