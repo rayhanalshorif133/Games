@@ -53,7 +53,7 @@ self.C3_GetObjectRefTable = function () {
 		C3.Plugins.System.Acts.SetBoolVar,
 		C3.Plugins.Browser.Acts.CancelFullScreen,
 		C3.Plugins.Sprite.Acts.SetVisible,
-		C3.ScriptsInEvents.E_game_1_Event19_Act2,
+		C3.ScriptsInEvents.E_game_1_Event20_Act2,
 		C3.Plugins.System.Cnds.EveryTick,
 		C3.Plugins.Mouse.Exps.X,
 		C3.Plugins.Mouse.Exps.Y,
@@ -157,11 +157,13 @@ self.C3_JsPropNameTable = [
 	{spr_coin: 0},
 	{MoveTo: 0},
 	{spr_coin_spwan: 0},
+	{coinCollectText: 0},
 	{anemy_movment_speed: 0},
 	{Count_Score: 0},
 	{Enemy_1_spawn_second: 0},
 	{Count_Main_health: 0},
-	{isFullScreen: 0}
+	{isFullScreen: 0},
+	{Collect_Coin: 0}
 ];
 
 self.InstanceType = {
@@ -240,5 +242,6 @@ self.InstanceType = {
 	Mouse: class extends self.IInstance {},
 	Explosions: class extends self.ISpriteInstance {},
 	spr_coin: class extends self.ISpriteInstance {},
-	spr_coin_spwan: class extends self.ISpriteInstance {}
+	spr_coin_spwan: class extends self.ISpriteInstance {},
+	coinCollectText: class extends self.ITextInstance {}
 }

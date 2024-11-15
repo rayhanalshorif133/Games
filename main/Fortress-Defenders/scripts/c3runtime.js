@@ -5118,6 +5118,10 @@ self.C3_ExpressionFuncs = [
 			return () => (n0.ExpObject() - 10);
 		},
 		() => "idle",
+		p => {
+			const v0 = p._GetNode(0).GetVar();
+			return () => and(" ", v0.GetValue());
+		},
 		() => "Cursor Controller",
 		p => {
 			const f0 = p._GetNode(0).GetBoundMethod();
