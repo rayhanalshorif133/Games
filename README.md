@@ -1,1 +1,1 @@
-Fortress Defenders: https://rayhanalshorif133.github.io/Games/main/Fortress-Defenders/
+Fortress Defenders: https://rayhanalshorif133.github.io/Games/main/Prototype/
