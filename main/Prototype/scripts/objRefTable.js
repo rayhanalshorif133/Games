@@ -24,6 +24,7 @@ self.C3_GetObjectRefTable = function () {
 		C3.Behaviors.Pathfinding.Acts.Stop,
 		C3.Plugins.Text.Acts.SetText,
 		C3.Behaviors.Turret.Acts.ClearTargets,
+		C3.Plugins.System.Acts.SetBoolVar,
 		C3.Plugins.System.Cnds.IsGroupActive,
 		C3.Plugins.System.Cnds.Every,
 		C3.Plugins.Sprite.Acts.Spawn,
@@ -50,6 +51,7 @@ self.C3_GetObjectRefTable = function () {
 		C3.Plugins.Sprite.Exps.X,
 		C3.Plugins.Sprite.Exps.Y,
 		C3.Behaviors.Turret.Cnds.OnShoot,
+		C3.Plugins.System.Cnds.CompareBoolVar,
 		C3.Behaviors.Bullet.Cnds.CompareTravelled,
 		C3.Plugins.Sprite.Cnds.OnCreated,
 		C3.Behaviors.MoveTo.Acts.MoveToObject,
@@ -171,6 +173,7 @@ self.C3_JsPropNameTable = [
 	{Enemy_2_spawn_second: 0},
 	{Count_Main_health: 0},
 	{isFullScreen: 0},
+	{isGameOver: 0},
 	{Collect_Coin: 0}
 ];
 
