@@ -55,6 +55,8 @@ self.C3_GetObjectRefTable = function () {
 		C3.Behaviors.Turret.Exps.Range,
 		C3.Plugins.Sprite.Acts.SetWidth,
 		C3.Plugins.Sprite.Acts.SetBoolInstanceVar,
+		C3.Plugins.System.Cnds.Else,
+		C3.Plugins.System.Acts.WaitForPreviousActions,
 		C3.Plugins.System.Cnds.OnLayoutStart,
 		C3.Behaviors.Turret.Acts.AddTarget,
 		C3.Behaviors.Turret.Acts.SetTargetMode,
@@ -70,7 +72,7 @@ self.C3_GetObjectRefTable = function () {
 		C3.Plugins.Touch.Cnds.OnTapGestureObject,
 		C3.Plugins.Browser.Acts.RequestFullScreen,
 		C3.Plugins.Browser.Acts.CancelFullScreen,
-		C3.ScriptsInEvents.E_game_1_Event32_Act2,
+		C3.ScriptsInEvents.E_game_1_Event34_Act2,
 		C3.Plugins.System.Cnds.EveryTick,
 		C3.Plugins.Mouse.Exps.X,
 		C3.Plugins.Mouse.Exps.Y,
@@ -83,10 +85,8 @@ self.C3_GetObjectRefTable = function () {
 		C3.Behaviors.Pathfinding.Cnds.OnArrived,
 		C3.Plugins.Arr.Exps.Width,
 		C3.Plugins.Sprite.Acts.AddInstanceVar,
-		C3.Plugins.System.Cnds.Else,
 		C3.Plugins.Timeline.Cnds.OnKeyframeReached,
-		C3.Behaviors.Flash.Acts.Flash,
-		C3.Plugins.System.Acts.WaitForPreviousActions
+		C3.Behaviors.Flash.Acts.Flash
 	];
 };
 self.C3_JsPropNameTable = [

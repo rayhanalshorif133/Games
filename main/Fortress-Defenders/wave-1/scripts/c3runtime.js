@@ -1520,6 +1520,8 @@ self.C3_ExpressionFuncs = [
 			return () => (n0.ExpObject() - 10);
 		},
 		() => "idle",
+		() => "NOT ENOUGH COINS",
+		() => "NEEDS 1000 COINS",
 		() => "Wave Controller",
 		() => 120,
 		() => 220,
