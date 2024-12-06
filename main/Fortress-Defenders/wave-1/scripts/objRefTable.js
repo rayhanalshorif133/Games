@@ -66,7 +66,7 @@ self.C3_GetObjectRefTable = function () {
 		C3.Plugins.Browser.Acts.RequestFullScreen,
 		C3.Plugins.Browser.Acts.CancelFullScreen,
 		C3.Plugins.Sprite.Acts.SetVisible,
-		C3.ScriptsInEvents.E_game_1_Event26_Act2,
+		C3.ScriptsInEvents.E_game_1_Event29_Act2,
 		C3.Plugins.System.Cnds.EveryTick,
 		C3.Plugins.Mouse.Exps.X,
 		C3.Plugins.Mouse.Exps.Y,

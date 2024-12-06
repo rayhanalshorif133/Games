@@ -1519,7 +1519,9 @@ self.C3_ExpressionFuncs = [
 			return () => (n0.ExpObject() - 10);
 		},
 		() => "idle",
+		() => "Wave Controller",
 		() => 120,
+		() => 220,
 		() => "Control Turrets & Bullets",
 		() => 3,
 		() => 100,
@@ -1537,7 +1539,6 @@ self.C3_ExpressionFuncs = [
 			const f0 = p._GetNode(0).GetBoundMethod();
 			return () => f0();
 		},
-		() => "Score & Coin Controller",
 		() => "Game_1",
 		() => "Path_1",
 		() => 8,
