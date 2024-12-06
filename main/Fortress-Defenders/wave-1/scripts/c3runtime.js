@@ -1460,8 +1460,9 @@ function or(l, r)
 
 self.C3_ExpressionFuncs = [
 		() => "",
-		() => "Control Enemy",
 		() => 0,
+		() => -9999,
+		() => "Control Enemy",
 		() => 2,
 		() => "Game",
 		() => 10,
@@ -1523,6 +1524,10 @@ self.C3_ExpressionFuncs = [
 		() => 120,
 		() => 220,
 		() => "Control Turrets & Bullets",
+		p => {
+			const n0 = p._GetNode(0);
+			return () => and("", n0.ExpInstVar());
+		},
 		() => 3,
 		() => 100,
 		p => {
