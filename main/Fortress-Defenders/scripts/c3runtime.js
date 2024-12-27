@@ -1454,10 +1454,11 @@ function or(l, r)
 }
 
 self.C3_ExpressionFuncs = [
+		() => 0,
+		() => 9090,
 		() => "Control Enemy",
 		() => 1,
 		() => 2,
-		() => 0,
 		p => {
 			const n0 = p._GetNode(0);
 			const v1 = p._GetNode(1).GetVar();
@@ -1500,10 +1501,12 @@ self.C3_ExpressionFuncs = [
 			const n0 = p._GetNode(0);
 			return () => n0.ExpObject();
 		},
+		() => -1000,
 		p => {
 			const n0 = p._GetNode(0);
 			return () => and("", n0.ExpInstVar());
 		},
+		() => "Fire Controller",
 		() => "fire",
 		() => "idle",
 		() => "blast",
@@ -1515,25 +1518,14 @@ self.C3_ExpressionFuncs = [
 			const n0 = p._GetNode(0);
 			return () => (n0.ExpObject() - 0.5);
 		},
-		p => {
-			const v0 = p._GetNode(0).GetVar();
-			return () => and(" ", v0.GetValue());
-		},
-		() => 6,
-		p => {
-			const n0 = p._GetNode(0);
-			return () => (n0.ExpObject() + 230);
-		},
 		() => "Cursor & Touch Controller",
+		() => 6,
 		p => {
 			const f0 = p._GetNode(0).GetBoundMethod();
 			return () => f0();
 		},
 		() => 3,
-		p => {
-			const v0 = p._GetNode(0).GetVar();
-			return () => and("", v0.GetValue());
-		},
+		() => "Main Player Tower Controller",
 		p => {
 			const v0 = p._GetNode(0).GetVar();
 			return () => and("Wave ", v0.GetValue());
@@ -1577,6 +1569,14 @@ self.C3_ExpressionFuncs = [
 			const n0 = p._GetNode(0);
 			const v1 = p._GetNode(1).GetVar();
 			return () => and(n0.ExpObject(v1.GetValue(), 0), "/4");
+		},
+		p => {
+			const v0 = p._GetNode(0).GetVar();
+			return () => and("", v0.GetValue());
+		},
+		p => {
+			const v0 = p._GetNode(0).GetVar();
+			return () => and(" ", v0.GetValue());
 		},
 		p => {
 			const n0 = p._GetNode(0);
