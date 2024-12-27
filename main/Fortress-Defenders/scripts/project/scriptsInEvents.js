@@ -3,7 +3,7 @@
 
 const scriptsInEvents = {
 
-	async E_game_1_Event36_Act2(runtime, localVars)
+	async E_game_1_Event40_Act2(runtime, localVars)
 	{
 		document.body.style.cursor = 'none';
 	}
