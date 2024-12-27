@@ -1491,7 +1491,6 @@ self.C3_ExpressionFuncs = [
 			return () => n0.ExpObject(n1.ExpInstVar(), 1);
 		},
 		() => 5,
-		() => 9000,
 		() => 0.1,
 		() => 7,
 		() => "Wave Controller",
@@ -1506,6 +1505,7 @@ self.C3_ExpressionFuncs = [
 			const n0 = p._GetNode(0);
 			return () => and("", n0.ExpInstVar());
 		},
+		() => 3,
 		() => "Fire Controller",
 		() => "fire",
 		() => "idle",
@@ -1518,13 +1518,14 @@ self.C3_ExpressionFuncs = [
 			const n0 = p._GetNode(0);
 			return () => (n0.ExpObject() - 0.5);
 		},
+		() => -1023,
+		() => 15,
 		() => "Cursor & Touch Controller",
 		() => 6,
 		p => {
 			const f0 = p._GetNode(0).GetBoundMethod();
 			return () => f0();
 		},
-		() => 3,
 		() => "Main Player Tower Controller",
 		p => {
 			const v0 = p._GetNode(0).GetVar();
@@ -1542,7 +1543,6 @@ self.C3_ExpressionFuncs = [
 			return () => (n0.ExpObject() - 1);
 		},
 		() => "Path_2",
-		() => 15,
 		() => 9,
 		() => 11,
 		() => 12,
@@ -1585,7 +1585,8 @@ self.C3_ExpressionFuncs = [
 		p => {
 			const n0 = p._GetNode(0);
 			return () => n0.ExpObject(0, 1);
-		}
+		},
+		() => -1
 ];
 
 
