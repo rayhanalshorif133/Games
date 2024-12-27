@@ -1494,9 +1494,6 @@ self.C3_ExpressionFuncs = [
 		() => 0.1,
 		() => 7,
 		() => "Wave Controller",
-		() => 120,
-		() => 6,
-		() => 220,
 		() => "Control Turrets & Bullets",
 		() => 8,
 		p => {
@@ -1522,6 +1519,7 @@ self.C3_ExpressionFuncs = [
 			const v0 = p._GetNode(0).GetVar();
 			return () => and(" ", v0.GetValue());
 		},
+		() => 6,
 		p => {
 			const n0 = p._GetNode(0);
 			return () => (n0.ExpObject() + 230);
