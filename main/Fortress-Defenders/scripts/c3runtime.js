@@ -1527,6 +1527,9 @@ self.C3_ExpressionFuncs = [
 			return () => f0();
 		},
 		() => "Main Player Tower Controller",
+		() => "Bridge Controller",
+		() => "broken",
+		() => "break",
 		p => {
 			const v0 = p._GetNode(0).GetVar();
 			return () => and("Wave ", v0.GetValue());
