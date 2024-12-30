@@ -59,7 +59,7 @@ self.C3_GetObjectRefTable = function () {
 		C3.Plugins.Browser.Acts.RequestFullScreen,
 		C3.Plugins.Browser.Acts.CancelFullScreen,
 		C3.Plugins.Sprite.Acts.SetVisible,
-		C3.ScriptsInEvents.E_game_1_Event42_Act2,
+		C3.ScriptsInEvents.E_game_1_Event53_Act2,
 		C3.Plugins.System.Cnds.EveryTick,
 		C3.Plugins.Sprite.Acts.SetPos,
 		C3.Plugins.Mouse.Exps.X,
@@ -82,7 +82,9 @@ self.C3_GetObjectRefTable = function () {
 		C3.Behaviors.Turret.Acts.ClearTargets,
 		C3.Plugins.Sprite.Acts.SetAngle,
 		C3.Behaviors.MoveTo.Acts.MoveToPosition,
-		C3.Plugins.System.Acts.AddVar
+		C3.Plugins.System.Acts.AddVar,
+		C3.Plugins.Sprite.Cnds.OnDestroyed,
+		C3.Plugins.Sprite.Exps.Count
 	];
 };
 self.C3_JsPropNameTable = [
@@ -107,10 +109,13 @@ self.C3_JsPropNameTable = [
 	{update_turrent: 0},
 	{build_tower: 0},
 	{spr_boom: 0},
+	{EnemyContainer: 0},
 	{PathIndex: 0},
 	{Health: 0},
 	{selectPath: 0},
+	{SET_NUMBER: 0},
 	{Pathfinding: 0},
+	{Enemy_1: 0},
 	{Enemy_3: 0},
 	{spr_cannon_3: 0},
 	{spr_enemy_3_area: 0},
@@ -202,6 +207,7 @@ self.C3_JsPropNameTable = [
 	{health_container_home: 0},
 	{spr_bridge_1: 0},
 	{spr_bridge_2: 0},
+	{spr_bridge_3: 0},
 	{Fire: 0},
 	{Explosions: 0},
 	{spr_coin: 0},
@@ -246,6 +252,8 @@ self.InstanceType = {
 	update_turrent: class extends self.ISpriteInstance {},
 	build_tower: class extends self.ISpriteInstance {},
 	spr_boom: class extends self.ISpriteInstance {},
+	EnemyContainer: class extends self.ISpriteInstance {},
+	Enemy_1: class extends self.ISpriteInstance {},
 	Enemy_3: class extends self.ISpriteInstance {},
 	spr_cannon_3: class extends self.ISpriteInstance {},
 	spr_enemy_3_area: class extends self.ISpriteInstance {},
@@ -333,6 +341,7 @@ self.InstanceType = {
 	health_container_home: class extends self.ISpriteInstance {},
 	spr_bridge_1: class extends self.ISpriteInstance {},
 	spr_bridge_2: class extends self.ISpriteInstance {},
+	spr_bridge_3: class extends self.ISpriteInstance {},
 	Fire: class extends self.ISpriteInstance {},
 	Explosions: class extends self.ISpriteInstance {},
 	spr_coin: class extends self.ISpriteInstance {},
