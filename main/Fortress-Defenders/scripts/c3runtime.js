@@ -1470,7 +1470,7 @@ function or(l, r)
 
 self.C3_ExpressionFuncs = [
 		() => 0,
-		() => 9090,
+		() => 2000,
 		() => "Control Enemy",
 		() => 1,
 		p => {
@@ -1497,11 +1497,6 @@ self.C3_ExpressionFuncs = [
 		},
 		p => {
 			const n0 = p._GetNode(0);
-			const v1 = p._GetNode(1).GetVar();
-			return () => n0.ExpObject(v1.GetValue(), 1);
-		},
-		p => {
-			const n0 = p._GetNode(0);
 			const n1 = p._GetNode(1);
 			return () => n0.ExpObject(n1.ExpInstVar(), 0);
 		},
@@ -1510,6 +1505,8 @@ self.C3_ExpressionFuncs = [
 			const n1 = p._GetNode(1);
 			return () => n0.ExpObject(n1.ExpInstVar(), 1);
 		},
+		() => "Game",
+		() => "walk",
 		() => 0.1,
 		() => 7,
 		p => {
@@ -1517,7 +1514,6 @@ self.C3_ExpressionFuncs = [
 			const v1 = p._GetNode(1).GetVar();
 			return () => n0.ExpObject(v1.GetValue(), 3);
 		},
-		() => "Game",
 		() => 3,
 		p => {
 			const n0 = p._GetNode(0);
@@ -1527,8 +1523,14 @@ self.C3_ExpressionFuncs = [
 		p => {
 			const n0 = p._GetNode(0);
 			const v1 = p._GetNode(1).GetVar();
+			return () => n0.ExpObject(v1.GetValue(), 1);
+		},
+		p => {
+			const n0 = p._GetNode(0);
+			const v1 = p._GetNode(1).GetVar();
 			return () => subtract(n0.ExpObject(v1.GetValue(), 1), 1);
 		},
+		() => "Boat_Enemy",
 		() => "Wave Controller",
 		() => -1,
 		() => 4,
@@ -1555,6 +1557,8 @@ self.C3_ExpressionFuncs = [
 			const n0 = p._GetNode(0);
 			return () => (n0.ExpObject() - 0.5);
 		},
+		() => "die",
+		() => "Main Home Tower Fire",
 		() => -1023,
 		() => 15,
 		() => "Cursor & Touch Controller",
@@ -1586,6 +1590,8 @@ self.C3_ExpressionFuncs = [
 		() => 14,
 		() => "Path_3",
 		() => 16,
+		() => "Water Path",
+		() => 30,
 		() => 20,
 		() => "Functions",
 		() => 45,
@@ -1631,6 +1637,22 @@ self.C3_ExpressionFuncs = [
 		p => {
 			const v0 = p._GetNode(0).GetVar();
 			return () => and("Wave ", v0.GetValue());
+		},
+		p => {
+			const n0 = p._GetNode(0);
+			return () => (n0.ExpObject() - 40);
+		},
+		p => {
+			const n0 = p._GetNode(0);
+			return () => (n0.ExpObject() + 50);
+		},
+		p => {
+			const n0 = p._GetNode(0);
+			return () => (n0.ExpObject() + 40);
+		},
+		p => {
+			const n0 = p._GetNode(0);
+			return () => (n0.ExpObject() - 50);
 		}
 ];
 
