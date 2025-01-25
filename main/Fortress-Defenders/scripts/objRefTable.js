@@ -11,10 +11,10 @@ self.C3_GetObjectRefTable = function () {
 		C3.Plugins.Particles,
 		C3.Behaviors.solid,
 		C3.Plugins.Tilemap,
+		C3.Plugins.Text,
 		C3.Plugins.Arr,
 		C3.Plugins.Audio,
 		C3.Plugins.Browser,
-		C3.Plugins.Text,
 		C3.Plugins.Touch,
 		C3.Plugins.Mouse,
 		C3.Behaviors.Sin,
@@ -89,7 +89,9 @@ self.C3_GetObjectRefTable = function () {
 		C3.Behaviors.Pathfinding.Acts.Stop,
 		C3.Behaviors.MoveTo.Acts.MoveToPosition,
 		C3.Plugins.Spritefont2.Acts.SetText,
-		C3.Plugins.System.Exps.loadingprogress
+		C3.Plugins.System.Exps.loadingprogress,
+		C3.Plugins.System.Cnds.OnLoadFinished,
+		C3.Plugins.System.Acts.GoToLayout
 	];
 };
 self.C3_JsPropNameTable = [
@@ -168,6 +170,12 @@ self.C3_JsPropNameTable = [
 	{node_1_23: 0},
 	{path_detected: 0},
 	{starting_bg: 0},
+	{spr_game_title_loading: 0},
+	{spr_loading_title: 0},
+	{spr_bg_title_screan_loading: 0},
+	{spr_loading_up_deco: 0},
+	{spr_deco_round: 0},
+	{spr_play_btn: 0},
 	{bg: 0},
 	{bg_decoration: 0},
 	{animated_water: 0},
@@ -325,6 +333,12 @@ self.InstanceType = {
 	node_1_23: class extends self.ISpriteInstance {},
 	path_detected: class extends self.ISpriteInstance {},
 	starting_bg: class extends self.ITilemapInstance {},
+	spr_game_title_loading: class extends self.ISpriteInstance {},
+	spr_loading_title: class extends self.ITextInstance {},
+	spr_bg_title_screan_loading: class extends self.ISpriteInstance {},
+	spr_loading_up_deco: class extends self.ISpriteInstance {},
+	spr_deco_round: class extends self.ISpriteInstance {},
+	spr_play_btn: class extends self.ISpriteInstance {},
 	bg: class extends self.ITilemapInstance {},
 	bg_decoration: class extends self.ITilemapInstance {},
 	animated_water: class extends self.ISpriteInstance {},
