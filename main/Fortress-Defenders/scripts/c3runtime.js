@@ -1470,8 +1470,12 @@ function or(l, r)
 
 self.C3_ExpressionFuncs = [
 		() => 0,
-		() => 2000,
 		() => "Control Turrets & Bullets",
+		p => {
+			const v0 = p._GetNode(0).GetVar();
+			return () => v0.GetValue();
+		},
+		() => 1000,
 		() => 8,
 		p => {
 			const n0 = p._GetNode(0);
@@ -1479,12 +1483,11 @@ self.C3_ExpressionFuncs = [
 		},
 		() => "",
 		() => -1000,
+		() => "Not enough coins",
 		p => {
 			const n0 = p._GetNode(0);
 			return () => and("", n0.ExpInstVar());
 		},
-		() => 10,
-		() => 5,
 		() => 3,
 		() => "Wave 1",
 		() => 1,
@@ -1494,13 +1497,10 @@ self.C3_ExpressionFuncs = [
 			const v1 = p._GetNode(1).GetVar();
 			return () => n0.ExpObject(v1.GetValue(), 2);
 		},
+		() => 5,
 		p => {
 			const f0 = p._GetNode(0).GetBoundMethod();
 			return () => Math.floor(f0(1, 3));
-		},
-		p => {
-			const v0 = p._GetNode(0).GetVar();
-			return () => v0.GetValue();
 		},
 		() => 2,
 		p => {
@@ -1520,6 +1520,16 @@ self.C3_ExpressionFuncs = [
 		},
 		() => "Game",
 		() => "walk",
+		() => 10,
+		p => {
+			const f0 = p._GetNode(0).GetBoundMethod();
+			return () => Math.floor(f0(10, 15));
+		},
+		p => {
+			const f0 = p._GetNode(0).GetBoundMethod();
+			return () => Math.floor(f0(16, 22));
+		},
+		() => 20,
 		() => "die",
 		() => 1.5,
 		() => "Wave 2",
@@ -1546,11 +1556,28 @@ self.C3_ExpressionFuncs = [
 		},
 		() => 0.1,
 		() => 7,
+		p => {
+			const f0 = p._GetNode(0).GetBoundMethod();
+			return () => Math.floor(f0(22, 30));
+		},
+		p => {
+			const f0 = p._GetNode(0).GetBoundMethod();
+			return () => Math.floor(f0(20, 90));
+		},
+		p => {
+			const f0 = p._GetNode(0).GetBoundMethod();
+			return () => Math.floor(f0(27, 39));
+		},
+		p => {
+			const f0 = p._GetNode(0).GetBoundMethod();
+			return () => Math.floor(f0(30, 50));
+		},
 		() => "Control Water Attact",
 		() => 5000,
 		() => "Boat_Enemy",
 		() => "Wave Controller",
 		() => 4,
+		() => -9999999,
 		() => "Fire Controller",
 		() => "fire",
 		() => "idle",
@@ -1565,7 +1592,6 @@ self.C3_ExpressionFuncs = [
 		},
 		() => "Main Home Tower Fire",
 		() => -1023,
-		() => 15,
 		() => "Cursor & Touch Controller",
 		() => 6,
 		p => {
@@ -1575,6 +1601,10 @@ self.C3_ExpressionFuncs = [
 		() => 4.4,
 		() => "Main Player Tower Controller",
 		() => "Bridge Controller",
+		p => {
+			const v0 = p._GetNode(0).GetVar();
+			return () => and("", v0.GetValue());
+		},
 		() => "broken",
 		() => "break",
 		() => "Game_1",
@@ -1588,6 +1618,7 @@ self.C3_ExpressionFuncs = [
 			return () => (n0.ExpObject() - 1);
 		},
 		() => "Path_2",
+		() => 15,
 		() => 9,
 		() => 11,
 		() => 12,
@@ -1601,12 +1632,15 @@ self.C3_ExpressionFuncs = [
 			return () => (n0.ExpObject() + 63);
 		},
 		() => 30,
-		() => 20,
 		() => "Functions",
 		() => 45,
 		p => {
 			const n0 = p._GetNode(0);
 			return () => (n0.ExpObject() - 30);
+		},
+		p => {
+			const v0 = p._GetNode(0).GetVar();
+			return () => and(" ", v0.GetValue());
 		},
 		p => {
 			const n0 = p._GetNode(0);
@@ -1619,14 +1653,6 @@ self.C3_ExpressionFuncs = [
 			const n0 = p._GetNode(0);
 			const v1 = p._GetNode(1).GetVar();
 			return () => and(n0.ExpObject(v1.GetValue(), 0), "/4");
-		},
-		p => {
-			const v0 = p._GetNode(0).GetVar();
-			return () => and("", v0.GetValue());
-		},
-		p => {
-			const v0 = p._GetNode(0).GetVar();
-			return () => and(" ", v0.GetValue());
 		},
 		p => {
 			const n0 = p._GetNode(0);
@@ -1642,12 +1668,13 @@ self.C3_ExpressionFuncs = [
 		},
 		p => {
 			const n0 = p._GetNode(0);
-			return () => (n0.ExpObject() - 40);
+			return () => (n0.ExpObject() - 20);
 		},
 		p => {
 			const n0 = p._GetNode(0);
-			return () => (n0.ExpObject() + 50);
+			return () => (n0.ExpObject() + 52);
 		},
+		() => 0.4,
 		p => {
 			const n0 = p._GetNode(0);
 			return () => (n0.ExpObject() + 40);
