@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <link rel="stylesheet" href="TemplateData/style.css" />
+  <title>Missiles</title>  
+</head>
+<body>
+<div id="unity-container">
+  <canvas id="unity-canvas" width=1080 height=1920 tabindex="-1" style="width: 1080px; height: 1920px; background: #231F20"></canvas>
+  <div id="unity-loading-bar">
+    <div id="unity-progress-bar-full"></div>
+  </div>
+  <div id="unity-warning"></div>
+</div>
+<script src="Build/WebBuilds.loader.js"></script>
+<script>
+
+if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+        // Mobile device style: fill the whole browser client area with the game canvas:
+        var meta = document.createElement('meta');
+        meta.name = 'viewport';
+        meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
+        document.getElementsByTagName('head')[0].appendChild(meta);
+
+        var canvas = document.querySelector("#unity-canvas");
+        canvas.style.width = "100%";
+        canvas.style.height = "100%";
+        canvas.style.position = "fixed";
+
+        document.body.style.textAlign = "left";
+      }
+
+  function resizeCanvas() {
+    const canvas = document.querySelector("#unity-canvas");
+    const container = document.querySelector("#unity-container");
+
+    // Calculate aspect ratio 9:16
+    const aspectRatio = 9 / 16;
+    const containerWidth = window.innerWidth;
+    const containerHeight = window.innerHeight;
+
+    let newWidth, newHeight;
+
+    if (containerWidth / containerHeight > aspectRatio) {
+      // Constrain by height
+      newHeight = containerHeight;
+      newWidth = containerHeight * aspectRatio;
+    } else {
+      // Constrain by width
+      newWidth = containerWidth;
+      newHeight = containerWidth / aspectRatio;
+    }
+
+    canvas.style.width = `${newWidth}px`;
+    canvas.style.height = `${newHeight}px`;
+
+    // Center the canvas
+    canvas.style.marginTop = `${(containerHeight - newHeight) / 2}px`;
+    canvas.style.marginLeft = `${(containerWidth - newWidth) / 2}px`;
+  }
+
+
+
+
+  window.addEventListener("resize", resizeCanvas);
+  resizeCanvas();
+
+  function showLoadingScreen(progress) {
+    if (progress !== undefined) {
+      document.querySelector("#unity-progress-bar-full").style.width = 100 * progress + "%";
+    }
+  }
+
+  function hideLoadingScreen() {
+    document.querySelector("#unity-loading-bar").style.display = "none";
+  }
+
+  function unityShowBanner(msg, type) {
+    const warningBanner = document.querySelector("#unity-warning");
+    function updateBannerVisibility() {
+      warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
+    }
+    const div = document.createElement('div');
+    div.innerHTML = msg;
+    warningBanner.appendChild(div);
+    if (type === 'error') div.style.background = 'red';
+    else if (type === 'warning') div.style.background = 'yellow';
+    setTimeout(() => {
+      warningBanner.removeChild(div);
+      updateBannerVisibility();
+    }, 5000);
+    updateBannerVisibility();
+  }
+
+  createUnityInstance(document.querySelector("#unity-canvas"), {
+    dataUrl: "Build/WebBuilds.data.unityweb",
+    frameworkUrl: "Build/WebBuilds.framework.js.unityweb",
+    codeUrl: "Build/WebBuilds.wasm.unityweb",
+    streamingAssetsUrl: "StreamingAssets",
+    companyName: "ForgeGames",
+  productName: "Missiles",
+  productVersion: "1.0",
+  showBanner: unityShowBanner,
+  }, showLoadingScreen)
+  .then(() => {
+    hideLoadingScreen();
+  });
+</script>
+</body>
+</html>
