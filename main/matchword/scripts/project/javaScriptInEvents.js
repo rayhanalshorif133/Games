@@ -24,12 +24,7 @@ async function checkRealWord(word, GET_runtime) {
 
 	},
 
-	async E_helps_Event1_Act1(runtime, localVars)
-	{
-		document.body.style.cursor = "none";
-	},
-
-	async E_game_Event40_Act1(runtime, localVars)
+	async E_game_Event41_Act1(runtime, localVars)
 	{
 		document.body.style.cursor = "none";
 	}
