@@ -77,6 +77,7 @@ self.C3_GetObjectRefTable = function () {
 		C3.Plugins.Mouse.Exps.Y,
 		C3.Plugins.Touch.Cnds.OnTapGesture,
 		C3.Plugins.System.Cnds.OnLayoutStart,
+		C3.Plugins.Browser.Acts.RequestFullScreen,
 		C3.Plugins.Browser.Cnds.IsPortraitLandscape,
 		C3.JavaScriptInEvents.E_game_Event41_Act1,
 		C3.Plugins.Arr.Acts.SetSize,
