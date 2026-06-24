@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Game Zone</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body class="bg-[#121212] text-white min-h-screen flex flex-col items-center py-10 px-4">
+
+    <h1 class="text-4xl md:text-5xl font-extrabold text-[#00ffcc] mb-12 drop-shadow-[0_0_10px_rgba(0,255,204,0.3)] tracking-wide text-center">
+        🎮 Welcome to My Game Zone 🕹️
+    </h1>
+
+    <div id="game-container" class="flex flex-wrap gap-8 justify-center max-w-6xl w-full">
+        <div class="loading text-xl text-gray-400 animate-pulse">Loading Games...</div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // গিটহাব ইউজারনেম এবং রিপোজিটরি ডেটা
+            const username = "rayhanalshorif133"; 
+            const repo = "Games"; 
+            const apiUrl = `https://api.github.com/repos/${username}/${repo}/contents/container`;
+
+            $.getJSON(apiUrl, function(data) {
+                $('#game-container').empty();
+
+                data.forEach(function(item) {
+                    if (item.type === "dir") {
+                        const gameName = item.name.replace(/-/g, ' '); 
+                        const gameLink = `./container/${item.name}/`;
+                        const imageLink = `./container/${item.name}/thumbnail.png`; 
+
+                        // Tailwind ক্লাসেস দিয়ে কার্ডের HTML স্ট্রাকচার
+                        const cardHtml = `
+                            <div class="group bg-[#1e1e1e] border border-gray-800 rounded-xl overflow-hidden shadow-2xl w-72 flex flex-col transform transition-all duration-300 hover:-translate-y-2 hover:border-[#00ffcc] hover:shadow-[0_10px_20px_rgba(0,255,204,0.15)]">
+                                <img src="${imageLink}" alt="${gameName}" 
+                                     class="w-full h-40 object-cover bg-gray-800 transition-transform duration-300 group-hover:scale-105"
+                                     onerror="this.src='https://placehold.co/280x160/2a2a2a/ffffff?text=No+Image'">
+                                
+                                <div class="p-5 text-center flex flex-col flex-grow">
+                                    <h3 class="text-xl font-bold text-white mb-5 capitalize tracking-snug">${gameName}</h3>
+                                    
+                                    <a href="${gameLink}" 
+                                       class="mt-auto block w-full bg-[#00ffcc] text-[#121212] py-3 px-5 rounded-lg font-bold transition-colors duration-200 hover:bg-[#00b38f] active:scale-[0.98]">
+                                        Play Now
+                                    </a>
+                                </div>
+                            </div>
+                        `;
+                        
+                        $('#game-container').append(cardHtml);
+                    }
+                });
+            }).fail(function() {
+                $('#game-container').html('<p class="text-red-500 font-semibold text-lg">Failed to load games from GitHub API.</p>');
+            });
+        });
+    </script>
+</body>
+</html>
