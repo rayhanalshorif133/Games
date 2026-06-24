@@ -17,9 +17,21 @@
         <div class="loading text-xl text-gray-400 animate-pulse">Loading Games...</div>
     </div>
 
+    <div id="game-modal" class="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex flex-col items-center justify-center hidden opacity-0 transition-opacity duration-300">
+        <div class="w-full max-w-5xl flex justify-between items-center px-4 mb-4">
+            <h2 id="modal-game-title" class="text-xl md:text-2xl font-bold text-[#00ffcc] capitalize">Game Name</h2>
+            <button id="close-modal" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-5 rounded-lg transition-colors duration-200 shadow-md">
+                ✕ Close Game
+            </button>
+        </div>
+        
+        <div class="w-full max-w-5xl aspect-video bg-black rounded-xl overflow-hidden border border-gray-800 shadow-2xl px-4 md:px-0">
+            <iframe id="game-iframe" src="" class="w-full h-full" frameborder="0" allowfullscreen></iframe>
+        </div>
+    </div>
+
     <script>
         $(document).ready(function() {
-            // গিটহাব ইউজারনেম এবং রিপোজিটরি ডেটা
             const username = "rayhanalshorif133"; 
             const repo = "Games"; 
             const apiUrl = `https://api.github.com/repos/${username}/${repo}/contents/container`;
@@ -29,11 +41,11 @@
 
                 data.forEach(function(item) {
                     if (item.type === "dir") {
-                        const gameName = item.name.replace(/-/g, ' '); 
-                        const gameLink = `./container/${item.name}/`;
-                        const imageLink = `./container/${item.name}/thumbnail.png`; 
+                        const rawName = item.name;
+                        const gameName = rawName.replace(/-/g, ' '); 
+                        const gameLink = `./container/${rawName}/`;
+                        const imageLink = `./container/${rawName}/thumbnail.png`; 
 
-                        // Tailwind ক্লাসেস দিয়ে কার্ডের HTML স্ট্রাকচার
                         const cardHtml = `
                             <div class="group bg-[#1e1e1e] border border-gray-800 rounded-xl overflow-hidden shadow-2xl w-72 flex flex-col transform transition-all duration-300 hover:-translate-y-2 hover:border-[#00ffcc] hover:shadow-[0_10px_20px_rgba(0,255,204,0.15)]">
                                 <img src="${imageLink}" alt="${gameName}" 
@@ -42,11 +54,10 @@
                                 
                                 <div class="p-5 text-center flex flex-col flex-grow">
                                     <h3 class="text-xl font-bold text-white mb-5 capitalize tracking-snug">${gameName}</h3>
-                                    
-                                    <a href="${gameLink}" 
-                                       class="mt-auto block w-full bg-[#00ffcc] text-[#121212] py-3 px-5 rounded-lg font-bold transition-colors duration-200 hover:bg-[#00b38f] active:scale-[0.98]">
+                                    <button data-url="${gameLink}" data-name="${gameName}" 
+                                       class="play-btn-trigger mt-auto block w-full bg-[#00ffcc] text-[#121212] py-3 px-5 rounded-lg font-bold transition-colors duration-200 hover:bg-[#00b38f] active:scale-[0.98]">
                                         Play Now
-                                    </a>
+                                    </button>
                                 </div>
                             </div>
                         `;
@@ -55,7 +66,33 @@
                     }
                 });
             }).fail(function() {
-                $('#game-container').html('<p class="text-red-500 font-semibold text-lg">Failed to load games from GitHub API.</p>');
+                $('#game-container').html('<p class="text-red-500 font-semibold text-lg">Failed to load games.</p>');
+            });
+
+            $(document).on('click', '.play-btn-trigger', function() {
+                const gameUrl = $(this).data('url');
+                const gameName = $(this).data('name');
+
+                $('#modal-game-title').text(gameName);
+                $('#game-iframe').attr('src', gameUrl);
+
+                $('#game-modal').removeClass('hidden').addClass('flex');
+                setTimeout(() => {
+                    $('#game-modal').removeClass('opacity-0').addClass('opacity-100');
+                }, 50);
+
+                $('body').addClass('overflow-hidden');
+            });
+
+            $('#close-modal').on('click', function() {
+                $('#game-modal').removeClass('opacity-100').addClass('opacity-0');
+                
+                setTimeout(() => {
+                    $('#game-modal').removeClass('flex').addClass('hidden');
+                    $('#game-iframe').attr('src', ''); 
+                }, 300);
+
+                $('body').removeClass('overflow-hidden');
             });
         });
     </script>
