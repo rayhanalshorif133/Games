@@ -4,96 +4,480 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Game Zone</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --accent: #00e5b0;
+            --accent-dark: #00b38a;
+            --accent-glow: rgba(0, 229, 176, 0.18);
+            --bg: #0d0d12;
+            --surface: #15151e;
+            --surface2: #1c1c28;
+            --border: rgba(255,255,255,0.07);
+            --border-hover: rgba(0,229,176,0.45);
+            --text: #e8e8f0;
+            --text-muted: #7a7a95;
+            --radius: 16px;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ── Background grid ── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(0,229,176,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,229,176,0.03) 1px, transparent 1px);
+            background-size: 48px 48px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ── Header ── */
+        .header {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 60px 24px 48px;
+        }
+
+        .header-badge {
+            display: inline-block;
+            background: rgba(0,229,176,0.1);
+            border: 1px solid rgba(0,229,176,0.25);
+            color: var(--accent);
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 6px 18px;
+            border-radius: 100px;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 900;
+            color: #fff;
+            line-height: 1.1;
+            letter-spacing: -1px;
+        }
+
+        .header h1 span {
+            color: var(--accent);
+        }
+
+        .header-sub {
+            margin-top: 14px;
+            color: var(--text-muted);
+            font-size: 15px;
+            font-weight: 400;
+        }
+
+        .header-line {
+            width: 60px;
+            height: 3px;
+            background: var(--accent);
+            margin: 28px auto 0;
+            border-radius: 2px;
+        }
+
+        /* ── Game grid ── */
+        #game-container {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px 80px;
+        }
+
+        /* ── Loading skeleton ── */
+        .loading-grid {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .skeleton-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            animation: pulse 1.6s ease-in-out infinite;
+        }
+
+        .skeleton-img { height: 170px; background: var(--surface2); }
+
+        .skeleton-body { padding: 20px; }
+
+        .skeleton-line {
+            background: var(--surface2);
+            border-radius: 6px;
+            margin-bottom: 12px;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* ── Game Card ── */
+        .game-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+            cursor: pointer;
+        }
+
+        .game-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--border-hover);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,229,176,0.15);
+        }
+
+        .card-thumb {
+            position: relative;
+            overflow: hidden;
+            height: 170px;
+            background: var(--surface2);
+        }
+
+        .card-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.4s ease;
+        }
+
+        .game-card:hover .card-thumb img {
+            transform: scale(1.06);
+        }
+
+        .card-thumb-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(13,13,18,0.7) 0%, transparent 60%);
+            opacity: 0;
+            transition: opacity 0.25s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .game-card:hover .card-thumb-overlay {
+            opacity: 1;
+        }
+
+        .overlay-play-icon {
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            background: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: scale(0.8);
+            transition: transform 0.25s ease;
+        }
+
+        .game-card:hover .overlay-play-icon {
+            transform: scale(1);
+        }
+
+        .overlay-play-icon svg {
+            width: 22px;
+            height: 22px;
+            fill: #0d0d12;
+            margin-left: 3px;
+        }
+
+        .card-body {
+            padding: 18px 20px 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            text-transform: capitalize;
+            line-height: 1.3;
+        }
+
+        .play-btn-trigger {
+            margin-top: auto;
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: var(--accent);
+            color: #0a1410;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.1s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .play-btn-trigger:hover { background: var(--accent-dark); }
+        .play-btn-trigger:active { transform: scale(0.97); }
+
+        /* ── Modal ── */
+        #game-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            background: rgba(7, 7, 11, 0.96);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        #game-modal.active {
+            display: flex;
+        }
+
+        #game-modal.visible {
+            opacity: 1;
+        }
+
+        .modal-header {
+            width: 100%;
+            max-width: 960px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            gap: 16px;
+        }
+
+        .modal-title-wrap {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .modal-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--accent);
+            animation: blink 1.4s ease infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        #modal-game-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--accent);
+            text-transform: capitalize;
+            letter-spacing: 0.5px;
+        }
+
+        #close-modal {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: rgba(220, 50, 50, 0.12);
+            border: 1px solid rgba(220, 50, 50, 0.35);
+            color: #ff6b6b;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s;
+            font-family: 'Inter', sans-serif;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        #close-modal:hover {
+            background: rgba(220, 50, 50, 0.22);
+            border-color: rgba(220, 50, 50, 0.6);
+        }
+
+        .modal-frame-wrap {
+            width: 100%;
+            max-width: 960px;
+            aspect-ratio: 16/9;
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid rgba(0,229,176,0.2);
+            background: #000;
+            box-shadow: 0 0 60px rgba(0,229,176,0.06);
+        }
+
+        #game-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        .modal-hint {
+            margin-top: 14px;
+            font-size: 12px;
+            color: var(--text-muted);
+            letter-spacing: 0.3px;
+        }
+
+        /* ── Error ── */
+        .error-msg {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 48px 24px;
+            color: #ff6b6b;
+            font-size: 16px;
+        }
+    </style>
 </head>
-<body class="bg-[#121212] text-white min-h-screen flex flex-col items-center py-10 px-4">
+<body>
 
-    <h1 class="text-4xl md:text-5xl font-extrabold text-[#00ffcc] mb-12 drop-shadow-[0_0_10px_rgba(0,255,204,0.3)] tracking-wide text-center">
-        🎮 Welcome to My Game Zone 🕹️
-    </h1>
-
-    <div id="game-container" class="flex flex-wrap gap-8 justify-center max-w-6xl w-full">
-        <div class="loading text-xl text-gray-400 animate-pulse">Loading Games...</div>
+    <div class="header">
+        <div class="header-badge">🎮 Game Zone</div>
+        <h1>My <span>Game</span> Zone</h1>
+        <p class="header-sub">Pick a game and start playing instantly</p>
+        <div class="header-line"></div>
     </div>
 
-    <div id="game-modal" class="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex flex-col items-center justify-center hidden opacity-0 transition-opacity duration-300">
-        <div class="w-full max-w-5xl flex justify-between items-center px-4 mb-4">
-            <h2 id="modal-game-title" class="text-xl md:text-2xl font-bold text-[#00ffcc] capitalize">Game Name</h2>
-            <button id="close-modal" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-5 rounded-lg transition-colors duration-200 shadow-md">
-                ✕ Close Game
+    <div id="game-container">
+        <div class="loading-grid">
+            <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line" style="height:14px;width:70%;"></div><div class="skeleton-line" style="height:40px;width:100%;"></div></div></div>
+            <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line" style="height:14px;width:55%;"></div><div class="skeleton-line" style="height:40px;width:100%;"></div></div></div>
+            <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line" style="height:14px;width:65%;"></div><div class="skeleton-line" style="height:40px;width:100%;"></div></div></div>
+        </div>
+    </div>
+
+    <div id="game-modal">
+        <div class="modal-header">
+            <div class="modal-title-wrap">
+                <div class="modal-dot"></div>
+                <h2 id="modal-game-title">Game Name</h2>
+            </div>
+            <button id="close-modal">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                Close Game
             </button>
         </div>
-        
-        <div class="w-full max-w-5xl aspect-video bg-black rounded-xl overflow-hidden border border-gray-800 shadow-2xl px-4 md:px-0">
-            <iframe id="game-iframe" src="" class="w-full h-full" frameborder="0" allowfullscreen></iframe>
+
+        <div class="modal-frame-wrap">
+            <iframe id="game-iframe" src="" allowfullscreen></iframe>
         </div>
+
+        <p class="modal-hint">Press Esc or click "Close Game" to exit</p>
     </div>
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        $(document).ready(function() {
-            const username = "rayhanalshorif133"; 
-            const repo = "Games"; 
+        $(document).ready(function () {
+            const username = "rayhanalshorif133";
+            const repo = "Games";
             const apiUrl = `https://api.github.com/repos/${username}/${repo}/contents/container`;
 
-            $.getJSON(apiUrl, function(data) {
+            $.getJSON(apiUrl, function (data) {
                 $('#game-container').empty();
 
-                data.forEach(function(item) {
+                data.forEach(function (item) {
                     if (item.type === "dir") {
                         const rawName = item.name;
-                        const gameName = rawName.replace(/-/g, ' '); 
+                        const gameName = rawName.replace(/-/g, ' ');
                         const gameLink = `./container/${rawName}/`;
-                        const imageLink = `./container/${rawName}/thumbnail.png`; 
+                        const imageLink = `./container/${rawName}/thumbnail.png`;
 
                         const cardHtml = `
-                            <div class="group bg-[#1e1e1e] border border-gray-800 rounded-xl overflow-hidden shadow-2xl w-72 flex flex-col transform transition-all duration-300 hover:-translate-y-2 hover:border-[#00ffcc] hover:shadow-[0_10px_20px_rgba(0,255,204,0.15)]">
-                                <img src="${imageLink}" alt="${gameName}" 
-                                     class="w-full h-40 object-cover bg-gray-800 transition-transform duration-300 group-hover:scale-105"
-                                     onerror="this.src='https://placehold.co/280x160/2a2a2a/ffffff?text=No+Image'">
-                                
-                                <div class="p-5 text-center flex flex-col flex-grow">
-                                    <h3 class="text-xl font-bold text-white mb-5 capitalize tracking-snug">${gameName}</h3>
-                                    <button data-url="${gameLink}" data-name="${gameName}" 
-                                       class="play-btn-trigger mt-auto block w-full bg-[#00ffcc] text-[#121212] py-3 px-5 rounded-lg font-bold transition-colors duration-200 hover:bg-[#00b38f] active:scale-[0.98]">
-                                        Play Now
+                            <div class="game-card">
+                                <div class="card-thumb">
+                                    <img src="${imageLink}" alt="${gameName}"
+                                         onerror="this.src='https://placehold.co/560x340/1c1c28/7a7a95?text=No+Image'">
+                                    <div class="card-thumb-overlay">
+                                        <div class="overlay-play-icon">
+                                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="card-title">${gameName}</div>
+                                    <button class="play-btn-trigger" data-url="${gameLink}" data-name="${gameName}">
+                                        ▶ &nbsp;Play Now
                                     </button>
                                 </div>
                             </div>
                         `;
-                        
                         $('#game-container').append(cardHtml);
                     }
                 });
-            }).fail(function() {
-                $('#game-container').html('<p class="text-red-500 font-semibold text-lg">Failed to load games.</p>');
+
+                if ($('#game-container').children().length === 0) {
+                    $('#game-container').html('<div class="error-msg">No games found in the repository.</div>');
+                }
+            }).fail(function () {
+                $('#game-container').html('<div class="error-msg">⚠ Failed to load games. Check your internet connection or repo settings.</div>');
             });
 
-            $(document).on('click', '.play-btn-trigger', function() {
+            $(document).on('click', '.play-btn-trigger', function () {
                 const gameUrl = $(this).data('url');
                 const gameName = $(this).data('name');
 
                 $('#modal-game-title').text(gameName);
                 $('#game-iframe').attr('src', gameUrl);
-
-                $('#game-modal').removeClass('hidden').addClass('flex');
-                setTimeout(() => {
-                    $('#game-modal').removeClass('opacity-0').addClass('opacity-100');
-                }, 50);
-
-                $('body').addClass('overflow-hidden');
+                $('#game-modal').addClass('active');
+                setTimeout(() => $('#game-modal').addClass('visible'), 20);
+                $('body').css('overflow', 'hidden');
             });
 
-            $('#close-modal').on('click', function() {
-                $('#game-modal').removeClass('opacity-100').addClass('opacity-0');
-                
+            $('#close-modal').on('click', closeModal);
+
+            $(document).on('keydown', function (e) {
+                if (e.key === 'Escape') closeModal();
+            });
+
+            function closeModal() {
+                $('#game-modal').removeClass('visible');
                 setTimeout(() => {
-                    $('#game-modal').removeClass('flex').addClass('hidden');
-                    $('#game-iframe').attr('src', ''); 
+                    $('#game-modal').removeClass('active');
+                    $('#game-iframe').attr('src', '');
+                    $('body').css('overflow', '');
                 }, 300);
-
-                $('body').removeClass('overflow-hidden');
-            });
+            }
         });
     </script>
 </body>
