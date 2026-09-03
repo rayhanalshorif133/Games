@@ -1,0 +1,36 @@
+{
+  "project": {
+    "name": "Realistic Basketball 3-Min Challenge",
+    "version": "1.0.0.0",
+    "author": "AI Sports Studio",
+    "canvasWidth": 1080,
+    "canvasHeight": 1920,
+    "orientation": "portrait"
+  },
+  "gameplay": {
+    "roundTimeSeconds": 180,
+    "warningTimeSeconds": 10,
+    "regularScore": 2,
+    "swishScore": 3,
+    "streakThreshold": 2,
+    "ballRadius": 54,
+    "gravity": 1800,
+    "airResistance": 0.999,
+    "ballRestitution": 0.76,
+    "floorRestitution": 0.65,
+    "backboardRestitution": 0.55,
+    "rimRestitution": 0.72,
+    "floorY": 1740,
+    "hoop": {
+      "rimY": 760,
+      "rimLeftX": 660,
+      "rimRightX": 890,
+      "rimRadius": 14,
+      "backboardX": 910,
+      "backboardTopY": 480,
+      "backboardBottomY": 920,
+      "backboardWidth": 26
+    }
+  }
+}
+
