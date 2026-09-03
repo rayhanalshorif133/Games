@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Realistic Bubble Shooter 2D - 5 Love Lives</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#ff2d55">
+  <meta name="description" content="Realistic 2D Bubble Shooter game featuring 5 Love Lives, realistic 3D-shaded glass bubbles, ricochet trajectory aiming, and dynamic chain combos.">
+
+  <!-- Construct 3 Web Export Meta & Links -->
+  <link rel="manifest" href="appmanifest.json">
+  <link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Construct 3 Style Canvas Container (Preserves 1080x1920 9:16 Aspect Ratio) -->
+  <div id="c3-canvas-wrapper">
+    <!-- Game Canvas -->
+    <canvas id="c3-canvas" width="1080" height="1920"></canvas>
+
+    <!-- In-Game UI Overlay Layer -->
+    <div id="ui-layer">
+      <!-- Top HUD Header -->
+      <header class="hud-header">
+        <!-- 5 Love Lives Panel -->
+        <div class="hud-panel lives-panel" title="5 Love Lives remaining">
+          <div class="hud-label">LIVES</div>
+          <div id="hud-lives" class="lives-container" aria-label="5 lives">
+            <div class="heart-slot heart-full" data-index="0">
+              <img src="images/heart-full.svg" alt="Heart Life 1" class="heart-img">
+            </div>
+            <div class="heart-slot heart-full" data-index="1">
+              <img src="images/heart-full.svg" alt="Heart Life 2" class="heart-img">
+            </div>
+            <div class="heart-slot heart-full" data-index="2">
+              <img src="images/heart-full.svg" alt="Heart Life 3" class="heart-img">
+            </div>
+            <div class="heart-slot heart-full" data-index="3">
+              <img src="images/heart-full.svg" alt="Heart Life 4" class="heart-img">
+            </div>
+            <div class="heart-slot heart-full" data-index="4">
+              <img src="images/heart-full.svg" alt="Heart Life 5" class="heart-img">
+            </div>
+          </div>
+        </div>
+
+        <!-- Score Box -->
+        <div class="hud-panel score-panel">
+          <span class="hud-label">SCORE</span>
+          <span id="hud-score" class="hud-value score">0</span>
+        </div>
+
+        <!-- Level Box -->
+        <div class="hud-panel level-panel">
+          <span class="hud-label">LEVEL</span>
+          <span id="hud-level" class="hud-value level">1</span>
+        </div>
+
+        <!-- Streak / Multiplier Box -->
+        <div class="hud-panel streak-panel">
+          <span class="hud-label">STREAK</span>
+          <span class="hud-value streak">
+            <span class="streak-flame">🔥</span>
+            <span id="hud-streak">0</span>
+          </span>
+        </div>
+
+        <!-- Action Controls -->
+        <div class="hud-actions">
+          <button id="btn-sound" class="hud-btn" title="Toggle Sound" aria-label="Toggle Sound">🔊</button>
+          <button id="btn-pause" class="hud-btn" title="Pause Game" aria-label="Pause Game">⏸</button>
+        </div>
+      </header>
+
+      <!-- Foul / Miss Meter Sub-Bar -->
+      <div class="hud-sub-bar">
+        <div class="sub-badge" id="miss-meter-badge">
+          CEILING DROP IN: <span id="hud-misses-left">5</span> SHOTS
+        </div>
+        <div class="sub-badge combo-badge" id="hud-combo-status">
+          READY TO SHOOT
+        </div>
+      </div>
+
+      <!-- Bottom Shooter HUD (Next Bubble & Swap Button) -->
+      <div class="shooter-hud">
+        <div class="swap-container" id="swap-box" title="Click to Swap Bubbles">
+          <div class="swap-label">NEXT</div>
+          <div class="next-bubble-orb" id="next-bubble-display"></div>
+          <button id="btn-swap" class="btn-swap-bubble" title="Swap Current & Next Bubble" aria-label="Swap Bubble">
+            ⇄ SWAP
+          </button>
+        </div>
+      </div>
+
+      <!-- Aiming Drag Hint -->
+      <div id="drag-hint">
+        <span>🎯</span> TOUCH / DRAG TO AIM &amp; RELEASE TO SHOOT
+      </div>
+    </div>
+
+    <!-- Start Challenge Modal Overlay -->
+    <div id="start-modal" class="modal-overlay">
+      <div class="card-modal">
+        <div class="modal-badge">2D PHYSICS ARCADE</div>
+        <div class="modal-title">BUBBLE<br><span>SHOOTER 2D</span></div>
+        <div class="modal-subtitle">রিয়্যালিস্টিক বাবল শুটার - ৫টি লাভ লাইভ নিয়ে খেলুন!</div>
+
+        <div class="rules-card">
+          <ul class="instruction-list">
+            <li>❤️ <span>5 Love Lives:</span> প্রতিটি মিস শটে ১টি লাভ লাইফ কমে যাবে! ৩+ কম্বো করলে লাইফ ফিরে পাবেন!</li>
+            <li>🎯 <span>Realistic Aim:</span> আঙ্গুল টেনে লক্ষ্য স্থির করুন। দেয়ালে বাউন্স (Ricochet) করে কঠিন কোণায় আঘাত করুন!</li>
+            <li>💥 <span>Pop 3+:</span> একই রঙের ৩ বা ততোধিক বাবল মিলিয়ে পপ করুন।</li>
+            <li>🎈 <span>Drop Physics:</span> সিলিং থেকে বিচ্ছিন্ন বাবলগুলো মাধ্যাকর্ষণে ঝরে পড়বে এবং বোনাস পয়েন্ট দেবে!</li>
+            <li>⚠️ <span>Danger Line:</span> বাবলগুলো নিচের ডেঞ্জার লাইন অতিক্রম করলে খেলা সমাপ্ত হবে!</li>
+          </ul>
+        </div>
+
+        <button id="btn-start-play" class="btn-cta">START GAME</button>
+      </div>
+    </div>
+
+    <!-- Game Over Modal Overlay -->
+    <div id="gameover-modal" class="modal-overlay hidden">
+      <div class="card-modal">
+        <div id="go-rank" class="badge-rank">GAME OVER 💔</div>
+        <div class="modal-title">OUT OF <span>HEARTS!</span></div>
+        <div id="go-reason" class="modal-subtitle">সকল লাভ লাইভ শেষ হয়ে গেছে!</div>
+
+        <div class="stats-grid">
+          <div class="stat-box highlight">
+            <div id="go-score" class="stat-num gold">0</div>
+            <div class="stat-desc">FINAL SCORE 🌟</div>
+          </div>
+          <div class="stat-box">
+            <div id="go-bubbles-popped" class="stat-num">0</div>
+            <div class="stat-desc">BUBBLES POPPED 🫧</div>
+          </div>
+          <div class="stat-box">
+            <div id="go-dropped" class="stat-num">0</div>
+            <div class="stat-desc">BUBBLES DROPPED 🎈</div>
+          </div>
+          <div class="stat-box">
+            <div id="go-best-streak" class="stat-num">0</div>
+            <div class="stat-desc">MAX STREAK 🔥</div>
+          </div>
+        </div>
+
+        <button id="btn-play-again" class="btn-cta">PLAY AGAIN</button>
+      </div>
+    </div>
+
+    <!-- Level Cleared Modal Overlay -->
+    <div id="win-modal" class="modal-overlay hidden">
+      <div class="card-modal">
+        <div class="badge-rank gold-rank">STAGE CLEARED! 🎉</div>
+        <div class="modal-title">VICTORY <span>BURST!</span></div>
+        <div class="modal-subtitle">অসাধারণ! আপনি সকল বাবল সাফ করেছেন!</div>
+
+        <div class="stats-grid">
+          <div class="stat-box highlight">
+            <div id="win-score" class="stat-num gold">0</div>
+            <div class="stat-desc">STAGE SCORE ⭐</div>
+          </div>
+          <div class="stat-box">
+            <div id="win-hearts-bonus" class="stat-num">+1000</div>
+            <div class="stat-desc">LIVES BONUS ❤️</div>
+          </div>
+        </div>
+
+        <button id="btn-next-level" class="btn-cta">NEXT LEVEL 🚀</button>
+      </div>
+    </div>
+
+    <!-- Pause Modal Overlay -->
+    <div id="pause-modal" class="modal-overlay hidden">
+      <div class="card-modal">
+        <div class="modal-title">GAME <span>PAUSED</span></div>
+        <div class="modal-subtitle">খেলা সাময়িক বিরতিতে আছে</div>
+        <button id="btn-resume" class="btn-cta">RESUME</button>
+        <button id="btn-restart-from-pause" class="btn-secondary">RESTART</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Game Scripts (Construct 3 Module Pattern) -->
+  <script src="scripts/audio.js"></script>
+  <script src="scripts/grid.js"></script>
+  <script src="scripts/shooter.js"></script>
+  <script src="scripts/renderer.js"></script>
+  <script src="scripts/game.js"></script>
+  <script src="scripts/main.js"></script>
+</body>
+</html>
+

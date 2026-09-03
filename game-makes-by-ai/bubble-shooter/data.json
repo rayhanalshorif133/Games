@@ -1,0 +1,44 @@
+{
+  "project": {
+    "name": "Realistic Bubble Shooter 2D",
+    "version": "1.0.0.0",
+    "author": "AI Games Studio",
+    "canvasWidth": 1080,
+    "canvasHeight": 1920,
+    "orientation": "portrait"
+  },
+  "gameplay": {
+    "initialLives": 5,
+    "maxLives": 5,
+    "bubbleRadius": 48,
+    "gridRows": 14,
+    "gridCols": 11,
+    "initialActiveRows": 7,
+    "topOffset": 240,
+    "bottomDangerY": 1540,
+    "shooterY": 1700,
+    "shooterX": 540,
+    "bubbleSpeed": 2600,
+    "missesBeforeCeilingDrop": 5,
+    "comboThresholdForHeart": 3,
+    "colors": [
+      { "id": "ruby", "name": "Ruby Red", "primary": "#ff2d55", "shadow": "#a50026", "glow": "rgba(255, 45, 85, 0.6)" },
+      { "id": "sapphire", "name": "Sapphire Blue", "primary": "#007aff", "shadow": "#003b80", "glow": "rgba(0, 122, 255, 0.6)" },
+      { "id": "emerald", "name": "Emerald Green", "primary": "#34c759", "shadow": "#176e30", "glow": "rgba(52, 199, 89, 0.6)" },
+      { "id": "topaz", "name": "Topaz Yellow", "primary": "#ffcc00", "shadow": "#997a00", "glow": "rgba(255, 204, 0, 0.6)" },
+      { "id": "amethyst", "name": "Amethyst Purple", "primary": "#af52de", "shadow": "#581b7e", "glow": "rgba(175, 82, 222, 0.6)" },
+      { "id": "cyan", "name": "Diamond Cyan", "primary": "#00d2d3", "shadow": "#01a3a4", "glow": "rgba(0, 210, 211, 0.6)" }
+    ],
+    "specialBubbles": {
+      "bombChance": 0.05,
+      "rainbowChance": 0.04
+    },
+    "scoring": {
+      "popPerBubble": 15,
+      "dropPerBubble": 40,
+      "comboMultiplierStep": 0.5,
+      "heartRecoveryBonus": 200
+    }
+  }
+}
+

@@ -1,0 +1,23 @@
+{
+  "name": "Realistic Bubble Shooter 2D",
+  "short_name": "BubbleShooter",
+  "description": "Realistic 2D Bubble Shooter game with 5 Love Lives, realistic glass physics and glossy 3D visuals.",
+  "start_url": "index.html",
+  "display": "fullscreen",
+  "orientation": "portrait",
+  "background_color": "#0a0e17",
+  "theme_color": "#ff2d55",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
+

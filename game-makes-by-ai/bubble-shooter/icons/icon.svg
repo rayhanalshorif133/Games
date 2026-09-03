@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <!-- Background Gradient -->
+    <radialGradient id="bgGrad" cx="50%" cy="30%" r="75%">
+      <stop offset="0%" stop-color="#1f2438"/>
+      <stop offset="60%" stop-color="#0c0e18"/>
+      <stop offset="100%" stop-color="#05070d"/>
+    </radialGradient>
+
+    <!-- Glossy Bubble Gradients -->
+    <radialGradient id="bubbleRed" cx="35%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#ff9eb5"/>
+      <stop offset="40%" stop-color="#ff2d55"/>
+      <stop offset="85%" stop-color="#a50026"/>
+      <stop offset="100%" stop-color="#550012"/>
+    </radialGradient>
+    <radialGradient id="bubbleBlue" cx="35%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#a8d4ff"/>
+      <stop offset="40%" stop-color="#007aff"/>
+      <stop offset="85%" stop-color="#003b80"/>
+      <stop offset="100%" stop-color="#00183b"/>
+    </radialGradient>
+    <radialGradient id="bubbleGreen" cx="35%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#b6f7c7"/>
+      <stop offset="40%" stop-color="#34c759"/>
+      <stop offset="85%" stop-color="#176e30"/>
+      <stop offset="100%" stop-color="#0b3817"/>
+    </radialGradient>
+    <radialGradient id="bubbleYellow" cx="35%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#fff8b3"/>
+      <stop offset="40%" stop-color="#ffcc00"/>
+      <stop offset="85%" stop-color="#cc8800"/>
+      <stop offset="100%" stop-color="#664400"/>
+    </radialGradient>
+    <radialGradient id="bubblePurple" cx="35%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#efc9ff"/>
+      <stop offset="40%" stop-color="#af52de"/>
+      <stop offset="85%" stop-color="#581b7e"/>
+      <stop offset="100%" stop-color="#2c0a42"/>
+    </radialGradient>
+
+    <!-- Heart Gradient -->
+    <linearGradient id="heartGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff6b8b"/>
+      <stop offset="50%" stop-color="#ff2d55"/>
+      <stop offset="100%" stop-color="#c4002f"/>
+    </linearGradient>
+
+    <!-- Glow Filter -->
+    <filter id="glowFilter" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Background Card -->
+  <rect width="512" height="512" rx="100" fill="url(#bgGrad)"/>
+  <rect width="504" height="504" x="4" y="4" rx="96" fill="none" stroke="#ff2d55" stroke-opacity="0.3" stroke-width="4"/>
+
+  <!-- Cluster of 3D Glossy Bubbles -->
+  <!-- Top Left: Blue -->
+  <circle cx="160" cy="150" r="75" fill="url(#bubbleBlue)"/>
+  <ellipse cx="140" cy="125" rx="30" ry="16" fill="#ffffff" opacity="0.6" transform="rotate(-30 140 125)"/>
+
+  <!-- Top Right: Green -->
+  <circle cx="340" cy="140" r="72" fill="url(#bubbleGreen)"/>
+  <ellipse cx="320" cy="115" rx="28" ry="14" fill="#ffffff" opacity="0.6" transform="rotate(-30 320 115)"/>
+
+  <!-- Center Right: Yellow -->
+  <circle cx="370" cy="270" r="68" fill="url(#bubbleYellow)"/>
+  <ellipse cx="350" cy="245" rx="26" ry="13" fill="#ffffff" opacity="0.6" transform="rotate(-30 350 245)"/>
+
+  <!-- Center Left: Purple -->
+  <circle cx="140" cy="285" r="70" fill="url(#bubblePurple)"/>
+  <ellipse cx="120" cy="260" rx="27" ry="13" fill="#ffffff" opacity="0.6" transform="rotate(-30 120 260)"/>
+
+  <!-- Center Hero Bubble: Ruby Red with Heart -->
+  <circle cx="256" cy="290" r="105" fill="url(#bubbleRed)" filter="url(#glowFilter)"/>
+  <circle cx="256" cy="290" r="105" fill="none" stroke="#ffffff" stroke-width="3" opacity="0.3"/>
+  
+  <!-- Glossy Highlight on Center Bubble -->
+  <ellipse cx="225" cy="245" rx="45" ry="24" fill="#ffffff" opacity="0.75" transform="rotate(-25 225 245)"/>
+  <circle cx="205" cy="265" r="6" fill="#ffffff" opacity="0.8"/>
+
+  <!-- Golden 5 Lives Badge Star -->
+  <path d="M 256,215 C 240,185 195,190 195,225 C 195,260 256,305 256,305 C 256,305 317,260 317,225 C 317,190 272,185 256,215 Z" 
+        fill="url(#heartGrad)" filter="url(#glowFilter)" stroke="#ffffff" stroke-width="4"/>
+
+  <!-- Shooter Cannon Ring Base at Bottom -->
+  <path d="M 190,470 Q 256,430 322,470" fill="none" stroke="#00d2d3" stroke-width="12" stroke-linecap="round"/>
+  <circle cx="256" cy="425" r="28" fill="#ff2d55" stroke="#ffffff" stroke-width="4"/>
+  <line x1="256" y1="425" x2="256" y2="350" stroke="#00d2d3" stroke-width="6" stroke-dasharray="10,8"/>
+</svg>
+
