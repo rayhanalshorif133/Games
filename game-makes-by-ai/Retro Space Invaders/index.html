@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>CYBER INVADERS // 2D Sci-Fi Tactical Defense</title>
+  <meta name="description" content="Modern Sci-Fi 2D Space Invaders Tactical Combat with Holographic HUD, Plasma Energy Bunkers, Web Audio Synthesizer, and Dedicated Score API.">
+  <meta name="theme-color" content="#030712">
+
+  <!-- Futuristic Sci-Fi & Pixel Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=Rajdhani:wght@500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Cybernetic Framework Host -->
+  <div id="arcade-cabinet" class="scifi-frame">
+    
+    <!-- Game Container with Fixed Aspect Ratio -->
+    <div id="game-container" class="scifi-viewport">
+      
+      <!-- Primary HTML5 Canvas (800x900 Internal Resolution) -->
+      <canvas id="game-canvas" width="800" height="900"></canvas>
+
+      <!-- Holographic Tactical Grid & Coordinate HUD Overlay -->
+      <div id="crt-overlay" class="holo-grid-overlay">
+        <div class="holo-scan-line"></div>
+        <div class="holo-corner holo-tl"></div>
+        <div class="holo-corner holo-tr"></div>
+        <div class="holo-corner holo-bl"></div>
+        <div class="holo-corner holo-br"></div>
+      </div>
+
+      <!-- Modern Sci-Fi Tactical HUD -->
+      <div id="game-hud" class="scifi-hud hidden">
+        <div class="hud-chip">
+          <span class="hud-label">COMBAT SCORE</span>
+          <span id="hud-score" class="hud-val text-cyan">00000</span>
+        </div>
+
+        <div class="hud-chip">
+          <span class="hud-label">APEX RECORD</span>
+          <span id="hud-high-score" class="hud-val text-yellow">00000</span>
+        </div>
+
+        <div class="hud-chip">
+          <span class="hud-label">SECTOR THREAT</span>
+          <span id="hud-wave" class="hud-val text-plasma">WAVE 1</span>
+        </div>
+
+        <div class="hud-chip lives-chip">
+          <span class="hud-label">DEFENDER INTEGRITY</span>
+          <div id="hud-lives-icons" class="lives-container">
+            <span class="life-icon"></span>
+            <span class="life-icon"></span>
+            <span class="life-icon"></span>
+          </div>
+        </div>
+
+        <div class="hud-controls">
+          <button id="btn-crt-toggle" class="scifi-chip-btn" title="Toggle Holographic Grid">HOLO: ON</button>
+          <button id="btn-pause" class="scifi-chip-btn" title="Tactical Pause">⏸️</button>
+          <button id="btn-mute" class="scifi-chip-btn" title="Audio Protocol">🔊</button>
+        </div>
+      </div>
+
+      <!-- Start Screen / Mission Briefing -->
+      <div id="start-screen" class="screen-modal">
+        <div class="scifi-card">
+          <div class="card-bracket bracket-tl"></div>
+          <div class="card-bracket bracket-tr"></div>
+          <div class="card-bracket bracket-bl"></div>
+          <div class="card-bracket bracket-br"></div>
+
+          <div class="scifi-title-box">
+            <div class="telemetry-tag">DEFENSE PROTOCOL // ORBITAL SECTOR 7</div>
+            <h1 class="scifi-main-title">CYBER<span class="title-highlight">INVADERS</span></h1>
+            <div class="scifi-subtitle">TACTICAL SPACE WARFARE // 2026 EDITION</div>
+          </div>
+
+          <!-- Target Classification Table -->
+          <div class="target-table">
+            <div class="table-header-tag">[ THREAT CLASSIFICATION & BOUNTY ]</div>
+            <div class="target-row">
+              <span class="alien-preview preview-ufo"></span>
+              <span class="target-info">MOTHERSHIP SAUCER</span>
+              <span class="target-bounty text-red">? MYSTERY</span>
+            </div>
+            <div class="target-row">
+              <span class="alien-preview preview-squid"></span>
+              <span class="target-info">CYBER SQUID DREAD</span>
+              <span class="target-bounty text-cyan">30 PTS</span>
+            </div>
+            <div class="target-row">
+              <span class="alien-preview preview-crab"></span>
+              <span class="target-info">PLASMA CRAB RAIDER</span>
+              <span class="target-bounty text-pink">20 PTS</span>
+            </div>
+            <div class="target-row">
+              <span class="alien-preview preview-octopus"></span>
+              <span class="target-info">OCTO VANGUARD UNIT</span>
+              <span class="target-bounty text-green">10 PTS</span>
+            </div>
+          </div>
+
+          <!-- Pilot Identity -->
+          <div class="pilot-input-wrap">
+            <label for="player-name-input" class="input-label-scifi">PILOT CALLSIGN</label>
+            <div class="input-glow-box">
+              <span class="input-icon">⚡</span>
+              <input type="text" id="player-name-input" class="scifi-input" placeholder="ENTER PILOT ID" value="CYBER_PILOT_01" maxlength="15" autocomplete="off">
+            </div>
+          </div>
+
+          <!-- Tactical Action Buttons -->
+          <div class="action-buttons">
+            <button id="btn-start" class="btn-scifi btn-scifi-primary">
+              <span class="btn-flare"></span>
+              <span>⚔️ ENGAGE FLEET // DEPLOY</span>
+            </button>
+            <button id="btn-leaderboard-start" class="btn-scifi btn-scifi-secondary">
+              <span>🏆 GALACTIC LEADERBOARD</span>
+            </button>
+          </div>
+
+          <!-- Tactical Controls Hint -->
+          <div class="telemetry-footer">
+            <div class="hud-telemetry-item">NAVIGATION: <strong>[A]/[D]</strong> OR <strong>[ARROWS]</strong></div>
+            <div class="hud-telemetry-item">PLASMA CANNON: <strong>[SPACE]</strong> • PAUSE: <strong>[P]</strong></div>
+            <div class="hud-telemetry-item">SHIELDS: <strong>ENERGY BUNKERS</strong> • NETWORK: <strong>SCORE API LIVE</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mission Summary / Post-Combat Debrief -->
+      <div id="game-over-screen" class="screen-modal hidden">
+        <div class="scifi-card">
+          <div class="card-bracket bracket-tl"></div>
+          <div class="card-bracket bracket-tr"></div>
+          <div class="card-bracket bracket-bl"></div>
+          <div class="card-bracket bracket-br"></div>
+
+          <div class="debrief-header">
+            <div class="telemetry-tag text-red">[ MISSION TERMINATED ]</div>
+            <h2 class="debrief-title">SYSTEM COMPROMISED</h2>
+            <div id="summary-rank-badge" class="scifi-rank-badge">SPACE CADET 🛸</div>
+          </div>
+
+          <!-- Stats Hologram Matrix -->
+          <div class="matrix-stats-panel">
+            <div class="matrix-main-cell">
+              <span class="matrix-label">FINAL ACCUMULATED SCORE</span>
+              <div id="summary-score" class="matrix-value-hero text-cyan">0 PTS</div>
+            </div>
+            
+            <div class="matrix-sub-grid">
+              <div class="matrix-cell">
+                <span class="matrix-label">SECTOR CLEARED</span>
+                <span id="summary-wave" class="matrix-value text-yellow">WAVE 1</span>
+              </div>
+              <div class="matrix-cell">
+                <span class="matrix-label">INVADERS DESTROYED</span>
+                <span id="summary-aliens" class="matrix-value text-pink">0</span>
+              </div>
+              <div class="matrix-cell">
+                <span class="matrix-label">RAILGUN ACCURACY</span>
+                <span id="summary-accuracy" class="matrix-value text-green">0%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Score Submission via Dedicated ScoreAPI -->
+          <div class="api-submission-box">
+            <button id="btn-submit-score" class="btn-scifi btn-scifi-accent">
+              <span class="btn-flare"></span>
+              <span>🚀 TRANSMIT DATA TO SCORE API</span>
+            </button>
+            <div id="submit-status-text" class="status-feedback"></div>
+          </div>
+
+          <!-- Redeploy Actions -->
+          <div class="action-buttons">
+            <button id="btn-play-again" class="btn-scifi btn-scifi-primary">
+              <span>🔄 RE-ENGAGE FLEET</span>
+            </button>
+            <button id="btn-leaderboard-end" class="btn-scifi btn-scifi-secondary">
+              <span>🏆 VIEW LEADERBOARD</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Galactic Leaderboard Modal -->
+      <div id="leaderboard-modal" class="screen-modal hidden">
+        <div class="scifi-card modal-wide">
+          <div class="card-bracket bracket-tl"></div>
+          <div class="card-bracket bracket-tr"></div>
+          <div class="card-bracket bracket-bl"></div>
+          <div class="card-bracket bracket-br"></div>
+
+          <div class="modal-header-scifi">
+            <div class="telemetry-tag text-cyan">[ GLOBAL DEFENDER TELEMETRY ]</div>
+            <h2 class="scifi-modal-title">GALACTIC LEADERBOARD</h2>
+            <div class="scifi-modal-desc">TOP 10 ELITE PILOTS WORLDWIDE</div>
+          </div>
+
+          <div id="leaderboard-list" class="scifi-leaderboard-container">
+            <!-- Populated via scoreApi.fetchLeaderboard -->
+          </div>
+
+          <button id="btn-close-leaderboard" class="btn-scifi btn-scifi-secondary">DISMISS</button>
+        </div>
+      </div>
+
+      <!-- Mobile / Tablet Futuristic Touch Controls -->
+      <div id="mobile-touch-controls" class="mobile-controls hidden-touch">
+        <div class="dpad-left">
+          <button id="btn-touch-left" class="scifi-touch-btn touch-nav" aria-label="Vector Left">◀</button>
+          <button id="btn-touch-right" class="scifi-touch-btn touch-nav" aria-label="Vector Right">▶</button>
+        </div>
+        <div class="dpad-right">
+          <button id="btn-touch-fire" class="scifi-touch-btn touch-fire" aria-label="Discharge Plasma">FIRE ⚡</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Modular Scripts Pipeline -->
+  <script src="scripts/scoreApi.js"></script>
+  <script src="scripts/audio.js"></script>
+  <script src="scripts/bunkers.js"></script>
+  <script src="scripts/particles.js"></script>
+  <script src="scripts/player.js"></script>
+  <script src="scripts/aliens.js"></script>
+  <script src="scripts/game.js"></script>
+  <script src="scripts/main.js"></script>
+
+</body>
+</html>

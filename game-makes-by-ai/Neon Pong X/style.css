@@ -1,0 +1,287 @@
+/* Neon Pong X - Construct 3 Style Game Canvas & Cyberpunk UI */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    background-color: #020208;
+    color: #ffffff;
+    font-family: 'Orbitron', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    overflow: hidden;
+    position: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    touch-action: none;
+}
+
+/* Construct 3 Style Canvas Container */
+#c3canvasdiv {
+    position: relative;
+    width: 100vw;
+    height: calc(100vw * (1920 / 1080));
+    max-height: 100vh;
+    max-width: calc(100vh * (1080 / 1920));
+    aspect-ratio: 1080 / 1920;
+    margin: auto;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 0 60px rgba(0, 243, 255, 0.15), 0 0 100px rgba(255, 0, 127, 0.1);
+    background: #050510;
+}
+
+/* Canvas Element */
+#c3canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    cursor: crosshair;
+    touch-action: none;
+}
+
+/* Scanline and CRT Overlay */
+.crt-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+                radial-gradient(circle at center, transparent 65%, rgba(0, 0, 0, 0.6) 100%);
+    background-size: 100% 4px, 100% 100%;
+    z-index: 10;
+    opacity: 0.65;
+}
+
+/* HUD Overlay Elements */
+.hud-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 20;
+}
+
+#hud-pause-btn {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    width: 44px;
+    height: 44px;
+    background: rgba(5, 5, 20, 0.8);
+    border: 2px solid #00f3ff;
+    border-radius: 8px;
+    color: #00f3ff;
+    font-size: 18px;
+    cursor: pointer;
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+    transition: all 0.2s ease;
+}
+
+#hud-pause-btn:hover {
+    background: #00f3ff;
+    color: #050510;
+    box-shadow: 0 0 25px rgba(0, 243, 255, 0.8);
+}
+
+/* Modals & Screens */
+.menu-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(5, 5, 18, 0.88);
+    backdrop-filter: blur(8px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 30px;
+    z-index: 50;
+    opacity: 1;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.menu-overlay.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* Cyber Title */
+.game-title {
+    font-size: 3.4rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 6px;
+    text-align: center;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, #00f3ff 0%, #ffffff 50%, #ff007f 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 25px rgba(0, 243, 255, 0.6));
+    animation: titlePulse 3s infinite alternate ease-in-out;
+}
+
+.game-subtitle {
+    font-size: 0.95rem;
+    letter-spacing: 5px;
+    color: #00f3ff;
+    text-shadow: 0 0 10px rgba(0, 243, 255, 0.7);
+    margin-bottom: 35px;
+}
+
+@keyframes titlePulse {
+    0% { filter: drop-shadow(0 0 20px rgba(0, 243, 255, 0.5)); transform: scale(1); }
+    100% { filter: drop-shadow(0 0 35px rgba(255, 0, 127, 0.7)); transform: scale(1.02); }
+}
+
+/* Buttons */
+.cyber-btn {
+    position: relative;
+    width: 280px;
+    padding: 16px 20px;
+    margin: 10px 0;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #ffffff;
+    background: rgba(10, 15, 30, 0.7);
+    border: 2px solid #00f3ff;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.3), inset 0 0 10px rgba(0, 243, 255, 0.15);
+    transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+    outline: none;
+}
+
+.cyber-btn:hover {
+    background: #00f3ff;
+    color: #050510;
+    box-shadow: 0 0 35px rgba(0, 243, 255, 0.9), inset 0 0 15px #ffffff;
+    transform: translateY(-2px);
+}
+
+.cyber-btn.pink-btn {
+    border-color: #ff007f;
+    box-shadow: 0 0 15px rgba(255, 0, 127, 0.3), inset 0 0 10px rgba(255, 0, 127, 0.15);
+}
+
+.cyber-btn.pink-btn:hover {
+    background: #ff007f;
+    color: #050510;
+    box-shadow: 0 0 35px rgba(255, 0, 127, 0.9), inset 0 0 15px #ffffff;
+}
+
+/* Difficulty Selector */
+.section-label {
+    font-size: 0.85rem;
+    letter-spacing: 3px;
+    color: #8899aa;
+    margin-top: 20px;
+    margin-bottom: 8px;
+}
+
+.diff-container {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 25px;
+}
+
+.diff-btn {
+    padding: 8px 14px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    background: transparent;
+    border: 1px solid #445566;
+    color: #8899aa;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.diff-btn.active {
+    border-color: #00f3ff;
+    color: #00f3ff;
+    background: rgba(0, 243, 255, 0.15);
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+}
+
+/* Audio Controls Bar */
+.audio-bar {
+    display: flex;
+    gap: 12px;
+    margin-top: 15px;
+}
+
+.audio-btn {
+    padding: 6px 14px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    background: transparent;
+    border: 1px solid #556677;
+    color: #8899aa;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.audio-btn:hover {
+    border-color: #ffffff;
+    color: #ffffff;
+}
+
+/* Instructions */
+.instructions-panel {
+    margin-top: 30px;
+    padding: 14px 20px;
+    border: 1px dashed rgba(0, 243, 255, 0.3);
+    border-radius: 6px;
+    font-size: 0.75rem;
+    line-height: 1.6;
+    color: #88aacc;
+    text-align: center;
+    max-width: 320px;
+}
+
+/* Victory / Game Over Details */
+.announcement {
+    font-size: 2.1rem;
+    font-weight: 900;
+    text-align: center;
+    margin-bottom: 12px;
+    text-shadow: 0 0 25px currentColor;
+}
+
+.score-display {
+    font-size: 4rem;
+    font-weight: 900;
+    color: #ffffff;
+    text-shadow: 0 0 30px rgba(255, 255, 255, 0.7);
+    margin-bottom: 25px;
+}

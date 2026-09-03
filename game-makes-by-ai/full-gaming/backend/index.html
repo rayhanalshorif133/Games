@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nexus Admin // Gaming Operations & Management</title>
+
+  <!-- Google Fonts: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- FontAwesome 6 CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Outfit', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Custom Admin Styles -->
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="bg-slate-100 dark:bg-[#090e1a] text-slate-900 dark:text-slate-100 min-h-screen flex antialiased selection:bg-indigo-500 selection:text-white">
+
+  <!-- ========================================================= -->
+  <!-- SIDEBAR NAVIGATION -->
+  <!-- ========================================================= -->
+  <aside id="adminSidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-white dark:bg-[#0d1322] border-r border-slate-200 dark:border-slate-800/80 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 flex flex-col justify-between">
+    
+    <!-- Top Brand & Navigation -->
+    <div>
+      <!-- Brand Header -->
+      <div class="h-20 px-6 flex items-center justify-between border-b border-slate-200 dark:border-slate-800/80">
+        <a href="index.html" class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-violet-600 via-indigo-600 to-cyan-400 flex items-center justify-center text-white shadow-md shadow-indigo-500/20">
+            <i class="fa-solid fa-shield-halved text-lg"></i>
+          </div>
+          <div>
+            <span class="font-display font-black text-lg tracking-wider bg-gradient-to-r from-violet-500 to-cyan-400 bg-clip-text text-transparent">
+              NEXUS<span class="text-slate-800 dark:text-white">ADMIN</span>
+            </span>
+            <span class="block text-[10px] font-bold tracking-widest text-slate-400 uppercase -mt-0.5">Control Panel</span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Nav Links -->
+      <nav class="p-4 space-y-1.5">
+        <a href="#dashboard" data-tab="dashboard-tab" class="nav-item active flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
+          <i class="fa-solid fa-chart-pie text-base w-5"></i>
+          <span>Dashboard</span>
+        </a>
+
+        <a href="#games" data-tab="games-tab" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
+          <i class="fa-solid fa-gamepad text-base w-5"></i>
+          <span>All Games</span>
+        </a>
+
+        <a href="#upload" data-tab="upload-tab" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
+          <i class="fa-solid fa-cloud-arrow-up text-base w-5"></i>
+          <span>Upload Game</span>
+          <span class="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-400">NEW</span>
+        </a>
+
+        <a href="#backup" data-tab="backup-tab" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
+          <i class="fa-solid fa-database text-base w-5"></i>
+          <span>Data & Backup</span>
+        </a>
+      </nav>
+    </div>
+
+    <!-- Bottom Actions: View Live Website & User Profile -->
+    <div class="p-4 border-t border-slate-200 dark:border-slate-800/80 space-y-3">
+      <!-- Go to Public Pages -->
+      <div class="space-y-1.5">
+        <a href="../frontend/index.html" class="flex items-center justify-between w-full py-2 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 hover:bg-violet-600 hover:text-white text-xs font-bold text-slate-700 dark:text-slate-300 transition-all">
+          <span class="flex items-center gap-2"><i class="fa-solid fa-house"></i> Home Page</span>
+          <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+        </a>
+        <a href="../frontend/games.html" class="flex items-center justify-between w-full py-2 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 hover:bg-violet-600 hover:text-white text-xs font-bold text-slate-700 dark:text-slate-300 transition-all">
+          <span class="flex items-center gap-2"><i class="fa-solid fa-shapes"></i> All 100 Games</span>
+          <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+        </a>
+        <a href="../frontend/profile.html" class="flex items-center justify-between w-full py-2 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 hover:bg-violet-600 hover:text-white text-xs font-bold text-slate-700 dark:text-slate-300 transition-all">
+          <span class="flex items-center gap-2"><i class="fa-solid fa-user"></i> Player Profile</span>
+          <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+        </a>
+      </div>
+
+      <!-- Admin Profile Card -->
+      <div class="flex items-center gap-3 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800">
+        <div class="w-9 h-9 rounded-lg bg-gradient-to-tr from-violet-600 to-indigo-600 text-white font-black text-sm flex items-center justify-center">
+          SA
+        </div>
+        <div class="flex-1 min-w-0">
+          <span class="block text-xs font-bold text-slate-800 dark:text-slate-200 truncate">Super Admin</span>
+          <span class="block text-[10px] text-emerald-500 font-semibold">Online &bull; Root</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ========================================================= -->
+  <!-- MAIN WORKSPACE CONTAINER -->
+  <!-- ========================================================= -->
+  <div class="flex-1 lg:pl-64 flex flex-col min-w-0">
+    
+    <!-- Topbar Header -->
+    <header class="h-20 bg-white/80 dark:bg-[#0d1322]/80 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800/80 sticky top-0 z-30 px-4 sm:px-8 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <!-- Mobile Sidebar Toggle -->
+        <button id="adminMobileMenuBtn" class="lg:hidden p-2 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400">
+          <i class="fa-solid fa-bars text-lg"></i>
+        </button>
+        <div>
+          <h1 class="font-display font-bold text-lg sm:text-xl text-slate-900 dark:text-white">Admin Management Studio</h1>
+          <p class="text-xs text-slate-500 dark:text-slate-400 hidden sm:block">Upload, customize, and manage public gaming catalog</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <!-- Quick Add Game Button -->
+        <button id="topbarAddGameBtn" class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-violet-600 hover:bg-violet-500 text-white text-xs font-bold shadow-md shadow-violet-600/30 transition-all">
+          <i class="fa-solid fa-plus"></i>
+          <span class="hidden sm:inline">Add Game</span>
+        </button>
+
+        <!-- Theme Toggle -->
+        <button id="adminThemeToggleBtn" title="Toggle Dark/Light" class="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:text-violet-500 transition-all flex items-center gap-2">
+          <i class="fa-solid fa-sun text-amber-400 text-base theme-icon-sun"></i>
+          <i class="fa-solid fa-moon text-indigo-400 text-base theme-icon-moon hidden"></i>
+          <span id="themeStatusText" class="hidden md:inline text-xs font-semibold">Light</span>
+        </button>
+
+        <!-- External Website Link -->
+        <a href="../frontend/index.html" target="_blank" class="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 transition-all">
+          <i class="fa-solid fa-globe"></i>
+          <span>Live Site</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- Main Content Tabs -->
+    <main class="flex-1 p-4 sm:p-8 max-w-7xl w-full mx-auto space-y-8">
+
+      <!-- ======================================================= -->
+      <!-- TAB 1: DASHBOARD OVERVIEW -->
+      <!-- ======================================================= -->
+      <section id="dashboard-tab" class="tab-content space-y-8">
+        
+        <!-- 4 Metric Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <!-- Card 1: Total Games -->
+          <div class="p-6 rounded-2xl bg-white dark:bg-[#0d1322] border border-slate-200 dark:border-slate-800/80 shadow-sm relative overflow-hidden">
+            <div class="flex items-center justify-between">
+              <div>
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Games</span>
+                <h3 id="statTotalGames" class="font-display font-black text-3xl text-slate-900 dark:text-white mt-1">12</h3>
+              </div>
+              <div class="w-12 h-12 rounded-2xl bg-violet-500/10 text-violet-500 flex items-center justify-center text-xl">
+                <i class="fa-solid fa-gamepad"></i>
+              </div>
+            </div>
+            <span class="text-[11px] text-emerald-500 font-semibold mt-3 block flex items-center gap-1">
+              <i class="fa-solid fa-circle-check"></i> Fully synchronized
+            </span>
+          </div>
+
+          <!-- Card 2: Featured -->
+          <div class="p-6 rounded-2xl bg-white dark:bg-[#0d1322] border border-slate-200 dark:border-slate-800/80 shadow-sm relative overflow-hidden">
+            <div class="flex items-center justify-between">
+              <div>
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Featured Games</span>
+                <h3 id="statFeaturedGames" class="font-display font-black text-3xl text-slate-900 dark:text-white mt-1">4</h3>
+              </div>
+              <div class="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center text-xl">
+                <i class="fa-solid fa-fire"></i>
+              </div>
+            </div>
+            <span class="text-[11px] text-amber-500 font-semibold mt-3 block">Hero & Spotlight row</span>
+          </div>
+
+          <!-- Card 3: Categories -->
+          <div class="p-6 rounded-2xl bg-white dark:bg-[#0d1322] border border-slate-200 dark:border-slate-800/80 shadow-sm relative overflow-hidden">
+            <div class="flex items-center justify-between">
+              <div>
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Genres & Categories</span>
+                <h3 id="statCategories" class="font-display font-black text-3xl text-slate-900 dark:text-white mt-1">6</h3>
+              </div>
+              <div class="w-12 h-12 rounded-2xl bg-cyan-500/10 text-cyan-500 flex items-center justify-center text-xl">
+                <i class="fa-solid fa-shapes"></i>
+              </div>
+            </div>
+            <span class="text-[11px] text-cyan-500 font-semibold mt-3 block">Multi-genre catalog</span>
+          </div>
+
+          <!-- Card 4: Total Plays -->
+          <div class="p-6 rounded-2xl bg-white dark:bg-[#0d1322] border border-slate-200 dark:border-slate-800/80 shadow-sm relative overflow-hidden">
+            <div class="flex items-center justify-between">
+              <div>
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Play Count</span>
+                <h3 id="statTotalPlays" class="font-display font-black text-3xl text-slate-900 dark:text-white mt-1">1.8M</h3>
+              </div>
+              <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center text-xl">
+                <i class="fa-solid fa-users"></i>
+              </div>
+            </div>
+            <span class="text-[11px] text-emerald-500 font-semibold mt-3 block">Community engagements</span>
+          </div>
+        </div>
+
+        <!-- Two Column Dashboard Layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Left: Quick Actions & Live Sync Note -->
+          <div class="lg:col-span-2 p-6 rounded-2xl bg-white dark:bg-[#0d1322] border border-slate-200 dark:border-slate-800/80 shadow-sm space-y-4">
+            <div class="flex items-center justify-between">
+              <h3 class="font-display font-bold text-base text-slate-900 dark:text-white flex items-center gap-2">
+                <i class="fa-solid fa-bolt text-violet-500"></i> Quick Operations
+              </h3>
+              <span class="text-xs text-slate-400">Live Client Sync</span>
+            </div>
+
+            <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+              Every game you add, edit, or delete is instantly saved into <code class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-violet-600 dark:text-violet-400 font-mono text-[11px]">localStorage</code>. When users browse the frontend website, all changes appear in real-time!
+            </p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+              <button onclick="$('.nav-item[data-tab=\'upload-tab\']').click()" class="p-4 rounded-xl border border-dashed border-violet-500/40 bg-violet-500/5 hover:bg-violet-500/10 text-left transition-all group">
+                <div class="w-9 h-9 rounded-lg bg-violet-500 text-white flex items-center justify-center mb-2 group-hover:scale-105 transition-transform">
+                  <i class="fa-solid fa-cloud-arrow-up"></i>
+                </div>
+                <h4 class="font-bold text-sm text-slate-900 dark:text-white">Upload New Game</h4>
+                <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Add posters, playable iframe URL, ratings, and genre tags.</p>
+              </button>
+
+              <button onclick="$('.nav-item[data-tab=\'games-tab\']').click()" class="p-4 rounded-xl border border-dashed border-indigo-500/40 bg-indigo-500/5 hover:bg-indigo-500/10 text-left transition-all group">
+                <div class="w-9 h-9 rounded-lg bg-indigo-500 text-white flex items-center justify-center mb-2 group-hover:scale-105 transition-transform">
+                  <i class="fa-solid fa-table-list"></i>
+                </div>
+                <h4 class="font-bold text-sm text-slate-900 dark:text-white">Browse Game Catalog</h4>
+                <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Edit game specs, toggle featured badge, or remove items.</p>
+              </button>
+            </div>
+          </div>
+
+          <!-- Right: Recent Uploads -->
+          <div class="p-6 rounded-2xl bg-white dark:bg-[#0d1322] border border-slate-200 dark:border-slate-800/80 shadow-sm flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="font-display font-bold text-base text-slate-900 dark:text-white">Recent Catalog Additions</h3>
+                <span class="text-[11px] text-violet-500 font-semibold">Latest</span>
+              </div>
+              <!-- Injected dynamically -->
+              <div id="recentUploadsContainer" class="space-y-3"></div>
+            </div>
+
+            <button onclick="$('.nav-item[data-tab=\'games-tab\']').click()" class="mt-4 w-full py-2 rounded-xl text-xs font-semibold text-center bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors">
+              View All Games &rarr;
+            </button>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ======================================================= -->
+      <!-- TAB 2: MANAGE GAMES TABLE -->
+      <!-- ======================================================= -->
+      <section id="games-tab" class="tab-content hidden space-y-6">
+        
+        <!-- Table Control Bar -->
+        <div class="p-4 rounded-2xl bg-white dark:bg-[#0d1322] border border-slate-200 dark:border-slate-800/80 shadow-sm flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+          <!-- Search in Table -->
+          <div class="relative flex-1 max-w-md">
+            <span class="absolute left-3.5 top-2.5 text-slate-400 text-xs">
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </span>
+            <input 
+              type="text" 
+              id="tableSearchInput" 
+              placeholder="Filter by title, developer, category..." 
+              class="w-full pl-9 pr-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-xs focus:outline-none focus:ring-2 focus:ring-violet-500"
+            >
+          </div>
+
+          <div class="flex items-center gap-3">
+            <!-- Category Filter Dropdown -->
+            <select id="tableCategoryFilter" class="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-700 dark:text-slate-300 focus:outline-none">
+              <!-- Injected dynamically -->
+            </select>
+
+            <!-- Add Button -->
+            <button onclick="$('.nav-item[data-tab=\'upload-tab\']').click()" class="px-3.5 py-2 rounded-xl bg-violet-600 hover:bg-violet-500 text-white text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap">
+              <i class="fa-solid fa-plus"></i> Upload Game
+            </button>
+          </div>
+        </div>
+
+        <!-- Table Container -->
+        <div class="rounded-2xl bg-white dark:bg-[#0d1322] border border-slate-200 dark:border-slate-800/80 shadow-sm overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse admin-table">
+              <thead>
+                <tr class="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 text-slate-400 uppercase text-[11px] font-bold tracking-wider">
+                  <th class="py-3 px-4">Game & Studio</th>
+                  <th class="py-3 px-4">Category</th>
+                  <th class="py-3 px-4">Rating / Year</th>
+                  <th class="py-3 px-4">Platforms</th>
+                  <th class="py-3 px-4">Featured</th>
+                  <th class="py-3 px-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="gamesTableBody">
+                <!-- Dynamically populated via jQuery -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ======================================================= -->
+      <!-- TAB 3: UPLOAD NEW GAME & LIVE PREVIEW -->
+      <!-- ======================================================= -->
+      <section id="upload-tab" class="tab-content hidden">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          
+          <!-- Upload Form (7 cols) -->
+          <div class="lg:col-span-7 p-6 sm:p-8 rounded-2xl bg-white dark:bg-[#0d1322] border border-slate-200 dark:border-slate-800/80 shadow-sm">
+            <div class="mb-6">
+              <h3 class="font-display font-black text-xl text-slate-900 dark:text-white flex items-center gap-2">
+                <i class="fa-solid fa-cloud-arrow-up text-violet-500"></i> Upload New Game
+              </h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                Fill in the specifications below to publish directly into the public game collection.
+              </p>
+            </div>
+
+            <form id="uploadGameForm" class="space-y-5">
+              
+              <!-- Game Title -->
+              <div>
+                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase mb-1.5">
+                  Game Title <span class="text-rose-500">*</span>
+                </label>
+                <input 
+                  type="text" 
+                  id="uploadTitle" 
+                  required 
+                  placeholder="e.g. Cyberpunk 2077 or 2048 Web Game" 
+                  class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+                >
+              </div>
+
+              <!-- Category, Rating & Year -->
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase mb-1.5">
+                    Category <span class="text-rose-500">*</span>
+                  </label>
+                  <select id="uploadCategory" class="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-violet-500">
+                    <option value="Action">Action</option>
+                    <option value="RPG">RPG</option>
+                    <option value="Shooter">Shooter</option>
+                    <option value="Racing">Racing</option>
+                    <option value="Adventure">Adventure</option>
+                    <option value="Strategy">Strategy</option>
+                    <option value="Web Games">Web Games</option>
+                    <option value="Casual">Casual</option>
+                    <option value="Indie">Indie</option>
+                    <option value="Horror">Horror</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase mb-1.5">
+                    Rating (1.0 - 5.0)
+                  </label>
+                  <input 
+                    type="number" 
+                    id="uploadRating" 
+                    min="1.0" 
+                    max="5.0" 
+                    step="0.1" 
+                    value="4.8" 
+                    class="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+                  >
+                </div>
+
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase mb-1.5">
+                    Release Year
+                  </label>
+                  <input 
+                    type="number" 
+                    id="uploadYear" 
+                    min="1990" 
+                    max="2030" 
+                    value="2024" 
+                    class="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+                  >
+                </div>
+              </div>
+
+              <!-- Developer Studio -->
+              <div>
+                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase mb-1.5">
+                  Developer / Studio
+                </label>
+                <input 
+                  type="text" 
+                  id="uploadDeveloper" 
+                  placeholder="e.g. CD Projekt Red or Indie Studio" 
+                  class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+                >
+              </div>
+
+              <!-- Thumbnail Image Options (URL or File Upload) -->
+              <div class="space-y-2">
+                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase">
+                  Cover Poster Thumbnail
+                </label>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <!-- Option 1: URL -->
+                  <div>
+                    <input 
+                      type="url" 
+                      id="uploadImgUrl" 
+                      placeholder="Paste Image URL (https://...)" 
+                      value="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80"
+                      class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-xs focus:outline-none focus:ring-2 focus:ring-violet-500"
+                    >
+                    <span class="text-[10px] text-slate-400 mt-0.5 block">Web image URL</span>
+                  </div>
+
+                  <!-- Option 2: Local File Upload -->
+                  <div>
+                    <input 
+                      type="file" 
+                      id="uploadThumbnailFile" 
+                      accept="image/*" 
+                      class="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-violet-500/10 file:text-violet-500 hover:file:bg-violet-500/20 cursor-pointer"
+                    >
+                    <span class="text-[10px] text-slate-400 mt-0.5 block">Or select local image file</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Playable Web URL & Iframe toggle -->
+              <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 space-y-3">
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">
+                    Playable Game URL / Iframe Embed
+                  </label>
+                  <input 
+                    type="url" 
+                    id="uploadPlayUrl" 
+                    placeholder="e.g. https://play2048.co/ or https://hextris.io/" 
+                    value="https://play2048.co/"
+                    class="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs focus:outline-none focus:ring-2 focus:ring-violet-500"
+                  >
+                  <span class="text-[10px] text-slate-400 mt-0.5 block">
+                    Working embed examples: <code class="text-violet-400">https://play2048.co/</code>, <code class="text-violet-400">https://hextris.io/</code>, <code class="text-violet-400">https://freepacman.org/</code>
+                  </span>
+                </div>
+
+                <div class="flex items-center gap-2">
+                  <input type="checkbox" id="uploadIsPlayableWeb" checked class="w-4 h-4 rounded text-violet-600 focus:ring-violet-500 cursor-pointer">
+                  <label for="uploadIsPlayableWeb" class="text-xs font-semibold text-slate-700 dark:text-slate-300 cursor-pointer">
+                    Enable Instant In-Browser Playback (Embed in modal)
+                  </label>
+                </div>
+              </div>
+
+              <!-- Platforms Multi-select -->
+              <div>
+                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase mb-2">
+                  Target Platforms
+                </label>
+                <div class="flex flex-wrap items-center gap-3 text-xs">
+                  <label class="flex items-center gap-1.5 cursor-pointer">
+                    <input type="checkbox" value="PC" class="platform-checkbox w-4 h-4 text-violet-600 rounded" checked>
+                    <span>PC Windows</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 cursor-pointer">
+                    <input type="checkbox" value="PlayStation" class="platform-checkbox w-4 h-4 text-violet-600 rounded" checked>
+                    <span>PlayStation</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 cursor-pointer">
+                    <input type="checkbox" value="Xbox" class="platform-checkbox w-4 h-4 text-violet-600 rounded" checked>
+                    <span>Xbox</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 cursor-pointer">
+                    <input type="checkbox" value="Mobile" class="platform-checkbox w-4 h-4 text-violet-600 rounded">
+                    <span>Mobile</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 cursor-pointer">
+                    <input type="checkbox" value="Web" class="platform-checkbox w-4 h-4 text-violet-600 rounded" checked>
+                    <span>Web Browser</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Tags -->
+              <div>
+                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase mb-1.5">
+                  Tags (Comma Separated)
+                </label>
+                <input 
+                  type="text" 
+                  id="uploadTags" 
+                  placeholder="e.g. Cyberpunk, Open World, Multiplayer, RPG" 
+                  class="w-full px-4 py-2 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-xs focus:outline-none focus:ring-2 focus:ring-violet-500"
+                >
+              </div>
+
+              <!-- Description -->
+              <div>
+                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase mb-1.5">
+                  Game Description
+                </label>
+                <textarea 
+                  id="uploadDesc" 
+                  rows="3" 
+                  placeholder="Enter a compelling description and storyline..." 
+                  class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+                ></textarea>
+              </div>
+
+              <!-- Featured Checkbox -->
+              <div class="flex items-center gap-2 p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
+                <input type="checkbox" id="uploadFeatured" class="w-4 h-4 text-amber-500 rounded focus:ring-amber-500 cursor-pointer">
+                <label for="uploadFeatured" class="text-xs font-bold text-amber-600 dark:text-amber-400 cursor-pointer">
+                  Feature this game on the Homepage Spotlight Banner
+                </label>
+              </div>
+
+              <!-- Submit Button -->
+              <div class="pt-3">
+                <button type="submit" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500 hover:from-violet-500 hover:to-cyan-400 text-white font-bold text-sm shadow-xl shadow-indigo-600/30 transition-all flex items-center justify-center gap-2">
+                  <i class="fa-solid fa-cloud-arrow-up"></i>
+                  <span>Publish & Upload Game</span>
+                </button>
+              </div>
+
+            </form>
+          </div>
+
+          <!-- Live Card Mockup Preview (5 cols) -->
+          <div class="lg:col-span-5 space-y-4">
+            <div class="p-4 rounded-2xl bg-white dark:bg-[#0d1322] border border-slate-200 dark:border-slate-800/80 shadow-sm">
+              <div class="flex items-center justify-between mb-3">
+                <h4 class="font-display font-bold text-sm text-slate-900 dark:text-white flex items-center gap-1.5">
+                  <i class="fa-solid fa-eye text-violet-500"></i> Live Card Preview
+                </h4>
+                <span class="text-[10px] uppercase font-bold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded">Real-Time Sync</span>
+              </div>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400 mb-4">
+                This shows exactly how your game will appear in the frontend public collection.
+              </p>
+
+              <!-- Mockup Card Container -->
+              <div class="max-w-sm mx-auto rounded-2xl overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl">
+                <!-- Thumbnail -->
+                <div class="relative w-full pt-[58%] overflow-hidden bg-slate-950">
+                  <span id="previewCardFeatured" class="hidden absolute top-3 left-3 z-10 px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow">
+                    <i class="fa-solid fa-fire mr-0.5"></i> Featured
+                  </span>
+
+                  <img id="previewCardImg" src="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80" alt="Preview" class="absolute inset-0 w-full h-full object-cover">
+
+                  <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-transparent to-transparent"></div>
+
+                  <div class="absolute bottom-2 left-3 right-3 flex items-center justify-between text-xs">
+                    <span id="previewCardCategory" class="px-2 py-0.5 rounded-md bg-slate-900/80 text-[11px] font-semibold text-violet-400 border border-violet-500/20">
+                      Action
+                    </span>
+                    <div class="flex items-center gap-1 text-amber-400 bg-slate-900/80 px-2 py-0.5 rounded-md">
+                      <i class="fa-solid fa-star text-[10px]"></i>
+                      <span id="previewCardRating" class="font-bold text-white text-[11px]">4.8</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Body -->
+                <div class="p-4 space-y-2">
+                  <div class="flex items-center justify-between">
+                    <h5 id="previewCardTitle" class="font-bold text-slate-900 dark:text-white text-base truncate">
+                      Game Title Preview
+                    </h5>
+                    <span id="previewCardYear" class="text-xs text-slate-400 font-medium">2024</span>
+                  </div>
+                  <p id="previewCardDesc" class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">
+                    Real-time description preview will appear here as you type in the upload form.
+                  </p>
+                  <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                    <div class="flex items-center gap-1.5 text-xs text-slate-400">
+                      <i class="fa-brands fa-windows"></i>
+                      <i class="fa-brands fa-playstation"></i>
+                      <i class="fa-brands fa-xbox"></i>
+                    </div>
+                    <span class="text-xs font-semibold text-violet-500">Details &rarr;</span>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ======================================================= -->
+      <!-- TAB 4: DATA, BACKUP & RESTORE -->
+      <!-- ======================================================= -->
+      <section id="backup-tab" class="tab-content hidden space-y-6">
+        <div class="p-6 sm:p-8 rounded-2xl bg-white dark:bg-[#0d1322] border border-slate-200 dark:border-slate-800/80 shadow-sm space-y-6 max-w-3xl">
+          
+          <div>
+            <h3 class="font-display font-black text-xl text-slate-900 dark:text-white flex items-center gap-2">
+              <i class="fa-solid fa-database text-violet-500"></i> Catalog Data Management
+            </h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+              Backup your gaming library as JSON or reset to the 12 pre-built default games anytime.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+            <!-- Reset Button -->
+            <button id="resetDefaultsBtn" class="p-5 rounded-xl border border-amber-500/30 bg-amber-500/5 hover:bg-amber-500/15 text-left transition-all group">
+              <div class="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center mb-3">
+                <i class="fa-solid fa-rotate-left"></i>
+              </div>
+              <h4 class="font-bold text-sm text-slate-900 dark:text-white">Reset Default Catalog</h4>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Revert to the original 12 games with playable embeds.</p>
+            </button>
+
+            <!-- Export JSON -->
+            <button id="exportJsonBtn" class="p-5 rounded-xl border border-indigo-500/30 bg-indigo-500/5 hover:bg-indigo-500/15 text-left transition-all group">
+              <div class="w-10 h-10 rounded-xl bg-indigo-500 text-white flex items-center justify-center mb-3">
+                <i class="fa-solid fa-file-export"></i>
+              </div>
+              <h4 class="font-bold text-sm text-slate-900 dark:text-white">Export Catalog JSON</h4>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Download games backup file to your computer.</p>
+            </button>
+
+            <!-- Import JSON -->
+            <label class="p-5 rounded-xl border border-cyan-500/30 bg-cyan-500/5 hover:bg-cyan-500/15 text-left transition-all group cursor-pointer block">
+              <div class="w-10 h-10 rounded-xl bg-cyan-500 text-white flex items-center justify-center mb-3">
+                <i class="fa-solid fa-file-import"></i>
+              </div>
+              <h4 class="font-bold text-sm text-slate-900 dark:text-white">Import JSON</h4>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Restore or load custom games from JSON backup.</p>
+              <input type="file" id="importJsonFile" accept=".json" class="hidden">
+            </label>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- EDIT GAME MODAL -->
+  <!-- ========================================================= -->
+  <div id="editGameModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 overflow-y-auto">
+    <div class="fixed inset-0 bg-black/80 backdrop-blur-sm"></div>
+
+    <div class="relative w-full max-w-2xl rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden z-10 my-auto flex flex-col max-h-[90vh]">
+      <!-- Header -->
+      <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
+        <h3 class="font-display font-bold text-base text-slate-900 dark:text-white flex items-center gap-2">
+          <i class="fa-solid fa-pen-to-square text-violet-500"></i> Edit Game Specifications
+        </h3>
+        <button id="closeEditModalBtn" class="text-slate-400 hover:text-slate-200 text-base">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Body Form -->
+      <div class="p-6 overflow-y-auto flex-1">
+        <form id="editGameForm" class="space-y-4">
+          <div>
+            <label class="block text-xs font-bold uppercase mb-1">Game Title</label>
+            <input type="text" id="editTitle" required class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs">
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold uppercase mb-1">Category</label>
+              <select id="editCategory" class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs">
+                <option value="Action">Action</option>
+                <option value="RPG">RPG</option>
+                <option value="Shooter">Shooter</option>
+                <option value="Racing">Racing</option>
+                <option value="Adventure">Adventure</option>
+                <option value="Strategy">Strategy</option>
+                <option value="Web Games">Web Games</option>
+                <option value="Casual">Casual</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold uppercase mb-1">Developer</label>
+              <input type="text" id="editDeveloper" class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold uppercase mb-1">Rating (1.0 - 5.0)</label>
+              <input type="number" id="editRating" step="0.1" min="1" max="5" class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs">
+            </div>
+            <div>
+              <label class="block text-xs font-bold uppercase mb-1">Release Year</label>
+              <input type="number" id="editYear" class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase mb-1">Thumbnail Poster</label>
+            <div class="flex items-center gap-3">
+              <img id="editImgPreview" src="" alt="Thumbnail" class="w-14 h-14 rounded-lg object-cover border border-slate-700">
+              <div class="flex-1 space-y-1">
+                <input type="text" id="editImgUrl" placeholder="Image URL" class="w-full px-3 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs">
+                <input type="file" id="editThumbnailFile" accept="image/*" class="text-[11px] text-slate-400">
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase mb-1">Play / Embed URL</label>
+            <input type="url" id="editPlayUrl" class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs">
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase mb-1">Platforms</label>
+            <div class="flex flex-wrap items-center gap-3 text-xs">
+              <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" value="PC" class="edit-platform-checkbox w-4 h-4 text-violet-600 rounded"> PC</label>
+              <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" value="PlayStation" class="edit-platform-checkbox w-4 h-4 text-violet-600 rounded"> PlayStation</label>
+              <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" value="Xbox" class="edit-platform-checkbox w-4 h-4 text-violet-600 rounded"> Xbox</label>
+              <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" value="Mobile" class="edit-platform-checkbox w-4 h-4 text-violet-600 rounded"> Mobile</label>
+              <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" value="Web" class="edit-platform-checkbox w-4 h-4 text-violet-600 rounded"> Web</label>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase mb-1">Description</label>
+            <textarea id="editDesc" rows="3" class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs"></textarea>
+          </div>
+
+          <div class="flex items-center gap-4">
+            <label class="flex items-center gap-1.5 text-xs font-bold text-amber-500 cursor-pointer">
+              <input type="checkbox" id="editFeatured" class="w-4 h-4 text-amber-500 rounded">
+              Feature on Homepage
+            </label>
+            <label class="flex items-center gap-1.5 text-xs font-bold text-violet-400 cursor-pointer">
+              <input type="checkbox" id="editIsPlayableWeb" class="w-4 h-4 text-violet-500 rounded">
+              Instant Web Playable
+            </label>
+          </div>
+
+          <div class="pt-4 flex items-center justify-end gap-3 border-t border-slate-100 dark:border-slate-800">
+            <button type="button" id="cancelEditBtn" class="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-semibold text-slate-400 hover:text-white">
+              Cancel
+            </button>
+            <button type="submit" class="px-5 py-2 rounded-xl bg-violet-600 hover:bg-violet-500 text-white text-xs font-bold shadow-lg shadow-violet-600/30">
+              Save Changes
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- DELETE CONFIRMATION MODAL -->
+  <!-- ========================================================= -->
+  <div id="deleteConfirmModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+    <div class="fixed inset-0 bg-black/80 backdrop-blur-sm"></div>
+
+    <div class="relative w-full max-w-md rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 shadow-2xl z-10 text-center space-y-4">
+      <div class="w-14 h-14 rounded-2xl bg-rose-500/10 text-rose-500 flex items-center justify-center text-2xl mx-auto">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <div>
+        <h3 class="font-display font-bold text-lg text-slate-900 dark:text-white">Delete Game from Catalog?</h3>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+          Are you sure you want to remove <span id="deleteGameTitle" class="font-bold text-rose-500"></span>? This action is saved immediately in localStorage.
+        </p>
+      </div>
+      <div class="flex items-center justify-center gap-3 pt-2">
+        <button id="cancelDeleteBtn" class="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-semibold text-slate-600 dark:text-slate-300">
+          Cancel
+        </button>
+        <button id="confirmDeleteBtn" class="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold shadow-lg shadow-rose-600/30">
+          Yes, Delete Game
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Toast Container -->
+  <div id="adminToastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none"></div>
+
+  <!-- Scripts -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <!-- Share data structures from frontend -->
+  <script src="../frontend/js/data.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>All 100 2D HTML Games // Nexus 2D Catalog</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- FontAwesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Outfit', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-slate-50 dark:bg-[#070b14] text-slate-900 dark:text-slate-100 min-h-screen flex flex-col antialiased selection:bg-violet-500 selection:text-white">
+
+  <!-- ========================================================= -->
+  <!-- TOP NAVIGATION BAR -->
+  <!-- ========================================================= -->
+  <header class="sticky top-0 z-40 w-full backdrop-blur-xl bg-white/85 dark:bg-[#070b14]/85 border-b border-slate-200/80 dark:border-slate-800/80 transition-colors">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+      
+      <!-- Logo -->
+      <a href="index.html" class="flex items-center gap-3 group">
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-violet-600 via-indigo-600 to-cyan-400 flex items-center justify-center text-white shadow-lg shadow-indigo-500/25 group-hover:scale-105 transition-transform duration-300">
+          <i class="fa-solid fa-gamepad text-xl"></i>
+        </div>
+        <div>
+          <span class="font-display font-black text-xl tracking-wider uppercase bg-gradient-to-r from-violet-500 via-indigo-400 to-cyan-400 bg-clip-text text-transparent">
+            NEXUS<span class="text-slate-800 dark:text-white">2D</span>
+          </span>
+          <span class="block text-[10px] font-bold tracking-widest text-violet-500 uppercase -mt-1">
+            All 100 Games
+          </span>
+        </div>
+      </a>
+
+      <!-- Desktop Nav -->
+      <nav class="hidden lg:flex items-center gap-1.5 text-sm font-semibold text-slate-600 dark:text-slate-300">
+        <a href="index.html" class="px-3.5 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-violet-500 transition-all">
+          <i class="fa-solid fa-house mr-1.5"></i> Home
+        </a>
+        <a href="index.html#challenging-section" class="px-3.5 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-orange-500 transition-all flex items-center gap-1.5">
+          <i class="fa-solid fa-fire text-orange-500"></i> Challenges
+        </a>
+        <a href="index.html#gift-section" class="px-3.5 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-amber-500 transition-all flex items-center gap-1.5">
+          <i class="fa-solid fa-gift text-amber-500"></i> Gifts
+        </a>
+        <a href="games.html" class="px-3.5 py-2 rounded-xl bg-violet-500/10 text-violet-600 dark:text-violet-400 font-bold transition-all flex items-center gap-1.5">
+          <i class="fa-solid fa-shapes text-violet-500"></i> All 100 Games
+        </a>
+        <a href="profile.html" class="px-3.5 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-cyan-500 transition-all flex items-center gap-1.5">
+          <i class="fa-solid fa-user text-cyan-400"></i> Profile
+        </a>
+      </nav>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center gap-2.5 sm:gap-3">
+        <!-- Player Coins -->
+        <a href="profile.html" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-xs font-bold hover:scale-105 transition-all">
+          <i class="fa-solid fa-coins text-amber-500 text-sm"></i>
+          <span id="navCoinBalance">2,450</span>
+        </a>
+
+        <!-- Wishlist -->
+        <button id="filterFavoritesBtn" title="Wishlist" class="relative p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900/80 text-slate-600 dark:text-slate-300 hover:text-rose-500 transition-all">
+          <i class="fa-solid fa-heart text-base"></i>
+          <span id="favCounterBadge" class="hidden absolute -top-1 -right-1 w-5 h-5 rounded-full bg-rose-500 text-white text-[10px] font-bold flex items-center justify-center shadow-md">0</span>
+        </button>
+
+        <!-- Theme Toggle -->
+        <button id="themeToggleBtn" title="Toggle Theme" class="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900/80 text-slate-600 dark:text-slate-300 hover:text-violet-500 transition-all">
+          <i class="fa-solid fa-sun text-amber-400 text-base theme-icon-sun"></i>
+          <i class="fa-solid fa-moon text-indigo-400 text-base theme-icon-moon hidden"></i>
+        </button>
+
+        <!-- Admin -->
+        <a href="../backend/index.html" class="hidden sm:flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white text-xs font-bold shadow-md">
+          <i class="fa-solid fa-shield-halved"></i>
+          <span>Admin</span>
+        </a>
+
+        <!-- Mobile Menu Toggle -->
+        <button id="mobileMenuBtn" class="lg:hidden p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300">
+          <i class="fa-solid fa-bars text-lg"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Dropdown Navigation -->
+    <div id="mobileMenu" class="hidden lg:hidden px-4 pb-4 border-t border-slate-200 dark:border-slate-800 pt-3 space-y-2">
+      <div class="grid grid-cols-2 gap-2 text-xs font-semibold">
+        <a href="index.html" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-900 flex items-center gap-2">
+          <i class="fa-solid fa-house"></i> Home
+        </a>
+        <a href="index.html#challenging-section" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-900 flex items-center gap-2 text-orange-500">
+          <i class="fa-solid fa-fire"></i> Challenges
+        </a>
+        <a href="index.html#gift-section" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-900 flex items-center gap-2 text-amber-500">
+          <i class="fa-solid fa-gift"></i> Gift Section
+        </a>
+        <a href="games.html" class="p-2.5 rounded-xl bg-violet-500/10 text-violet-500 font-bold flex items-center gap-2">
+          <i class="fa-solid fa-shapes"></i> All 100 Games
+        </a>
+        <a href="profile.html" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-900 flex items-center gap-2 text-cyan-400">
+          <i class="fa-solid fa-user"></i> Player Profile
+        </a>
+        <a href="../backend/index.html" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-900 flex items-center gap-2 text-emerald-400">
+          <i class="fa-solid fa-shield-halved"></i> Admin Studio
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========================================================= -->
+  <!-- MAIN CATALOG CONTENT -->
+  <!-- ========================================================= -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    
+    <!-- Top Header Banner -->
+    <div class="p-8 rounded-3xl bg-gradient-to-r from-violet-900/40 via-indigo-900/30 to-slate-900/60 border border-violet-500/30 relative overflow-hidden shadow-xl">
+      <div class="max-w-2xl space-y-2 relative z-10">
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-violet-500/20 text-violet-400 border border-violet-500/30">
+          <i class="fa-solid fa-database"></i> Complete 2D Archive
+        </span>
+        <h1 class="font-display font-black text-3xl sm:text-4xl text-slate-900 dark:text-white">
+          All 100 2D HTML Games Library
+        </h1>
+        <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+          Browse our entire vault of 100 pixel-perfect 2D games. Filter by retro arcade, puzzle, platformer, or challenge tier. Instant in-browser play without downloads!
+        </p>
+      </div>
+
+      <div class="mt-6 flex flex-wrap items-center gap-3 text-xs font-semibold">
+        <span class="px-3 py-1 rounded-xl bg-white/10 backdrop-blur-md text-slate-800 dark:text-slate-200 border border-white/10">🕹️ 100 Games</span>
+        <span class="px-3 py-1 rounded-xl bg-white/10 backdrop-blur-md text-slate-800 dark:text-slate-200 border border-white/10">⚡ 35+ Challenges</span>
+        <span class="px-3 py-1 rounded-xl bg-white/10 backdrop-blur-md text-slate-800 dark:text-slate-200 border border-white/10">🪙 Free Coin Bounties</span>
+      </div>
+    </div>
+
+    <!-- Category Filter Bar (Horizontal Scrollable) -->
+    <div>
+      <div id="gamesCategoryPills" class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none no-scrollbar">
+        <!-- Injected dynamically -->
+      </div>
+    </div>
+
+    <!-- Multi-Control Bar -->
+    <div class="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900/70 border border-slate-200 dark:border-slate-800/80 shadow-sm flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+      
+      <!-- Live Search -->
+      <div class="relative flex-1 max-w-md">
+        <span class="absolute left-3.5 top-3 text-slate-400 text-xs">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </span>
+        <input 
+          type="text" 
+          id="gamesSearchInput" 
+          placeholder="Search all 100 games by title, genre, difficulty..." 
+          class="w-full pl-9 pr-8 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+        >
+        <button id="clearGamesSearchBtn" class="absolute right-3 top-3 text-slate-400 hover:text-slate-200 text-xs">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Controls: Difficulty, Sorter & View Toggle -->
+      <div class="flex flex-wrap items-center gap-3">
+        <!-- Difficulty Filter -->
+        <select id="difficultySelect" class="px-3.5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 focus:outline-none cursor-pointer">
+          <option value="all">⚡ All Difficulties</option>
+          <option value="Casual">Casual</option>
+          <option value="Medium">Medium</option>
+          <option value="Challenging">Challenging</option>
+          <option value="Hardcore">Hardcore</option>
+          <option value="Insane">Insane 💀</option>
+        </select>
+
+        <!-- Sorter -->
+        <select id="gamesSortSelect" class="px-3.5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 focus:outline-none cursor-pointer">
+          <option value="featured">🔥 Featured First</option>
+          <option value="plays">🚀 Most Played</option>
+          <option value="rating">⭐ Highest Rated</option>
+          <option value="coins">🪙 Highest Bounty</option>
+          <option value="name-asc">🔤 Title (A - Z)</option>
+        </select>
+
+        <!-- View Mode Switcher (Grid vs List) -->
+        <div class="flex items-center p-1 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+          <button id="viewGridBtn" title="Grid View" class="p-2 rounded-lg bg-violet-600 text-white text-xs transition-all">
+            <i class="fa-solid fa-grip"></i>
+          </button>
+          <button id="viewListBtn" title="List View" class="p-2 rounded-lg text-slate-400 hover:text-slate-200 text-xs transition-all">
+            <i class="fa-solid fa-list"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Filter Status & Count -->
+    <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+      <span id="allGamesCountDisplay" class="font-bold text-slate-700 dark:text-slate-300">
+        Loading 100 games...
+      </span>
+      <span class="flex items-center gap-1.5 text-emerald-500">
+        <i class="fa-solid fa-bolt"></i> Instant 2D Embed Ready
+      </span>
+    </div>
+
+    <!-- Games Display Container (Grid or List) -->
+    <div id="allGamesContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <!-- Injected dynamically -->
+    </div>
+
+    <!-- Load More Button -->
+    <div class="text-center pt-6 pb-12">
+      <button id="loadMoreBtn" class="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold text-sm shadow-xl shadow-indigo-600/30 hover:scale-105 transition-all inline-flex items-center gap-2">
+        <i class="fa-solid fa-rotate"></i>
+        <span>Load More 2D Games</span>
+      </button>
+    </div>
+
+  </main>
+
+  <!-- ========================================================= -->
+  <!-- FOOTER -->
+  <!-- ========================================================= -->
+  <footer class="mt-auto border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-[#070b14] py-8 text-xs text-slate-500 text-center">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <p>&copy; 2026 NEXUS 2D. 100 HTML5 Games Catalog.</p>
+      <div class="flex items-center gap-4">
+        <a href="index.html" class="hover:text-violet-500">Home</a>
+        <a href="profile.html" class="hover:text-violet-500">Player Profile</a>
+        <a href="../backend/index.html" class="hover:text-violet-500">Admin Studio</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ========================================================= -->
+  <!-- PLAY & DETAILS MODAL -->
+  <!-- ========================================================= -->
+  <div id="gameModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 sm:p-6 overflow-y-auto">
+    <div id="modalBackdrop" class="fixed inset-0 modal-backdrop"></div>
+
+    <div class="relative w-full max-w-4xl rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden z-10 my-auto flex flex-col max-h-[90vh]">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
+        <div class="flex items-center gap-2">
+          <span id="modalGameCategory" class="text-xs font-bold px-2.5 py-1 rounded-md bg-violet-500/10 text-violet-600 dark:text-violet-400 uppercase">
+            2D Retro
+          </span>
+          <h3 id="modalGameTitle" class="font-display font-black text-lg text-slate-900 dark:text-white line-clamp-1">
+            Game Title
+          </h3>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button id="modalFavBtn" class="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold flex items-center">
+            <i class="fa-regular fa-heart mr-1.5"></i> Add to Favorites
+          </button>
+          <button id="closeModalBtn" class="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 flex items-center justify-center">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-6 space-y-6">
+        <div class="relative rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-950 aspect-video shadow-inner">
+          <div id="gamePosterContainer" class="w-full h-full relative">
+            <img id="modalGamePoster" src="" alt="Poster" class="w-full h-full object-cover">
+          </div>
+
+          <div id="gamePlayIframeContainer" class="w-full h-full hidden relative bg-black">
+            <iframe id="gamePlayIframe" src="" class="w-full h-full border-0" allowfullscreen allow="gamepad; autoplay"></iframe>
+          </div>
+
+          <div class="absolute top-3 right-3 flex items-center gap-2 z-10">
+            <button id="modalPlayToggleBtn" class="px-4 py-2 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-semibold text-xs flex items-center">
+              <i class="fa-solid fa-play mr-1"></i> Play Game Now
+            </button>
+            <button id="modalFullscreenBtn" class="p-2 rounded-xl bg-black/50 hover:bg-black/80 text-white text-xs">
+              <i class="fa-solid fa-expand"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800">
+          <div>
+            <span class="block text-[11px] text-slate-400 uppercase font-semibold">Difficulty</span>
+            <span id="modalGameDifficulty" class="font-bold text-sm text-orange-500 mt-0.5 block">Hardcore</span>
+          </div>
+          <div>
+            <span class="block text-[11px] text-slate-400 uppercase font-semibold">Rating</span>
+            <div class="flex items-center gap-1 text-amber-500 font-bold text-sm mt-0.5">
+              <i class="fa-solid fa-star text-xs"></i>
+              <span id="modalGameRating">4.9</span>
+            </div>
+          </div>
+          <div>
+            <span class="block text-[11px] text-slate-400 uppercase font-semibold">Reward Bounty</span>
+            <span id="modalGameBounty" class="font-bold text-sm text-amber-400 mt-0.5 block">+150 Coins</span>
+          </div>
+          <div>
+            <span class="block text-[11px] text-slate-400 uppercase font-semibold">Total Plays</span>
+            <span id="modalGamePlays" class="font-bold text-sm text-emerald-500 mt-0.5 block">100k+</span>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="font-display font-bold text-sm text-slate-900 dark:text-white uppercase tracking-wider mb-2">Overview</h4>
+          <p id="modalGameDesc" class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none"></div>
+
+  <!-- Scripts -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/games-page.js"></script>
+</body>
+</html>
+

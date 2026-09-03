@@ -1,0 +1,183 @@
+/* ==========================================================
+   NEXUS GAMING - MODERN UI STYLES
+   Tailwind CSS Enhancement & Custom Visuals
+   ========================================================== */
+
+/* Custom Smooth Scrolling & Transitions */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.4);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 9999px;
+  border: 2px solid #0f172a;
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #7c3aed;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+  border: 2px solid #f8fafc;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #6366f1;
+}
+
+/* Futuristic Fonts */
+.font-display {
+  font-family: 'Outfit', 'Orbitron', sans-serif;
+}
+
+/* Neon Glows & Accents */
+.glow-purple {
+  box-shadow: 0 0 25px -5px rgba(139, 92, 246, 0.45);
+}
+
+.glow-blue {
+  box-shadow: 0 0 25px -5px rgba(59, 130, 246, 0.45);
+}
+
+.glow-emerald {
+  box-shadow: 0 0 25px -5px rgba(16, 185, 129, 0.45);
+}
+
+.glow-fire {
+  box-shadow: 0 0 30px -5px rgba(249, 115, 22, 0.5);
+}
+
+.glow-gold {
+  box-shadow: 0 0 30px -5px rgba(234, 179, 8, 0.5);
+}
+
+.glow-text-purple {
+  text-shadow: 0 0 16px rgba(168, 85, 247, 0.6);
+}
+
+/* Glassmorphism Cards */
+.glass-panel-dark {
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-panel-light {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+}
+
+/* Card Hover Lift & Border Shimmer */
+.game-card {
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.game-card:hover {
+  transform: translateY(-6px) scale(1.01);
+}
+
+.dark .game-card:hover {
+  border-color: rgba(139, 92, 246, 0.6);
+  box-shadow: 0 15px 35px -10px rgba(139, 92, 246, 0.3), 0 0 15px 0 rgba(59, 130, 246, 0.2);
+}
+
+.game-card:hover {
+  box-shadow: 0 20px 30px -10px rgba(99, 102, 241, 0.2);
+}
+
+/* List View Card */
+.game-card-list {
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.game-card-list:hover {
+  transform: translateX(4px);
+}
+
+/* Animated Gradient Mesh for Hero Banner */
+.hero-gradient-dark {
+  background: radial-gradient(circle at 10% 20%, rgba(124, 58, 237, 0.25) 0%, transparent 40%),
+              radial-gradient(circle at 90% 80%, rgba(59, 130, 246, 0.2) 0%, transparent 45%),
+              linear-gradient(180deg, rgba(15, 23, 42, 0.8) 0%, #0b0f19 100%);
+}
+
+.hero-gradient-light {
+  background: radial-gradient(circle at 10% 20%, rgba(199, 210, 254, 0.4) 0%, transparent 50%),
+              radial-gradient(circle at 90% 80%, rgba(224, 231, 255, 0.5) 0%, transparent 50%),
+              linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
+}
+
+/* Badge Styling */
+.badge-pill {
+  transition: all 0.2s ease;
+}
+.badge-pill:hover {
+  transform: translateY(-1px);
+}
+
+/* Interactive Modal Backdrop */
+.modal-backdrop {
+  background: rgba(4, 7, 15, 0.85);
+  backdrop-filter: blur(8px);
+}
+
+/* Shimmer Animation */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.shimmer-bg {
+  background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 2.5s infinite;
+}
+
+/* Floating pulse element */
+@keyframes floatSlow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.animate-float {
+  animation: floatSlow 4s ease-in-out infinite;
+}
+
+/* Gift Chest Wobble Animation */
+@keyframes chestWobble {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  25% { transform: rotate(-4deg) scale(1.03); }
+  75% { transform: rotate(4deg) scale(1.03); }
+}
+
+.animate-wobble:hover {
+  animation: chestWobble 0.6s ease-in-out infinite;
+}
+
+/* Flame Flicker */
+@keyframes flameFlicker {
+  0%, 100% { opacity: 0.9; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.08); }
+}
+
+.animate-flame {
+  animation: flameFlicker 1.8s infinite alternate ease-in-out;
+}

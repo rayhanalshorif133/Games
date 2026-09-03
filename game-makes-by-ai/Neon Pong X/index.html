@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Neon Pong X</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <meta name="generator" content="Construct 3 Pattern">
+    <meta name="author" content="Neon Pong X">
+    <meta name="description" content="Realistic Cyberpunk Neon 2D Pong Arcade Game (1080x1920)">
+    <meta name="theme-color" content="#00f3ff">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="appmanifest.json">
+    <link rel="icon" type="image/png" href="icons/icon-32.png">
+    <link rel="apple-touch-icon" sizes="128x128" href="icons/icon-128.png">
+    <link rel="apple-touch-icon" sizes="256x256" href="icons/icon-256.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="c3canvasdiv">
+        <!-- 1080 x 1920 Native Resolution Canvas -->
+        <canvas id="c3canvas" width="1080" height="1920"></canvas>
+
+        <!-- CRT Scanline & Vignette Shader Simulation -->
+        <div class="crt-overlay"></div>
+
+        <!-- In-game HUD Controls -->
+        <div class="hud-layer">
+            <button id="hud-pause-btn" title="Pause Game (Esc / P)">❚❚</button>
+        </div>
+
+        <!-- Start / Main Menu -->
+        <div id="start-menu" class="menu-overlay">
+            <h1 class="game-title">NEON PONG X</h1>
+            <p class="game-subtitle">CYBERPUNK ARCADE EDITION</p>
+
+            <button id="btn-play-1p" class="cyber-btn">1 PLAYER (VS AI)</button>
+            <button id="btn-play-2p" class="cyber-btn pink-btn">2 PLAYERS (LOCAL)</button>
+
+            <div class="section-label">AI DIFFICULTY</div>
+            <div class="diff-container">
+                <button class="diff-btn" data-diff="CASUAL">CASUAL</button>
+                <button class="diff-btn active" data-diff="NORMAL">NORMAL</button>
+                <button class="diff-btn" data-diff="HARD">HARD</button>
+                <button class="diff-btn" data-diff="XTREME">X-TREME</button>
+            </div>
+
+            <div class="audio-bar">
+                <button class="audio-btn btn-toggle-mute">MUTE AUDIO</button>
+                <button class="audio-btn btn-toggle-music">MUTE BGM</button>
+            </div>
+
+            <div class="instructions-panel">
+                <p><strong>HOW TO PLAY</strong></p>
+                <p>🕹️ <strong>Touch / Mouse</strong>: Drag horizontally to move paddle.</p>
+                <p>⌨️ <strong>Keyboard</strong>: [A] / [D] or [Left] / [Right] Arrows.</p>
+                <p>⚡ <strong>Spin & Smash</strong>: Rapid paddle movement on contact curves the ball and triggers high-speed smashes!</p>
+            </div>
+        </div>
+
+        <!-- Pause Modal -->
+        <div id="pause-modal" class="menu-overlay hidden">
+            <h2 class="announcement" style="color: #00f3ff;">SYSTEM PAUSED</h2>
+            
+            <button id="btn-resume" class="cyber-btn">RESUME</button>
+            <button id="btn-restart" class="cyber-btn">RESTART</button>
+            <button id="btn-quit" class="cyber-btn pink-btn">MAIN MENU</button>
+
+            <div class="audio-bar" style="margin-top: 25px;">
+                <button class="audio-btn btn-toggle-mute">MUTE AUDIO</button>
+                <button class="audio-btn btn-toggle-music">MUTE BGM</button>
+            </div>
+        </div>
+
+        <!-- Game Over Modal -->
+        <div id="game-over-modal" class="menu-overlay hidden">
+            <div id="winner-announcement" class="announcement">PLAYER 1 VICTORIOUS!</div>
+            <div id="final-score-display" class="score-display">7 - 4</div>
+
+            <button id="btn-play-again" class="cyber-btn">PLAY AGAIN</button>
+            <button id="btn-gameover-menu" class="cyber-btn pink-btn">MAIN MENU</button>
+        </div>
+    </div>
+
+    <!-- Scripts structured in Construct 3 Export Pattern -->
+    <script src="scripts/supportcheck.js"></script>
+    <script src="scripts/audio.js"></script>
+    <script src="scripts/particles.js"></script>
+    <script src="scripts/physics.js"></script>
+    <script src="scripts/main.js"></script>
+</body>
+</html>
+
