@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Air Superiority: Endless Dogfight</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#030712" />
+
+  <!-- Construct 3 App Manifest -->
+  <link rel="manifest" href="appmanifest.json" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" type="image/png" href="icons/icon-128.png" />
+</head>
+<body>
+  <!-- Construct 3 Canvas Wrap Container (1080x1920 9:16 Aspect Ratio) -->
+  <div id="c3-canvas-wrap">
+    <!-- Main Game Canvas -->
+    <canvas id="c2canvas" width="1080" height="1920"></canvas>
+
+    <!-- Pause Control -->
+    <button id="btn-pause" title="Pause / Resume (Esc or P)" aria-label="Pause">⏸</button>
+
+    <!-- Mobile Touch Tactical Controls Overlay -->
+    <div class="touch-overlay">
+      <button class="touch-btn touch-btn-fire" aria-label="Fire 20mm Cannon">GUNS</button>
+      <button class="touch-btn touch-btn-missile" aria-label="Launch Fox-2 Missile">FOX-2</button>
+      <button class="touch-btn touch-btn-flare" aria-label="Deploy Flare Countermeasures">FLARE</button>
+      <button class="touch-btn touch-btn-boost" aria-label="Afterburner Boost">BOOST</button>
+    </div>
+
+    <!-- Pre-Flight Mission Briefing Screen -->
+    <div id="modal-briefing" class="ui-modal">
+      <div class="ui-panel">
+        <div class="ui-title">Air Superiority</div>
+        <div class="ui-subtitle">TACTICAL FLIGHT COMBAT SIMULATOR // 1080x1920</div>
+
+        <table class="ui-stats-table">
+          <tr>
+            <td>AIRCRAFT</td>
+            <td>F-22 RAPTOR 5TH-GEN</td>
+          </tr>
+          <tr>
+            <td>CANON</td>
+            <td>20MM M61A2 VULCAN</td>
+          </tr>
+          <tr>
+            <td>MISSILES</td>
+            <td>AIM-9X SIDEWINDER (FOX-2)</td>
+          </tr>
+          <tr>
+            <td>DEFENSE</td>
+            <td>AN/ALE-47 THERMAL FLARES</td>
+          </tr>
+          <tr>
+            <td>THEATER</td>
+            <td>ARCHIPELAGO PACIFIC</td>
+          </tr>
+        </table>
+
+        <button id="btn-start-sortie" class="ui-btn">SCRAMBLE JETS</button>
+
+        <div class="ui-controls-guide">
+          <strong>FLIGHT CONTROLS:</strong><br/>
+          • <kbd>Mouse / Touch</kbd> Flight-Stick Steering<br/>
+          • <kbd>Left Click</kbd> or <kbd>Space</kbd> 20mm Rotary Cannon<br/>
+          • <kbd>Right Click</kbd> or <kbd>F</kbd> Fox-2 Heat-Seeking Missile<br/>
+          • <kbd>C</kbd> Deploy Magnesium Flares (evades SAMs)<br/>
+          • <kbd>Shift</kbd> or <kbd>W</kbd> Afterburner Boost (Mach 1.2+)<br/>
+          • <kbd>WASD / Arrows</kbd> Keyboard Flight Stick
+        </div>
+      </div>
+    </div>
+
+    <!-- Post-Mission Debriefing (Game Over) Screen -->
+    <div id="modal-gameover" class="ui-modal" style="display: none;">
+      <div class="ui-panel">
+        <div class="ui-title" style="color: #ff3344; text-shadow: 0 0 16px rgba(255, 51, 68, 0.6);">
+          AIRFRAME DESTROYED
+        </div>
+        <div class="ui-subtitle">MISSION DEBRIEFING REPORT</div>
+
+        <table class="ui-stats-table">
+          <tr>
+            <td>COMBAT SCORE</td>
+            <td id="debrief-score">0</td>
+          </tr>
+          <tr>
+            <td>HOSTILE KILLS</td>
+            <td id="debrief-kills">0</td>
+          </tr>
+          <tr>
+            <td>TIME SURVIVED</td>
+            <td id="debrief-time">0 SEC</td>
+          </tr>
+          <tr>
+            <td>RECORD HIGH SCORE</td>
+            <td id="debrief-hiscore">0</td>
+          </tr>
+        </table>
+
+        <button id="btn-restart-sortie" class="ui-btn">FLY NEXT SORTIE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Construct 3 Game Scripts Pipeline -->
+  <script src="media/audio.js"></script>
+  <script src="scripts/c3runtime.js"></script>
+  <script src="scripts/particles.js"></script>
+  <script src="scripts/terrain.js"></script>
+  <script src="scripts/fighter.js"></script>
+  <script src="scripts/enemies.js"></script>
+  <script src="scripts/powerups.js"></script>
+  <script src="scripts/hud.js"></script>
+  <script src="scripts/main.js"></script>
+</body>
+</html>
+

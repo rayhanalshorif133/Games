@@ -1,0 +1,21 @@
+{
+  "version": 1725361200,
+  "fileList": [
+    "index.html",
+    "style.css",
+    "appmanifest.json",
+    "media/audio.js",
+    "scripts/c3runtime.js",
+    "scripts/particles.js",
+    "scripts/terrain.js",
+    "scripts/fighter.js",
+    "scripts/enemies.js",
+    "scripts/powerups.js",
+    "scripts/hud.js",
+    "scripts/main.js",
+    "icons/icon-128.png",
+    "icons/icon-256.png",
+    "icons/icon-512.png"
+  ]
+}
+

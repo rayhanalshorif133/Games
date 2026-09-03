@@ -1,0 +1,284 @@
+/* =========================================================
+   Air Superiority: Endless Dogfight - Construct 3 Style CSS
+   Canvas Native Resolution: 1080 x 1920 (9:16 Portrait)
+   ========================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@600;800;900&display=swap');
+
+:root {
+  --hud-green: #00ff66;
+  --hud-green-glow: rgba(0, 255, 102, 0.4);
+  --hud-cyan: #00e5ff;
+  --hud-red: #ff3344;
+  --hud-amber: #ffaa00;
+  --hud-dark: rgba(4, 12, 20, 0.85);
+  --hud-border: rgba(0, 255, 102, 0.3);
+}
+
+* {
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: #030712;
+  color: #d1d5db;
+  font-family: 'Share Tech Mono', monospace, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Construct 3 Canvas Wrapper & Letterboxing */
+#c3-canvas-wrap {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  max-width: calc(100vh * 9 / 16);
+  max-height: calc(100vw * 16 / 9);
+  aspect-ratio: 9 / 16;
+  box-shadow: 0 0 60px rgba(0, 0, 0, 0.9), 0 0 20px rgba(0, 229, 255, 0.15);
+  overflow: hidden;
+  background: #000;
+}
+
+#c2canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  image-rendering: auto;
+  cursor: crosshair;
+}
+
+/* CRT Tactical Scanline Effect (subtle) */
+#c3-canvas-wrap::after {
+  content: " ";
+  display: block;
+  position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.18) 50%),
+              radial-gradient(ellipse at center, transparent 65%, rgba(0, 0, 0, 0.4) 100%);
+  background-size: 100% 4px, 100% 100%;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Mobile & Touch Controls Overlay */
+.touch-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 20;
+  display: none; /* dynamically visible on touch devices */
+}
+
+.touch-btn {
+  position: absolute;
+  pointer-events: auto;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 800;
+  text-shadow: 0 0 8px currentColor;
+  border: 2px solid;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  touch-action: none;
+  transition: transform 0.05s ease, background 0.1s ease;
+}
+
+.touch-btn:active {
+  transform: scale(0.92);
+}
+
+.touch-btn-fire {
+  bottom: 40px;
+  right: 28px;
+  width: 78px;
+  height: 78px;
+  color: var(--hud-red);
+  background: rgba(255, 51, 68, 0.15);
+  border-color: rgba(255, 51, 68, 0.6);
+  font-size: 13px;
+}
+
+.touch-btn-missile {
+  bottom: 135px;
+  right: 28px;
+  width: 66px;
+  height: 66px;
+  color: var(--hud-amber);
+  background: rgba(255, 170, 0, 0.15);
+  border-color: rgba(255, 170, 0, 0.6);
+  font-size: 11px;
+}
+
+.touch-btn-flare {
+  bottom: 215px;
+  right: 28px;
+  width: 58px;
+  height: 58px;
+  color: var(--hud-cyan);
+  background: rgba(0, 229, 255, 0.15);
+  border-color: rgba(0, 229, 255, 0.6);
+  font-size: 10px;
+}
+
+.touch-btn-boost {
+  bottom: 40px;
+  left: 28px;
+  width: 72px;
+  height: 72px;
+  color: var(--hud-green);
+  background: rgba(0, 255, 102, 0.15);
+  border-color: rgba(0, 255, 102, 0.6);
+  font-size: 12px;
+}
+
+/* Modals & Dialog Screens (Briefing / Game Over) */
+.ui-modal {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(3, 7, 18, 0.88);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 30;
+  padding: 24px;
+  text-align: center;
+  color: #e5e7eb;
+}
+
+.ui-panel {
+  max-width: 440px;
+  width: 90%;
+  background: rgba(8, 20, 32, 0.92);
+  border: 1px solid var(--hud-border);
+  box-shadow: 0 0 35px rgba(0, 255, 102, 0.15), inset 0 0 15px rgba(0, 255, 102, 0.05);
+  border-radius: 8px;
+  padding: 28px 24px;
+  position: relative;
+}
+
+.ui-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: var(--hud-cyan);
+  text-shadow: 0 0 16px rgba(0, 229, 255, 0.6);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.ui-subtitle {
+  font-size: 12px;
+  color: #9ca3af;
+  letter-spacing: 1px;
+  margin-bottom: 22px;
+}
+
+.ui-stats-table {
+  width: 100%;
+  margin: 16px 0 24px;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.ui-stats-table td {
+  padding: 7px 10px;
+  border-bottom: 1px dashed rgba(0, 255, 102, 0.2);
+}
+
+.ui-stats-table td:last-child {
+  text-align: right;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  color: var(--hud-green);
+}
+
+.ui-btn {
+  background: linear-gradient(135deg, rgba(0, 255, 102, 0.2), rgba(0, 229, 255, 0.2));
+  border: 1px solid var(--hud-green);
+  color: #ffffff;
+  padding: 14px 28px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 15px rgba(0, 255, 102, 0.25);
+  text-transform: uppercase;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.ui-btn:hover {
+  background: linear-gradient(135deg, rgba(0, 255, 102, 0.4), rgba(0, 229, 255, 0.4));
+  box-shadow: 0 0 25px rgba(0, 255, 102, 0.5);
+  transform: translateY(-2px);
+}
+
+.ui-btn:active {
+  transform: translateY(1px);
+}
+
+.ui-controls-guide {
+  margin-top: 18px;
+  font-size: 12px;
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+.ui-controls-guide kbd {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 2px 6px;
+  border-radius: 3px;
+  color: #93c5fd;
+  font-family: inherit;
+}
+
+/* Pause Button */
+#btn-pause {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 40px;
+  height: 40px;
+  background: rgba(8, 20, 32, 0.7);
+  border: 1px solid var(--hud-border);
+  color: var(--hud-green);
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  cursor: pointer;
+  z-index: 25;
+  transition: all 0.2s ease;
+}
+
+#btn-pause:hover {
+  background: rgba(0, 255, 102, 0.2);
+  box-shadow: 0 0 10px rgba(0, 255, 102, 0.4);
+}
+
