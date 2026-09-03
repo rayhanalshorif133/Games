@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Football Kick Tournament 2D</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="description" content="Realistic 2D/2.5D Football Kick Penalty Tournament Game with Progressive Goalkeeper AI, Target Zones, Extra Kick Bonus, and Score API">
+  <meta name="theme-color" content="#060e14">
+  <link rel="manifest" href="appmanifest.json">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Game Aspect Ratio Host (Native 1080 x 1920) -->
+  <div id="game-container">
+    
+    <!-- Ultra-Crisp Canvas Pipeline -->
+    <canvas id="game-canvas" width="1080" height="1920"></canvas>
+
+    <!-- In-Game Tournament HUD -->
+    <div id="game-hud" class="hidden">
+      <!-- Top Row: Kick Count, Current Score, Audio Mute -->
+      <div class="hud-top-bar">
+        <div class="hud-chip">
+          <span class="chip-label">KICK</span>
+          <span id="hud-kick-count" class="chip-value">1 / 10</span>
+        </div>
+
+        <div class="hud-chip score-chip">
+          <span class="chip-label">SCORE</span>
+          <span id="hud-score" class="chip-value">0</span>
+        </div>
+
+        <div class="hud-actions">
+          <button id="btn-mute" class="btn-icon" title="Toggle Sound" aria-label="Toggle Sound">🔊</button>
+        </div>
+      </div>
+
+      <!-- Secondary Row: Goalkeeper AI Level & Streak Multiplier -->
+      <div class="hud-sub-bar">
+        <div id="hud-gk-level" class="gk-badge">EASY (Rookie GK)</div>
+        <div id="hud-streak" class="streak-badge hidden">🔥 2.0x STREAK</div>
+      </div>
+
+      <!-- History Dots: Visual Kick Tracker -->
+      <div id="hud-history-dots" class="history-dots-container"></div>
+    </div>
+
+    <!-- Start / Kickoff Screen -->
+    <div id="start-screen" class="screen-overlay">
+      <div class="card-modal">
+        <span class="badge-tag">TOURNAMENT EDITION • 1080×1920</span>
+        <h1 class="game-title">FOOTBALL KICK<br>CHAMPIONSHIP</h1>
+        <p class="game-desc">
+          Swipe upward from the ball to shoot! Curve your swipe for Magnus spin.
+          Beat the goalkeeper across 10 progressive rounds!
+        </p>
+
+        <div class="tournament-highlights">
+          <div class="highlight-item">
+            <span>🧤</span> <span><strong>Adaptive Goalkeeper:</strong> Becomes smarter and faster each kick!</span>
+          </div>
+          <div class="highlight-item">
+            <span>🎯</span> <span><strong>Target Zones:</strong> Top Bins award 150 PTS; Corners award 100 PTS.</span>
+          </div>
+          <div class="highlight-item">
+            <span>⭐</span> <span><strong>Extra Kick Bar:</strong> Hit the moving bonus target to win +1 Extra Kick!</span>
+          </div>
+          <div class="highlight-item">
+            <span>🚀</span> <span><strong>Score API:</strong> Direct tournament score submission & leaderboard.</span>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label for="player-name-input" class="input-label">PLAYER / STRIKER NAME</label>
+          <input type="text" id="player-name-input" class="input-field" placeholder="Enter your striker name..." value="Striker_10" maxlength="16">
+        </div>
+
+        <button id="btn-start-tournament" class="btn-primary">⚽ START TOURNAMENT</button>
+        <button id="btn-leaderboard-start" class="btn-secondary">🏆 VIEW LEADERBOARD</button>
+      </div>
+    </div>
+
+    <!-- Match Summary & Score API Submission Screen -->
+    <div id="game-over-screen" class="screen-overlay hidden">
+      <div class="card-modal">
+        <span class="badge-tag">MATCH FINISHED</span>
+        <h2 class="game-title">MATCH SUMMARY</h2>
+
+        <div class="summary-score-box">
+          <span class="chip-label">FINAL SCORE</span>
+          <div id="summary-score" class="summary-score-value">0 PTS</div>
+          <div id="summary-rank-badge" class="rank-badge badge-gold">GOLD STRIKER</div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-item">
+            <span class="stat-label">GOALS / SHOTS</span>
+            <span id="summary-goals" class="stat-val">0 / 10</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">ACCURACY</span>
+            <span id="summary-accuracy" class="stat-val">0%</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">EXTRA KICKS</span>
+            <span id="summary-extra-kicks" class="stat-val">+0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">TOP BINS HIT</span>
+            <span id="summary-top-bins" class="stat-val">0</span>
+          </div>
+        </div>
+
+        <!-- Dedicated Tournament Score Submission -->
+        <button id="btn-submit-score" class="btn-primary">🚀 SUBMIT SCORE TO TOURNAMENT</button>
+        <div id="submit-status-text" class="status-feedback"></div>
+
+        <button id="btn-play-again" class="btn-secondary">🔄 PLAY AGAIN</button>
+        <button id="btn-leaderboard-end" class="btn-secondary">🏆 LEADERBOARD STANDINGS</button>
+      </div>
+    </div>
+
+    <!-- Leaderboard Modal -->
+    <div id="leaderboard-modal" class="screen-overlay hidden">
+      <div class="card-modal">
+        <span class="badge-tag">TOURNAMENT STANDINGS</span>
+        <h2 class="game-title">TOP STRIKERS</h2>
+        
+        <div id="leaderboard-list" class="leaderboard-list"></div>
+
+        <button id="btn-close-leaderboard" class="btn-primary">CLOSE</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Modular Scripts (Construct 3 Standard Pattern) -->
+  <script src="scripts/audio.js"></script>
+  <script src="scripts/scoreApi.js"></script>
+  <script src="scripts/goalkeeper.js"></script>
+  <script src="scripts/renderer.js"></script>
+  <script src="scripts/game.js"></script>
+  <script src="scripts/main.js"></script>
+
+</body>
+</html>
+

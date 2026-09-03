@@ -1,0 +1,19 @@
+{
+  "name": "Football Kick Tournament 2D",
+  "short_name": "FootballKick",
+  "description": "Realistic 2D/2.5D Football Kick Penalty Tournament Game with Progressive Goalkeeper AI, Point Zones, and Score API",
+  "version": "1.0.0.0",
+  "start_url": "index.html",
+  "display": "fullscreen",
+  "orientation": "portrait",
+  "background_color": "#060e14",
+  "theme_color": "#00f0ff",
+  "icons": [
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
+
