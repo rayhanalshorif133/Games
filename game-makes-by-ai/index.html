@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Neon Cyber Runner - Mobile Portrait 1080x1920</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#070b19">
+  <link rel="manifest" href="appmanifest.json">
+  <link rel="icon" type="image/svg+xml" href="icons/icon-192.svg">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Construct 3 Canvas Letterbox Container -->
+  <div id="c3-container">
+    <!-- Main 1080x1920 WebGL/2D Canvas -->
+    <canvas id="c3canvas" width="1080" height="1920"></canvas>
+
+    <!-- Overlay Controls Layer -->
+    <div id="ui-overlay">
+      <button id="btn-pause" class="corner-btn pause-btn interactive" title="Pause Game" aria-label="Pause Game">⏸</button>
+      <button id="btn-mute" class="corner-btn interactive" title="Toggle Sound" aria-label="Toggle Sound">🔊</button>
+    </div>
+  </div>
+
+  <!-- Construct 3 Splash / Loading Screen -->
+  <div id="c3-loader">
+    <img src="icons/icon-512.svg" alt="Cyber Runner Logo" class="loader-logo">
+    <div class="loader-title">CYBER RUNNER</div>
+    <div class="loader-bar-wrap">
+      <div class="loader-bar"></div>
+    </div>
+    <div class="loader-tip">OPTIMIZED FOR MOBILE PORTRAIT (1080 x 1920)</div>
+  </div>
+
+  <!-- Mobile Landscape Orientation Reminder -->
+  <div id="orientation-warning">
+    <svg viewBox="0 0 24 24">
+      <path d="M16 1H8C6.34 1 5 2.34 5 4v16c0 1.66 1.34 3 3 3h8c1.66 0 3-1.34 3-3V4c0-1.66-1.34-3-3-3zm1 18H7V5h10v14z"/>
+    </svg>
+    <h2 style="font-size: 24px; color: #00f0ff; margin-bottom: 8px;">PLEASE ROTATE YOUR DEVICE</h2>
+    <p style="color: #8fa0cf; font-size: 15px;">This endless runner is built specifically for portrait orientation.</p>
+  </div>
+
+  <!-- Construct 3 Runtime & Modular Game Scripts -->
+  <script src="scripts/audio.js"></script>
+  <script src="scripts/c3runtime.js"></script>
+  <script src="scripts/world.js"></script>
+  <script src="scripts/player.js"></script>
+  <script src="scripts/obstacles.js"></script>
+  <script src="scripts/collectibles.js"></script>
+  <script src="scripts/ui.js"></script>
+  <script src="scripts/main.js"></script>
+
+</body>
+</html>
+
