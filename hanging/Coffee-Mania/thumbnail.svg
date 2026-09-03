@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 360" width="600" height="360">
+  <defs>
+    <linearGradient id="coffeeBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1e130c"/>
+      <stop offset="50%" stop-color="#3e2723"/>
+      <stop offset="100%" stop-color="#1a0f0a"/>
+    </linearGradient>
+    <linearGradient id="cupGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#e0e0e0"/>
+    </linearGradient>
+    <linearGradient id="warmAmber" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ffb74d"/>
+      <stop offset="100%" stop-color="#ff9800"/>
+    </linearGradient>
+    <radialGradient id="steamGlow" cx="50%" cy="40%" r="50%">
+      <stop offset="0%" stop-color="#ffb74d" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#ffb74d" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="600" height="360" fill="url(#coffeeBg)"/>
+  <circle cx="300" cy="160" r="160" fill="url(#steamGlow)"/>
+
+  <!-- Subtle Coffee Beans in background -->
+  <g fill="#4e342e" opacity="0.4">
+    <ellipse cx="90" cy="70" rx="14" ry="9" transform="rotate(30 90 70)"/>
+    <ellipse cx="500" cy="100" rx="16" ry="10" transform="rotate(-25 500 100)"/>
+    <ellipse cx="120" cy="260" rx="15" ry="10" transform="rotate(45 120 260)"/>
+    <ellipse cx="480" cy="250" rx="18" ry="11" transform="rotate(-35 480 250)"/>
+  </g>
+
+  <!-- Steam curves -->
+  <path d="M 270 120 Q 260 90 275 60 Q 290 30 270 10" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity="0.4"/>
+  <path d="M 300 110 Q 320 80 305 50 Q 290 20 310 5" fill="none" stroke="#ffcc80" stroke-width="5" stroke-linecap="round" opacity="0.5"/>
+  <path d="M 330 120 Q 340 90 325 60 Q 310 30 330 10" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity="0.4"/>
+
+  <!-- Coffee Cup Saucer -->
+  <ellipse cx="300" cy="255" rx="150" ry="24" fill="#cfd8dc"/>
+  <ellipse cx="300" cy="252" rx="135" ry="18" fill="#eceff1"/>
+
+  <!-- Coffee Cup Body -->
+  <path d="M 200 150 C 200 230, 230 250, 300 250 C 370 250, 400 230, 400 150 Z" fill="url(#cupGrad)"/>
+
+  <!-- Cup Handle -->
+  <path d="M 390 160 C 445 160, 445 220, 385 225 C 430 220, 430 170, 390 170 Z" fill="#cfd8dc"/>
+
+  <!-- Coffee surface inside cup -->
+  <ellipse cx="300" cy="150" rx="98" ry="20" fill="#4a2c11"/>
+  <!-- Latte art heart -->
+  <path d="M 300 158 C 290 148, 280 142, 280 135 C 280 128, 286 122, 294 125 C 298 127, 300 132, 300 132 C 300 132, 302 127, 306 125 C 314 122, 320 128, 320 135 C 320 142, 310 148, 300 158 Z" fill="#fff9c4" opacity="0.85" transform="translate(0, 10) scale(0.8) translate(75, 15)"/>
+
+  <!-- Title Badge -->
+  <rect x="150" y="295" width="300" height="44" rx="10" fill="rgba(30, 19, 12, 0.9)" stroke="#ffb74d" stroke-width="1.5"/>
+  <text x="300" y="325" font-family="'Orbitron', sans-serif, system-ui" font-weight="900" font-size="20" fill="#ffb74d" text-anchor="middle" letter-spacing="2">COFFEE MANIA</text>
+</svg>
+

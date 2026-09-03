@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 360" width="600" height="360">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#030712"/>
+      <stop offset="50%" stop-color="#0b1326"/>
+      <stop offset="100%" stop-color="#050a18"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#00f0ff" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#00f0ff" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">
+      <path d="M 30 0 L 0 0 0 30" fill="none" stroke="rgba(0, 240, 255, 0.08)" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <rect width="600" height="360" fill="url(#bgGrad)"/>
+  <rect width="600" height="360" fill="url(#grid)"/>
+  <circle cx="300" cy="180" r="180" fill="url(#glow)"/>
+
+  <circle cx="80" cy="60" r="1.5" fill="#fff" opacity="0.8"/>
+  <circle cx="140" cy="120" r="1" fill="#00f0ff" opacity="0.7"/>
+  <circle cx="520" cy="80" r="2" fill="#fff" opacity="0.9"/>
+  <circle cx="480" cy="220" r="1.5" fill="#3b82f6" opacity="0.6"/>
+  <circle cx="220" cy="40" r="1" fill="#fff" opacity="0.5"/>
+  <circle cx="380" cy="70" r="2" fill="#00f0ff" opacity="0.8"/>
+
+  <g transform="translate(180, 70) scale(3.5)" fill="#00f0ff">
+    <rect x="3" y="0" width="1" height="1"/><rect x="7" y="0" width="1" height="1"/>
+    <rect x="4" y="1" width="1" height="1"/><rect x="6" y="1" width="1" height="1"/>
+    <rect x="3" y="2" width="5" height="1"/>
+    <rect x="2" y="3" width="2" height="1"/><rect x="5" y="3" width="1" height="1"/><rect x="7" y="3" width="2" height="1"/>
+    <rect x="1" y="4" width="9" height="1"/>
+    <rect x="1" y="5" width="1" height="1"/><rect x="3" y="5" width="5" height="1"/><rect x="9" y="5" width="1" height="1"/>
+    <rect x="1" y="6" width="1" height="1"/><rect x="3" y="6" width="1" height="1"/><rect x="7" y="6" width="1" height="1"/><rect x="9" y="6" width="1" height="1"/>
+    <rect x="4" y="7" width="1" height="1"/><rect x="6" y="7" width="1" height="1"/>
+  </g>
+
+  <g transform="translate(260, 50) scale(4.5)" fill="#f43f5e">
+    <rect x="2" y="0" width="1" height="1"/><rect x="5" y="0" width="1" height="1"/>
+    <rect x="0" y="1" width="1" height="1"/><rect x="2" y="1" width="4" height="1"/><rect x="7" y="1" width="1" height="1"/>
+    <rect x="0" y="2" width="8" height="1"/>
+    <rect x="0" y="3" width="2" height="1"/><rect x="3" y="3" width="2" height="1"/><rect x="6" y="3" width="2" height="1"/>
+    <rect x="0" y="4" width="8" height="1"/>
+    <rect x="1" y="5" width="1" height="1"/><rect x="6" y="5" width="1" height="1"/>
+    <rect x="0" y="6" width="1" height="1"/><rect x="2" y="6" width="1" height="1"/><rect x="5" y="6" width="1" height="1"/><rect x="7" y="6" width="1" height="1"/>
+  </g>
+
+  <g transform="translate(265, 220) scale(3.5)" fill="#10b981">
+    <rect x="9" y="0" width="2" height="2" fill="#00f0ff"/>
+    <rect x="8" y="2" width="4" height="2"/>
+    <rect x="7" y="4" width="6" height="2"/>
+    <rect x="2" y="6" width="16" height="3"/>
+    <rect x="0" y="9" width="20" height="3"/>
+    <rect x="9.5" y="-14" width="1" height="10" fill="#f43f5e"/>
+  </g>
+
+  <rect x="120" y="290" width="360" height="46" rx="10" fill="rgba(15, 23, 42, 0.85)" stroke="#00f0ff" stroke-width="1.5"/>
+  <text x="300" y="320" font-family="'Orbitron', monospace, sans-serif" font-weight="900" font-size="20" fill="#00f0ff" text-anchor="middle" letter-spacing="3">CYBER INVADERS</text>
+</svg>
+
