@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Don't Misclick - Windows 11 Survival</title>
+    
+    <!-- Construct 3 PWA Manifest & App Info -->
+    <link rel="manifest" href="appmanifest.json">
+    <link rel="apple-touch-icon" sizes="128x128" href="icons/icon-128.png">
+    <link rel="apple-touch-icon" sizes="256x256" href="icons/icon-256.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="icons/icon-512.png">
+    <link rel="icon" type="image/png" href="icons/icon-32.png">
+    <meta name="theme-color" content="#0078d4">
+    <meta name="description" content="Don't Misclick - Windows 11 Popup Reflex Survival Game">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="game-wrapper">
+        <!-- Native 1080 x 1920 Stage -->
+        <div id="game-stage">
+
+            <!-- Windows 11 Top HUD Bar (Enlarged & Reorganized) -->
+            <div id="top-hud">
+                <!-- Left Panel: HUD Close Button & Prominent Score -->
+                <div class="hud-panel hud-panel-left">
+                    <!-- HUD Close Button (Replaces Game Title) -->
+                    <button class="hud-close-btn" id="hud-btn-close" title="Exit / Pause Game">
+                        <span class="hud-close-icon">✕</span>
+                        <span class="hud-close-label">CLOSE</span>
+                    </button>
+
+                    <!-- Score Display -->
+                    <div class="hud-score-box">
+                        <span class="score-icon">🎯</span>
+                        <div class="score-data-col">
+                            <span class="score-badge">SCORE</span>
+                            <span id="hud-score">0</span>
+                        </div>
+                    </div>
+
+                    <!-- High Score Pill -->
+                    <div class="hud-highscore-box">
+                        <span class="highscore-badge">BEST:</span>
+                        <span id="hud-highscore">0</span>
+                    </div>
+                </div>
+
+                <!-- Center Panel: Large Digital Countdown Timer -->
+                <div class="hud-timer-box">
+                    <span class="hud-timer-icon">⏱️</span>
+                    <div class="timer-data-col">
+                        <div class="hud-timer-label">SURVIVE TIME</div>
+                        <div id="hud-timer">03:00</div>
+                    </div>
+                </div>
+
+                <!-- Right Panel: Memory Overload Load Meter -->
+                <div class="hud-panel hud-panel-right">
+                    <div class="window-meter-wrap">
+                        <div class="meter-header">
+                            <span>MEMORY LOAD</span>
+                            <span id="hud-window-count">0 / 35</span>
+                        </div>
+                        <div class="meter-bar">
+                            <div id="window-meter-fill"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Windows 11 Desktop Playfield Area -->
+            <div id="desktop-area">
+                <!-- Windows 11 Desktop Icons -->
+                <div class="desktop-icons-grid">
+                    <div class="desktop-icon">
+                        <div class="icon-graphic">💻</div>
+                        <div class="icon-label">This PC</div>
+                    </div>
+                    <div class="desktop-icon">
+                        <div class="icon-graphic">🗑️</div>
+                        <div class="icon-label">Recycle Bin</div>
+                    </div>
+                    <div class="desktop-icon">
+                        <div class="icon-graphic">🌐</div>
+                        <div class="icon-label">Edge</div>
+                    </div>
+                    <div class="desktop-icon">
+                        <div class="icon-graphic">📁</div>
+                        <div class="icon-label">Explorer</div>
+                    </div>
+                    <div class="desktop-icon">
+                        <div class="icon-graphic">🎮</div>
+                        <div class="icon-label">Xbox</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Windows Container (Popups spawn here) -->
+            <div id="window-container"></div>
+
+            <!-- Windows 11 Centered Floating Taskbar -->
+            <div id="bottom-taskbar">
+                <!-- Centered App Dock -->
+                <div class="taskbar-center">
+                    <!-- Windows 11 Start Button -->
+                    <button class="win11-taskbar-item" id="taskbar-start-btn" title="Start">
+                        <div class="win11-start-logo">
+                            <div class="start-square"></div>
+                            <div class="start-square"></div>
+                            <div class="start-square"></div>
+                            <div class="start-square"></div>
+                        </div>
+                    </button>
+                    <!-- Search -->
+                    <button class="win11-taskbar-item" title="Search">
+                        <span style="font-size: 20px;">🔍</span>
+                    </button>
+                    <!-- Task View -->
+                    <button class="win11-taskbar-item" title="Task View">
+                        <span style="font-size: 20px;">🪟</span>
+                    </button>
+                    <!-- Copilot -->
+                    <button class="win11-taskbar-item" title="Copilot">
+                        <span style="font-size: 20px;">✨</span>
+                    </button>
+                    <!-- Active Game App -->
+                    <button class="win11-taskbar-item active" title="Don't Misclick Running">
+                        <span style="font-size: 22px;">🛡️</span>
+                    </button>
+                </div>
+
+                <!-- Right System Tray -->
+                <div class="taskbar-right-tray">
+                    <button class="tray-btn" id="taskbar-music-btn" title="Toggle Lo-Fi Synth Ambient">🎵</button>
+                    <button class="tray-btn" id="taskbar-mute-btn" title="Toggle Sound FX">🔊</button>
+                    <div class="tray-clock-box">
+                        <div class="tray-clock" id="tray-clock">12:00 PM</div>
+                        <div class="tray-date" id="tray-date">9/4/2026</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Windows 11 Notification / Mutation Alert Banner -->
+            <div id="mutation-banner">
+                <div class="mutation-inner">
+                    <div class="mutation-title">⚡ SYSTEM NOTICE ⚡</div>
+                    <div class="mutation-sub">Fluent mutation in progress...</div>
+                </div>
+            </div>
+
+            <!-- AI Hand Tutorial Overlay -->
+            <div id="tutorial-container">
+                <div id="tutorial-target-ring" class="tutorial-target-ring"></div>
+                <div id="tutorial-hand" class="tutorial-hand">👆</div>
+                <div id="tutorial-bubble" class="tutorial-bubble">
+                    <div class="tutorial-bubble-header">
+                        <div class="tutorial-ai-tag"><span>🤖</span> AI ASSISTANT</div>
+                        <div id="tutorial-step-badge" class="tutorial-step-badge">STEP 1/3</div>
+                    </div>
+                    <div id="tutorial-text" class="tutorial-bubble-text">
+                        Click the <strong>[ ✕ ]</strong> button on the top-right to close this window and earn +1 Score!
+                    </div>
+                    <div class="tutorial-bubble-warning">
+                        ⚠️ Warning: Clicking outside spawns +5 new windows!
+                    </div>
+                </div>
+            </div>
+
+            <!-- Virtual Custom Scalable Windows 11 Cursor -->
+            <div id="virtual-cursor">
+                <svg viewBox="0 0 32 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2 2L2 33L8.8 26.2L15.5 37.8L20.2 35L13.5 23.5L23.2 23.5L2 2Z" fill="#FFFFFF" stroke="#111827" stroke-width="2.4" stroke-linejoin="round"/>
+                </svg>
+            </div>
+
+            <!-- ================= MODALS ================= -->
+
+            <!-- Start / Menu Modal -->
+            <div id="screen-menu" class="screen-modal active">
+                <div class="menu-dialog">
+                    <div class="menu-dialog-header">
+                        <span>🛡️</span>
+                        <span>Windows Security • Action Required</span>
+                    </div>
+                    <div class="menu-dialog-body">
+                        <div class="game-logo-banner">
+                            <h1 class="game-logo-title">DON'T MISCLICK</h1>
+                            <p class="game-logo-tagline">WINDOWS 11 SURVIVAL CHALLENGE • 1080 × 1920</p>
+                        </div>
+
+                        <div class="rules-card">
+                            <h3>⚠️ SECURITY INSTRUCTIONS:</h3>
+                            <ul>
+                                <li>🎯 <strong>Goal:</strong> Close popup windows by clicking the <strong>[ ✕ ]</strong> button on the top-right of each window.</li>
+                                <li>💣 <span class="rule-highlight">PENALTY:</span> If you misclick anywhere (on window body, fake buttons, or desktop), <strong>5 NEW POPUPS INSTANTLY SPAWN!</strong></li>
+                                <li>⏳ <strong>Survive 3 Minutes (180s)</strong> before active popups overload your PC to <strong>35 windows (BSOD Crash)</strong>.</li>
+                                <li>⚡ <strong>Dynamic Hardness:</strong>
+                                    <br>• Score 50+: <strong>MEGACURSOR & MICRO-WINDOWS</strong>!
+                                    <br>• Score 75+: <strong>NANOCURSOR & TITAN WINDOWS</strong>!
+                                    <br>• Score 100+: Drifting windows & chaos matrix!
+                                </li>
+                            </ul>
+                        </div>
+
+                        <button id="btn-start-game" class="btn-big-action">▶ START SURVIVAL</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Windows 11 Blue Screen of Death (BSOD) -->
+            <div id="screen-bsod" class="screen-modal">
+                <div class="bsod-sad-face">:(</div>
+                <div class="bsod-title">Your PC ran into a problem and needs to restart. We're just collecting some error info, and then we'll restart for you.</div>
+                <div class="bsod-progress">100% complete</div>
+
+                <div class="bsod-info-row">
+                    <!-- Windows 11 QR Code Mock -->
+                    <div class="bsod-qr-mock">
+                        <div class="qr-row">
+                            <div class="qr-block" style="width: 30%;"></div>
+                            <div class="qr-block" style="width: 20%;"></div>
+                            <div class="qr-block" style="width: 30%;"></div>
+                        </div>
+                        <div class="qr-row">
+                            <div class="qr-block" style="width: 20%;"></div>
+                            <div class="qr-block" style="width: 50%;"></div>
+                            <div class="qr-block" style="width: 20%;"></div>
+                        </div>
+                        <div class="qr-row">
+                            <div class="qr-block" style="width: 35%;"></div>
+                            <div class="qr-block" style="width: 25%;"></div>
+                            <div class="qr-block" style="width: 30%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="bsod-details">
+                        <p>For more info about this issue and possible fixes, visit https://windows.com/stopcode</p>
+                        <br>
+                        <p>If you call a support person, give them this info:</p>
+                        <p><strong>Stop code:</strong> CRITICAL_POPUP_OVERFLOW (35 Windows)</p>
+                        <p><strong>What failed:</strong> MisclickProtector.sys</p>
+                    </div>
+                </div>
+
+                <div class="bsod-stat-box">
+                    <div>WINDOWS CLOSED: <span id="bsod-score" class="bsod-stat-val">0</span></div>
+                    <div>MISCLICKS MADE: <span id="bsod-misclicks" class="bsod-stat-val">0</span></div>
+                </div>
+
+                <button id="btn-bsod-retry" class="bsod-retry-btn">🔄 RESTART PC (RETRY)</button>
+            </div>
+
+            <!-- Victory Screen (Survive 3 Minutes) -->
+            <div id="screen-victory" class="screen-modal">
+                <div class="victory-dialog">
+                    <div class="victory-header">🏆 SYSTEM RESTORED • 3:00 FULL CLEAR!</div>
+                    <div class="victory-body">
+                        <div class="victory-title">SURVIVAL SUCCESSFUL!</div>
+                        
+                        <div class="victory-rank-badge">
+                            <div class="rank-label">SYSTEM PERFORMANCE RANK</div>
+                            <div class="rank-val" id="win-rank">S</div>
+                        </div>
+
+                        <div class="victory-stats-grid">
+                            <div class="stat-tile">
+                                <span class="stat-tile-label">WINDOWS CLOSED</span>
+                                <span class="stat-tile-val" id="win-score">0</span>
+                            </div>
+                            <div class="stat-tile">
+                                <span class="stat-tile-label">MISCLICKS MADE</span>
+                                <span class="stat-tile-val" id="win-misclicks">0</span>
+                            </div>
+                            <div class="stat-tile">
+                                <span class="stat-tile-label">CLICK ACCURACY</span>
+                                <span class="stat-tile-val" id="win-accuracy">100%</span>
+                            </div>
+                            <div class="stat-tile">
+                                <span class="stat-tile-label">TIME SURVIVED</span>
+                                <span class="stat-tile-val">03:00</span>
+                            </div>
+                        </div>
+
+                        <button id="btn-win-retry" class="btn-big-action" style="width: 100%;">▶ PLAY AGAIN</button>
+                    </div>
+                </div>
+            </div>
+
+        </div> <!-- /#game-stage -->
+    </div> <!-- /#game-wrapper -->
+
+    <!-- Construct 3 Game Scripts -->
+    <script src="scripts/audio.js"></script>
+    <script src="scripts/scoreapi.js"></script>
+    <script src="scripts/window-system.js"></script>
+    <script src="scripts/ui.js"></script>
+    <script src="scripts/main.js"></script>
+</body>
+</html>
