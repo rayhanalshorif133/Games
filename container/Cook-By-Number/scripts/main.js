@@ -65,7 +65,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
 
     // 1. Check if clicking directly on a port (or near it)
-    const port = game.wireManager.findPortAt(x, y);
+    const port = game.wireManager.findPortAt(x, y, null, 32);
     if (port) {
       if (port.type === 'output') {
         // Start dragging a wire
@@ -73,14 +73,42 @@ window.addEventListener('DOMContentLoaded', async () => {
         return;
       } else if (port.type === 'input') {
         // Clicked an input port: if there's an incoming wire, disconnect it
-        if (game.wireManager.disconnectTo(port.boxId)) {
+        if (game.wireManager.disconnectTo(port.boxId, port.portId)) {
           if (window.Sound) window.Sound.playUnplug();
         }
         return;
       }
     }
 
-    // 2. Check if touching a draggable modifier box
+    // 2. Check if touching startBox (Dispenser Vault)
+    if (game.startBox) {
+      const sb = game.startBox;
+      const halfW = sb.w / 2;
+      const halfH = sb.h / 2;
+      if (x >= sb.x - halfW && x <= sb.x + halfW && y >= sb.y - halfH && y <= sb.y + halfH) {
+        game.dragBox = sb;
+        game.dragOffsetX = x - sb.x;
+        game.dragOffsetY = y - sb.y;
+        if (window.Sound) window.Sound.playClick();
+        return;
+      }
+    }
+
+    // 3. Check if touching endBox (Recipe Computer)
+    if (game.endBox) {
+      const eb = game.endBox;
+      const halfW = eb.w / 2;
+      const halfH = eb.h / 2;
+      if (x >= eb.x - halfW && x <= eb.x + halfW && y >= eb.y - halfH && y <= eb.y + halfH) {
+        game.dragBox = eb;
+        game.dragOffsetX = x - eb.x;
+        game.dragOffsetY = y - eb.y;
+        if (window.Sound) window.Sound.playClick();
+        return;
+      }
+    }
+
+    // 4. Check if touching a draggable modifier box
     for (let i = game.modifierBoxes.length - 1; i >= 0; i--) {
       const box = game.modifierBoxes[i];
       const halfW = box.w / 2;
@@ -102,7 +130,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       }
     }
 
-    // 3. Check if touching an existing wire to unplug / cut it
+    // 5. Check if touching an existing wire to unplug / cut it
     const cutSuccess = game.wireManager.tryCutWireAt(x, y);
     if (cutSuccess) {
       game.showToast('Cable disconnected', 'info');
@@ -125,23 +153,29 @@ window.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    // 2. If currently dragging a modifier box
+    // 2. If currently dragging a box (startBox, endBox, or modifierBox)
     if (game.dragBox) {
       const box = game.dragBox;
       let targetX = x - game.dragOffsetX;
       let targetY = y - game.dragOffsetY;
 
-      // Constrain within playable board limits (between top dispenser & bottom computer)
+      // Constrain within playable board limits (between top HUD and bottom controls)
       const halfW = box.w / 2;
       const halfH = box.h / 2;
 
       const minX = halfW + 35;
       const maxX = canvas.width - halfW - 35;
-      const minY = 520 + halfH;
-      const maxY = 1520 - halfH;
+      const minY = 200 + halfH;
+      const maxY = 1750 - halfH;
 
       box.x = Math.max(minX, Math.min(maxX, targetX));
       box.y = Math.max(minY, Math.min(maxY, targetY));
+
+      // Keep resting ball aligned with startBox while resting in dispenser
+      if (box === game.startBox && !game.isSimulating && game.ball) {
+        game.ball.x = box.x;
+        game.ball.y = box.y + 10;
+      }
       return;
     }
   });

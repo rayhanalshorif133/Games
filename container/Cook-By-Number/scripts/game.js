@@ -4,12 +4,12 @@
  * drag-and-drop mechanics, level progression, and recipe math calculations.
  */
 if (typeof require !== 'undefined') {
-  if (typeof WireManager === 'undefined') {
-    try { global.WireManager = require('./wireManager.js'); } catch (e) {}
-  }
-  if (typeof Renderer === 'undefined') {
-    try { global.Renderer = require('./renderer.js'); } catch (e) {}
-  }
+  try {
+    if (typeof global !== 'undefined') {
+      if (!global.WireManager) global.WireManager = require('./wireManager.js');
+      if (!global.Renderer) global.Renderer = require('./renderer.js');
+    }
+  } catch (e) {}
 }
 
 class GameEngine {
@@ -47,6 +47,7 @@ class GameEngine {
 
     // Cookie & Progression State
     this.unlockedLevel = this.getSavedUnlockedLevel();
+    this.tutorialActive = false;
 
     // Time tracking
     this.lastTime = performance.now();
@@ -81,6 +82,75 @@ class GameEngine {
     } catch (e) {}
   }
 
+  isTutorialCompleted() {
+    return this.getCookie('cbn_tutorial_completed') === 'true';
+  }
+
+  completeTutorial(showToast = true) {
+    this.tutorialActive = false;
+    this.setCookie('cbn_tutorial_completed', 'true');
+    const skipBtn = document.getElementById('btn-skip-tutorial');
+    if (skipBtn) skipBtn.style.display = 'none';
+    if (showToast) {
+      this.showToast('Tutorial completed! Happy Cooking! 🍳', 'success');
+    }
+  }
+
+  getTutorialStep() {
+    if (!this.tutorialActive || this.currentLevelIndex !== 0) return null;
+
+    const wm = this.wireManager;
+    // Step 1: from 'start' to 'box_1_1'
+    const conn1 = wm.getConnection('start');
+    if (!conn1 || conn1.toBoxId !== 'box_1_1') {
+      return {
+        stepNum: 1,
+        totalSteps: 3,
+        fromBoxId: 'start',
+        fromPortId: 'out',
+        toBoxId: 'box_1_1',
+        toPortId: 'in',
+        instruction: 'Drag cable from Dispenser to Spice Pod (+1)'
+      };
+    }
+
+    // Step 2: from 'box_1_1' to 'box_1_2'
+    const conn2 = wm.getConnection('box_1_1');
+    if (!conn2 || conn2.toBoxId !== 'box_1_2') {
+      return {
+        stepNum: 2,
+        totalSteps: 3,
+        fromBoxId: 'box_1_1',
+        fromPortId: 'out',
+        toBoxId: 'box_1_2',
+        toPortId: 'in',
+        instruction: 'Connect Spice Pod Alpha to Spice Pod Beta (+1)'
+      };
+    }
+
+    // Step 3: from 'box_1_2' to 'end'
+    const conn3 = wm.getConnection('box_1_2');
+    if (!conn3 || conn3.toBoxId !== 'end') {
+      return {
+        stepNum: 3,
+        totalSteps: 3,
+        fromBoxId: 'box_1_2',
+        fromPortId: 'out',
+        toBoxId: 'end',
+        toPortId: 'in',
+        instruction: 'Connect Spice Pod Beta into Recipe Computer'
+      };
+    }
+
+    // Step 4: All connected! Tap START COOKING
+    return {
+      stepNum: 4,
+      totalSteps: 3,
+      isCookStep: true,
+      instruction: 'All connected! Tap START COOKING to cook dish!'
+    };
+  }
+
   getSavedUnlockedLevel() {
     const saved = this.getCookie('cbn_unlocked_level');
     if (saved) {
@@ -108,6 +178,7 @@ class GameEngine {
     if (confirm('Reset unlocked progress back to Level 1?')) {
       this.unlockedLevel = 1;
       this.saveUnlockedLevel(1);
+      this.setCookie('cbn_tutorial_completed', 'false');
       this.loadLevel(0);
       this.showLevelsModal();
       this.showToast('Progress reset to Level 1', 'info');
@@ -141,8 +212,10 @@ class GameEngine {
     this.startBox = {
       x: data.startBox.x,
       y: data.startBox.y,
-      w: data.startBox.w,
-      h: data.startBox.h,
+      origX: data.startBox.x,
+      origY: data.startBox.y,
+      w: data.startBox.w || 150,
+      h: data.startBox.h || 150,
       label: data.startBox.label
     };
 
@@ -150,8 +223,10 @@ class GameEngine {
     this.endBox = {
       x: data.endBox.x,
       y: data.endBox.y,
-      w: data.endBox.w,
-      h: data.endBox.h,
+      origX: data.endBox.x,
+      origY: data.endBox.y,
+      w: data.endBox.w || 180,
+      h: data.endBox.h || 170,
       label: data.endBox.label
     };
 
@@ -162,24 +237,37 @@ class GameEngine {
       ...b,
       origX: b.x,
       origY: b.y,
-      isCooking: false
+      isCooking: false,
+      warpVisits: 0
     }));
 
     // Setup Numbered Ball resting in start chamber
     this.ball = {
       x: this.startBox.x,
-      y: this.startBox.y + 12,
-      radius: 34,
+      y: this.startBox.y + 10,
+      radius: 28,
       value: data.startValue,
       initialValue: data.startValue,
       rotation: 0,
-      visible: true
+      visible: true,
+      isTimeWarped: false
     };
 
     // Update UI Elements
     this.updateHUD();
     this.hideWinModal();
     this.hideLevelsModal();
+
+    // Check if tutorial should be active (Level 1 first-time only)
+    if (levelIndex === 0 && !this.isTutorialCompleted()) {
+      this.tutorialActive = true;
+      const skipBtn = document.getElementById('btn-skip-tutorial');
+      if (skipBtn) skipBtn.style.display = 'inline-flex';
+    } else {
+      this.tutorialActive = false;
+      const skipBtn = document.getElementById('btn-skip-tutorial');
+      if (skipBtn) skipBtn.style.display = 'none';
+    }
 
     // Reset Cook button appearance
     const cookBtn = document.getElementById('btn-cook');
@@ -206,13 +294,15 @@ class GameEngine {
     this.computerStatus = 'idle';
     if (this.ball && this.currentLevelData) {
       this.ball.x = this.startBox.x;
-      this.ball.y = this.startBox.y + 12;
+      this.ball.y = this.startBox.y + 10;
       this.ball.value = this.currentLevelData.startValue;
       this.ball.rotation = 0;
       this.ball.visible = true;
+      this.ball.isTimeWarped = false;
     }
     for (const box of this.modifierBoxes) {
       box.isCooking = false;
+      box.warpVisits = 0;
     }
     const cookBtn = document.getElementById('btn-cook');
     if (cookBtn) {
@@ -230,6 +320,15 @@ class GameEngine {
       box.x = box.origX;
       box.y = box.origY;
     }
+    if (this.startBox) {
+      this.startBox.x = this.startBox.origX;
+      this.startBox.y = this.startBox.origY;
+    }
+    if (this.endBox) {
+      this.endBox.x = this.endBox.origX;
+      this.endBox.y = this.endBox.origY;
+    }
+    this.resetBallToStart();
     this.showToast('Pod positions reset!', 'info');
     if (window.Sound) window.Sound.playClick();
   }
@@ -271,6 +370,10 @@ class GameEngine {
     this.isSimulating = true;
     this.computerStatus = 'idle';
 
+    if (this.tutorialActive) {
+      this.completeTutorial(false);
+    }
+
     const cookBtn = document.getElementById('btn-cook');
     if (cookBtn) {
       cookBtn.classList.add('cooking');
@@ -311,8 +414,11 @@ class GameEngine {
     // 2. Update Particles
     for (let i = this.particles.length - 1; i >= 0; i--) {
       const p = this.particles[i];
-      p.x += p.vx * deltaTime;
-      p.y += p.vy * deltaTime;
+      p.x += (p.vx || 0) * deltaTime;
+      p.y += (p.vy || 0) * deltaTime;
+      if (p.expandSpeed) {
+        p.radius += p.expandSpeed * deltaTime;
+      }
       p.alpha -= p.decay * deltaTime;
       if (p.rotation !== undefined) {
         p.rotation += (p.rotSpeed || 0) * deltaTime;
@@ -438,6 +544,10 @@ class GameEngine {
             isMet = this.ball.value > modBox.condVal;
           } else if (modBox.condType === 'gte') {
             isMet = this.ball.value >= modBox.condVal;
+          } else if (modBox.condType === 'lt') {
+            isMet = this.ball.value < modBox.condVal;
+          } else if (modBox.condType === 'lte') {
+            isMet = this.ball.value <= modBox.condVal;
           } else if (modBox.condType === 'eq') {
             isMet = this.ball.value === modBox.condVal;
           }
@@ -446,13 +556,16 @@ class GameEngine {
             window.Sound.playConditionCheck(isMet);
           }
 
+          const condSymbol = modBox.condType === 'eq' ? '=' : (modBox.condType === 'gte' ? '≥' : (modBox.condType === 'gt' ? '>' : (modBox.condType === 'lte' ? '≤' : '<')));
+          const invSymbol = modBox.condType === 'eq' ? '≠' : (modBox.condType === 'gte' ? '<' : (modBox.condType === 'gt' ? '≤' : (modBox.condType === 'lte' ? '>' : '≥')));
+
           if (isMet) {
             // Condition TRUE -> Route via YES port
             modBox.activeBranch = 'yes';
             sim.outgoingPortId = 'yes';
             sim.nextConn = this.wireManager.getConnection(modBox.id, 'yes');
 
-            floatingMsg = `✔ YES (> ${modBox.condVal}) ➔ EXIT [YES]`;
+            floatingMsg = `✔ YES (${condSymbol} ${modBox.condVal}) ➔ EXIT [YES]`;
             floatingColor = '#00e676';
             this.spawnSpark(modBox.x + 80, modBox.y - 48, 25, '#00e676');
           } else {
@@ -461,18 +574,70 @@ class GameEngine {
             sim.outgoingPortId = 'no';
             sim.nextConn = this.wireManager.getConnection(modBox.id, 'no');
 
-            floatingMsg = `✖ NO (≤ ${modBox.condVal}) ➔ EXIT [NO]`;
+            floatingMsg = `✖ NO (${invSymbol} ${modBox.condVal}) ➔ EXIT [NO]`;
             floatingColor = '#ff3d00';
             this.spawnSpark(modBox.x + 80, modBox.y + 48, 25, '#ff3d00');
           }
 
           sim.pauseTimer = 0.7; // Dramatic scan pause
+        } else if (modBox.op === 'number_cooker' || modBox.op === 'time_travel') {
+          // Master Number Cooker with 2-3 Loop Cooking / Simmering Progression
+          modBox.warpVisits = (modBox.warpVisits || 0) + 1;
+          const prevVal = this.ball.value;
+
+          if (modBox.warpVisits < 3) {
+            // Raw / Simmering phase: generate random simmering temperature value (never 100)
+            const simmerPools = [
+              [34, 42, 53, 61], // pass 1 possibilities (Simmering)
+              [74, 82, 89, 93]  // pass 2 possibilities (Boiling)
+            ];
+            const pool = simmerPools[modBox.warpVisits - 1] || [45, 68, 77, 85];
+            const simmerVal = pool[Math.floor(Math.random() * pool.length)];
+
+            this.ball.value = simmerVal;
+            this.ball.isTimeWarped = false; // Not yet fully cooked
+
+            const stageName = modBox.warpVisits === 1 ? 'SIMMERING 33%' : 'BOILING 66%';
+            floatingMsg = `🔥 ${stageName}: ${prevVal} ➔ ${this.ball.value}`;
+            floatingColor = '#ffb300';
+            sim.pauseTimer = 0.8;
+
+            if (window.Sound) {
+              window.Sound.playCookTransform();
+            }
+            this.spawnSteam(modBox.x, modBox.y, 20);
+            this.spawnSpark(modBox.x, modBox.y, 20, '#ff9800');
+          } else {
+            // Visit 3+: Dish is fully cooked, locked onto perfection!
+            this.ball.value = modBox.val || 100;
+            this.ball.isTimeWarped = true; // Supercharged golden culinary aura
+
+            floatingMsg = `🔥 DISH FULLY COOKED: ${this.ball.value}! (100% READY)`;
+            floatingColor = '#ffea00';
+            sim.pauseTimer = 1.1; // Dramatic sizzling pause
+
+            if (window.Sound && window.Sound.playTimeWarp) {
+              window.Sound.playTimeWarp();
+            } else if (window.Sound) {
+              window.Sound.playCookTransform();
+            }
+
+            this.spawnTimeVortex(modBox.x, modBox.y);
+            this.spawnSteam(modBox.x, modBox.y, 30);
+          }
+
+          sim.outgoingPortId = 'out';
+          sim.nextConn = this.wireManager.getConnection(modBox.id, 'out');
         } else {
-          // Standard operator pod (+, *)
+          // Standard operator pod (+, -, *)
           if (modBox.op === '+') {
             this.ball.value += modBox.val;
+          } else if (modBox.op === '-') {
+            this.ball.value -= modBox.val;
           } else if (modBox.op === '*') {
             this.ball.value *= modBox.val;
+          } else if (modBox.op === '/') {
+            this.ball.value = Math.floor(this.ball.value / modBox.val);
           }
 
           floatingMsg = `${modBox.badge} ➔ ${this.ball.value}`;
@@ -484,6 +649,14 @@ class GameEngine {
           if (window.Sound) {
             window.Sound.playCookTransform();
           }
+        }
+
+        sim.loopCount = (sim.loopCount || 0) + 1;
+        if (sim.loopCount > 50) {
+          this.showToast('Loop limit reached! Ball reset.', 'error');
+          if (window.Sound) window.Sound.playReject();
+          setTimeout(() => this.resetBallToStart(), 1200);
+          return;
         }
 
         // Trigger cooking effects
@@ -504,7 +677,9 @@ class GameEngine {
           32
         );
 
-        this.spawnSteam(modBox.x, modBox.y, 16);
+        if (modBox.op !== 'number_cooker' && modBox.op !== 'time_travel') {
+          this.spawnSteam(modBox.x, modBox.y, 16);
+        }
       }
     } else {
       // Interpolate position and tangent along Bezier curve
@@ -541,6 +716,10 @@ class GameEngine {
         // ACCEPTED!
         this.computerStatus = 'accepted';
         if (window.Sound) window.Sound.playAccept();
+
+        if (this.tutorialActive) {
+          this.completeTutorial(false);
+        }
 
         this.spawnConfetti(this.endBox.x, this.endBox.y, 80);
         this.spawnFloatingText('ACCEPTED! ⭐⭐⭐', this.endBox.x, this.endBox.y - 120, '#00e676', 48);
@@ -634,6 +813,46 @@ class GameEngine {
     }
   }
 
+  /**
+   * Dramatic Temporal Vortex Shockwave & Particles for Time Travel Pod
+   */
+  spawnTimeVortex(x, y) {
+    // 1. Expanding Chronal Shockwave Rings
+    for (let r = 0; r < 3; r++) {
+      this.particles.push({
+        type: 'chrono_ring',
+        x,
+        y,
+        radius: 20 + r * 25,
+        expandSpeed: 260 + r * 80,
+        color: r % 2 === 0 ? '#b388ff' : '#00e5ff',
+        alpha: 1.0,
+        decay: 0.95
+      });
+    }
+
+    // 2. Swirling Quantum Sparks / Temporal Debris
+    const chronoColors = ['#b388ff', '#00e5ff', '#ffd700', '#ffffff', '#7c4dff', '#e040fb'];
+    for (let i = 0; i < 45; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = Math.random() * 260 + 80;
+      this.particles.push({
+        type: 'chrono_spark',
+        x,
+        y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        radius: Math.random() * 5 + 2.5,
+        color: chronoColors[Math.floor(Math.random() * chronoColors.length)],
+        alpha: 1.0,
+        decay: Math.random() * 1.1 + 0.7
+      });
+    }
+
+    // 3. Floating Temporal Subtitle Popups
+    this.spawnFloatingText('YEAR 2026 ➔ 3026 (FUTURE JUMP)', x, y + 90, '#b388ff', 24);
+  }
+
   spawnFloatingText(text, x, y, color = '#ffeb3b', size = 40) {
     this.floatingTexts.push({
       text,
@@ -672,7 +891,7 @@ class GameEngine {
     const nextLvlBtn = document.getElementById('btn-next-level');
     if (nextLvlBtn) {
       if (this.currentLevelIndex + 1 >= this.levels.length) {
-        nextLvlBtn.textContent = 'ALL 100 LEVELS COMPLETED! 👑';
+        nextLvlBtn.textContent = `ALL ${this.levels.length} LEVELS COMPLETED! 👑`;
       } else {
         nextLvlBtn.textContent = `NEXT LEVEL (${this.currentLevelIndex + 2}) ➔`;
       }
@@ -692,6 +911,10 @@ class GameEngine {
     const progressEl = document.getElementById('unlocked-progress-text');
     if (!modal || !grid) return;
 
+    const titleEl = document.getElementById('levels-modal-title');
+    if (titleEl) {
+      titleEl.textContent = `SELECT LEVEL (1 - ${this.levels.length})`;
+    }
     if (progressEl) {
       progressEl.textContent = `UNLOCKED: ${this.unlockedLevel} / ${this.levels.length}`;
     }
@@ -753,6 +976,15 @@ class GameEngine {
   }
 
   bindUI() {
+    // Skip Tutorial Button
+    const skipBtn = document.getElementById('btn-skip-tutorial');
+    if (skipBtn) {
+      skipBtn.addEventListener('click', () => {
+        this.completeTutorial(true);
+        if (window.Sound) window.Sound.playClick();
+      });
+    }
+
     // Cook / Start Button
     const cookBtn = document.getElementById('btn-cook');
     if (cookBtn) {

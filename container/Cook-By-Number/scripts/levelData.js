@@ -1,0 +1,836 @@
+/**
+ * Cook by Number - 3 Progressive Recipe Levels
+ */
+const GAME_LEVELS = [
+  {
+    "id": 1,
+    "name": "Level 1: The First Recipe",
+    "subtitle": "Warmup: 1 + 1 + 1 = 3",
+    "startValue": 1,
+    "targetValue": 3,
+    "startBox": {
+      "x": 250,
+      "y": 380,
+      "w": 150,
+      "h": 150,
+      "label": "INGREDIENT DISPENSER"
+    },
+    "endBox": {
+      "x": 830,
+      "y": 1540,
+      "w": 180,
+      "h": 170,
+      "label": "RECIPE COMPUTER"
+    },
+    "boxes": [
+      {
+        "id": "box_1_1",
+        "op": "+",
+        "val": 1,
+        "badge": "+1",
+        "name": "Spice Pod Alpha",
+        "x": 360,
+        "y": 800,
+        "w": 150,
+        "h": 130,
+        "theme": "orange"
+      },
+      {
+        "id": "box_1_2",
+        "op": "+",
+        "val": 1,
+        "badge": "+1",
+        "name": "Spice Pod Beta",
+        "x": 720,
+        "y": 1100,
+        "w": 150,
+        "h": 130,
+        "theme": "orange"
+      }
+    ],
+    "winningFormula": "1 + 1 + 1 = 3  ✔"
+  },
+  {
+    "id": 2,
+    "name": "Level 2: The Feedback Loop",
+    "subtitle": "Computer accepts 8: Loop ×2 with IF = 8 Gate",
+    "startValue": 2,
+    "targetValue": 8,
+    "startBox": {
+      "x": 250,
+      "y": 400,
+      "w": 150,
+      "h": 150,
+      "label": "INGREDIENT DISPENSER"
+    },
+    "endBox": {
+      "x": 820,
+      "y": 1520,
+      "w": 180,
+      "h": 170,
+      "label": "RECIPE COMPUTER"
+    },
+    "boxes": [
+      {
+        "id": "box_2_mult",
+        "op": "*",
+        "val": 2,
+        "badge": "×2",
+        "name": "Double Pod",
+        "dualInput": true,
+        "x": 360,
+        "y": 920,
+        "w": 160,
+        "h": 140,
+        "theme": "cyan"
+      },
+      {
+        "id": "box_2_cond",
+        "type": "conditional",
+        "op": "conditional",
+        "condType": "eq",
+        "condVal": 8,
+        "badge": "IF = 8",
+        "name": "⚡ Logic Gate",
+        "x": 740,
+        "y": 920,
+        "w": 180,
+        "h": 150,
+        "theme": "quantum"
+      }
+    ],
+    "winningFormula": "(2 × 2 = 4) [IF = 8 ➔ NO] ➔ (4 × 2 = 8) [IF = 8 ➔ YES] = 8  ✔"
+  },
+  {
+    "id": 3,
+    "name": "Level 3: Loop & Branch Mastery",
+    "subtitle": "Computer accepts 15: Loop ×2 with IF > 15, then deduct -1",
+    "startValue": 2,
+    "targetValue": 15,
+    "startBox": {
+      "x": 250,
+      "y": 380,
+      "w": 150,
+      "h": 150,
+      "label": "INGREDIENT DISPENSER"
+    },
+    "endBox": {
+      "x": 820,
+      "y": 1540,
+      "w": 180,
+      "h": 170,
+      "label": "RECIPE COMPUTER"
+    },
+    "boxes": [
+      {
+        "id": "box_3_mult",
+        "op": "*",
+        "val": 2,
+        "badge": "×2",
+        "name": "Multiplier Pod",
+        "dualInput": true,
+        "x": 300,
+        "y": 820,
+        "w": 160,
+        "h": 140,
+        "theme": "cyan"
+      },
+      {
+        "id": "box_3_cond",
+        "type": "conditional",
+        "op": "conditional",
+        "condType": "gt",
+        "condVal": 15,
+        "badge": "IF > 15",
+        "name": "⚡ Logic Gate",
+        "x": 760,
+        "y": 820,
+        "w": 180,
+        "h": 150,
+        "theme": "quantum"
+      },
+      {
+        "id": "box_3_sub",
+        "op": "-",
+        "val": 1,
+        "badge": "-1",
+        "name": "Trimmer Pod",
+        "dualInput": true,
+        "x": 520,
+        "y": 1200,
+        "w": 160,
+        "h": 140,
+        "theme": "purple"
+      }
+    ],
+    "winningFormula": "(2 × 2 = 4) [NO] ➔ (4 × 2 = 8) [NO] ➔ (8 × 2 = 16) [YES] ➔ (16 - 1) = 15  ✔"
+  },
+  {
+    "id": 4,
+    "name": "Level 4: The Dual Loop Pipeline",
+    "subtitle": "Computer accepts 24: +4 loop until > 20, then +1 loop until = 24",
+    "startValue": 1,
+    "targetValue": 24,
+    "startBox": {
+      "x": 250,
+      "y": 380,
+      "w": 150,
+      "h": 150,
+      "label": "INGREDIENT DISPENSER"
+    },
+    "endBox": {
+      "x": 820,
+      "y": 1540,
+      "w": 180,
+      "h": 170,
+      "label": "RECIPE COMPUTER"
+    },
+    "boxes": [
+      {
+        "id": "box_4_add4",
+        "op": "+",
+        "val": 4,
+        "badge": "+4",
+        "name": "Quad Booster",
+        "dualInput": true,
+        "x": 300,
+        "y": 780,
+        "w": 160,
+        "h": 140,
+        "theme": "cyan"
+      },
+      {
+        "id": "box_4_cond_gt20",
+        "type": "conditional",
+        "op": "conditional",
+        "condType": "gt",
+        "condVal": 20,
+        "badge": "IF > 20",
+        "name": "⚡ Logic Gate 1",
+        "x": 760,
+        "y": 780,
+        "w": 180,
+        "h": 150,
+        "theme": "quantum"
+      },
+      {
+        "id": "box_4_add1",
+        "op": "+",
+        "val": 1,
+        "badge": "+1",
+        "name": "Fine Tuner",
+        "dualInput": true,
+        "x": 300,
+        "y": 1180,
+        "w": 160,
+        "h": 140,
+        "theme": "orange"
+      },
+      {
+        "id": "box_4_cond_eq24",
+        "type": "conditional",
+        "op": "conditional",
+        "condType": "eq",
+        "condVal": 24,
+        "badge": "IF = 24",
+        "name": "⚡ Logic Gate 2",
+        "x": 760,
+        "y": 1180,
+        "w": 180,
+        "h": 150,
+        "theme": "quantum"
+      }
+    ],
+    "winningFormula": "(1 + 4×5 = 21) [IF > 20 ➔ YES] ➔ (21 + 1×3 = 24) [IF = 24 ➔ YES] = 24  ✔"
+  },
+  {
+    "id": 5,
+    "name": "Level 5: The Threshold Regulator",
+    "subtitle": "Computer accepts 50: Loop to 33, boost past 51, and trim to 50",
+    "startValue": 3,
+    "targetValue": 50,
+    "startBox": {
+      "x": 200,
+      "y": 320,
+      "w": 150,
+      "h": 150,
+      "label": "INGREDIENT DISPENSER"
+    },
+    "endBox": {
+      "x": 880,
+      "y": 1600,
+      "w": 180,
+      "h": 170,
+      "label": "RECIPE COMPUTER"
+    },
+    "boxes": [
+      {
+        "id": "box_5_add5_1",
+        "op": "+",
+        "val": 5,
+        "badge": "+5",
+        "name": "Booster 1",
+        "dualInput": true,
+        "x": 280,
+        "y": 580,
+        "w": 150,
+        "h": 130,
+        "theme": "cyan"
+      },
+      {
+        "id": "box_5_cond_eq33",
+        "type": "conditional",
+        "op": "conditional",
+        "condType": "eq",
+        "condVal": 33,
+        "badge": "IF = 33",
+        "name": "⚡ Logic Gate 1",
+        "x": 740,
+        "y": 580,
+        "w": 170,
+        "h": 140,
+        "theme": "quantum"
+      },
+      {
+        "id": "box_5_add5_2",
+        "op": "+",
+        "val": 5,
+        "badge": "+5",
+        "name": "Booster 2",
+        "dualInput": true,
+        "x": 240,
+        "y": 880,
+        "w": 150,
+        "h": 130,
+        "theme": "cyan"
+      },
+      {
+        "id": "box_5_add5_3",
+        "op": "+",
+        "val": 5,
+        "badge": "+5",
+        "name": "Booster 3",
+        "dualInput": true,
+        "x": 520,
+        "y": 880,
+        "w": 150,
+        "h": 130,
+        "theme": "cyan"
+      },
+      {
+        "id": "box_5_cond_lt51",
+        "type": "conditional",
+        "op": "conditional",
+        "condType": "lt",
+        "condVal": 51,
+        "badge": "IF < 51",
+        "name": "⚡ Logic Gate 2",
+        "x": 800,
+        "y": 880,
+        "w": 170,
+        "h": 140,
+        "theme": "quantum"
+      },
+      {
+        "id": "box_5_sub1_1",
+        "op": "-",
+        "val": 1,
+        "badge": "-1",
+        "name": "Trimmer 1",
+        "dualInput": true,
+        "x": 240,
+        "y": 1240,
+        "w": 150,
+        "h": 130,
+        "theme": "purple"
+      },
+      {
+        "id": "box_5_sub1_2",
+        "op": "-",
+        "val": 1,
+        "badge": "-1",
+        "name": "Trimmer 2",
+        "dualInput": true,
+        "x": 520,
+        "y": 1240,
+        "w": 150,
+        "h": 130,
+        "theme": "purple"
+      },
+      {
+        "id": "box_5_sub1_3",
+        "op": "-",
+        "val": 1,
+        "badge": "-1",
+        "name": "Trimmer 3",
+        "dualInput": true,
+        "x": 800,
+        "y": 1240,
+        "w": 150,
+        "h": 130,
+        "theme": "purple"
+      }
+    ],
+    "winningFormula": "(3 ➔ 33) [YES] ➔ (33 ➔ 53) [IF < 51 ➔ NO] ➔ (53 - 3) = 50  ✔"
+  },
+  {
+    "id": 6,
+    "name": "Level 6: The Cascade Reactor",
+    "subtitle": "Target 5: Divide by 2 while > 25, subtract 5 to 10, then divide to 5",
+    "startValue": 200,
+    "targetValue": 5,
+    "startBox": {
+      "x": 250,
+      "y": 350,
+      "w": 150,
+      "h": 150,
+      "label": "INGREDIENT DISPENSER"
+    },
+    "endBox": {
+      "x": 820,
+      "y": 1550,
+      "w": 180,
+      "h": 170,
+      "label": "RECIPE COMPUTER"
+    },
+    "boxes": [
+      {
+        "id": "box_6_div2",
+        "op": "/",
+        "val": 2,
+        "badge": "/2",
+        "name": "Binary Divider",
+        "inputs": 3,
+        "x": 300,
+        "y": 750,
+        "w": 160,
+        "h": 150,
+        "theme": "cyan"
+      },
+      {
+        "id": "box_6_cond_gt25",
+        "type": "conditional",
+        "op": "conditional",
+        "condType": "gt",
+        "condVal": 25,
+        "badge": "IF > 25",
+        "name": "⚡ Logic Gate 1",
+        "x": 760,
+        "y": 750,
+        "w": 180,
+        "h": 150,
+        "theme": "quantum"
+      },
+      {
+        "id": "box_6_cond_lt10",
+        "type": "conditional",
+        "op": "conditional",
+        "condType": "lt",
+        "condVal": 10,
+        "badge": "IF < 10",
+        "name": "⚡ Logic Gate 2",
+        "x": 760,
+        "y": 1050,
+        "w": 180,
+        "h": 150,
+        "theme": "quantum"
+      },
+      {
+        "id": "box_6_sub5",
+        "op": "-",
+        "val": 5,
+        "badge": "-5",
+        "name": "Decade Trimmer",
+        "dualInput": true,
+        "x": 300,
+        "y": 1350,
+        "w": 160,
+        "h": 140,
+        "theme": "purple"
+      },
+      {
+        "id": "box_6_cond_eq10",
+        "type": "conditional",
+        "op": "conditional",
+        "condType": "eq",
+        "condVal": 10,
+        "badge": "IF = 10",
+        "name": "⚡ Logic Gate 3",
+        "x": 760,
+        "y": 1350,
+        "w": 180,
+        "h": 150,
+        "theme": "quantum"
+      }
+    ],
+    "winningFormula": "(200 /2 /2 /2 = 25) ➔ (25 -5 -5 -5 = 10) ➔ (10 /2 = 5) [IF < 10 ➔ YES] = 5  ✔"
+  },
+  {
+    "id": 7,
+    "name": "Level 7: The Cosmic Supercollider",
+    "subtitle": "Target 42: Supercharge (×3 > 100), Cryo-stabilize (/2 < 50), and Catalyst (+6 = 42)",
+    "startValue": 16,
+    "targetValue": 42,
+    "startBox": {
+      "x": 250,
+      "y": 320,
+      "w": 150,
+      "h": 150,
+      "label": "INGREDIENT DISPENSER"
+    },
+    "endBox": {
+      "x": 820,
+      "y": 1580,
+      "w": 180,
+      "h": 170,
+      "label": "RECIPE COMPUTER"
+    },
+    "boxes": [
+      {
+        "id": "box_7_mult3",
+        "op": "*",
+        "val": 3,
+        "badge": "×3",
+        "name": "Thermal Supercharger",
+        "dualInput": true,
+        "x": 300,
+        "y": 680,
+        "w": 160,
+        "h": 140,
+        "theme": "orange"
+      },
+      {
+        "id": "box_7_cond_gt100",
+        "type": "conditional",
+        "op": "conditional",
+        "condType": "gt",
+        "condVal": 100,
+        "badge": "IF > 100",
+        "name": "⚡ Thermal Gate",
+        "x": 760,
+        "y": 680,
+        "w": 180,
+        "h": 150,
+        "theme": "quantum"
+      },
+      {
+        "id": "box_7_div2",
+        "op": "/",
+        "val": 2,
+        "badge": "/2",
+        "name": "Cryo Stabilizer",
+        "dualInput": true,
+        "x": 300,
+        "y": 1050,
+        "w": 160,
+        "h": 140,
+        "theme": "cyan"
+      },
+      {
+        "id": "box_7_cond_lt50",
+        "type": "conditional",
+        "op": "conditional",
+        "condType": "lt",
+        "condVal": 50,
+        "badge": "IF < 50",
+        "name": "⚡ Cryo Gate",
+        "x": 760,
+        "y": 1050,
+        "w": 180,
+        "h": 150,
+        "theme": "quantum"
+      },
+      {
+        "id": "box_7_add6",
+        "op": "+",
+        "val": 6,
+        "badge": "+6",
+        "name": "Quantum Catalyst",
+        "dualInput": true,
+        "x": 300,
+        "y": 1380,
+        "w": 160,
+        "h": 140,
+        "theme": "purple"
+      },
+      {
+        "id": "box_7_cond_eq42",
+        "type": "conditional",
+        "op": "conditional",
+        "condType": "eq",
+        "condVal": 42,
+        "badge": "IF = 42",
+        "name": "⚡ Cosmic Gate",
+        "x": 760,
+        "y": 1380,
+        "w": 180,
+        "h": 150,
+        "theme": "quantum"
+      }
+    ],
+    "winningFormula": "(16 ×3 ×3 = 144) [IF > 100] ➔ (144 /2 /2 = 36) [IF < 50] ➔ (36 + 6 = 42) [IF = 42] = 42  ✔"
+  },
+  {
+    "id": 8,
+    "name": "Level 8: The Parity Synthesizer",
+    "subtitle": "Target 101: Halve 800 to 200, synthesize +2 offset (+5 -3 = 202), and divide to 101",
+    "startValue": 800,
+    "targetValue": 101,
+    "startBox": {
+      "x": 250,
+      "y": 320,
+      "w": 150,
+      "h": 150,
+      "label": "INGREDIENT DISPENSER"
+    },
+    "endBox": {
+      "x": 820,
+      "y": 1580,
+      "w": 180,
+      "h": 170,
+      "label": "RECIPE COMPUTER"
+    },
+    "boxes": [
+      {
+        "id": "box_8_div2",
+        "op": "/",
+        "val": 2,
+        "badge": "/2",
+        "name": "Binary Divider",
+        "inputs": 3,
+        "x": 300,
+        "y": 720,
+        "w": 160,
+        "h": 150,
+        "theme": "cyan"
+      },
+      {
+        "id": "box_8_cond_gt250",
+        "type": "conditional",
+        "op": "conditional",
+        "condType": "gt",
+        "condVal": 250,
+        "badge": "IF > 250",
+        "name": "⚡ Thermal Gate",
+        "x": 760,
+        "y": 720,
+        "w": 180,
+        "h": 150,
+        "theme": "quantum"
+      },
+      {
+        "id": "box_8_cond_eq101",
+        "type": "conditional",
+        "op": "conditional",
+        "condType": "eq",
+        "condVal": 101,
+        "badge": "IF = 101",
+        "name": "⚡ Parity Gate",
+        "x": 760,
+        "y": 1050,
+        "w": 180,
+        "h": 150,
+        "theme": "quantum"
+      },
+      {
+        "id": "box_8_add5",
+        "op": "+",
+        "val": 5,
+        "badge": "+5",
+        "name": "Flux Booster",
+        "dualInput": true,
+        "x": 300,
+        "y": 1350,
+        "w": 160,
+        "h": 140,
+        "theme": "orange"
+      },
+      {
+        "id": "box_8_sub3",
+        "op": "-",
+        "val": 3,
+        "badge": "-3",
+        "name": "Decay Trimmer",
+        "dualInput": true,
+        "x": 760,
+        "y": 1350,
+        "w": 160,
+        "h": 140,
+        "theme": "purple"
+      }
+    ],
+    "winningFormula": "(800 /2 /2 = 200) ➔ (200 + 5 - 3 = 202) ➔ (202 /2 = 101) [IF = 101] = 101  ✔"
+  },
+  {
+    "id": 9,
+    "name": "Level 9: The Master Number Cooker",
+    "subtitle": "Start 10 ➔ (+1) ➔ Loop Number Cooker with IF = 100 to cook dish ➔ Target 100",
+    "startValue": 10,
+    "targetValue": 100,
+    "startBox": {
+      "x": 250,
+      "y": 350,
+      "w": 150,
+      "h": 150,
+      "label": "INGREDIENT DISPENSER"
+    },
+    "endBox": {
+      "x": 820,
+      "y": 1580,
+      "w": 180,
+      "h": 170,
+      "label": "RECIPE COMPUTER"
+    },
+    "boxes": [
+      {
+        "id": "box_9_add1",
+        "op": "+",
+        "val": 1,
+        "badge": "+1",
+        "name": "Spice Pod",
+        "x": 280,
+        "y": 740,
+        "w": 150,
+        "h": 130,
+        "theme": "orange"
+      },
+      {
+        "id": "box_9_cooker",
+        "op": "number_cooker",
+        "val": 100,
+        "badge": "🔥 COOKER",
+        "name": "Number Cooker",
+        "dualInput": true,
+        "x": 740,
+        "y": 740,
+        "w": 190,
+        "h": 160,
+        "theme": "cooker"
+      },
+      {
+        "id": "box_9_cond_eq100",
+        "type": "conditional",
+        "op": "conditional",
+        "condType": "eq",
+        "condVal": 100,
+        "badge": "IF = 100",
+        "name": "⚡ Quality Gate",
+        "x": 740,
+        "y": 1160,
+        "w": 180,
+        "h": 150,
+        "theme": "quantum"
+      }
+    ],
+    "winningFormula": "10 ➔ (+1 = 11) ➔ [Loop 🔥 NUMBER COOKER × 2] ➔ 100 [IF = 100 ➔ YES] = 100  ✔"
+  },
+  {
+    "id": 10,
+    "name": "Level 10: The Grand Culinary Synthesis",
+    "subtitle": "Start 21 ➔ (+2 loop = 25) ➔ (/5 = 5) ➔ Cooker (158) ➔ (-7) ➔ Target 151",
+    "startValue": 21,
+    "targetValue": 151,
+    "startBox": {
+      "x": 250,
+      "y": 320,
+      "w": 150,
+      "h": 150,
+      "label": "INGREDIENT DISPENSER"
+    },
+    "endBox": {
+      "x": 820,
+      "y": 1600,
+      "w": 180,
+      "h": 170,
+      "label": "RECIPE COMPUTER"
+    },
+    "boxes": [
+      {
+        "id": "box_10_add2",
+        "op": "+",
+        "val": 2,
+        "badge": "+2",
+        "name": "Flavor Booster",
+        "dualInput": true,
+        "x": 280,
+        "y": 650,
+        "w": 160,
+        "h": 140,
+        "theme": "orange"
+      },
+      {
+        "id": "box_10_cond_eq25",
+        "type": "conditional",
+        "op": "conditional",
+        "condType": "eq",
+        "condVal": 25,
+        "badge": "IF = 25",
+        "name": "⚡ Prep Gate",
+        "x": 740,
+        "y": 650,
+        "w": 180,
+        "h": 150,
+        "theme": "quantum"
+      },
+      {
+        "id": "box_10_div5",
+        "op": "/",
+        "val": 5,
+        "badge": "/5",
+        "name": "Essence Extractor",
+        "x": 280,
+        "y": 990,
+        "w": 160,
+        "h": 140,
+        "theme": "cyan"
+      },
+      {
+        "id": "box_10_cooker",
+        "op": "number_cooker",
+        "val": 158,
+        "badge": "🔥 COOKER",
+        "name": "Number Cooker",
+        "dualInput": true,
+        "x": 740,
+        "y": 990,
+        "w": 190,
+        "h": 160,
+        "theme": "cooker"
+      },
+      {
+        "id": "box_10_cond_eq158",
+        "type": "conditional",
+        "op": "conditional",
+        "condType": "eq",
+        "condVal": 158,
+        "badge": "IF = 158",
+        "name": "⚡ Roast Gate",
+        "x": 740,
+        "y": 1330,
+        "w": 180,
+        "h": 150,
+        "theme": "quantum"
+      },
+      {
+        "id": "box_10_sub7",
+        "op": "-",
+        "val": 7,
+        "badge": "-7",
+        "name": "Spice Trimmer",
+        "x": 280,
+        "y": 1330,
+        "w": 160,
+        "h": 140,
+        "theme": "purple"
+      }
+    ],
+    "winningFormula": "(21 + 2×2 = 25) ➔ (25 / 5 = 5) ➔ [Loop 🔥 COOKER] ➔ (158 - 7) = 151  ✔"
+  }
+];
+
+if (typeof window !== 'undefined') {
+  window.GAME_LEVELS = GAME_LEVELS;
+}
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = GAME_LEVELS;
+}

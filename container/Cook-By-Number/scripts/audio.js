@@ -313,6 +313,66 @@ class SoundEngine {
     osc.start(t);
     osc.stop(t + 0.25);
   }
+
+  // 11. Sci-Fi Temporal Warp / Time Travel Audio (Cosmic sweep, deep sub bass, and shimmer)
+  playTimeWarp() {
+    if (this.isMuted) return;
+    this.init();
+    if (!this.ctx) return;
+
+    const t = this.ctx.currentTime;
+
+    // A. Sub-bass dimensional punch
+    const subOsc = this.ctx.createOscillator();
+    const subGain = this.ctx.createGain();
+    subOsc.type = 'sine';
+    subOsc.frequency.setValueAtTime(140, t);
+    subOsc.frequency.exponentialRampToValueAtTime(35, t + 0.6);
+    subGain.gain.setValueAtTime(0.35, t);
+    subGain.gain.exponentialRampToValueAtTime(0.001, t + 0.6);
+    subOsc.connect(subGain);
+    subGain.connect(this.ctx.destination);
+    subOsc.start(t);
+    subOsc.stop(t + 0.6);
+
+    // B. Ascending cosmic time-dilation sweep
+    const sweepOsc = this.ctx.createOscillator();
+    const sweepGain = this.ctx.createGain();
+    sweepOsc.type = 'sawtooth';
+    sweepOsc.frequency.setValueAtTime(220, t);
+    sweepOsc.frequency.exponentialRampToValueAtTime(1760, t + 0.7);
+
+    // Filter to give that sci-fi portal resonance
+    const filter = this.ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.setValueAtTime(400, t);
+    filter.frequency.exponentialRampToValueAtTime(3200, t + 0.7);
+    filter.Q.setValueAtTime(4, t);
+
+    sweepGain.gain.setValueAtTime(0.01, t);
+    sweepGain.gain.linearRampToValueAtTime(0.25, t + 0.3);
+    sweepGain.gain.exponentialRampToValueAtTime(0.001, t + 0.75);
+
+    sweepOsc.connect(filter);
+    filter.connect(sweepGain);
+    sweepGain.connect(this.ctx.destination);
+    sweepOsc.start(t);
+    sweepOsc.stop(t + 0.75);
+
+    // C. Chrono chime / sparkle chord
+    [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
+      const chimeOsc = this.ctx.createOscillator();
+      const chimeGain = this.ctx.createGain();
+      chimeOsc.type = 'sine';
+      chimeOsc.frequency.setValueAtTime(freq, t + 0.2 + i * 0.05);
+      chimeGain.gain.setValueAtTime(0.12, t + 0.2 + i * 0.05);
+      chimeGain.gain.exponentialRampToValueAtTime(0.001, t + 0.6 + i * 0.05);
+      chimeOsc.connect(chimeGain);
+      chimeGain.connect(this.ctx.destination);
+      chimeOsc.start(t + 0.2 + i * 0.05);
+      chimeOsc.stop(t + 0.65 + i * 0.05);
+    });
+  }
 }
 
 if (typeof window !== 'undefined') {

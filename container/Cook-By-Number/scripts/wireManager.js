@@ -43,17 +43,79 @@ class WireManager {
 
     // 2. Modifier Boxes
     for (const box of this.game.modifierBoxes) {
-      // Standard Input Port on Left
-      ports.push({
-        boxId: box.id,
-        portId: 'in',
-        type: 'input',
-        x: box.x - box.w / 2,
-        y: box.y,
-        radius: 19,
-        label: 'IN',
-        color: '#00e5ff'
-      });
+      if (box.inputs === 3) {
+        // Upper Input Port on Left (IN 1)
+        ports.push({
+          boxId: box.id,
+          portId: 'in1',
+          type: 'input',
+          x: box.x - box.w / 2,
+          y: box.y - 38,
+          radius: 19,
+          label: 'IN 1',
+          color: '#00e5ff'
+        });
+
+        // Middle Input Port on Left (IN 2)
+        ports.push({
+          boxId: box.id,
+          portId: 'in2',
+          type: 'input',
+          x: box.x - box.w / 2,
+          y: box.y,
+          radius: 19,
+          label: 'IN 2',
+          color: '#00e5ff'
+        });
+
+        // Lower Input Port on Left (IN 3)
+        ports.push({
+          boxId: box.id,
+          portId: 'in3',
+          type: 'input',
+          x: box.x - box.w / 2,
+          y: box.y + 38,
+          radius: 19,
+          label: 'IN 3',
+          color: '#00e5ff'
+        });
+      } else if (box.dualInput || box.inputs === 2) {
+        // Upper Input Port on Left (IN 1)
+        ports.push({
+          boxId: box.id,
+          portId: 'in1',
+          type: 'input',
+          x: box.x - box.w / 2,
+          y: box.y - 30,
+          radius: 19,
+          label: 'IN 1',
+          color: '#00e5ff'
+        });
+
+        // Lower Input Port on Left (IN 2)
+        ports.push({
+          boxId: box.id,
+          portId: 'in2',
+          type: 'input',
+          x: box.x - box.w / 2,
+          y: box.y + 30,
+          radius: 19,
+          label: 'IN 2',
+          color: '#00e5ff'
+        });
+      } else {
+        // Standard Single Input Port on Left
+        ports.push({
+          boxId: box.id,
+          portId: 'in',
+          type: 'input',
+          x: box.x - box.w / 2,
+          y: box.y,
+          radius: 19,
+          label: 'IN',
+          color: '#00e5ff'
+        });
+      }
 
       if (box.op === 'conditional') {
         // DUAL OUTPUT PORTS FOR CONDITIONAL POD (YES / NO)
@@ -116,10 +178,10 @@ class WireManager {
   /**
    * Find port near coordinates
    */
-  findPortAt(x, y, filterType = null) {
+  findPortAt(x, y, filterType = null, maxRadius = null) {
     const ports = this.getAllPorts();
     let best = null;
-    let minDist = this.portSnapRadius;
+    let minDist = maxRadius !== null ? maxRadius : this.portSnapRadius;
 
     for (const port of ports) {
       if (filterType && port.type !== filterType) continue;

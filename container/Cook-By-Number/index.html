@@ -44,6 +44,8 @@
 
           <!-- Controls & Actions -->
           <div class="hud-actions">
+            <button id="btn-skip-tutorial" class="btn-skip-tutorial" title="Skip Tutorial" style="display: none;">SKIP ✕</button>
+            <a href="poster.html" target="_blank" class="btn-icon" title="View Game Poster (1000x600)" aria-label="View Game Poster" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">🖼️</a>
             <button id="btn-sound" class="btn-icon" title="Toggle Audio (Mute/Unmute)" aria-label="Toggle Sound">🔊</button>
             <button id="btn-levels" class="btn-icon" title="Select Level" aria-label="Select Level">📑</button>
             <button id="btn-help" class="btn-icon" title="How to Play" aria-label="How to Play">❓</button>
@@ -92,23 +94,23 @@
       </div>
     </div>
 
-    <!-- Modals: Level Select Modal (100 Levels) -->
+    <!-- Modals: Level Select Modal -->
     <div id="modal-levels" class="modal-backdrop">
       <div class="modal-dialog modal-dialog-large">
         <div class="modal-header-row">
           <div class="modal-title-group">
             <span class="modal-icon-small">📋</span>
-            <h2 class="modal-title-small">SELECT LEVEL (1 - 100)</h2>
+            <h2 class="modal-title-small" id="levels-modal-title">SELECT LEVEL</h2>
           </div>
           <button id="btn-close-levels-x" class="btn-icon-close" title="Close">✕</button>
         </div>
         <div class="modal-progress-row">
-          <span class="level-progress-pill" id="unlocked-progress-text">UNLOCKED: 1 / 100</span>
+          <span class="level-progress-pill" id="unlocked-progress-text">UNLOCKED: 1 / 4</span>
           <button id="btn-reset-progress" class="btn-text-small" title="Reset Unlocked Progress to Level 1">Reset Progress ↺</button>
         </div>
         <div class="level-grid-container">
           <div class="level-grid" id="level-grid">
-            <!-- Dynamically populated with 100 level cards -->
+            <!-- Dynamically populated with 3 level cards -->
           </div>
         </div>
         <button id="btn-close-levels" class="btn-outline">BACK TO KITCHEN</button>
@@ -121,7 +123,7 @@
         <div class="modal-icon">📖</div>
         <h2 class="modal-title">HOW TO PLAY</h2>
         <div class="modal-desc" style="text-align: left; font-size: 13.5px; line-height: 1.6;">
-          <p><strong>1. Move Pods:</strong> Touch and drag any modifier box (like <code>+1</code>) to move it anywhere on the kitchen counter.</p>
+          <p><strong>1. Move Pods & Terminals:</strong> Touch and drag any modifier box (like <code>+1</code>), the Dispenser Vault (start), or the Recipe Computer (end) to move them anywhere on the kitchen counter.</p>
           <br>
           <p><strong>2. Wire the Path:</strong> Touch or drag from the Start Box output port to the first pod, then connect to the next pod, and finally connect into the Computer receiver port.</p>
           <br>

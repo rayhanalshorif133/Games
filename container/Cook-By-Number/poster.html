@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cook by Number - Game Poster (1000 x 600)</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background: radial-gradient(circle at center, #1b2636 0%, #0d131a 100%);
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    h1 {
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      color: #ff9800;
+      text-shadow: 0 0 20px rgba(255, 152, 0, 0.5);
+    }
+    p {
+      color: #8da4be;
+      font-size: 14px;
+      margin-top: 6px;
+    }
+    .poster-container {
+      position: relative;
+      border: 3px solid rgba(0, 229, 255, 0.4);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 229, 255, 0.2);
+      background: #000;
+    }
+    canvas {
+      display: block;
+      width: 1000px;
+      height: 600px;
+      max-width: 95vw;
+      max-height: 70vh;
+      object-fit: contain;
+    }
+    .controls {
+      display: flex;
+      gap: 15px;
+      margin-top: 24px;
+    }
+    .btn {
+      background: linear-gradient(135deg, #ff9800 0%, #ff5722 100%);
+      color: #fff;
+      border: none;
+      padding: 12px 28px;
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(255, 87, 34, 0.4);
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+    }
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(255, 87, 34, 0.6);
+    }
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: none;
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.2);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>COOK BY NUMBER • OFFICIAL GAME POSTER</h1>
+    <p>Target Resolution: Exactly 1000px × 600px (Aspect Ratio 5:3)</p>
+  </div>
+
+  <div class="poster-container">
+    <canvas id="posterCanvas" width="1000" height="600"></canvas>
+  </div>
+
+  <div class="controls">
+    <button class="btn" id="btnDownload">
+      <span>💾 Download Poster (1000 × 600 PNG)</span>
+    </button>
+    <a href="index.html" class="btn btn-secondary">
+      <span>🎮 Back to Game</span>
+    </a>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('posterCanvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    img.src = 'poster.jpg';
+
+    img.onload = () => {
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(img, 0, 0, 1000, 600);
+    };
+
+    document.getElementById('btnDownload').addEventListener('click', () => {
+      const link = document.createElement('a');
+      link.download = 'cook-by-number-poster-1000x600.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    });
+  </script>
+</body>
+</html>
+
