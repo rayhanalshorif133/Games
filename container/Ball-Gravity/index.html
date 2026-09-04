@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ball-Gravity</title>
+    
+    <!-- App Icons & Manifest -->
+    <link rel="manifest" href="appmanifest.json">
+    <link rel="apple-touch-icon" sizes="128x128" href="icons/icon-128.png">
+    <link rel="apple-touch-icon" sizes="256x256" href="icons/icon-256.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="icons/icon-512.png">
+    <link rel="icon" type="image/png" href="icons/icon-512.png">
+    <meta name="theme-color" content="#1a1c29">
+    <meta name="description" content="Ball-Gravity - Precision Arrow Platforming & Physics Survival Game">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Main Game Container -->
+    <div id="game-container">
+        <!-- Render Canvas (720 x 1280 virtual resolution) -->
+        <canvas id="game-canvas"></canvas>
+
+        <!-- Minimal Clean Top HUD (Only: SCORE, HEIGHT, SOUND, LIFE) -->
+        <div id="top-hud">
+            <div class="hud-left">
+                <!-- Score Box -->
+                <div class="hud-card hud-score-box">
+                    <span class="hud-label">SCORE</span>
+                    <span id="hud-score" class="hud-value hud-value-gold">0</span>
+                </div>
+                <!-- Height Altitude -->
+                <div class="hud-card hud-height-box">
+                    <span class="hud-label">HEIGHT</span>
+                    <span id="hud-height" class="hud-value hud-value-cyan">0m</span>
+                </div>
+            </div>
+
+            <div class="hud-right">
+                <!-- Life Counter (1 Life) -->
+                <div class="hud-card hud-life-box">
+                    <span class="heart-icon">❤️</span>
+                    <span id="hud-life" class="hud-value">1</span>
+                </div>
+                <!-- Sound Toggle Button -->
+                <button id="btn-sound" class="hud-btn" title="Toggle Sound" aria-label="Toggle Sound">🔊</button>
+            </div>
+        </div>
+
+        <!-- Clean Minimalist Start Screen ("TAP TO PLAY") -->
+        <div id="start-screen" class="start-overlay">
+            <div class="start-prompt-box">
+                <h1 class="game-title">BALL-GRAVITY</h1>
+                <div class="tap-to-play-btn" id="btn-start-game">
+                    <span class="tap-pulse-icon">🏹</span>
+                    <span class="tap-text">TAP TO PLAY</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Over Modal (All stats, high score, and redirect/replay) -->
+        <div id="gameover-modal" class="overlay-modal hidden">
+            <div class="modal-card gameover-card">
+                <div class="skull-badge">💥</div>
+                <h2 class="gameover-title">GAME OVER</h2>
+                <p id="gameover-reason" class="gameover-reason-text">Ball fell into the abyss!</p>
+
+                <div class="results-grid">
+                    <div class="result-item highlight-item">
+                        <span class="result-label">FINAL SCORE</span>
+                        <div class="score-with-badge">
+                            <span id="final-score" class="result-value result-gold">0</span>
+                            <span id="new-high-badge" class="new-badge">NEW RECORD!</span>
+                        </div>
+                    </div>
+
+                    <div class="result-item">
+                        <span class="result-label">MAX HEIGHT</span>
+                        <span id="final-height" class="result-value result-cyan">0m</span>
+                    </div>
+
+                    <div class="result-item">
+                        <span class="result-label">BEST SCORE</span>
+                        <span id="final-highscore" class="result-value">0</span>
+                    </div>
+
+                    <div class="result-item">
+                        <span class="result-label">SURVIVED TIME</span>
+                        <span id="final-time" class="result-value">00:00</span>
+                    </div>
+
+                    <div class="result-item">
+                        <span class="result-label">ARROW BOUNCES</span>
+                        <span id="final-bounces" class="result-value">0</span>
+                    </div>
+                </div>
+
+                <!-- Live countdown text for auto-redirect if configured -->
+                <p id="modal-redirect-text" class="redirect-countdown-text"></p>
+
+                <!-- Primary Action Button (Play Again or Continue) -->
+                <button id="btn-restart" class="cta-button restart-button">PLAY AGAIN</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts (ES Modules) -->
+    <script type="module" src="sendscoreapi.js"></script>
+    <script type="module" src="gameover.js"></script>
+    <script type="module" src="scripts/audio.js"></script>
+    <script type="module" src="scripts/game.js"></script>
+
+</body>
+</html>
