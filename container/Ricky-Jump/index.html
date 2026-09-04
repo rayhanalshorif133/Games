@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Ricky Jump</title>
+
+    <!-- App Icons & Manifest -->
+    <link rel="manifest" href="appmanifest.json">
+    <link rel="apple-touch-icon" sizes="128x128" href="icons/icon-128.png">
+    <link rel="apple-touch-icon" sizes="256x256" href="icons/icon-256.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="icons/icon-512.png">
+    <link rel="icon" type="image/png" href="icons/icon-512.png">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="description" content="Ricky Jump - Tap & Hold Oscillating Force Platform Jumper">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Main Game Container -->
+    <div id="game-container">
+        <!-- Main Game Canvas (Virtual Resolution 480x800) -->
+        <canvas id="game-canvas"></canvas>
+
+        <!-- Top HUD (Score, Best, Sound) -->
+        <div id="top-hud">
+            <div class="hud-left">
+                <!-- Current Score -->
+                <div class="hud-card hud-score-box">
+                    <span class="hud-label">SCORE</span>
+                    <span id="hud-score" class="hud-value hud-value-gold">0</span>
+                </div>
+                <!-- Best High Score -->
+                <div class="hud-card hud-best-box">
+                    <span class="hud-label">BEST</span>
+                    <span id="hud-highscore" class="hud-value hud-value-cyan">0</span>
+                </div>
+            </div>
+
+            <div class="hud-right">
+                <!-- Sound Toggle Button -->
+                <button id="btn-sound" class="hud-btn" title="Toggle Sound" aria-label="Toggle Sound">🔊</button>
+            </div>
+        </div>
+
+        <!-- Clean Animated Start Screen -->
+        <div id="start-screen" class="start-overlay">
+            <div class="start-prompt-box">
+                <div class="game-logo-badge">🦘</div>
+                <h1 class="game-title">RICKY JUMP</h1>
+                
+                <div class="instructions-card">
+                    <div class="instruction-step">
+                        <span class="step-icon">👆</span>
+                        <span class="step-text"><strong>ট্যাপ করে ধরে রাখুন:</strong> ফোর্স ওঠানামা (Up/Down) করবে</span>
+                    </div>
+                    <div class="instruction-step">
+                        <span class="step-icon">🚀</span>
+                        <span class="step-text"><strong>ছেড়ে দিন:</strong> প্লেয়ার লাফিয়ে উপরের প্ল্যাটফর্মে যাবে</span>
+                    </div>
+                    <div class="instruction-step warning-step">
+                        <span class="step-icon">⚠️</span>
+                        <span class="step-text"><strong>সাবধান:</strong> বেশি জোরে জাম্প দিলে সিলিং স্পাইকে ধ্বংস হয়ে যাবে!</span>
+                    </div>
+                </div>
+
+                <div class="tap-to-play-btn" id="btn-start-game">
+                    <span class="tap-pulse-icon">⚡</span>
+                    <span class="tap-text">TAP TO PLAY</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Over Modal -->
+        <div id="gameover-modal" class="overlay-modal hidden">
+            <div class="modal-card gameover-card">
+                <div class="skull-badge">💥</div>
+                <h2 class="gameover-title">GAME OVER</h2>
+                <p id="gameover-reason" class="gameover-reason-text">বেশি জাম্প দেওয়ায় সিলিং স্পাইকে ধ্বংস হয়ে গেছে!</p>
+
+                <div class="results-grid">
+                    <div class="result-item highlight-item">
+                        <span class="result-label">FINAL SCORE</span>
+                        <div class="score-with-badge">
+                            <span id="final-score" class="result-value result-gold">0</span>
+                            <span id="new-high-badge" class="new-badge">NEW RECORD!</span>
+                        </div>
+                    </div>
+
+                    <div class="result-item">
+                        <span class="result-label">BEST SCORE</span>
+                        <span id="final-highscore" class="result-value">0</span>
+                    </div>
+
+                    <div class="result-item">
+                        <span class="result-label">TOTAL JUMPS</span>
+                        <span id="final-jumps" class="result-value">0</span>
+                    </div>
+
+                    <div class="result-item">
+                        <span class="result-label">PERFECT JUMPS</span>
+                        <span id="final-perfect" class="result-value result-cyan">0</span>
+                    </div>
+                </div>
+
+                <!-- Live countdown text for auto-redirect if configured in gameover.js -->
+                <p id="modal-redirect-text" class="redirect-countdown-text"></p>
+
+                <!-- Primary Action Button (Play Again or Continue) -->
+                <button id="btn-restart" class="cta-button restart-button">PLAY AGAIN</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Clean up any legacy Service Workers & CacheStorage -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(regs => {
+                for (const reg of regs) reg.unregister();
+            });
+        }
+        if ('caches' in window) {
+            caches.keys().then(keys => {
+                for (const key of keys) caches.delete(key);
+            });
+        }
+    </script>
+
+    <!-- Scripts (ES Modules) -->
+    <script type="module" src="apiscore.js"></script>
+    <script type="module" src="gameover.js"></script>
+    <script type="module" src="scripts/audio.js"></script>
+    <script type="module" src="scripts/game.js"></script>
+
+</body>
+</html>
