@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Granny Hero</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <!-- PWA & App Icons -->
+    <link rel="manifest" href="appmanifest.json">
+    <link rel="apple-touch-icon" sizes="128x128" href="icons/icon-128.png">
+    <link rel="apple-touch-icon" sizes="256x256" href="icons/icon-256.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="icons/icon-512.png">
+    <link rel="icon" type="image/png" href="icons/icon-512.png">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="game-container">
+        <div id="stage-wrapper">
+            <!-- 700 x 1200 Virtual Canvas -->
+            <canvas id="game-canvas"></canvas>
+
+            <!-- HTML UI Overlay Layer -->
+            <div id="ui-layer">
+                <!-- Top HUD Bar -->
+                <div id="top-hud">
+                    <div class="hud-left">
+                        <div class="score-box">
+                            <span class="score-label">SCORE</span>
+                            <span id="hud-score">0</span>
+                        </div>
+                        <div class="highscore-pill">
+                            <span>BEST:</span>
+                            <span id="hud-highscore">0</span>
+                        </div>
+                    </div>
+
+                    <div class="hud-right">
+                        <!-- 3 Granny Lives -->
+                        <div id="hud-lives">
+                            <div class="hud-life-icon active"></div>
+                            <div class="hud-life-icon active"></div>
+                            <div class="hud-life-icon active"></div>
+                        </div>
+
+                        <!-- Sound Toggle -->
+                        <button class="hud-btn ui-interactive" id="btn-sound" title="Toggle Sound">🔊</button>
+                    </div>
+                </div>
+
+                <!-- Active Power-up Banner -->
+                <div id="power-banner">✨ SUPER PAN 2X: 10s</div>
+
+                <!-- Title Screen Modal -->
+                <div class="screen-overlay ui-interactive" id="screen-title">
+                    <div class="title-logo-wrap">
+                        <div class="game-main-title">GRANNY</div>
+                        <div class="game-sub-title">HERO</div>
+                    </div>
+
+                    <div class="granny-hero-art">
+                        <div class="granny-avatar-circle">👵</div>
+                        <div class="pan-accent">🍳</div>
+                    </div>
+
+                    <button class="btn-primary ui-interactive" id="btn-play">
+                        <span>▶ PLAY</span>
+                    </button>
+
+                    <div class="instructions-card">
+                        <p><span class="instr-icon">🎯</span> <strong>Tap / Space</strong> to throw pan at the active enemy!</p>
+                        <p><span class="instr-icon">💥</span> Hits score random <strong>10–15 points</strong>!</p>
+                        <p><span class="instr-icon">❌</span> Misses cost <strong>1 Life</strong> (3 lives total).</p>
+                        <p><span class="instr-icon">🎈</span> Hit <strong>floating balloons</strong> for bonus lives & power-ups!</p>
+                    </div>
+                </div>
+
+                <!-- Game Over Screen Modal -->
+                <div class="screen-overlay ui-interactive" id="screen-gameover" style="display: none;">
+                    <div class="gameover-box">
+                        <div class="gameover-title">GAME OVER</div>
+
+                        <div class="score-summary-grid">
+                            <div class="summary-card">
+                                <span class="summary-label">FINAL SCORE</span>
+                                <span class="summary-val" id="go-final-score">0</span>
+                            </div>
+                            <div class="summary-card">
+                                <span class="summary-label">BEST SCORE</span>
+                                <span class="summary-val" id="go-best-score">0</span>
+                            </div>
+                            <div id="go-new-best">🎉 NEW BEST RECORD!</div>
+                        </div>
+
+                        <button class="btn-retry ui-interactive" id="btn-retry">
+                            <span>🔄 PLAY AGAIN</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Scripts -->
+    <script src="scripts/audio.js"></script>
+    <script src="scripts/game.js"></script>
+</body>
+</html>

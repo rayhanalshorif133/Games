@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Traffic Escape 2D - Car Direction Release</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="stylesheet" href="css/car_style.css">
+</head>
+<body>
+
+<div id="carGameContainer">
+  <!-- 1080x1920 Logical Canvas -->
+  <canvas id="carCanvas" width="1080" height="1920"></canvas>
+
+  <!-- HUD Overlay -->
+  <div class="car-hud">
+    <div class="car-badge">
+      <span>🚗</span>
+      <span id="carHudLevel">Level 1</span>
+    </div>
+
+    <div class="car-badge">
+      <span>🏁</span>
+      <span id="carHudCount">3 / 3</span>
+    </div>
+
+    <div class="car-badge">
+      <span>🪙</span>
+      <span id="carHudCoins">150</span>
+    </div>
+
+    <div class="car-hud-buttons">
+      <button class="car-btn" id="carBtnMute" title="Mute/Unmute">🔊</button>
+      <button class="car-btn" id="carBtnLevels" title="Level Menu">🗺️</button>
+      <button class="car-btn" id="carBtnRestart" title="Restart">🔄</button>
+      <a href="index.html" class="car-btn" style="text-decoration: none;" title="Coffee Mania Game">☕</a>
+    </div>
+  </div>
+
+  <!-- Feedback Toast -->
+  <div id="carFeedback">Clear Path! 🚗💨</div>
+
+  <!-- Boosters Bar -->
+  <div class="car-boosters-bar">
+    <button class="car-booster-btn" id="carBtnUndo" title="Undo last released car">↩ Undo (3)</button>
+    <button class="car-booster-btn" id="carBtnHint" title="Highlight next unblocked car">💡 Hint (3)</button>
+    <button class="car-booster-btn" id="carBtnHeli" title="Airlift 1 blocking car">🚁 Lift (2)</button>
+  </div>
+
+  <!-- Level Completed (Win) Modal -->
+  <div class="car-modal-overlay" id="carWinModal">
+    <div class="car-modal-card">
+      <div class="car-modal-title">TRAFFIC CLEARED!</div>
+      <div class="car-modal-stars" id="carWinStars">⭐⭐⭐</div>
+      <div class="car-modal-stats" id="carWinStats"></div>
+      <div class="car-modal-buttons">
+        <button class="car-primary-btn" id="carBtnNext">Next Level 🚗</button>
+        <button class="car-secondary-btn" id="carBtnWinLevels">All Levels</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Level Selection Modal -->
+  <div class="car-modal-overlay" id="carLevelModal">
+    <div class="car-modal-card" style="max-width: 480px;">
+      <div class="car-modal-title">PARKING ZONES</div>
+      <p style="color: #ffd54f; font-size: 14px;">Select your traffic puzzle level</p>
+      <div class="car-level-grid" id="carLevelGrid"></div>
+      <div class="car-modal-buttons">
+        <button class="car-secondary-btn" id="carBtnCloseLevels">Back to Drive</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="src/car_main.js"></script>
+
+</body>
+</html>
+
