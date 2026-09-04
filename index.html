@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GAME ZONE // Ultimate Web Arcade</title>
-    <meta name="description" content="Play high-speed action, puzzle, sports, and retro arcade games instantly in your browser with full-screen support.">
+    <title>MY GAME ZONE // Web Arcade</title>
+    <meta name="description" content="Play instant web arcade games from the container collection directly in your browser with full-screen support.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -105,7 +105,7 @@
             left: 10%;
             width: 500px;
             height: 500px;
-            background: radial-gradient(circle, rgba(255, 0, 119, 0.11) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(0, 229, 176, 0.12) 0%, transparent 70%);
             filter: blur(80px);
         }
 
@@ -142,12 +142,12 @@
         .brand-icon {
             width: 42px;
             height: 42px;
-            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-mint));
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 0 20px var(--cyan-glow);
+            box-shadow: 0 0 20px var(--mint-glow);
         }
 
         .brand-icon svg {
@@ -167,14 +167,14 @@
         }
 
         .brand-text span {
-            color: var(--neon-cyan);
-            text-shadow: 0 0 16px var(--cyan-glow);
+            color: var(--neon-mint);
+            text-shadow: 0 0 16px var(--mint-glow);
         }
 
         .nav-badge {
-            background: rgba(0, 240, 255, 0.12);
-            border: 1px solid rgba(0, 240, 255, 0.3);
-            color: var(--neon-cyan);
+            background: rgba(0, 229, 176, 0.12);
+            border: 1px solid rgba(0, 229, 176, 0.35);
+            color: var(--neon-mint);
             font-size: 11px;
             font-weight: 700;
             padding: 3px 10px;
@@ -206,9 +206,9 @@
         }
 
         .random-btn:hover {
-            border-color: var(--neon-cyan);
-            background: rgba(0, 240, 255, 0.08);
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+            border-color: var(--neon-mint);
+            background: rgba(0, 229, 176, 0.08);
+            box-shadow: 0 0 15px rgba(0, 229, 176, 0.2);
             transform: translateY(-2px);
         }
 
@@ -243,14 +243,14 @@
 
         .hero-spotlight {
             background: linear-gradient(135deg, rgba(22, 22, 38, 0.95), rgba(12, 12, 20, 0.95));
-            border: 1px solid rgba(0, 240, 255, 0.25);
+            border: 1px solid rgba(0, 229, 176, 0.25);
             border-radius: 24px;
             padding: 36px 44px;
             display: grid;
             grid-template-columns: 1.2fr 0.8fr;
             gap: 40px;
             align-items: center;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 60px rgba(0, 240, 255, 0.08);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 60px rgba(0, 229, 176, 0.08);
             position: relative;
             overflow: hidden;
         }
@@ -262,7 +262,7 @@
             left: 0;
             right: 0;
             height: 2px;
-            background: linear-gradient(90deg, transparent, var(--neon-cyan), var(--neon-purple), transparent);
+            background: linear-gradient(90deg, transparent, var(--neon-mint), var(--neon-cyan), transparent);
         }
 
         .hero-tag-row {
@@ -276,9 +276,9 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            background: rgba(255, 0, 119, 0.15);
-            border: 1px solid rgba(255, 0, 119, 0.4);
-            color: #ff3399;
+            background: rgba(0, 229, 176, 0.15);
+            border: 1px solid rgba(0, 229, 176, 0.4);
+            color: var(--neon-mint);
             font-size: 11px;
             font-weight: 700;
             letter-spacing: 1.5px;
@@ -291,8 +291,8 @@
             width: 7px;
             height: 7px;
             border-radius: 50%;
-            background: #ff0077;
-            box-shadow: 0 0 8px #ff0077;
+            background: var(--neon-mint);
+            box-shadow: 0 0 8px var(--neon-mint);
             animation: pulseDot 1.4s infinite;
         }
 
@@ -312,7 +312,7 @@
         }
 
         .hero-title span {
-            background: linear-gradient(135deg, var(--neon-cyan), #a855f7);
+            background: linear-gradient(135deg, var(--neon-mint), var(--neon-cyan));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -526,13 +526,13 @@
         }
 
         .search-input:focus {
-            border-color: var(--neon-cyan);
+            border-color: var(--neon-mint);
             background: rgba(24, 24, 40, 0.95);
-            box-shadow: 0 0 20px rgba(0, 240, 255, 0.15);
+            box-shadow: 0 0 20px rgba(0, 229, 176, 0.2);
         }
 
         .search-input:focus + .search-icon {
-            fill: var(--neon-cyan);
+            fill: var(--neon-mint);
         }
 
         .search-shortcut {
@@ -574,7 +574,7 @@
         }
 
         .sort-select:focus {
-            border-color: var(--neon-cyan);
+            border-color: var(--neon-mint);
         }
 
         /* ── Category Filter Pills ── */
@@ -619,10 +619,10 @@
         }
 
         .cat-pill.active {
-            background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(168, 85, 247, 0.2));
-            border-color: var(--neon-cyan);
+            background: linear-gradient(135deg, rgba(0, 229, 176, 0.2), rgba(0, 240, 255, 0.2));
+            border-color: var(--neon-mint);
             color: #fff;
-            box-shadow: 0 0 16px rgba(0, 240, 255, 0.25);
+            box-shadow: 0 0 16px rgba(0, 229, 176, 0.25);
         }
 
         .cat-count {
@@ -633,7 +633,7 @@
         }
 
         .cat-pill.active .cat-count {
-            background: var(--neon-cyan);
+            background: var(--neon-mint);
             color: #07070d;
             font-weight: 800;
         }
@@ -694,7 +694,7 @@
         .game-card:hover {
             transform: translateY(-7px);
             border-color: var(--surface-border-bright);
-            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.55), 0 0 30px rgba(0, 240, 255, 0.15);
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.55), 0 0 30px rgba(0, 229, 176, 0.15);
         }
 
         .card-thumb-container {
@@ -744,9 +744,9 @@
         }
 
         .badge-special {
-            background: rgba(0, 240, 255, 0.2);
-            border: 1px solid rgba(0, 240, 255, 0.45);
-            color: var(--neon-cyan);
+            background: rgba(0, 229, 176, 0.2);
+            border: 1px solid rgba(0, 229, 176, 0.45);
+            color: var(--neon-mint);
         }
 
         .card-fav-btn {
@@ -835,10 +835,11 @@
             line-height: 1.3;
             letter-spacing: 0.3px;
             transition: color 0.2s;
+            text-transform: capitalize;
         }
 
         .game-card:hover .card-title {
-            color: var(--neon-cyan);
+            color: var(--neon-mint);
         }
 
         .card-desc {
@@ -852,7 +853,7 @@
             flex-grow: 1;
         }
 
-        /* ── Enhanced Play Button & Action Bar ── */
+        /* ── Play Button & Action Bar ── */
         .card-action-bar {
             display: flex;
             align-items: center;
@@ -908,10 +909,10 @@
         }
 
         .btn-card-fullscreen:hover {
-            border-color: var(--neon-cyan);
-            color: var(--neon-cyan);
-            background: rgba(0, 240, 255, 0.12);
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+            border-color: var(--neon-mint);
+            color: var(--neon-mint);
+            background: rgba(0, 229, 176, 0.12);
+            box-shadow: 0 0 15px rgba(0, 229, 176, 0.2);
             transform: translateY(-2px);
         }
 
@@ -1038,6 +1039,7 @@
             overflow: hidden;
             text-overflow: ellipsis;
             letter-spacing: 0.5px;
+            text-transform: capitalize;
         }
 
         .modal-controls {
@@ -1066,21 +1068,21 @@
         }
 
         .modal-btn:hover {
-            border-color: var(--neon-cyan);
-            color: var(--neon-cyan);
-            background: rgba(0, 240, 255, 0.1);
+            border-color: var(--neon-mint);
+            color: var(--neon-mint);
+            background: rgba(0, 229, 176, 0.1);
         }
 
         .btn-toggle-fs {
-            background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(168, 85, 247, 0.2));
-            border-color: rgba(0, 240, 255, 0.5);
+            background: linear-gradient(135deg, rgba(0, 229, 176, 0.2), rgba(0, 240, 255, 0.2));
+            border-color: rgba(0, 229, 176, 0.5);
             color: #fff;
         }
 
         .btn-toggle-fs:hover {
-            background: linear-gradient(135deg, rgba(0, 240, 255, 0.35), rgba(168, 85, 247, 0.35));
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
-            color: var(--neon-cyan);
+            background: linear-gradient(135deg, rgba(0, 229, 176, 0.35), rgba(0, 240, 255, 0.35));
+            box-shadow: 0 0 15px rgba(0, 229, 176, 0.3);
+            color: var(--neon-mint);
         }
 
         .btn-close-modal {
@@ -1102,8 +1104,8 @@
             background: #000;
             border-radius: var(--radius-md);
             overflow: hidden;
-            border: 1px solid rgba(0, 240, 255, 0.3);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9), 0 0 40px rgba(0, 240, 255, 0.12);
+            border: 1px solid rgba(0, 229, 176, 0.3);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9), 0 0 40px rgba(0, 229, 176, 0.12);
             position: relative;
             display: flex;
             align-items: center;
@@ -1192,10 +1194,10 @@
             max-width: 90vw;
             z-index: 1010;
             background: rgba(10, 10, 16, 0.9);
-            border: 1px solid rgba(0, 240, 255, 0.35);
+            border: 1px solid rgba(0, 229, 176, 0.35);
             border-radius: 100px;
             padding: 8px 24px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 240, 255, 0.15);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 229, 176, 0.15);
             transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
         }
 
@@ -1233,8 +1235,8 @@
         #game-modal.is-fullscreen.hud-hidden .fs-corner-trigger:hover {
             opacity: 1;
             background: rgba(10, 10, 16, 0.95);
-            border-color: var(--neon-cyan);
-            color: var(--neon-cyan);
+            border-color: var(--neon-mint);
+            color: var(--neon-mint);
         }
 
         /* ── Toast Notifications ── */
@@ -1244,13 +1246,13 @@
             left: 50%;
             transform: translateX(-50%) translateY(100px);
             background: rgba(15, 15, 24, 0.95);
-            border: 1px solid var(--neon-cyan);
+            border: 1px solid var(--neon-mint);
             color: #fff;
             font-size: 13px;
             font-weight: 600;
             padding: 10px 22px;
             border-radius: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 240, 255, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 229, 176, 0.3);
             z-index: 2000000;
             opacity: 0;
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
@@ -1296,7 +1298,7 @@
         }
 
         .footer-links a:hover {
-            color: var(--neon-cyan);
+            color: var(--neon-mint);
         }
 
         /* ── Responsive adjustments ── */
@@ -1360,7 +1362,7 @@
                 <svg viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm3-3c-.83 0-1.5-.67-1.5-1.5S17.67 9 18.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
             </div>
             <div class="brand-text">GAME<span>ZONE</span></div>
-            <span class="nav-badge" id="total-badge">18 Games</span>
+            <span class="nav-badge" id="total-badge">7 Games</span>
         </a>
 
         <div class="nav-actions">
@@ -1382,25 +1384,25 @@
                         <span class="pulse-dot"></span>
                         Featured Game
                     </div>
-                    <span class="nav-badge" id="hero-badge">⚡ TOP RATED</span>
+                    <span class="nav-badge" id="hero-badge">⚡ TOP PICK</span>
                 </div>
                 <h1 class="hero-title" id="hero-title">Speed <span>Racer</span></h1>
                 <p class="hero-desc" id="hero-desc">High-octane highway racing game dodging heavy obstacle traffic and collecting nitro fuel.</p>
                 <div class="hero-actions">
-                    <button class="btn-primary" id="hero-play-btn" data-action="play" data-id="speed-racer">
+                    <button class="btn-primary" id="hero-play-btn" data-action="play" data-folder="Speed-Racer">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
                         PLAY NOW
                     </button>
-                    <button class="btn-fullscreen-hero" id="hero-fs-btn" data-action="fullscreen" data-id="speed-racer">
+                    <button class="btn-fullscreen-hero" id="hero-fs-btn" data-action="fullscreen" data-folder="Speed-Racer">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
                         Play in Fullscreen
                     </button>
                 </div>
             </div>
 
-            <div class="hero-banner-thumb" id="hero-thumb-click" data-action="play" data-id="speed-racer">
+            <div class="hero-banner-thumb" id="hero-thumb-click" data-action="play" data-folder="Speed-Racer">
                 <img src="./container/Speed-Racer/thumbnail.png" alt="Featured Game" id="hero-img">
-                <div class="hero-thumb-overlay" data-action="play" data-id="speed-racer">
+                <div class="hero-thumb-overlay" data-action="play" data-folder="Speed-Racer">
                     <div class="hero-thumb-play">
                         <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
                     </div>
@@ -1413,8 +1415,8 @@
             <div class="stat-item">
                 <div class="stat-icon">🎮</div>
                 <div class="stat-text">
-                    <h4>18 Instant Games</h4>
-                    <p>No downloads or installs</p>
+                    <h4 id="stat-count-text">Container Games</h4>
+                    <p>Instant browser play</p>
                 </div>
             </div>
             <div class="stat-item">
@@ -1445,7 +1447,7 @@
     <section class="controls-section">
         <div class="search-and-sort">
             <div class="search-box-wrap">
-                <input type="text" id="game-search" class="search-input" placeholder="Search by game name, tag, or category..." autocomplete="off">
+                <input type="text" id="game-search" class="search-input" placeholder="Search container games by name..." autocomplete="off">
                 <svg class="search-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
                 <span class="search-shortcut">/</span >
             </div>
@@ -1456,7 +1458,6 @@
                     <option value="featured">Featured First</option>
                     <option value="name-asc">Name (A - Z)</option>
                     <option value="name-desc">Name (Z - A)</option>
-                    <option value="category">By Category</option>
                 </select>
             </div>
         </div>
@@ -1465,27 +1466,19 @@
         <div class="category-pills" id="category-pills">
             <button class="cat-pill active" data-category="all">
                 <span>🌟 All Games</span>
-                <span class="cat-count" id="count-all">18</span>
-            </button>
-            <button class="cat-pill" data-category="action">
-                <span>⚡ Action & Arcade</span>
-                <span class="cat-count" id="count-action">0</span>
-            </button>
-            <button class="cat-pill" data-category="puzzle">
-                <span>🧩 Puzzle & Brain</span>
-                <span class="cat-count" id="count-puzzle">0</span>
+                <span class="cat-count" id="count-all">0</span>
             </button>
             <button class="cat-pill" data-category="racing">
-                <span>🏎️ Racing & Sports</span>
+                <span>🏎️ Racing</span>
                 <span class="cat-count" id="count-racing">0</span>
             </button>
-            <button class="cat-pill" data-category="ai">
-                <span>🤖 AI Crafted</span>
-                <span class="cat-count" id="count-ai">0</span>
+            <button class="cat-pill" data-category="arcade">
+                <span>⚡ Action & Arcade</span>
+                <span class="cat-count" id="count-arcade">0</span>
             </button>
-            <button class="cat-pill" data-category="classics">
-                <span>💎 Container Classics</span>
-                <span class="cat-count" id="count-classics">0</span>
+            <button class="cat-pill" data-category="puzzle">
+                <span>🧩 Puzzle</span>
+                <span class="cat-count" id="count-puzzle">0</span>
             </button>
             <button class="cat-pill" data-category="favorites">
                 <span>❤️ Favorites</span>
@@ -1498,21 +1491,21 @@
     <main class="games-section">
         <div class="grid-header">
             <h2 class="grid-title">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--neon-cyan)"><path d="M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm-6 4h4V4h-4v4zm6 6h4v-4h-4v4zm0 6h4v-4h-4v4z"/></svg>
-                Game Vault
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--neon-mint)"><path d="M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm-6 4h4V4h-4v4zm6 6h4v-4h-4v4zm0 6h4v-4h-4v4z"/></svg>
+                Container Games Vault
             </h2>
-            <div class="grid-results-count" id="results-count">Showing 18 games</div>
+            <div class="grid-results-count" id="results-count">Loading games...</div>
         </div>
 
         <div class="game-grid" id="game-grid">
-            <!-- Cards populated dynamically via JavaScript -->
+            <!-- Cards populated dynamically via JavaScript from container folder -->
         </div>
     </main>
 
     <!-- Footer -->
     <footer class="footer">
         <div class="footer-content">
-            <p>🎮 <strong>My Game Zone</strong> — Open-source HTML5 Web Gaming Portal</p>
+            <p>🎮 <strong>My Game Zone</strong> — Pure Container Web Games</p>
             <div class="footer-links">
                 <a href="#hero-spotlight">Back to Top</a>
                 <span>•</span>
@@ -1520,7 +1513,7 @@
                 <span>•</span>
                 <span>Press <kbd class="hint-kbd">F</kbd> for Fullscreen while playing</span>
             </div>
-            <p style="font-size: 12px; color: var(--text-dim); margin-top: 6px;">Created for seamless browser gaming with full-screen hardware acceleration.</p>
+            <p style="font-size: 12px; color: var(--text-dim); margin-top: 6px;">Every folder inside container is an individual game with thumbnail.png as poster.</p>
         </div>
     </footer>
 
@@ -1540,7 +1533,7 @@
 
                 <div class="modal-controls">
                     <!-- Aspect ratio toggle -->
-                    <button class="modal-btn" id="btn-aspect-toggle" title="Toggle Aspect Ratio (16:9 / Auto / 9:16)">
+                    <button class="modal-btn" id="btn-aspect-toggle" title="Toggle Aspect Ratio (Auto / 16:9 / 9:16 / 1:1)">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M10 4v16"/></svg>
                         <span id="aspect-label">Auto Fit</span>
                     </button>
@@ -1596,287 +1589,99 @@
     <!-- Toast Notification -->
     <div class="toast" id="toast">Notice message</div>
 
-    <!-- ── APPLICATION LOGIC & GAME CATALOG ── -->
+    <!-- ── APPLICATION LOGIC: CONTAINER GAMES ONLY ── -->
     <script>
-        // ── Catalog of All 18 Games across container, game-makes-by-ai, hanging ──
-        const GAMES = [
+        // ── Standard Container Games Catalog (Every folder in container is a game, poster is thumbnail.png) ──
+        const CONTAINER_CATALOG = [
             {
-                id: "speed-racer",
+                folder: "Speed-Racer",
                 title: "Speed Racer",
                 category: "racing",
-                categoryLabel: "Racing & Speed",
-                tags: ["racing", "cars", "traffic", "speed", "container"],
+                categoryLabel: "Racing",
                 desc: "High-octane highway racing game dodging heavy obstacle traffic and collecting nitro fuel.",
-                url: "./container/Speed-Racer/index.html",
-                thumb: "./container/Speed-Racer/thumbnail.png",
-                aspect: "landscape",
                 badge: "Hot",
-                isClassics: true,
-                isAi: false,
                 featured: true
             },
             {
-                id: "cyber-space-invaders",
-                title: "Cyber Space Invaders",
-                category: "action",
-                categoryLabel: "Sci-Fi Tactical",
-                tags: ["retro", "invaders", "space", "ai", "arcade"],
-                desc: "Defend planetary colonies against relentless waves of alien dreadnoughts in this tactical space shooter.",
-                url: "./game-makes-by-ai/Retro%20Space%20Invaders/index.html",
-                thumb: "./game-makes-by-ai/Retro Space Invaders/thumbnail.svg",
-                aspect: "landscape",
-                badge: "Retro",
-                isClassics: false,
-                isAi: true,
-                featured: true
-            },
-            {
-                id: "bubble-shooter-2d",
-                title: "Bubble Shooter 2D",
-                category: "puzzle",
-                categoryLabel: "Puzzle Classic",
-                tags: ["bubbles", "shooter", "match3", "ai", "casual"],
-                desc: "Aim, match 3+ bubbles of the same color, and clear the board with 5 love lives!",
-                url: "./game-makes-by-ai/bubble-shooter/index.html",
-                thumb: "./game-makes-by-ai/bubble-shooter/thumbnail.png",
-                aspect: "landscape",
-                badge: "Popular",
-                isClassics: false,
-                isAi: true,
-                featured: true
-            },
-            {
-                id: "neon-pong-x",
-                title: "Neon Pong X",
-                category: "action",
-                categoryLabel: "Synthwave Pong",
-                tags: ["pong", "neon", "retro", "arcade", "ai"],
-                desc: "Futuristic neon-infused table tennis with glowing particle trails and synthwave vibes.",
-                url: "./game-makes-by-ai/Neon%20Pong%20X/index.html",
-                thumb: "./game-makes-by-ai/Neon Pong X/icons/icon-256.png",
-                aspect: "landscape",
-                badge: "Synthwave",
-                isClassics: false,
-                isAi: true,
-                featured: true
-            },
-            {
-                id: "car-game",
-                title: "Cyber Car Racer",
-                category: "racing",
-                categoryLabel: "Arcade Racing",
-                tags: ["racing", "cars", "speed", "hanging", "arcade"],
-                desc: "Steer and drift through city traffic at blazing velocities to shatter leaderboard records.",
-                url: "./hanging/car-game/index.html",
-                thumb: "./hanging/car-game/icons/icon-256.png",
-                aspect: "landscape",
-                badge: "Fast",
-                isClassics: false,
-                isAi: false,
-                featured: false
-            },
-            {
-                id: "fortress-defenders",
-                title: "Fortress Defenders",
-                category: "action",
-                categoryLabel: "Tower Defense",
-                tags: ["defense", "strategy", "towers", "hanging", "battles"],
-                desc: "Place defensive towers strategically and stop invading armies from breaching your gates.",
-                url: "./hanging/Fortress-Defenders/index.html",
-                thumb: "./hanging/Fortress-Defenders/icons/icon-256.png",
-                aspect: "landscape",
-                badge: "Tactical",
-                isClassics: false,
-                isAi: false,
-                featured: false
-            },
-            {
-                id: "coffee-mania",
-                title: "Coffee Mania",
-                category: "puzzle",
-                categoryLabel: "Barista Sim",
-                tags: ["coffee", "shop", "casual", "hanging", "time"],
-                desc: "Serve delicious coffees quickly and manage orders to satisfy demanding customers.",
-                url: "./hanging/Coffee-Mania/index.html",
-                thumb: "./hanging/Coffee-Mania/thumbnail.svg",
-                aspect: "landscape",
-                badge: "Cozy",
-                isClassics: false,
-                isAi: false,
-                featured: false
-            },
-            {
-                id: "halloween-match-3",
+                folder: "Halloween-Match-3",
                 title: "Halloween Match 3",
                 category: "puzzle",
-                categoryLabel: "Match 3 Tile",
-                tags: ["match3", "halloween", "spooky", "container", "puzzle"],
+                categoryLabel: "Puzzle",
                 desc: "Spooky themed match-3 tile matcher with exciting combo explosions and high score chains.",
-                url: "./container/Match/index.html",
-                thumb: "./container/Match/thumbnail.png",
-                aspect: "landscape",
-                badge: "Spooky",
-                isClassics: true,
-                isAi: false,
+                badge: "Featured",
+                featured: true
+            },
+            {
+                folder: "100-Balls-Drop",
+                title: "100 Balls Drop",
+                category: "arcade",
+                categoryLabel: "Arcade",
+                desc: "Drop and bounce balls into moving cups to score multiplier combos and test timing precision.",
+                badge: "Classic",
                 featured: false
             },
             {
-                id: "air-superiority",
-                title: "Air Superiority: Dogfight",
-                category: "action",
-                categoryLabel: "Action Shooter",
-                tags: ["planes", "dogfight", "aerial", "shooter", "ai"],
-                desc: "High-altitude aerial dogfight — shoot down hostile fighter squadrons and dodge homing missiles.",
-                url: "./game-makes-by-ai/catch-ball/index.html",
-                thumb: "./game-makes-by-ai/catch-ball/icons/icon-512.png",
-                aspect: "landscape",
-                badge: "Dogfight",
-                isClassics: false,
-                isAi: true,
+                folder: "Dont-Misclick",
+                title: "Don't Misclick",
+                category: "arcade",
+                categoryLabel: "Arcade",
+                desc: "Fast-paced reflex challenge — avoid misclicking at all costs to survive the clock!",
+                badge: "Reflex",
                 featured: false
             },
             {
-                id: "cook-by-number",
-                title: "Cook by Number",
+                folder: "Facetastic",
+                title: "Facetastic",
                 category: "puzzle",
-                categoryLabel: "Culinary Puzzle",
-                tags: ["cooking", "puzzle", "numbers", "ai", "brain"],
-                desc: "Follow recipe number sequences to whip up culinary masterpieces in this delightful puzzle.",
-                url: "./game-makes-by-ai/cook-by-number/index.html",
-                thumb: "./game-makes-by-ai/cook-by-number/thumbnail.png",
-                aspect: "landscape",
-                badge: "Creative",
-                isClassics: false,
-                isAi: true,
-                featured: false
-            },
-            {
-                id: "round-pong-ball",
-                title: "Round Pong Ball",
-                category: "action",
-                categoryLabel: "Circular Pong",
-                tags: ["pong", "retro", "physics", "container", "arcade"],
-                desc: "Circular 360-degree pong paddle reflex game with intense spin and ball acceleration.",
-                url: "./container/Round-Pong-Ball/index.html",
-                thumb: "./container/Round-Pong-Ball/thumbnail.png",
-                aspect: "square",
-                badge: "Arcade",
-                isClassics: true,
-                isAi: false,
-                featured: false
-            },
-            {
-                id: "facetastic",
-                title: "Facetastic Emoji Match",
-                category: "puzzle",
-                categoryLabel: "Emoji Memory",
-                tags: ["puzzle", "emoji", "memory", "container", "casual"],
-                desc: "Fun and addictive emoji memory matching challenge with expressive faces.",
-                url: "./container/Facetastic/index.html",
-                thumb: "./container/Facetastic/thumbnail.png",
-                aspect: "landscape",
+                categoryLabel: "Puzzle",
+                desc: "Fun and addictive emoji memory matching challenge with colorful expressive faces.",
                 badge: "Casual",
-                isClassics: true,
-                isAi: false,
                 featured: false
             },
             {
-                id: "two-dots",
+                folder: "Round-Pong-Ball",
+                title: "Round Pong Ball",
+                category: "arcade",
+                categoryLabel: "Arcade",
+                desc: "Circular 360-degree pong paddle reflex game with intense spin and ball acceleration.",
+                badge: "Arcade",
+                featured: false
+            },
+            {
+                folder: "two-dots",
                 title: "Two Dots",
                 category: "puzzle",
-                categoryLabel: "Minimalist Puzzle",
-                tags: ["puzzle", "dots", "minimal", "container", "brain"],
+                categoryLabel: "Puzzle",
                 desc: "Connect colored dots, form closed loops, and solve challenging board puzzles.",
-                url: "./container/two-dots/index.html",
-                thumb: "./container/two-dots/thumbnail.png",
-                aspect: "square",
                 badge: "Mind",
-                isClassics: true,
-                isAi: false,
-                featured: false
-            },
-            {
-                id: "neon-cyber-runner",
-                title: "Neon Cyber Runner",
-                category: "action",
-                categoryLabel: "Cyberpunk Runner",
-                tags: ["cyberpunk", "runner", "neon", "ai", "fast"],
-                desc: "Sprint through futuristic neon rooftops, wall-slide, and dodge lethal drones in this fast-paced scifi runner.",
-                url: "./game-makes-by-ai/endless-runner/index.html",
-                thumb: "./game-makes-by-ai/endless-runner/icons/icon-512.svg",
-                aspect: "portrait",
-                badge: "Mobile Ready",
-                isClassics: false,
-                isAi: true,
-                featured: false
-            },
-            {
-                id: "100-balls-drop",
-                title: "100 Balls Drop",
-                category: "action",
-                categoryLabel: "Physics Arcade",
-                tags: ["physics", "balls", "classic", "container"],
-                desc: "Drop and bounce balls into moving cups to score multiplier combos and test timing precision.",
-                url: "./container/100-Balls-Drop/index.html",
-                thumb: "./container/100-Balls-Drop/thumbnail.png",
-                aspect: "portrait",
-                badge: "Addictive",
-                isClassics: true,
-                isAi: false,
-                featured: false
-            },
-            {
-                id: "dont-misclick",
-                title: "Don't Misclick",
-                category: "action",
-                categoryLabel: "Survival Reflex",
-                tags: ["reflex", "speed", "windows", "container", "clicker"],
-                desc: "Fast-paced reflex challenge — avoid misclicking at all costs to survive the clock!",
-                url: "./container/Dont-Misclick/index.html",
-                thumb: "./container/Dont-Misclick/thumbnail.png",
-                aspect: "portrait",
-                badge: "Reflex",
-                isClassics: true,
-                isAi: false,
-                featured: false
-            },
-            {
-                id: "basketball-2d",
-                title: "Realistic Basketball 2D",
-                category: "racing",
-                categoryLabel: "Sports & Physics",
-                tags: ["basketball", "sports", "physics", "ai", "hoops"],
-                desc: "Realistic ball trajectory and swish physics in an intense 3-minute shoot-out challenge.",
-                url: "./game-makes-by-ai/busketball/index.html",
-                thumb: "./game-makes-by-ai/busketball/images/icon.svg",
-                aspect: "portrait",
-                badge: "Sports",
-                isClassics: false,
-                isAi: true,
-                featured: false
-            },
-            {
-                id: "football-kick",
-                title: "Football Kick Tournament",
-                category: "racing",
-                categoryLabel: "Soccer Penalty",
-                tags: ["football", "soccer", "penalty", "sports", "ai"],
-                desc: "Bend free kicks past defensive walls and beat world-class goalkeepers in tournament shootouts.",
-                url: "./game-makes-by-ai/football-kick/index.html",
-                thumb: "./game-makes-by-ai/football-kick/icons/icon-512.png",
-                aspect: "landscape",
-                badge: "Tournament",
-                isClassics: false,
-                isAi: true,
                 featured: false
             }
         ];
+
+        // Format helper: Each folder inside container is an individual game with thumbnail.png as poster
+        function buildGameItem(folder, meta = {}) {
+            const rawTitle = meta.title || folder.replace(/-/g, ' ');
+            return {
+                folder: folder,
+                title: rawTitle,
+                category: meta.category || "arcade",
+                categoryLabel: meta.categoryLabel || "Arcade",
+                desc: meta.desc || `Play ${rawTitle} instantly in browser with full-screen mode.`,
+                badge: meta.badge || "Playable",
+                featured: meta.featured || false,
+                url: `./container/${folder}/`,
+                thumb: `./container/${folder}/thumbnail.png`
+            };
+        }
+
+        // Active games array (Only container games)
+        let GAMES = CONTAINER_CATALOG.map(item => buildGameItem(item.folder, item));
 
         // ── State Management ──
         let currentFilter = 'all';
         let searchQuery = '';
         let currentSort = 'featured';
-        let favorites = JSON.parse(localStorage.getItem('my_gamezone_favs') || '[]');
+        let favorites = JSON.parse(localStorage.getItem('container_gamezone_favs') || '[]');
         let activeGame = null;
         let hudTimer = null;
 
@@ -1908,18 +1713,54 @@
             renderGameGrid();
             setupEventListeners();
             setupFeaturedSpotlight();
+            fetchDynamicContainerFolders();
+        }
+
+        // ── Dynamic GitHub API Check for new container folders (seamless fallback if offline) ──
+        function fetchDynamicContainerFolders() {
+            const username = "rayhanalshorif133";
+            const repo = "Games";
+            const apiUrl = `https://api.github.com/repos/${username}/${repo}/contents/container`;
+
+            fetch(apiUrl)
+                .then(res => {
+                    if (!res.ok) throw new Error('API status ' + res.status);
+                    return res.json();
+                })
+                .then(data => {
+                    if (Array.isArray(data)) {
+                        let updated = false;
+                        data.forEach(item => {
+                            if (item.type === "dir") {
+                                const exists = GAMES.some(g => g.folder.toLowerCase() === item.name.toLowerCase());
+                                if (!exists) {
+                                    const meta = CONTAINER_CATALOG.find(c => c.folder.toLowerCase() === item.name.toLowerCase()) || {};
+                                    GAMES.push(buildGameItem(item.name, meta));
+                                    updated = true;
+                                }
+                            }
+                        });
+                        if (updated) {
+                            updateCategoryCounts();
+                            renderGameGrid();
+                            setupFeaturedSpotlight();
+                        }
+                    }
+                })
+                .catch(() => {
+                    // Running offline or local file or API limit - local catalog is already loaded!
+                });
         }
 
         // ── Update Filter Counters ──
         function updateCategoryCounts() {
             document.getElementById('count-all').textContent = GAMES.length;
-            document.getElementById('count-action').textContent = GAMES.filter(g => g.category === 'action').length;
-            document.getElementById('count-puzzle').textContent = GAMES.filter(g => g.category === 'puzzle').length;
             document.getElementById('count-racing').textContent = GAMES.filter(g => g.category === 'racing').length;
-            document.getElementById('count-ai').textContent = GAMES.filter(g => g.isAi).length;
-            document.getElementById('count-classics').textContent = GAMES.filter(g => g.isClassics).length;
+            document.getElementById('count-arcade').textContent = GAMES.filter(g => g.category === 'arcade').length;
+            document.getElementById('count-puzzle').textContent = GAMES.filter(g => g.category === 'puzzle').length;
             document.getElementById('count-favorites').textContent = favorites.length;
             document.getElementById('total-badge').textContent = `${GAMES.length} Games`;
+            document.getElementById('stat-count-text').textContent = `${GAMES.length} Container Games`;
         }
 
         // ── Filter and Sort Games ──
@@ -1927,12 +1768,10 @@
             let list = GAMES.filter(game => {
                 // Category Filter
                 let matchesCat = true;
-                if (currentFilter === 'action') matchesCat = (game.category === 'action');
+                if (currentFilter === 'racing') matchesCat = (game.category === 'racing');
+                else if (currentFilter === 'arcade') matchesCat = (game.category === 'arcade');
                 else if (currentFilter === 'puzzle') matchesCat = (game.category === 'puzzle');
-                else if (currentFilter === 'racing') matchesCat = (game.category === 'racing');
-                else if (currentFilter === 'ai') matchesCat = game.isAi;
-                else if (currentFilter === 'classics') matchesCat = game.isClassics;
-                else if (currentFilter === 'favorites') matchesCat = favorites.includes(game.id);
+                else if (currentFilter === 'favorites') matchesCat = favorites.includes(game.folder);
 
                 if (!matchesCat) return false;
 
@@ -1940,10 +1779,10 @@
                 if (searchQuery.trim() !== '') {
                     const q = searchQuery.toLowerCase();
                     const titleMatch = game.title.toLowerCase().includes(q);
+                    const folderMatch = game.folder.toLowerCase().includes(q);
                     const descMatch = game.desc.toLowerCase().includes(q);
                     const catMatch = game.categoryLabel.toLowerCase().includes(q);
-                    const tagMatch = game.tags.some(t => t.toLowerCase().includes(q));
-                    return titleMatch || descMatch || catMatch || tagMatch;
+                    return titleMatch || folderMatch || descMatch || catMatch;
                 }
 
                 return true;
@@ -1954,8 +1793,6 @@
                 list.sort((a, b) => a.title.localeCompare(b.title));
             } else if (currentSort === 'name-desc') {
                 list.sort((a, b) => b.title.localeCompare(a.title));
-            } else if (currentSort === 'category') {
-                list.sort((a, b) => a.categoryLabel.localeCompare(b.categoryLabel));
             } else {
                 // 'featured'
                 list.sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
@@ -1967,30 +1804,30 @@
         // ── Render Game Grid ──
         function renderGameGrid() {
             const filtered = getFilteredGames();
-            resultsCount.textContent = `Showing ${filtered.length} of ${GAMES.length} games`;
+            resultsCount.textContent = `Showing ${filtered.length} of ${GAMES.length} container games`;
 
             if (filtered.length === 0) {
                 gameGrid.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-state-icon">🔍</div>
                         <h3>No games found</h3>
-                        <p>No games matched your search query "${searchQuery}".</p>
-                        <button class="btn-primary" onclick="resetFilters()">Reset All Filters</button>
+                        <p>No container games matched "${searchQuery}".</p>
+                        <button class="btn-primary" onclick="resetFilters()">Reset Filters</button>
                     </div>
                 `;
                 return;
             }
 
             gameGrid.innerHTML = filtered.map(game => {
-                const isFav = favorites.includes(game.id);
+                const isFav = favorites.includes(game.folder);
                 return `
-                    <article class="game-card" data-id="${game.id}">
-                        <div class="card-thumb-container" data-action="play" data-id="${game.id}">
+                    <article class="game-card" data-folder="${game.folder}">
+                        <div class="card-thumb-container" data-action="play" data-folder="${game.folder}">
                             <img class="card-thumb-img" 
                                  src="${game.thumb}" 
                                  alt="${game.title}" 
                                  loading="lazy"
-                                 onerror="this.src='https://placehold.co/600x360/151520/00f0ff?text=${encodeURIComponent(game.title)}'">
+                                 onerror="this.src='https://placehold.co/600x360/151520/00e5b0?text=${encodeURIComponent(game.title)}'">
                             
                             <div class="card-badges">
                                 <span class="card-badge badge-category">${game.categoryLabel}</span>
@@ -1999,31 +1836,31 @@
 
                             <button class="card-fav-btn ${isFav ? 'is-fav' : ''}" 
                                     data-action="fav"
-                                    data-id="${game.id}"
+                                    data-folder="${game.folder}"
                                     title="${isFav ? 'Remove from Favorites' : 'Add to Favorites'}">
                                 <svg width="15" height="15" viewBox="0 0 24 24" fill="${isFav ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2.2">
                                     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
                                 </svg>
                             </button>
 
-                            <div class="card-overlay" data-action="play" data-id="${game.id}">
-                                <div class="overlay-center-btn" title="Play ${game.title}" data-action="play" data-id="${game.id}">
+                            <div class="card-overlay" data-action="play" data-folder="${game.folder}">
+                                <div class="overlay-center-btn" title="Play ${game.title}" data-action="play" data-folder="${game.folder}">
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
                                 </div>
                             </div>
                         </div>
 
                         <div class="card-body">
-                            <h3 class="card-title" data-action="play" data-id="${game.id}">${game.title}</h3>
+                            <h3 class="card-title" data-action="play" data-folder="${game.folder}">${game.title}</h3>
                             <p class="card-desc">${game.desc}</p>
                             
                             <div class="card-action-bar">
-                                <button class="btn-card-play" data-action="play" data-id="${game.id}" title="Play ${game.title} Now">
+                                <button class="btn-card-play" data-action="play" data-folder="${game.folder}" title="Play ${game.title} Now">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
                                     <span>PLAY NOW</span>
                                 </button>
                                 
-                                <button class="btn-card-fullscreen" data-action="fullscreen" data-id="${game.id}" title="Play in Full Screen mode">
+                                <button class="btn-card-fullscreen" data-action="fullscreen" data-folder="${game.folder}" title="Play in Full Screen mode">
                                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
                                 </button>
 
@@ -2050,17 +1887,17 @@
         };
 
         // ── Toggle Favorite ──
-        window.toggleFavorite = function (gameId) {
-            const index = favorites.indexOf(gameId);
-            const game = GAMES.find(g => g.id === gameId);
+        window.toggleFavorite = function (folder) {
+            const index = favorites.indexOf(folder);
+            const game = GAMES.find(g => g.folder === folder);
             if (index > -1) {
                 favorites.splice(index, 1);
                 showToast(`Removed from favorites.`);
             } else {
-                favorites.push(gameId);
-                showToast(`Saved "${game ? game.title : gameId}" to favorites! ❤️`);
+                favorites.push(folder);
+                showToast(`Saved "${game ? game.title : folder}" to favorites! ❤️`);
             }
-            localStorage.setItem('my_gamezone_favs', JSON.stringify(favorites));
+            localStorage.setItem('container_gamezone_favs', JSON.stringify(favorites));
             updateCategoryCounts();
             renderGameGrid();
         };
@@ -2074,11 +1911,12 @@
             }, 2500);
         }
 
-        // ── Setup Hero Featured Spotlight ──
+        // ── Setup Hero Featured Spotlight from Container ──
         function setupFeaturedSpotlight() {
-            // Default to an exciting, universally compatible landscape game
-            const landscapeFeatured = GAMES.filter(g => g.featured && g.aspect !== 'portrait');
-            const featuredGame = landscapeFeatured[Math.floor(Math.random() * landscapeFeatured.length)] || GAMES[0];
+            const featuredList = GAMES.filter(g => g.featured);
+            const featuredGame = featuredList[Math.floor(Math.random() * featuredList.length)] || GAMES[0];
+
+            if (!featuredGame) return;
 
             const titleWords = featuredGame.title.split(' ');
             const firstWord = titleWords[0];
@@ -2088,23 +1926,20 @@
             document.getElementById('hero-desc').textContent = featuredGame.desc;
             document.getElementById('hero-img').src = featuredGame.thumb;
 
-            // Set data-ids on hero triggers
-            document.getElementById('hero-play-btn').dataset.id = featuredGame.id;
-            document.getElementById('hero-fs-btn').dataset.id = featuredGame.id;
-            document.getElementById('hero-thumb-click').dataset.id = featuredGame.id;
+            // Set data-folder on hero triggers
+            document.getElementById('hero-play-btn').dataset.folder = featuredGame.folder;
+            document.getElementById('hero-fs-btn').dataset.folder = featuredGame.folder;
+            document.getElementById('hero-thumb-click').dataset.folder = featuredGame.folder;
         }
 
         // ── Open Game Modal & Full Screen Engine ──
-        window.openGame = function (gameId, startInFullscreen = false) {
-            const game = GAMES.find(g => g.id === gameId);
+        window.openGame = function (folder, startInFullscreen = false) {
+            const game = GAMES.find(g => g.folder.toLowerCase() === folder.toLowerCase());
             if (!game) return;
 
             activeGame = game;
             modalTitle.textContent = game.title;
             btnOpenTab.href = game.url;
-
-            // Apply aspect ratio mode
-            setAspectRatio(game.aspect || 'landscape');
 
             // Set iframe src
             gameIframe.src = game.url;
@@ -2113,7 +1948,7 @@
             gameModal.classList.add('active');
             document.body.style.overflow = 'hidden';
 
-            // If requested in fullscreen, trigger fullscreen immediately synchronously
+            // If requested in fullscreen, trigger fullscreen synchronously
             if (startInFullscreen) {
                 requestModalFullscreen();
             }
@@ -2221,8 +2056,10 @@
             } else if (mode === 'square') {
                 modalFrameContainer.classList.add('square-mode');
                 aspectLabel.textContent = 'Square (1:1)';
-            } else {
+            } else if (mode === 'landscape') {
                 aspectLabel.textContent = 'Landscape (16:9)';
+            } else {
+                aspectLabel.textContent = 'Auto Fit';
             }
         }
 
@@ -2231,6 +2068,8 @@
                 setAspectRatio('square');
             } else if (modalFrameContainer.classList.contains('square-mode')) {
                 setAspectRatio('landscape');
+            } else if (aspectLabel.textContent.includes('Landscape')) {
+                setAspectRatio('auto');
             } else {
                 setAspectRatio('portrait');
             }
@@ -2262,10 +2101,11 @@
 
             // Surprise Me Button
             document.getElementById('btn-surprise').addEventListener('click', () => {
+                if (GAMES.length === 0) return;
                 const randomIndex = Math.floor(Math.random() * GAMES.length);
                 const randomGame = GAMES[randomIndex];
                 showToast(`Launching ${randomGame.title}! 🎲`);
-                openGame(randomGame.id, false);
+                openGame(randomGame.folder, false);
             });
 
             // Unified Click Event Delegation for ALL Play, Fullscreen & Card Actions
@@ -2274,7 +2114,7 @@
                 const favBtn = e.target.closest('[data-action="fav"]');
                 if (favBtn) {
                     e.stopPropagation();
-                    toggleFavorite(favBtn.dataset.id);
+                    toggleFavorite(favBtn.dataset.folder);
                     return;
                 }
 
@@ -2282,8 +2122,8 @@
                 const fsBtn = e.target.closest('[data-action="fullscreen"]');
                 if (fsBtn) {
                     e.stopPropagation();
-                    const gameId = fsBtn.dataset.id;
-                    if (gameId) openGame(gameId, true);
+                    const folder = fsBtn.dataset.folder;
+                    if (folder) openGame(folder, true);
                     return;
                 }
 
@@ -2296,11 +2136,11 @@
                 
                 if (playBtn) {
                     e.stopPropagation();
-                    const gameId = playBtn.dataset.id;
-                    if (gameId) openGame(gameId, false);
+                    const folder = playBtn.dataset.folder;
+                    if (folder) openGame(folder, false);
                 } else if (card) {
-                    const gameId = card.dataset.id;
-                    if (gameId) openGame(gameId, false);
+                    const folder = card.dataset.folder;
+                    if (folder) openGame(folder, false);
                 }
             });
 

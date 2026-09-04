@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Halloween Match 3</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <link rel="icon" type="image/png" href="icons/icon-128.png">
+  <link rel="stylesheet" href="style.css">
+</head> 
+<body>
+
+  <div id="game-container">
+    <!-- Main Game Canvas (Base 480x854 Virtual Resolution) -->
+    <canvas id="gameCanvas" width="480" height="854"></canvas>
+
+    <!-- Initial Loading Screen -->
+    <div id="loading-screen">
+      <div class="spinner"></div>
+      <div class="loading-text">LOADING...</div>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div id="game-over-modal" class="modal-overlay">
+      <div class="modal-card">
+        <h2 class="modal-title">GAME OVER</h2>
+        <div class="score-display-box">
+          <div class="score-label">FINAL SCORE</div>
+          <div id="modal-score" class="score-number">0</div>
+          <div id="modal-highscore" class="highscore-label">Best: 0</div>
+        </div>
+        <div id="modal-redirect-text" class="redirect-label"></div>
+        <button id="btn-restart" class="btn-halloween">PLAY AGAIN</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Clean up any legacy Construct 3 Service Workers & CacheStorage -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(regs => {
+        for (const reg of regs) reg.unregister();
+      });
+    }
+    if ('caches' in window) {
+      caches.keys().then(keys => {
+        for (const key of keys) caches.delete(key);
+      });
+    }
+  </script>
+
+  <!-- Scripts -->
+  <script type="module" src="scoreapi.js"></script>
+  <script type="module" src="gameover.js"></script>
+  <script type="module" src="scripts/main.js"></script>
+
+</body> 
+</html>
