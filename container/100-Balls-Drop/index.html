@@ -2,13 +2,18 @@
 <html>
 <head>
     <meta charset="UTF-8">
-	<title>100_golf_balls</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+	<title>100 Balls Drop - Cyber Neon Mobile</title>
+	
+	<!-- Mobile-First 1080x1920 Screen Optimization -->
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+	<meta name="theme-color" content="#040614">
+	<meta name="screen-orientation" content="portrait">
+	<meta name="x5-orientation" content="portrait">
 	
 	<!-- Made with Construct, the game and app creator :: https://www.construct.net -->
 	<meta name="generator" content="Scirra Construct">
-
-
 
 	<link rel="manifest" href="appmanifest.json">
 	<link rel="apple-touch-icon" sizes="128x128" href="icons/icon-128.png">
@@ -16,21 +21,373 @@
 	<link rel="apple-touch-icon" sizes="512x512" href="icons/icon-512.png">
 	<link rel="icon" type="image/png" href="icons/icon-512.png">
 
+	<!-- Modern Google Neon Fonts -->
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700;800&family=Russo+One&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+
 	<link rel="stylesheet" href="style.css">
-
-
-
 </head> 
  
 <body>
 
-	
+	<!-- Cyber Neon Mobile UI Overlay Layer -->
+	<div id="customGameUIWrap">
+		<!-- Full-Width Cyber-Neon Top Dashboard Header -->
+		<header class="cyber-header-bar">
+			<!-- Left: Action Controls (Sound, Restart) -->
+			<div class="hud-left-controls">
+				<button id="hudSoundBtn" class="cyber-icon-btn" aria-label="Toggle Sound" title="Sound">
+					<svg id="soundOnIcon" class="hud-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+						<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"></polygon>
+						<path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+					</svg>
+					<svg id="soundOffIcon" class="hud-svg hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+						<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"></polygon>
+						<line x1="23" y1="9" x2="17" y2="15"></line>
+						<line x1="17" y1="9" x2="23" y2="15"></line>
+					</svg>
+				</button>
+				<button id="hudRestartBtn" class="cyber-icon-btn reload-btn" aria-label="Restart Game" title="Restart">
+					<svg class="hud-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+						<polyline points="23 4 23 10 17 10"></polyline>
+						<polyline points="1 20 1 14 7 14"></polyline>
+						<path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+					</svg>
+				</button>
+			</div>
+
+			<!-- Center: Glowing Quantum Score Display -->
+			<div class="hud-center-display">
+				<div class="score-visor-badge">
+					<div class="score-sub-label">SCORE</div>
+					<div id="hudScoreValue" class="score-digital-val">0</div>
+				</div>
+				<div id="highScoreBadge" class="neon-pill-badge">
+					<span class="trophy-icon">🏆</span>
+					<span class="pill-label">BEST:</span>
+					<span id="highScoreValue">0</span>
+				</div>
+				<div id="comboBadge" class="neon-combo-pill hidden">
+					<span class="combo-bolt">⚡</span>
+					<span id="comboText">COMBO x2!</span>
+				</div>
+			</div>
+
+			<!-- Right: Quantum Power Cell (Balls Count) -->
+			<div class="hud-right-controls">
+				<div class="balls-quantum-badge" id="ballsQuantumBadge">
+					<div class="ball-orb-icon">
+						<span class="orb-core"></span>
+					</div>
+					<div class="balls-readout">
+						<span class="balls-label">BALLS</span>
+						<span id="hudBallsCount" class="balls-val">100</span>
+					</div>
+				</div>
+			</div>
+		</header>
+
+		<!-- Animated Start / Tap & Hold Prompt -->
+		<div id="tapTutorialPrompt">
+			<div class="hand-anim">
+				<span class="tap-hand">👆</span>
+				<div class="tap-ring"></div>
+				<div class="tap-ring ring-2"></div>
+			</div>
+			<div class="cue-banner neon-box">
+				<span class="cue-main">⚡ HOLD TO DROP ⚡</span>
+				<span class="cue-sub">Fill the rotating neon cups!</span>
+			</div>
+		</div>
+
+		<!-- Floating Neon Score Popups Container -->
+		<div id="floatingScoreContainer"></div>
+
+		<!-- Atmospheric Cyber-Neon Rotor Aura -->
+		<div class="bottom-rotor-glow"></div>
+
+		<!-- Neon Game Over Modal Card -->
+		<div id="neonGameOverModal" class="neon-modal hidden">
+			<div class="neon-modal-backdrop"></div>
+			<div class="neon-modal-card">
+				<div class="neon-glitch-title">GAME OVER</div>
+				<div class="neon-stats-grid">
+					<div class="stat-card">
+						<div class="stat-title">FINAL SCORE</div>
+						<div id="neonFinalScore" class="stat-value cyan">0</div>
+					</div>
+					<div class="stat-card gold-border">
+						<div class="stat-title">ALL-TIME BEST</div>
+						<div id="neonBestScore" class="stat-value gold">0</div>
+					</div>
+				</div>
+				<div id="newRecordBanner" class="new-record-tag hidden">
+					<span>👑 NEW BEST RECORD! 👑</span>
+				</div>
+				<button id="neonReplayBtn" class="neon-action-btn">
+					<span class="replay-arrow">↺</span> PLAY AGAIN
+				</button>
+			</div>
+		</div>
+	</div>
 
 <script>
 if (location.protocol.substr(0, 4) === "file")
 {
 	alert("Web exports won't work until you upload them. (When running on the file: protocol, browsers block many features from working for security reasons.)");
 }
+
+// Procedural Web Audio Neon Synthesizer Engine
+const NeonAudio = (function() {
+	let audioCtx = null;
+	
+	function getContext() {
+		if (!audioCtx) {
+			const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+			if (AudioContextClass) {
+				audioCtx = new AudioContextClass();
+			}
+		}
+		if (audioCtx && audioCtx.state === 'suspended') {
+			audioCtx.resume();
+		}
+		return audioCtx;
+	}
+
+	// Pentatonic scale notes for melodic combo chimes
+	const notes = [523.25, 587.33, 659.25, 783.99, 880.00, 1046.50, 1174.66, 1318.51];
+
+	function playChime(comboIndex = 0) {
+		const ctx = getContext();
+		if (!ctx) return;
+		try {
+			const idx = Math.min(comboIndex, notes.length - 1);
+			const freq = notes[idx];
+			const osc = ctx.createOscillator();
+			const gain = ctx.createGain();
+
+			osc.type = 'sine';
+			osc.frequency.setValueAtTime(freq, ctx.currentTime);
+			osc.frequency.exponentialRampToValueAtTime(freq * 1.02, ctx.currentTime + 0.28);
+
+			gain.gain.setValueAtTime(0.2, ctx.currentTime);
+			gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.28);
+
+			osc.connect(gain);
+			gain.connect(ctx.destination);
+
+			osc.start();
+			osc.stop(ctx.currentTime + 0.28);
+		} catch (e) {}
+	}
+
+	function playFanfare() {
+		const ctx = getContext();
+		if (!ctx) return;
+		try {
+			const chord = [523.25, 659.25, 783.99, 1046.50];
+			chord.forEach((freq, i) => {
+				setTimeout(() => {
+					const osc = ctx.createOscillator();
+					const gain = ctx.createGain();
+					osc.type = 'triangle';
+					osc.frequency.setValueAtTime(freq, ctx.currentTime);
+					gain.gain.setValueAtTime(0.18, ctx.currentTime);
+					gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.45);
+					osc.connect(gain);
+					gain.connect(ctx.destination);
+					osc.start();
+					osc.stop(ctx.currentTime + 0.45);
+				}, i * 60);
+			});
+		} catch (e) {}
+	}
+
+	return { playChime, playFanfare, getContext };
+})();
+
+// UI Bridge & Synchronization
+(function() {
+	const uiWrap = document.getElementById('customGameUIWrap');
+	const highScoreVal = document.getElementById('highScoreValue');
+	const highScoreBadge = document.getElementById('highScoreBadge');
+	const hudScoreVal = document.getElementById('hudScoreValue');
+	const hudBallsCount = document.getElementById('hudBallsCount');
+	const ballsBadge = document.getElementById('ballsQuantumBadge');
+	const hudSoundBtn = document.getElementById('hudSoundBtn');
+	const soundOnIcon = document.getElementById('soundOnIcon');
+	const soundOffIcon = document.getElementById('soundOffIcon');
+	const hudRestartBtn = document.getElementById('hudRestartBtn');
+	const comboBadge = document.getElementById('comboBadge');
+	const comboText = document.getElementById('comboText');
+	const tutorialPrompt = document.getElementById('tapTutorialPrompt');
+	const scoreContainer = document.getElementById('floatingScoreContainer');
+	const gameOverModal = document.getElementById('neonGameOverModal');
+	const finalScoreEl = document.getElementById('neonFinalScore');
+	const bestScoreEl = document.getElementById('neonBestScore');
+	const newRecordTag = document.getElementById('newRecordBanner');
+	const replayBtn = document.getElementById('neonReplayBtn');
+
+	globalThis.updateLiveHUD = function(score, ballsLeft) {
+		if (hudScoreVal) hudScoreVal.textContent = score;
+		if (hudBallsCount) hudBallsCount.textContent = Math.max(0, ballsLeft);
+		if (ballsBadge) {
+			if (ballsLeft <= 15) {
+				ballsBadge.classList.add('critical');
+			} else {
+				ballsBadge.classList.remove('critical');
+			}
+		}
+	};
+
+	globalThis.updateSoundButtonUI = function(isSound) {
+		if (!hudSoundBtn) return;
+		if (isSound) {
+			hudSoundBtn.classList.remove('muted');
+			if (soundOnIcon) soundOnIcon.classList.remove('hidden');
+			if (soundOffIcon) soundOffIcon.classList.add('hidden');
+		} else {
+			hudSoundBtn.classList.add('muted');
+			if (soundOnIcon) soundOnIcon.classList.add('hidden');
+			if (soundOffIcon) soundOffIcon.classList.remove('hidden');
+		}
+	};
+
+	if (hudSoundBtn) {
+		hudSoundBtn.addEventListener('click', (e) => {
+			e.stopPropagation();
+			if (globalThis.gameRuntime) {
+				const current = globalThis.gameRuntime.globalVars.isSound;
+				const newVal = !current;
+				globalThis.gameRuntime.globalVars.isSound = newVal;
+				localStorage.setItem('100balls_isSound', newVal);
+				globalThis.updateSoundButtonUI(newVal);
+			}
+		});
+	}
+
+	if (hudRestartBtn) {
+		hudRestartBtn.addEventListener('click', (e) => {
+			e.stopPropagation();
+			location.reload();
+		});
+	}
+
+	// Initial high score from localStorage
+	const savedBest = localStorage.getItem('100balls_best_score') || '0';
+	highScoreVal.textContent = savedBest;
+
+	globalThis.updateHUDHighScore = function(score, isNew) {
+		highScoreVal.textContent = score;
+		if (isNew) {
+			highScoreBadge.classList.add('new-record');
+		}
+	};
+
+	globalThis.hideTutorial = function() {
+		if (tutorialPrompt && !tutorialPrompt.classList.contains('hidden')) {
+			tutorialPrompt.classList.add('hidden');
+		}
+	};
+
+	globalThis.updateComboHUD = function(combo) {
+		if (!comboBadge) return;
+		if (combo >= 2) {
+			comboBadge.classList.remove('hidden');
+			if (combo >= 8) {
+				comboText.textContent = `⚡ FRENZY x5!`;
+				comboBadge.className = 'neon-combo-pill frenzy';
+			} else if (combo >= 5) {
+				comboText.textContent = `🔥 SUPER x3!`;
+				comboBadge.className = 'neon-combo-pill super';
+			} else {
+				comboText.textContent = `COMBO x${combo}!`;
+				comboBadge.className = 'neon-combo-pill';
+			}
+		} else {
+			comboBadge.classList.add('hidden');
+		}
+	};
+
+	globalThis.onScoreAdded = function(diff, currentScore, combo = 1, multiplier = 1) {
+		// Play procedural neon chime sound if sound enabled
+		const soundActive = !globalThis.gameRuntime || globalThis.gameRuntime.globalVars.isSound !== false;
+		if (soundActive) {
+			if (multiplier >= 3) {
+				NeonAudio.playFanfare();
+			} else {
+				NeonAudio.playChime(combo);
+			}
+		}
+
+		// Update Combo HUD badge
+		globalThis.updateComboHUD(combo);
+
+		if (!scoreContainer) return;
+		const popup = document.createElement('div');
+		popup.className = 'floating-score';
+		if (multiplier > 1) {
+			popup.className += ' combo-mult';
+			popup.textContent = `+${diff * multiplier} (x${multiplier})`;
+		} else {
+			popup.textContent = `+${diff}`;
+		}
+		
+		// Random slight x jitter around gear catch area (45% - 55% width, 66% height)
+		const rx = 50 + (Math.random() * 16 - 8);
+		const ry = 66 + (Math.random() * 8 - 4);
+		popup.style.left = rx + '%';
+		popup.style.top = ry + '%';
+		scoreContainer.appendChild(popup);
+
+		setTimeout(() => {
+			if (popup.parentElement) popup.parentElement.removeChild(popup);
+		}, 950);
+	};
+
+	globalThis.onNeonGameOver = function(finalScore, bestScore) {
+		if (!gameOverModal) return;
+		finalScoreEl.textContent = finalScore;
+		bestScoreEl.textContent = bestScore;
+		if (finalScore >= bestScore && finalScore > 0) {
+			newRecordTag.classList.remove('hidden');
+		} else {
+			newRecordTag.classList.add('hidden');
+		}
+		gameOverModal.classList.remove('hidden');
+	};
+
+	if (replayBtn) {
+		replayBtn.addEventListener('click', () => {
+			location.reload();
+		});
+	}
+
+	// Unlock AudioContext and dismiss tutorial on first touch
+	window.addEventListener('pointerdown', () => {
+		NeonAudio.getContext();
+		globalThis.hideTutorial();
+	}, { passive: true });
+	window.addEventListener('touchstart', () => {
+		NeonAudio.getContext();
+		globalThis.hideTutorial();
+	}, { passive: true });
+
+	// Sync UI container dimensions and margins with the C3 canvas
+	function syncCanvasLayout() {
+		const canvas = document.querySelector('canvas');
+		if (canvas && uiWrap) {
+			uiWrap.style.width = canvas.style.width;
+			uiWrap.style.height = canvas.style.height;
+			uiWrap.style.marginLeft = canvas.style.marginLeft;
+			uiWrap.style.marginTop = canvas.style.marginTop;
+			uiWrap.style.display = canvas.style.display;
+		}
+		requestAnimationFrame(syncCanvasLayout);
+	}
+	requestAnimationFrame(syncCanvasLayout);
+})();
 </script>
 	
 	<noscript>
