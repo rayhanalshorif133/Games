@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Three Dots 3.0 - Neon Edition</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#070712">
+  <meta name="description" content="Three Dots 3.0 Neon Edition - Fast-paced orbital reflex color matching arcade game">
+  
+  <link rel="icon" type="image/png" href="icons/icon-512.png">
+  <link rel="apple-touch-icon" sizes="128x128" href="icons/icon-128.png">
+  <link rel="apple-touch-icon" sizes="256x256" href="icons/icon-256.png">
+  <link rel="apple-touch-icon" sizes="512x512" href="icons/icon-512.png">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div id="game-container">
+    <!-- HTML5 Canvas -->
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- Top In-Game HUD -->
+    <header id="game-hud">
+      <div class="hud-group">
+        <button id="btn-sound" class="hud-btn" aria-label="Toggle Sound">🔊</button>
+      </div>
+
+      <div class="score-display">
+        <span class="score-title">Score</span>
+        <span id="hud-score" class="score-value">0</span>
+        <!-- 3 Lives Display -->
+        <div id="hud-lives" class="hud-lives">
+          <span class="life-heart active" data-index="0">❤️</span>
+          <span class="life-heart active" data-index="1">❤️</span>
+          <span class="life-heart active" data-index="2">❤️</span>
+        </div>
+      </div>
+
+      <div class="hud-group">
+        <button id="btn-pause" class="hud-btn" aria-label="Pause Game">⏸</button>
+      </div>
+    </header>
+
+    <!-- Dynamic Combo Badge -->
+    <div id="combo-badge">COMBO x2 🔥</div>
+
+    <!-- Overdrive Speed Up Alert Banner -->
+    <div id="overdrive-banner">⚡ OVERDRIVE! SPEED UP ⚡</div>
+
+    <!-- Countdown Sequence Overlay (Ready, 3, 2, 1, START) -->
+    <div id="countdown-overlay" class="countdown-overlay">
+      <span id="countdown-text" class="countdown-text">READY</span>
+    </div>
+
+    <!-- Active Power-up Badges -->
+    <div id="powerup-bar"></div>
+
+    <!-- In-Game Tap Hint -->
+    <div id="tap-hint" style="display: none;">TAP TO ROTATE DOTS</div>
+
+    <!-- Start / Menu Screen Modal -->
+    <div id="menu-modal" class="screen-modal active">
+      <h1 class="game-title">
+        <span class="title-three">THREE</span>
+        <span class="title-dots">DOTS</span>
+      </h1>
+      <p class="game-subtitle">Neon Orbital Reflex Challenge</p>
+
+      <div class="how-to-play-box">
+        <p>🟡 <strong>Tap anywhere</strong> (or use Arrow keys) to rotate the 3 dots.</p>
+        <p style="margin-top: 8px;">🎯 Match incoming ball's <span>NEON COLOR</span> before impact!</p>
+        <p style="margin-top: 8px;">❤️ <strong>3 Lives</strong> & Power-Ups (Shield, Slow-Mo, Rainbow)!</p>
+      </div>
+
+      <button id="btn-play" class="btn-neon">Tap To Play</button>
+    </div>
+
+    <!-- Game Over Screen Modal -->
+    <div id="game-over-modal" class="screen-modal">
+      <div id="new-record-badge" class="new-record-badge">★ NEW RECORD! ★</div>
+      <h2 class="game-over-title">GAME OVER</h2>
+
+      <div class="stats-card">
+        <div class="stat-row">
+          <span class="stat-label">Score</span>
+          <span id="final-score" class="stat-num highlight">0</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Best Score</span>
+          <span id="best-score" class="stat-num gold">0</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Time Survived</span>
+          <span id="survived-time" class="stat-num">0s</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Max Combo</span>
+          <span id="max-combo" class="stat-num">0x</span>
+        </div>
+      </div>
+
+      <button id="btn-retry" class="btn-neon">TRY AGAIN</button>
+    </div>
+
+    <!-- Pause Screen Modal -->
+    <div id="pause-modal" class="screen-modal">
+      <h2 class="game-over-title" style="color: var(--neon-cyan); text-shadow: 0 0 20px var(--neon-cyan);">PAUSED</h2>
+      <button id="btn-resume" class="btn-neon" style="margin-top: 20px;">RESUME</button>
+    </div>
+  </div>
+
+  <!-- Main Game Script -->
+  <script type="module" src="game.js"></script>
+</body>
+</html>
