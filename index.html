@@ -1692,26 +1692,23 @@
             `;
         }
 
-        // ── Auto-Detect All Folders from container/ ──
+        // ── Auto-Detect All Folders from container/ (100% Dynamic from GitHub API) ──
         async function loadContainerFolders() {
-            // Check cached folders or initial folders for 0ms instant display
+            // Check cached folders for instant rendering while fetching fresh list
             const cachedFolders = localStorage.getItem('cached_container_folders');
             if (cachedFolders) {
                 try {
                     const parsed = JSON.parse(cachedFolders);
                     if (Array.isArray(parsed) && parsed.length > 0) {
                         GAMES = parsed.map(f => createGameFromFolder(f));
+                        updateCategoryCounts();
+                        renderGameGrid();
+                        setupFeaturedSpotlight();
                     }
                 } catch (e) {}
+            } else {
+                renderLoadingSkeletons();
             }
-            if (GAMES.length === 0) {
-                const initialFolders = ['100-Balls-Drop', 'Dont-Misclick', 'Facetastic', 'Granny-Hero', 'Halloween-Match-3', 'Round-Pong-Ball', 'Speed-Racer', 'two-dots'];
-                GAMES = initialFolders.map(f => createGameFromFolder(f));
-            }
-            
-            updateCategoryCounts();
-            renderGameGrid(); 
-            setupFeaturedSpotlight();
 
             // GitHub Repository Contents API for container/
             const username = "rayhanalshorif133";

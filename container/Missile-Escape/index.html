@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Missile Escape - Tactical Space Arcade</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/png" href="icons/icon-128.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- 1080x1920 Mobile Viewport Frame -->
+    <div id="mobileFrame">
+        <div id="gameContainer">
+            <!-- Main Game Canvas (1080x1920 logical) -->
+            <canvas id="gameCanvas" width="1080" height="1920"></canvas>
+
+    <!-- In-Game HUD Layer -->
+    <div id="inGameHUD" class="ui-layer hidden">
+        <!-- TOP BAR: Left = Close (✕), Middle = Play Timer, Right = Life Icons (same line!) -->
+        <div class="hud-top-bar">
+            <div class="hud-item-box hud-left">
+                <button id="btnHudQuit" class="btn-hud-icon btn-hud-close" title="Exit / Close Mission">✕</button>
+            </div>
+            <div class="hud-item-box hud-center">
+                <div class="hud-timer-badge">
+                    <span class="timer-icon">⏱️</span>
+                    <span id="hudTimer" class="timer-digits">00:00</span>
+                </div>
+            </div>
+            <div class="hud-item-box hud-right">
+                <div class="hud-lives-badge">
+                    <span id="hudLives" class="lives-hearts">❤️❤️❤️</span>
+                    <span id="hudShield" class="shield-tag" title="Shield Status">🛡️</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECOND ROW: Centered Directly Below Top HUD: Star & Points Collection -->
+        <div class="hud-second-row">
+            <div class="hud-stars-badge">
+                <span class="star-icon">★</span>
+                <span id="hudCoins" class="star-amount">0</span>
+                <span class="hud-divider">|</span>
+                <span class="pts-label">PTS</span>
+                <span id="hudScore" class="pts-amount">0</span>
+            </div>
+        </div>
+
+        <!-- Dynamic Celebratory / Bahobah Popup -->
+        <div id="hudCelebration" class="hud-celebration-popup" style="display: none;">
+            <div id="celebTitle" class="celeb-title">AWESOME! 🔥</div>
+            <div id="celebSub" class="celeb-sub">+500 PTS BONUS</div>
+        </div>
+
+        <div id="hudCombo" class="hud-combo-badge" style="display: none;">x2 MULTIPLIER!</div>
+
+        <!-- BOTTOM BAR: Left = Pause Icon, Right = Settings Icon, Flare Button -->
+        <div class="hud-bottom-bar">
+            <div class="hud-bottom-left">
+                <button id="btnHudPause" class="btn-hud-icon btn-hud-pause" title="Pause Game">⏸</button>
+            </div>
+            <div class="hud-bottom-right">
+                <div id="btnFlareHUD" class="flare-action-btn" title="Deploy Decoy Flare">
+                    <span class="flare-icon">✨</span>
+                    <span id="hudFlares" class="flare-count">3</span>
+                </div>
+                <button id="btnHudSettings" class="btn-hud-icon btn-hud-settings" title="Audio & Settings">⚙️</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Menu Layer with Single-Line TAP TO PLAY -->
+    <div id="mainMenu" class="ui-layer">
+        <div class="menu-content">
+            <img src="images/game_logo.png" alt="Missile Escape" class="game-logo">
+
+            <div class="menu-stats-bar">
+                <div>BEST: <span id="menuHighScore">0</span></div>
+                <div>STARS: <span id="menuCoins">0 ★</span></div>
+            </div>
+
+            <!-- Single-Line Tap To Play -->
+            <div id="tapToPlayOverlay" class="tap-to-play-line">
+                ⚡ TAP TO PLAY ⚡
+            </div>
+
+            <div class="menu-buttons">
+                <button id="btnSettings" class="btn-sci">SETTINGS ⚙️</button>
+            </div>
+
+            <div class="control-hints">
+                Infinite Sky • Random Fighter Jets • Dodge Missiles
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal-overlay hidden">
+        <div class="modal-window" style="max-width: 440px;">
+            <div class="modal-header">
+                <h2>AUDIO & SETTINGS</h2>
+                <button id="btnCloseSettings" class="btn-hud-icon">✕</button>
+            </div>
+
+            <div class="settings-group">
+                <div class="setting-row">
+                    <label>Sound FX:</label>
+                    <input type="range" id="soundVolSlider" min="0" max="1" step="0.05" value="0.8">
+                </div>
+                <div class="setting-row">
+                    <label>Music Volume:</label>
+                    <input type="range" id="musicVolSlider" min="0" max="1" step="0.05" value="0.5">
+                </div>
+                <div class="setting-row" style="margin-top: 15px;">
+                    <button id="btnResetSave" class="btn-sci" style="font-size: 0.85rem; border-color: #ff3366; color: #ff3366;">Reset All Save Data</button>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button id="btnDoneSettings" class="btn-sci">SAVE & CLOSE</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pause Modal -->
+    <div id="pauseModal" class="modal-overlay hidden">
+        <div class="modal-window" style="max-width: 380px; text-align: center;">
+            <div class="modal-header" style="justify-content: center;">
+                <h2>MISSION PAUSED</h2>
+            </div>
+            <div class="menu-buttons" style="width: 100%; margin: 15px 0;">
+                <button id="btnResume" class="btn-sci large">RESUME</button>
+                <button id="btnRestart" class="btn-sci">RESTART</button>
+                <button id="btnHomeFromPause" class="btn-sci">MAIN MENU</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div id="gameOverModal" class="modal-overlay hidden">
+        <div class="modal-window" style="max-width: 440px; text-align: center;">
+            <div class="modal-header" style="justify-content: center;">
+                <h2 style="color: #ff3344; text-shadow: 0 0 15px #ff0033;">AIRCRAFT DESTROYED</h2>
+            </div>
+
+            <div id="newHighBadge" class="high-score-badge" style="display: none;">
+                ★ NEW HIGH SCORE! ★
+            </div>
+
+            <div class="game-over-stats">
+                <div class="stat-line">
+                    <span>FINAL SCORE</span>
+                    <strong id="finalScore">0</strong>
+                </div>
+                <div class="stat-line">
+                    <span>BEST RECORD</span>
+                    <strong id="bestScore">0</strong>
+                </div>
+                <div class="stat-line">
+                    <span>SURVIVAL TIME</span>
+                    <span id="statTime">0s</span>
+                </div>
+                <div class="stat-line">
+                    <span>MISSILES DODGED</span>
+                    <span id="statDodged">0</span>
+                </div>
+                <div class="stat-line">
+                    <span>STARS COLLECTED</span>
+                    <span id="statCoins" style="color: #ffd700; font-weight: 700;">+0 ★</span>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button id="btnRetry" class="btn-sci large">RETRY</button>
+                <button id="btnHomeFromOver" class="btn-sci">MENU</button>
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <!-- Score API & Redirect Config -->
+    <script src="scripts/sendscoreapi.js"></script>
+    <script src="scripts/gameover.js"></script>
+
+    <!-- Load Game Engine -->
+    <script src="scripts/bundle.js"></script>
+
+    <!-- Settings Handlers -->
+    <script>
+        const soundSlider = document.getElementById('soundVolSlider');
+        const musicSlider = document.getElementById('musicVolSlider');
+        const settingsModal = document.getElementById('settingsModal');
+
+        soundSlider?.addEventListener('input', (e) => {
+            soundEngine.setSoundVolume(parseFloat(e.target.value));
+            storage.data.settings.soundVolume = parseFloat(e.target.value);
+            storage.save();
+        });
+
+        musicSlider?.addEventListener('input', (e) => {
+            soundEngine.setMusicVolume(parseFloat(e.target.value));
+            storage.data.settings.musicVolume = parseFloat(e.target.value);
+            storage.save();
+        });
+
+        document.getElementById('btnCloseSettings')?.addEventListener('click', () => {
+            soundEngine.playClick();
+            settingsModal.classList.add('hidden');
+        });
+
+        document.getElementById('btnDoneSettings')?.addEventListener('click', () => {
+            soundEngine.playClick();
+            settingsModal.classList.add('hidden');
+        });
+
+        document.getElementById('btnResetSave')?.addEventListener('click', () => {
+            if (confirm('Are you sure you want to reset all game progress and currency?')) {
+                localStorage.removeItem('missile_escape_save_v1');
+                location.reload();
+            }
+        });
+    </script>
+</body>
+</html>

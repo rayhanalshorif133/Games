@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Missile Escape - Official Banners (1000x600)</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: #070d18;
+            color: #e0f0ff;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .header h1 {
+            font-size: 2.2rem;
+            letter-spacing: 2px;
+            color: #00f0ff;
+            text-shadow: 0 0 15px rgba(0,240,255,0.6);
+            margin-bottom: 8px;
+        }
+        .header p {
+            color: #88a5c4;
+            font-size: 1rem;
+        }
+        .spec-badge {
+            display: inline-block;
+            background: rgba(0, 240, 255, 0.15);
+            border: 1px solid #00f0ff;
+            color: #00f0ff;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-top: 10px;
+        }
+        .tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .tab-btn {
+            background: #0f1c30;
+            border: 1px solid #204066;
+            color: #a0c2e0;
+            padding: 10px 22px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        .tab-btn:hover {
+            border-color: #00f0ff;
+            color: #fff;
+        }
+        .tab-btn.active {
+            background: linear-gradient(135deg, #0077aa, #00f0ff);
+            color: #000;
+            border-color: #00f0ff;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.5);
+            font-weight: 700;
+        }
+        .banner-container {
+            max-width: 1000px;
+            width: 100%;
+            background: #000;
+            border: 2px solid #00f0ff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 240, 255, 0.25);
+            position: relative;
+        }
+        .banner-img {
+            width: 100%;
+            height: auto;
+            display: block;
+            aspect-ratio: 1000 / 600;
+            object-fit: cover;
+        }
+        .actions {
+            margin-top: 25px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .btn {
+            background: linear-gradient(135deg, #0088cc, #00f0ff);
+            color: #04101e;
+            padding: 14px 28px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 800;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 20px rgba(0, 240, 255, 0.4);
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(0, 240, 255, 0.6);
+        }
+        .btn-outline {
+            background: transparent;
+            color: #00f0ff;
+            border: 1px solid #00f0ff;
+            box-shadow: none;
+        }
+        .btn-outline:hover {
+            background: rgba(0, 240, 255, 0.1);
+        }
+        .info-card {
+            max-width: 1000px;
+            width: 100%;
+            background: #0c1626;
+            border: 1px solid #1c3350;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+        }
+        .info-item h4 {
+            color: #00f0ff;
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .info-item p {
+            color: #c4d8ed;
+            font-size: 0.95rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>MISSILE ESCAPE • OFFICIAL BANNERS</h1>
+        <p>Tactical 2D Aerial Dogfight & Missile Evasion</p>
+        <span class="spec-badge">EXACT RESOLUTION: 1000 WIDE × 600 HIGH (PIXELS)</span>
+    </div>
+
+    <div class="tabs">
+        <button id="tabGameUI" class="tab-btn active" onclick="selectBanner('game_ui')">Option 1: In-Game UI & Fleet Banner</button>
+        <button id="tabCinematic" class="tab-btn" onclick="selectBanner('cinematic')">Option 2: Cinematic Concept Art</button>
+    </div>
+
+    <div class="banner-container">
+        <img id="bannerDisplay" class="banner-img" src="banner_1000x600.png" alt="Missile Escape Game Banner">
+    </div>
+
+    <div class="actions">
+        <a id="btnDownload" class="btn" href="banner_1000x600.png" download="missile_escape_banner_1000x600.png">
+            ⬇ DOWNLOAD 1000x600 PNG
+        </a>
+        <a class="btn btn-outline" href="index.html" target="_blank">
+            ▶ PLAY GAME
+        </a>
+    </div>
+
+    <div class="info-card">
+        <div class="info-item">
+            <h4>Width & Height</h4>
+            <p>1000px × 600px</p>
+        </div>
+        <div class="info-item">
+            <h4>Aspect Ratio</h4>
+            <p>5:3 (1.67:1 Widescreen)</p>
+        </div>
+        <div class="info-item">
+            <h4>Featured Assets</h4>
+            <p>3 Fighter Jets, Real HUD, Missiles, Contrails & Explosions</p>
+        </div>
+        <div class="info-item">
+            <h4>File Locations</h4>
+            <p><code>banner_1000x600.png</code> in root</p>
+        </div>
+    </div>
+
+    <script>
+        function selectBanner(type) {
+            const img = document.getElementById('bannerDisplay');
+            const btn = document.getElementById('btnDownload');
+            const tab1 = document.getElementById('tabGameUI');
+            const tab2 = document.getElementById('tabCinematic');
+
+            if (type === 'game_ui') {
+                img.src = 'banner_1000x600.png';
+                btn.href = 'banner_1000x600.png';
+                btn.download = 'missile_escape_game_ui_banner_1000x600.png';
+                tab1.classList.add('active');
+                tab2.classList.remove('active');
+            } else {
+                img.src = 'banner_cinematic_1000x600.png';
+                btn.href = 'banner_cinematic_1000x600.png';
+                btn.download = 'missile_escape_cinematic_banner_1000x600.png';
+                tab2.classList.add('active');
+                tab1.classList.remove('active');
+            }
+        }
+    </script>
+</body>
+</html>
