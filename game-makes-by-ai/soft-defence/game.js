@@ -590,8 +590,18 @@
   // Input States (Virtual screen coordinates)
   const keys = {};
   const mouse = { x: V_WIDTH / 2, y: V_HEIGHT / 2, down: false };
-  let touchJoystick = { active: false, id: null, startX: 0, startY: 0, curX: 0, curY: 0, dx: 0, dy: 0 };
-  let touchAim = { active: false, id: null, x: V_WIDTH / 2, y: V_HEIGHT / 2 };
+  const inputControl = {
+    active: false,
+    type: null,
+    id: null,
+    startX: 0,
+    startY: 0,
+    curX: 0,
+    curY: 0,
+    dx: 0,
+    dy: 0,
+    isMoving: false,
+  };
 
   // --- INPUT LISTENERS ---
   window.addEventListener('keydown', (e) => {
@@ -605,23 +615,85 @@
     keys[e.code] = false;
   });
 
-  // Mouse Inputs
+  // Mouse Inputs (Desktop Click-to-Shoot, Drag-to-Move + Shoot)
   CANVAS.addEventListener('mousemove', (e) => {
     const p = getCanvasCoords(e);
-    mouse.x = p.x;
-    mouse.y = p.y;
-  });
-  CANVAS.addEventListener('mousedown', (e) => {
-    SOUNDS.init();
-    if (e.button === 0) {
-      const p = getCanvasCoords(e);
+    if (!inputControl.active || inputControl.type !== 'mouse') {
+      mouse.x = p.x;
+      mouse.y = p.y;
+      return;
+    }
+
+    inputControl.curX = p.x;
+    inputControl.curY = p.y;
+
+    const diffX = p.x - inputControl.startX;
+    const diffY = p.y - inputControl.startY;
+    const dist = Math.hypot(diffX, diffY);
+
+    // Slight swipe ("halka swap") threshold: > 8px
+    if (dist > 8) {
+      inputControl.isMoving = true;
+      const speedRatio = Math.min(1.0, 0.75 + (dist - 8) / 20);
+      inputControl.dx = (diffX / dist) * speedRatio;
+      inputControl.dy = (diffY / dist) * speedRatio;
+
+      // Direct aim and continuous fire in swipe direction
+      const swipeAngle = Math.atan2(diffY, diffX);
+      const screenPx = player.x - camera.x;
+      const screenPy = player.y - camera.y;
+      mouse.x = screenPx + Math.cos(swipeAngle) * 600;
+      mouse.y = screenPy + Math.sin(swipeAngle) * 600;
+      mouse.down = true;
+
+      // Floating anchor: allows smooth infinite gliding without cursor getting stuck
+      const maxRadius = 75;
+      if (dist > maxRadius) {
+        const excess = dist - maxRadius;
+        inputControl.startX += (diffX / dist) * excess;
+        inputControl.startY += (diffY / dist) * excess;
+      }
+    } else {
+      inputControl.dx = 0;
+      inputControl.dy = 0;
+      inputControl.isMoving = false;
       mouse.x = p.x;
       mouse.y = p.y;
       mouse.down = true;
     }
   });
+
+  CANVAS.addEventListener('mousedown', (e) => {
+    SOUNDS.init();
+    if (e.button === 0) {
+      const p = getCanvasCoords(e);
+      inputControl.active = true;
+      inputControl.type = 'mouse';
+      inputControl.id = 'mouse';
+      inputControl.startX = p.x;
+      inputControl.startY = p.y;
+      inputControl.curX = p.x;
+      inputControl.curY = p.y;
+      inputControl.dx = 0;
+      inputControl.dy = 0;
+      inputControl.isMoving = false;
+
+      mouse.x = p.x;
+      mouse.y = p.y;
+      mouse.down = true;
+    }
+  });
+
   window.addEventListener('mouseup', (e) => {
-    if (e.button === 0) mouse.down = false;
+    if (e.button === 0) {
+      mouse.down = false;
+      if (inputControl.type === 'mouse') {
+        inputControl.active = false;
+        inputControl.dx = 0;
+        inputControl.dy = 0;
+        inputControl.isMoving = false;
+      }
+    }
   });
 
   window.addEventListener('wheel', (e) => {
@@ -636,7 +708,7 @@
     }
   });
 
-  // Mobile Touch System
+  // Mobile Touch System (Tap to Fire, Swipe & Hold to Move and Shoot)
   CANVAS.addEventListener(
     'touchstart',
     (e) => {
@@ -650,22 +722,24 @@
           y: ((t.clientY - rect.top) / rect.height) * V_HEIGHT,
         };
 
-        if (p.x < V_WIDTH * 0.5) {
-          // Left side -> Movement Virtual Stick
-          touchJoystick.active = true;
-          touchJoystick.id = t.identifier;
-          touchJoystick.startX = p.x;
-          touchJoystick.startY = p.y;
-          touchJoystick.curX = p.x;
-          touchJoystick.curY = p.y;
-          touchJoystick.dx = 0;
-          touchJoystick.dy = 0;
-        } else {
-          // Right side -> Aim & Shoot
-          touchAim.active = true;
-          touchAim.id = t.identifier;
-          touchAim.x = p.x;
-          touchAim.y = p.y;
+        if (!inputControl.active || inputControl.type === 'mouse') {
+          inputControl.active = true;
+          inputControl.type = 'touch';
+          inputControl.id = t.identifier;
+          inputControl.startX = p.x;
+          inputControl.startY = p.y;
+          inputControl.curX = p.x;
+          inputControl.curY = p.y;
+          inputControl.dx = 0;
+          inputControl.dy = 0;
+          inputControl.isMoving = false;
+
+          // Aim at tap and fire immediately!
+          mouse.x = p.x;
+          mouse.y = p.y;
+          mouse.down = true;
+        } else if (inputControl.type === 'touch' && t.identifier !== inputControl.id) {
+          // Secondary finger overrides aim / shoot
           mouse.x = p.x;
           mouse.y = p.y;
           mouse.down = true;
@@ -687,24 +761,49 @@
           y: ((t.clientY - rect.top) / rect.height) * V_HEIGHT,
         };
 
-        if (touchJoystick.active && t.identifier === touchJoystick.id) {
-          touchJoystick.curX = p.x;
-          touchJoystick.curY = p.y;
-          const maxDist = 90;
-          const diffX = p.x - touchJoystick.startX;
-          const diffY = p.y - touchJoystick.startY;
+        if (inputControl.active && inputControl.type === 'touch' && t.identifier === inputControl.id) {
+          inputControl.curX = p.x;
+          inputControl.curY = p.y;
+
+          const diffX = p.x - inputControl.startX;
+          const diffY = p.y - inputControl.startY;
           const dist = Math.hypot(diffX, diffY);
-          if (dist > 0) {
-            const clamped = Math.min(dist, maxDist);
-            touchJoystick.dx = (diffX / dist) * (clamped / maxDist);
-            touchJoystick.dy = (diffY / dist) * (clamped / maxDist);
+
+          // Slight swipe ("halka swap") threshold: > 8px
+          if (dist > 8) {
+            inputControl.isMoving = true;
+            const speedRatio = Math.min(1.0, 0.75 + (dist - 8) / 20);
+            inputControl.dx = (diffX / dist) * speedRatio;
+            inputControl.dy = (diffY / dist) * speedRatio;
+
+            // Aim in the swipe direction from player
+            const swipeAngle = Math.atan2(diffY, diffX);
+            const screenPx = player.x - camera.x;
+            const screenPy = player.y - camera.y;
+            mouse.x = screenPx + Math.cos(swipeAngle) * 600;
+            mouse.y = screenPy + Math.sin(swipeAngle) * 600;
+            mouse.down = true;
+
+            // Floating anchor: allows smooth infinite gliding without finger running off-screen
+            const maxRadius = 75;
+            if (dist > maxRadius) {
+              const excess = dist - maxRadius;
+              inputControl.startX += (diffX / dist) * excess;
+              inputControl.startY += (diffY / dist) * excess;
+            }
+          } else {
+            inputControl.dx = 0;
+            inputControl.dy = 0;
+            inputControl.isMoving = false;
+            mouse.x = p.x;
+            mouse.y = p.y;
+            mouse.down = true;
           }
-        }
-        if (touchAim.active && t.identifier === touchAim.id) {
-          touchAim.x = p.x;
-          touchAim.y = p.y;
+        } else {
+          // Secondary touch aim tracking
           mouse.x = p.x;
           mouse.y = p.y;
+          mouse.down = true;
         }
       }
     },
@@ -714,15 +813,44 @@
   const onTouchEnd = (e) => {
     for (let i = 0; i < e.changedTouches.length; i++) {
       const t = e.changedTouches[i];
-      if (touchJoystick.active && t.identifier === touchJoystick.id) {
-        touchJoystick.active = false;
-        touchJoystick.dx = 0;
-        touchJoystick.dy = 0;
-      }
-      if (touchAim.active && t.identifier === touchAim.id) {
-        touchAim.active = false;
+      if (inputControl.active && inputControl.type === 'touch' && t.identifier === inputControl.id) {
+        inputControl.active = false;
+        inputControl.id = null;
+        inputControl.dx = 0;
+        inputControl.dy = 0;
+        inputControl.isMoving = false;
         mouse.down = false;
       }
+    }
+    if (e.touches.length === 0) {
+      mouse.down = false;
+      if (inputControl.type === 'touch') {
+        inputControl.active = false;
+        inputControl.id = null;
+        inputControl.dx = 0;
+        inputControl.dy = 0;
+        inputControl.isMoving = false;
+      }
+    } else if (!inputControl.active && e.touches.length > 0) {
+      const t = e.touches[0];
+      const rect = CANVAS.getBoundingClientRect();
+      const p = {
+        x: ((t.clientX - rect.left) / rect.width) * V_WIDTH,
+        y: ((t.clientY - rect.top) / rect.height) * V_HEIGHT,
+      };
+      inputControl.active = true;
+      inputControl.type = 'touch';
+      inputControl.id = t.identifier;
+      inputControl.startX = p.x;
+      inputControl.startY = p.y;
+      inputControl.curX = p.x;
+      inputControl.curY = p.y;
+      inputControl.dx = 0;
+      inputControl.dy = 0;
+      inputControl.isMoving = false;
+      mouse.x = p.x;
+      mouse.y = p.y;
+      mouse.down = true;
     }
   };
   CANVAS.addEventListener('touchend', onTouchEnd);
@@ -741,6 +869,18 @@
     activePowerups.RAPID = 0;
     activePowerups.SPEED = 0;
     activePowerups.SHIELD = false;
+
+    inputControl.active = false;
+    inputControl.type = null;
+    inputControl.id = null;
+    inputControl.startX = 0;
+    inputControl.startY = 0;
+    inputControl.curX = 0;
+    inputControl.curY = 0;
+    inputControl.dx = 0;
+    inputControl.dy = 0;
+    inputControl.isMoving = false;
+    mouse.down = false;
 
     player.x = 0;
     player.y = 0;
@@ -1253,9 +1393,17 @@
     if (keys['KeyA'] || keys['ArrowLeft']) mx -= 1;
     if (keys['KeyD'] || keys['ArrowRight']) mx += 1;
 
-    if (touchJoystick.active) {
-      mx += touchJoystick.dx;
-      my += touchJoystick.dy;
+    if (inputControl.active && inputControl.isMoving) {
+      mx += inputControl.dx;
+      my += inputControl.dy;
+
+      // Continuously aim and fire in swipe direction while held
+      const swipeAngle = Math.atan2(inputControl.dy, inputControl.dx);
+      const screenPx = player.x - camera.x;
+      const screenPy = player.y - camera.y;
+      mouse.x = screenPx + Math.cos(swipeAngle) * 600;
+      mouse.y = screenPy + Math.sin(swipeAngle) * 600;
+      mouse.down = true;
     }
 
     const moveDist = Math.hypot(mx, my);
@@ -1329,7 +1477,7 @@
       player.animFrame = (player.animFrame + 1) % count;
     }
 
-    // Auto / Touch Shooting
+    // Active Shooting (Tap or Swipe & Hold)
     if (mouse.down && !player.dead) {
       shootWeapon();
     }
@@ -1764,25 +1912,50 @@
       CTX.restore();
     }
 
-    // Mobile Virtual Joystick Knob
-    if (touchJoystick.active) {
+    // Mouse Drag / Mobile Touch Visuals (Anchor, Swipe Indicator & Tap Reticle)
+    if (inputControl.active) {
       CTX.save();
-      CTX.strokeStyle = 'rgba(255, 255, 255, 0.35)';
-      CTX.lineWidth = 4;
-      CTX.beginPath();
-      CTX.arc(touchJoystick.startX, touchJoystick.startY, 75, 0, Math.PI * 2);
-      CTX.stroke();
+      if (inputControl.isMoving) {
+        // Glowing swipe origin circle
+        CTX.strokeStyle = 'rgba(56, 189, 248, 0.45)';
+        CTX.lineWidth = 4;
+        CTX.beginPath();
+        CTX.arc(inputControl.startX, inputControl.startY, 48, 0, Math.PI * 2);
+        CTX.stroke();
 
-      CTX.fillStyle = 'rgba(56, 189, 248, 0.65)';
-      CTX.shadowColor = '#38bdf8';
-      CTX.shadowBlur = 12;
-      CTX.beginPath();
-      CTX.arc(touchJoystick.curX, touchJoystick.curY, 36, 0, Math.PI * 2);
-      CTX.fill();
+        // Direction line pointing towards drag target
+        CTX.strokeStyle = 'rgba(56, 189, 248, 0.85)';
+        CTX.lineWidth = 5;
+        CTX.lineCap = 'round';
+        CTX.beginPath();
+        CTX.moveTo(inputControl.startX, inputControl.startY);
+        CTX.lineTo(inputControl.curX, inputControl.curY);
+        CTX.stroke();
+
+        // Moving thumb knob
+        CTX.fillStyle = 'rgba(56, 189, 248, 0.75)';
+        CTX.shadowColor = '#38bdf8';
+        CTX.shadowBlur = 16;
+        CTX.beginPath();
+        CTX.arc(inputControl.curX, inputControl.curY, 28, 0, Math.PI * 2);
+        CTX.fill();
+      } else {
+        // Tap reticle ping
+        CTX.strokeStyle = 'rgba(244, 63, 94, 0.7)';
+        CTX.lineWidth = 3;
+        CTX.beginPath();
+        CTX.arc(inputControl.startX, inputControl.startY, 32, 0, Math.PI * 2);
+        CTX.stroke();
+
+        CTX.fillStyle = 'rgba(244, 63, 94, 0.5)';
+        CTX.beginPath();
+        CTX.arc(inputControl.startX, inputControl.startY, 10, 0, Math.PI * 2);
+        CTX.fill();
+      }
       CTX.restore();
     }
 
-    // Tactical Crosshair (follows mouse / right touch aim)
+    // Tactical Crosshair (follows mouse / touch aim)
     if (IMAGES['crosshair']) {
       CTX.save();
       CTX.drawImage(IMAGES['crosshair'], mouse.x - 28, mouse.y - 28, 56, 56);
