@@ -180,32 +180,22 @@ class SoundManager {
   }
 }
 
-// Celebration Tiers for 4+ Chains (All 10 requested phrases)
+// Celebration Tiers for 6+ Match Combos (All 10 requested phrases)
 const CELEBRATION_CONFIG = {
-  4: {
-    phrases: ['Sweet!', 'Nice Move!', 'Lovely!'],
-    badge: '4 MATCH!',
+  6: {
+    phrases: ['Sweet!', 'Nice Move!', 'Lovely!', 'Clever!'],
+    badge: '6 MATCH COMBO!',
     theme: 'theme-honey'
   },
-  5: {
-    phrases: ['Great Job!', 'Clever!', 'Well Done!'],
-    badge: '5 MATCH COMBO!',
+  7: {
+    phrases: ['Great Job!', 'Well Done!', 'Spot On!'],
+    badge: 'MEGA 7 MATCH!',
     theme: 'theme-caramel'
   },
-  6: {
-    phrases: ['Spot On!', 'Wonderful!'],
-    badge: 'SUPER 6 MATCH!',
-    theme: 'theme-peach'
-  },
-  7: {
-    phrases: ['Superb!', 'Keep It Up!'],
-    badge: 'MEGA 7 MATCH!',
-    theme: 'theme-gold'
-  },
   8: {
-    phrases: ['Wonderful!', 'Superb!'],
+    phrases: ['Wonderful!', 'Superb!', 'Keep It Up!'],
     badge: 'EPIC 8 MATCH!',
-    theme: 'theme-lavender'
+    theme: 'theme-peach'
   },
   9: {
     phrases: ['Spot On!', 'Great Job!', 'Superb!'],
@@ -498,20 +488,18 @@ class HalloweenGame {
     // Play Sound
     this.sound.playMatchSuccess(matchCount);
 
-    // Trigger Celebration Popup, Audio Fanfare & Visual Effects for 4+ chains
-    if (matchCount >= 4) {
+    // Trigger Celebration Popup, Audio Fanfare & Visual Effects for 6+ match combo
+    if (matchCount >= 6) {
       this.sound.playCelebrationSound(matchCount);
       this.triggerCelebration(matchCount, matchScore);
 
       // Spawn golden starburst particles at center of match
       const avgX = matchedChain.reduce((sum, it) => sum + it.x, 0) / matchCount;
       const avgY = matchedChain.reduce((sum, it) => sum + it.y, 0) / matchCount;
-      this.createStarBurst(avgX, avgY, Math.min(26, 12 + matchCount * 2));
+      this.createStarBurst(avgX, avgY, Math.min(28, 14 + matchCount * 2));
 
       // Juicy screen shake for 6+ chains
-      if (matchCount >= 6) {
-        this.shakeScreen(matchCount >= 8 ? 6 : 3.5, 0.22);
-      }
+      this.shakeScreen(matchCount >= 8 ? 6 : 3.5, 0.22);
     }
 
     // Spawn Floating Score
@@ -550,9 +538,9 @@ class HalloweenGame {
     container.innerHTML = '';
     if (this.celebrationTimeout) clearTimeout(this.celebrationTimeout);
 
-    // Determine tier (4 to 10+)
-    const tierKey = Math.min(10, Math.max(4, matchCount));
-    const config = CELEBRATION_CONFIG[tierKey] || CELEBRATION_CONFIG[4];
+    // Determine tier (6 to 10+)
+    const tierKey = Math.min(10, Math.max(6, matchCount));
+    const config = CELEBRATION_CONFIG[tierKey] || CELEBRATION_CONFIG[6];
 
     // Pick phrase, alternating if possible
     const candidates = config.phrases.filter(p => p !== this.lastCelebrationPhrase);
@@ -588,7 +576,7 @@ class HalloweenGame {
     // Subtitle Badge
     const badgeEl = document.createElement('div');
     badgeEl.className = 'celebration-badge';
-    badgeEl.innerHTML = `<span>★</span> <span>${badgeText}</span> <span class="score-pill">+${matchScore}</span> <span>★</span>`;
+    badgeEl.innerHTML = `<span class="star-icon">★</span> <span>${badgeText}</span> <span class="score-pill">+${matchScore}</span> <span class="star-icon">★</span>`;
     inner.appendChild(badgeEl);
 
     popup.appendChild(inner);
