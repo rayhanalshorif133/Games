@@ -52,34 +52,81 @@
             </div>
         </div>
 
-        <!-- Tap To Play Interactive Start Screen Overlay -->
+        <!-- Tap To Play Interactive Start Screen Overlay (Matching tap to play.jpg) -->
         <div id="startOverlay" class="active">
-            <div class="start-card">
-                <div class="frog-avatar-glow">
-                    <span class="frog-avatar">🐸</span>
-                </div>
-                <h1 class="game-logo">FROGGY ROAD</h1>
-                <p class="game-tagline">Infinite Crossing Adventure</p>
+            <div class="tap-screen-wrapper">
+                <img src="images/tap to play.jpg" alt="Frogie Cross The Road" class="start-bg-art">
+                <div class="start-screen-overlay-content">
+                    <!-- Tap to play animated indicator -->
+                    <div class="tap-pulse-zone" id="tapPulseZone">
+                        <span class="tap-hand-icon">👆</span>
+                        <span class="tap-pulse-text">Tap to play</span>
+                    </div>
 
-                <div class="tap-banner">
-                    <span class="tap-pulse-icon">👆</span>
-                    <span class="tap-text">TAP TO PLAY</span>
+                    <!-- Bottom Action Buttons: Gamepad (Controls) & Crown (Best Score) -->
+                    <div class="start-actions-row">
+                        <button id="btnStartControls" class="art-action-btn btn-gamepad" aria-label="Controls Guide" title="How to Play">
+                            <span class="art-btn-icon">🎮</span>
+                        </button>
+                        <button id="btnStartLeaderboard" class="art-action-btn btn-crown" aria-label="Best Score" title="High Score">
+                            <span class="art-btn-icon">👑</span>
+                        </button>
+                    </div>
                 </div>
+            </div>
+        </div>
 
-                <div class="guide-pills">
-                    <div class="guide-pill">
-                        <span class="pill-icon">▲</span>
-                        <span class="pill-text">Hop Forward</span>
+        <!-- Controls / Guide Modal -->
+        <div id="controlsModal" class="info-popup-modal">
+            <div class="info-popup-card">
+                <h2 class="info-popup-title">HOW TO PLAY</h2>
+                <div class="info-popup-list">
+                    <div class="info-item">
+                        <span class="info-icon">⬆️</span>
+                        <div class="info-text">
+                            <strong>Hop Forward</strong>
+                            <p>Press Up Arrow, W, or Tap to advance</p>
+                        </div>
                     </div>
-                    <div class="guide-pill">
-                        <span class="pill-icon">◀ ▶</span>
-                        <span class="pill-text">Dodge Left / Right</span>
+                    <div class="info-item">
+                        <span class="info-icon">⬅️ ➡️</span>
+                        <div class="info-text">
+                            <strong>Dodge Left / Right</strong>
+                            <p>Press Left/Right Arrow or A/D</p>
+                        </div>
                     </div>
-                    <div class="guide-pill highlight">
-                        <span class="pill-icon">❤️ x3</span>
-                        <span class="pill-text">3 Lives to Survive</span>
+                    <div class="info-item">
+                        <span class="info-icon">🪵</span>
+                        <div class="info-text">
+                            <strong>River Crossing</strong>
+                            <p>Hop on floating logs to stay safe</p>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-icon">❤️ x3</span>
+                        <div class="info-text">
+                            <strong>3 Lives</strong>
+                            <p>Survive cars, trains, and water hazards</p>
+                        </div>
                     </div>
                 </div>
+                <button id="btnCloseControls" class="action-btn">GOT IT</button>
+            </div>
+        </div>
+
+        <!-- Best Score / Leaderboard Modal -->
+        <div id="rankModal" class="info-popup-modal">
+            <div class="info-popup-card">
+                <h2 class="info-popup-title">BEST RECORD</h2>
+                <div class="rank-record-display">
+                    <span class="rank-crown">👑</span>
+                    <div class="rank-val-wrap">
+                        <span id="rankBestScore" class="rank-value">0</span>
+                        <span class="rank-unit">m</span>
+                    </div>
+                    <p class="rank-subtitle">Highest Distance Reached</p>
+                </div>
+                <button id="btnCloseRank" class="action-btn">CLOSE</button>
             </div>
         </div>
 

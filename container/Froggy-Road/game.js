@@ -324,22 +324,101 @@
     const sound = new SoundEngine();
 
     // =========================================================================
-    // 3. ASSET MANAGER
+    // 3. ASSET MANAGER & PRE-RENDERED SPRITE EXTRACTOR
     // =========================================================================
     class AssetManager {
         constructor() {
             this.images = {};
+            this.sprites = {};
             this.loaded = false;
+        }
+
+        extractSprite(sourceImg, x, y, w, h, rotated) {
+            if (!sourceImg || !sourceImg.complete || sourceImg.naturalWidth === 0) {
+                return null;
+            }
+            try {
+                const canvas = document.createElement('canvas');
+                canvas.width = w;
+                canvas.height = h;
+                const ctx = canvas.getContext('2d');
+                if (rotated) {
+                    // In Construct 3 atlas, rotated sprites are turned 90 deg clockwise.
+                    // Slice on the sheet is at (x, y) with dimensions width=h, height=w.
+                    // Unrotate counter-clockwise onto normal w x h canvas:
+                    ctx.translate(0, h);
+                    ctx.rotate(-Math.PI / 2);
+                    ctx.drawImage(sourceImg, x, y, h, w, 0, 0, h, w);
+                } else {
+                    ctx.drawImage(sourceImg, x, y, w, h, 0, 0, w, h);
+                }
+                return canvas;
+            } catch (err) {
+                console.warn('Failed to extract sprite:', err);
+                return null;
+            }
+        }
+
+        buildSprites() {
+            try {
+                // Vegetation & Environment props
+                this.sprites.tree = this.extractSprite(this.images.ui3, 1254, 1537, 291, 386, false);
+                this.sprites.bush = this.extractSprite(this.images.ui4, 116, 769, 162, 153, true);
+                this.sprites.fence = this.extractSprite(this.images.ui4, 427, 513, 397, 113, true);
+                this.sprites.bench = this.extractSprite(this.images.ui4, 897, 513, 393, 124, true);
+                this.sprites.cottage = this.extractSprite(this.images.ui3, 1143, 1, 726, 668, true);
+                this.sprites.shop = this.extractSprite(this.images.ui3, 473, 1025, 486, 761, false);
+
+                // Ground details
+                this.sprites.steppingStone = this.extractSprite(this.images.ui5, 1, 1, 128, 71, true);
+                this.sprites.pebble = this.extractSprite(this.images.ui5, 129, 193, 47, 41, true);
+                this.sprites.flower = this.extractSprite(this.images.ui6, 1, 1, 37, 28, true);
+                this.sprites.grassDecal = this.extractSprite(this.images.ui5, 147, 129, 61, 45, true);
+
+                // Road & Sidewalk
+                this.sprites.sidewalk = this.extractSprite(this.images.ui2, 1831, 1, 1502, 154, true);
+                this.sprites.road = this.extractSprite(this.images.ui2, 602, 1, 1530, 599, true);
+
+                // River & Shoreline
+                this.sprites.water = this.extractSprite(this.images.ui3, 1, 1, 1645, 470, true);
+                this.sprites.riverBank = this.extractSprite(this.images.ui3, 1921, 1, 1646, 75, true);
+
+                // Floating Wooden Logs
+                this.sprites.logShort = this.extractSprite(this.images.ui4, 599, 351, 362, 147, true);
+                this.sprites.logMedium = this.extractSprite(this.images.ui4, 301, 1, 428, 147, true);
+                this.sprites.logLong = this.extractSprite(this.images.ui4, 1, 1, 595, 148, true);
+
+                // Vehicles matching demo_1.jpg
+                this.sprites.carOrange = this.extractSprite(this.images.carOrange, 1537, 1537, 438, 380, true);
+                this.sprites.carCyan = this.extractSprite(this.images.carCyan, 1537, 1537, 438, 380, true);
+                this.sprites.carBlue = this.extractSprite(this.images.carBlue, 1537, 1537, 438, 380, true);
+
+                // Frog Player animations matching demo_1.jpg & demo.png
+                this.sprites.playerIdle = this.extractSprite(this.images.player, 290, 1793, 158, 142, true);
+                this.sprites.playerJump = this.extractSprite(this.images.player, 202, 1, 233, 199, true);
+                this.sprites.playerSideIdle = this.extractSprite(this.images.player, 1422, 1281, 158, 150, true);
+                this.sprites.playerSideJump = this.extractSprite(this.images.player, 769, 457, 178, 195, false);
+            } catch (err) {
+                console.warn('Error during buildSprites:', err);
+            }
         }
 
         loadAll(callback) {
             const sources = {
                 player: 'images/spr_player-sheet0.webp',
-                carRed: 'images/spr_car-sheet2.webp',
-                carBlue: 'images/spr_car-sheet1.webp',
-                carYellow: 'images/spr_car-sheet0.webp',
-                water: 'images/spr_water-sheet0.webp',
-                wood: 'images/shared-0-sheet3.webp'
+                carOrange: 'images/spr_car-sheet1.webp',
+                carCyan: 'images/spr_car-sheet2.webp',
+                carBlue: 'images/spr_car-sheet0.webp',
+                waterOld: 'images/spr_water-sheet0.webp',
+                ui2: 'images/spr_ui-sheet2.webp',
+                ui3: 'images/spr_ui-sheet3.webp',
+                ui4: 'images/spr_ui-sheet4.webp',
+                ui5: 'images/spr_ui-sheet5.webp',
+                ui6: 'images/spr_ui-sheet6.webp',
+                shared1: 'images/shared-0-sheet1.webp',
+                shared2: 'images/shared-0-sheet2.webp',
+                shared3: 'images/shared-0-sheet3.webp',
+                tapToPlay: 'images/tap to play.jpg'
             };
 
             let pending = Object.keys(sources).length;
@@ -349,11 +428,12 @@
                 if (!finished) {
                     finished = true;
                     this.loaded = true;
+                    this.buildSprites();
                     if (callback) callback();
                 }
             };
 
-            setTimeout(onDone, 1200);
+            setTimeout(onDone, 1600);
 
             for (const key in sources) {
                 const img = new Image();
@@ -363,7 +443,7 @@
                     if (pending <= 0) onDone();
                 };
                 img.onerror = () => {
-                    console.warn(`Could not load ${sources[key]}, using canvas procedural fallback.`);
+                    console.warn(`Could not load ${sources[key]}, proceeding.`);
                     pending--;
                     if (pending <= 0) onDone();
                 };
@@ -775,60 +855,44 @@
                 ctx.restore();
             }
 
-            const pImg = assets.images.player;
-            if (pImg && pImg.complete && pImg.naturalWidth > 0) {
+            if (assets.sprites.playerIdle && assets.sprites.playerJump) {
                 const isJumping = this.z > 5;
-                const destW = 110;
-                const destH = 100;
+                const destW = isJumping ? 122 : 110;
+                const destH = isJumping ? 112 : 100;
 
-                // Dedicated directional rendering matching sprite atlas packing:
                 if (this.hopDirection === DIR.LEFT) {
-                    if (isJumping) {
-                        // side_jump frame (x=769, y=457, w=178, h=195, unrotated upright facing left)
-                        ctx.drawImage(pImg, 769, 457, 178, 195, -destW / 2, -destH / 2, destW, destH);
+                    if (isJumping && assets.sprites.playerSideJump) {
+                        ctx.drawImage(assets.sprites.playerSideJump, -destW / 2, -destH / 2, destW, destH);
+                    } else if (assets.sprites.playerSideIdle) {
+                        ctx.drawImage(assets.sprites.playerSideIdle, -destW / 2, -destH / 2, destW, destH);
                     } else {
-                        // idle_left frame (x=1422, y=1281, sw=150, sh=158, packed 90 deg clockwise)
                         ctx.save();
                         ctx.rotate(-Math.PI / 2);
-                        ctx.drawImage(pImg, 1422, 1281, 150, 158, -destH / 2, -destW / 2, destH, destW);
+                        ctx.drawImage(isJumping ? assets.sprites.playerJump : assets.sprites.playerIdle, -destW / 2, -destH / 2, destW, destH);
                         ctx.restore();
                     }
                 } else if (this.hopDirection === DIR.RIGHT) {
                     ctx.save();
-                    ctx.scale(-1, 1); // Flip horizontally to face right
-                    if (isJumping) {
-                        ctx.drawImage(pImg, 769, 457, 178, 195, -destW / 2, -destH / 2, destW, destH);
+                    ctx.scale(-1, 1);
+                    if (isJumping && assets.sprites.playerSideJump) {
+                        ctx.drawImage(assets.sprites.playerSideJump, -destW / 2, -destH / 2, destW, destH);
+                    } else if (assets.sprites.playerSideIdle) {
+                        ctx.drawImage(assets.sprites.playerSideIdle, -destW / 2, -destH / 2, destW, destH);
                     } else {
                         ctx.save();
                         ctx.rotate(-Math.PI / 2);
-                        ctx.drawImage(pImg, 1422, 1281, 150, 158, -destH / 2, -destW / 2, destH, destW);
+                        ctx.drawImage(isJumping ? assets.sprites.playerJump : assets.sprites.playerIdle, -destW / 2, -destH / 2, destW, destH);
                         ctx.restore();
                     }
                     ctx.restore();
                 } else if (this.hopDirection === DIR.DOWN) {
-                    // Moving backward / down: rotate 180 from North
                     ctx.save();
-                    ctx.rotate(Math.PI / 2);
-                    if (isJumping) {
-                        ctx.drawImage(pImg, 202, 1, 199, 233, -destH / 2, -destW / 2, destH, destW);
-                    } else {
-                        ctx.drawImage(pImg, 290, 1793, 142, 158, -destH / 2, -destW / 2, destH, destW);
-                    }
+                    ctx.rotate(Math.PI);
+                    ctx.drawImage(isJumping ? assets.sprites.playerJump : assets.sprites.playerIdle, -destW / 2, -destH / 2, destW, destH);
                     ctx.restore();
                 } else {
-                    // Default facing UP (North):
-                    // Sprites in sheet are packed rotated 90 deg clockwise.
-                    // Rotate by -Math.PI / 2 to make them face straight UP!
-                    ctx.save();
-                    ctx.rotate(-Math.PI / 2);
-                    if (isJumping) {
-                        // jump frame: sx=202, sy=1, sw=199, sh=233
-                        ctx.drawImage(pImg, 202, 1, 199, 233, -destH / 2, -destW / 2, destH, destW);
-                    } else {
-                        // idle frame: sx=290, sy=1793, sw=142, sh=158
-                        ctx.drawImage(pImg, 290, 1793, 142, 158, -destH / 2, -destW / 2, destH, destW);
-                    }
-                    ctx.restore();
+                    // Default UP (facing forward towards road/river)
+                    ctx.drawImage(isJumping ? assets.sprites.playerJump : assets.sprites.playerIdle, -destW / 2, -destH / 2, destW, destH);
                 }
             } else {
                 this.renderProceduralFrog(ctx);
@@ -959,22 +1023,15 @@
             ctx.fill();
             ctx.restore();
 
-            let img = null;
-            if (this.carType === 0) img = assets.images.carRed;
-            else if (this.carType === 1) img = assets.images.carBlue;
-            else img = assets.images.carYellow;
+            let sprite = null;
+            if (this.carType === 0) sprite = assets.sprites.carOrange;
+            else if (this.carType === 1) sprite = assets.sprites.carCyan;
+            else sprite = assets.sprites.carBlue;
 
-            if (img && img.complete && img.naturalWidth > 0) {
-                // In spr_car-sheet0/1/2.webp:
-                // Frame is at (1537, 1537) with width 380, height 438, packed 90 deg clockwise.
-                // Rotate by -Math.PI / 2 to restore horizontal orientation:
-                // Wheels at the bottom, roof at the top, front bumper pointing right!
-                ctx.save();
-                ctx.rotate(-Math.PI / 2);
-                const dw = this.height * 1.15;
-                const dh = this.width * 1.05;
-                ctx.drawImage(img, 1537, 1537, 380, 438, -dw / 2, -dh / 2, dw, dh);
-                ctx.restore();
+            if (sprite) {
+                const dw = this.width * 1.1;
+                const dh = this.height * 1.15;
+                ctx.drawImage(sprite, -dw / 2, -dh / 2 - 2, dw, dh);
             } else {
                 this.renderProceduralCar(ctx);
             }
@@ -1055,44 +1112,34 @@
             ctx.translate(this.x, screenY);
 
             // Water log shadow
-            ctx.fillStyle = 'rgba(2, 6, 23, 0.4)';
+            ctx.fillStyle = 'rgba(2, 28, 48, 0.45)';
             ctx.beginPath();
-            ctx.roundRect(-this.width / 2, -this.height / 2 + 8, this.width, this.height, 18);
+            ctx.roundRect(-this.width / 2, -this.height / 2 + 10, this.width, this.height, 18);
             ctx.fill();
 
-            const woodImg = assets.images.wood;
-            if (woodImg && woodImg.complete && woodImg.naturalWidth > 0) {
-                // In shared-0-sheet3.webp, logs are vertical (packed 90 deg clockwise).
-                // Rotating by -Math.PI / 2 makes them horizontal with shadow at the bottom!
-                ctx.save();
-                ctx.rotate(-Math.PI / 2);
-                const dw = this.height;
-                const dh = this.width;
+            let sprite = null;
+            if (this.width > 350) sprite = assets.sprites.logLong;
+            else if (this.width > 260) sprite = assets.sprites.logMedium;
+            else sprite = assets.sprites.logShort;
 
-                let sx = 151, sy = 1, sw = 147, sh = 428;
-                if (this.width > 340) {
-                    sx = 1; sy = 1; sw = 148; sh = 595;
-                } else if (this.width < 270) {
-                    sx = 730; sy = 513; sw = 147; sh = 362;
-                }
-                ctx.drawImage(woodImg, sx, sy, sw, sh, -dw / 2, -dh / 2, dw, dh);
-                ctx.restore();
+            if (sprite) {
+                ctx.drawImage(sprite, -this.width / 2, -this.height / 2, this.width, this.height);
             } else {
-                ctx.fillStyle = '#854d0e';
+                ctx.fillStyle = '#d97706';
                 ctx.beginPath();
-                ctx.roundRect(-this.width / 2, -this.height / 2, this.width, this.height, 24);
+                ctx.roundRect(-this.width / 2, -this.height / 2, this.width, this.height, 22);
                 ctx.fill();
 
-                ctx.fillStyle = '#713f12';
+                ctx.fillStyle = '#b45309';
                 ctx.beginPath();
-                ctx.roundRect(-this.width / 2 + 16, -this.height / 2 + 14, this.width - 32, 10, 5);
-                ctx.roundRect(-this.width / 2 + 30, this.height / 2 - 24, this.width - 60, 10, 5);
+                ctx.roundRect(-this.width / 2 + 16, -this.height / 2 + 12, this.width - 32, 12, 6);
+                ctx.roundRect(-this.width / 2 + 30, this.height / 2 - 24, this.width - 60, 12, 6);
                 ctx.fill();
 
-                ctx.fillStyle = '#a16207';
+                ctx.fillStyle = '#f59e0b';
                 ctx.beginPath();
-                ctx.ellipse(-this.width / 2 + 12, 0, 10, this.height / 2 - 6, 0, 0, Math.PI * 2);
-                ctx.ellipse(this.width / 2 - 12, 0, 10, this.height / 2 - 6, 0, 0, Math.PI * 2);
+                ctx.ellipse(-this.width / 2 + 14, 0, 12, this.height / 2 - 6, 0, 0, Math.PI * 2);
+                ctx.ellipse(this.width / 2 - 14, 0, 12, this.height / 2 - 6, 0, 0, Math.PI * 2);
                 ctx.fill();
             }
 
@@ -1288,6 +1335,10 @@
             this.trainSignalBlink = false;
 
             this.obstacles = [];
+            this.obstacleTypes = {};
+            this.decorations = [];
+            this.steppingStones = [];
+            this.building = null;
             this.coin = null;
             this.cars = [];
             this.logs = [];
@@ -1305,29 +1356,74 @@
             this.logs.length = 0;
             this.train = null;
             this.obstacles.length = 0;
+            this.obstacleTypes = {};
+            this.decorations.length = 0;
+            this.steppingStones.length = 0;
+            this.building = null;
             this.coin = null;
 
             if (type === ROW_TYPES.GRASS) {
-                // Negative rows: decorative background park
+                // Negative rows: decorative background lawn
                 if (rowIndex < 0) {
                     if (rowIndex <= -2) {
-                        // Dense tree line at far bottom of the world
                         this.obstacles = [0, 1, 2, 6, 7, 8];
+                        this.obstacles.forEach(c => this.obstacleTypes[c] = 'tree');
                     } else {
                         // Row -1
                         this.obstacles = [0, 8];
+                        this.obstacleTypes[0] = 'tree';
+                        this.obstacleTypes[8] = 'tree';
+                        this.steppingStones.push({ x: 4 * CELL_SIZE + CELL_SIZE / 2, y: 60 });
+                        this.decorations.push({ type: 'flower', x: 2.5 * CELL_SIZE, y: 40 });
+                        this.decorations.push({ type: 'flower', x: 5.5 * CELL_SIZE, y: 45 });
+                        this.decorations.push({ type: 'pebble', x: 3.2 * CELL_SIZE, y: 70 });
                     }
+                } else if (rowIndex === 0) {
+                    // Safe player start row
+                    this.steppingStones.push({ x: 4 * CELL_SIZE + CELL_SIZE / 2, y: 60 });
+                    this.decorations.push({ type: 'fence', x: 0.8 * CELL_SIZE, y: 25 });
+                    this.decorations.push({ type: 'fence', x: 7.2 * CELL_SIZE, y: 25 });
+                    this.decorations.push({ type: 'flower', x: 2.2 * CELL_SIZE, y: 40 });
+                    this.decorations.push({ type: 'flower', x: 5.8 * CELL_SIZE, y: 45 });
+                } else if (rowIndex === 3) {
+                    // Starter park cottage on the left side lawn (matching demo_1.jpg)
+                    this.building = { type: 'cottage', x: 1.2 * CELL_SIZE + CELL_SIZE / 2, y: 0 };
+                    this.obstacles = [0, 1]; // Blocks cottage footprint
+                    this.obstacleTypes[0] = 'tree';
+                    this.obstacleTypes[1] = 'tree';
+                    this.steppingStones.push({ x: 4 * CELL_SIZE + CELL_SIZE / 2, y: 30 });
+                    this.steppingStones.push({ x: 4 * CELL_SIZE + CELL_SIZE / 2, y: 90 });
+                    this.decorations.push({ type: 'fence', x: 7.5 * CELL_SIZE, y: 25 });
+                    this.decorations.push({ type: 'bench', x: 6.5 * CELL_SIZE, y: 25 });
+                    this.obstacles.push(8);
+                    this.obstacleTypes[8] = 'bush';
+                    this.decorations.push({ type: 'flower', x: 2.8 * CELL_SIZE, y: 40 });
                 } else if (rowIndex <= 6) {
-                    // Safe starter area: open middle columns so player can hop freely
-                    const count = Math.random() < 0.5 ? 2 : 1;
+                    // Safe starter area (rows 1, 2, 4, 5, 6)
                     const sideCols = [0, 1, 7, 8];
+                    const count = Math.random() < 0.6 ? 2 : 1;
                     for (let i = 0; i < count; i++) {
                         const col = sideCols[Math.floor(Math.random() * sideCols.length)];
                         if (!this.obstacles.includes(col)) {
                             this.obstacles.push(col);
+                            this.obstacleTypes[col] = Math.random() < 0.6 ? 'tree' : 'bush';
                         }
                     }
-                    // Coins in starter area to encourage hopping forward
+                    // Stepping stones along middle open path
+                    this.steppingStones.push({ x: 4 * CELL_SIZE + CELL_SIZE / 2, y: 55 });
+                    if (Math.random() < 0.4) {
+                        this.steppingStones.push({ x: (Math.random() < 0.5 ? 3 : 5) * CELL_SIZE + CELL_SIZE / 2, y: 70 });
+                    }
+                    if (Math.random() < 0.5) {
+                        this.decorations.push({ type: 'bench', x: (Math.random() < 0.5 ? 2.2 : 6.2) * CELL_SIZE, y: 25 });
+                    }
+                    if (Math.random() < 0.5) {
+                        this.decorations.push({ type: 'fence', x: (Math.random() < 0.5 ? 1.5 : 7.2) * CELL_SIZE, y: 25 });
+                    }
+                    this.decorations.push({ type: 'flower', x: (Math.random() * 5 + 2) * CELL_SIZE, y: Math.random() * 50 + 20 });
+                    this.decorations.push({ type: 'pebble', x: (Math.random() * 5 + 2) * CELL_SIZE, y: Math.random() * 50 + 20 });
+
+                    // Starter coins
                     if (rowIndex >= 1 && Math.random() < 0.5) {
                         const openCols = [2, 3, 4, 5, 6].filter(c => !this.obstacles.includes(c));
                         if (openCols.length > 0) {
@@ -1342,7 +1438,40 @@
                         const col = Math.floor(Math.random() * GRID_COLS);
                         if (!safeCols.includes(col) && !this.obstacles.includes(col)) {
                             this.obstacles.push(col);
+                            this.obstacleTypes[col] = Math.random() < 0.55 ? 'tree' : 'bush';
                         }
+                    }
+
+                    // Stepping stones
+                    if (Math.random() < 0.75) {
+                        const stoneCol = Math.floor(Math.random() * 5) + 2;
+                        if (!this.obstacles.includes(stoneCol)) {
+                            this.steppingStones.push({ x: stoneCol * CELL_SIZE + CELL_SIZE / 2, y: Math.random() * 40 + 40 });
+                        }
+                    }
+
+                    // Occasional props: fence, bench, flowers, pebbles
+                    if (Math.random() < 0.35) {
+                        this.decorations.push({ type: 'fence', x: (Math.random() < 0.5 ? 1.2 : 7.5) * CELL_SIZE, y: 25 });
+                    }
+                    if (Math.random() < 0.35) {
+                        this.decorations.push({ type: 'bench', x: (Math.random() < 0.5 ? 2.5 : 6.5) * CELL_SIZE, y: 25 });
+                    }
+                    if (Math.random() < 0.6) {
+                        this.decorations.push({ type: 'flower', x: (Math.random() * 7 + 1) * CELL_SIZE, y: Math.random() * 60 + 20 });
+                    }
+                    if (Math.random() < 0.5) {
+                        this.decorations.push({ type: 'pebble', x: (Math.random() * 7 + 1) * CELL_SIZE, y: Math.random() * 60 + 20 });
+                    }
+
+                    // Occasional Town Shop on wide grass clearing
+                    if (rowIndex % 32 === 0 && !this.building) {
+                        const shopSide = Math.random() < 0.5 ? 1.2 : 7.2;
+                        this.building = { type: 'shop', x: shopSide * CELL_SIZE + CELL_SIZE / 2, y: 0 };
+                        const shopCols = shopSide < 4 ? [0, 1] : [7, 8];
+                        shopCols.forEach(c => {
+                            if (!this.obstacles.includes(c)) this.obstacles.push(c);
+                        });
                     }
 
                     // Chance to spawn a golden coin
@@ -1360,19 +1489,15 @@
             } else if (type === ROW_TYPES.ROAD) {
                 // Tiered speed & spawn interval based on row progression
                 if (rowIndex <= 20) {
-                    // Tier 2: Easy - slow cars, wide gaps
                     this.speed = 160 + Math.random() * 40;
                     this.spawnInterval = 3.8 + Math.random() * 1.0;
                 } else if (rowIndex <= 50) {
-                    // Tier 3: Medium
                     this.speed = 220 + Math.random() * 70 + difficulty * 50;
                     this.spawnInterval = 2.8 + Math.random() * 0.8 - difficulty * 0.4;
                 } else if (rowIndex <= 85) {
-                    // Tier 4: Hard
                     this.speed = 300 + Math.random() * 120 + difficulty * 100;
                     this.spawnInterval = 2.1 + Math.random() * 0.6 - difficulty * 0.5;
                 } else {
-                    // Tier 5: Expert
                     this.speed = 420 + Math.random() * 180 + difficulty * 120;
                     this.spawnInterval = Math.max(1.1, 1.6 + Math.random() * 0.5 - difficulty * 0.4);
                 }
@@ -1384,7 +1509,6 @@
             } else if (type === ROW_TYPES.RIVER) {
                 let logWidth = 380;
                 if (rowIndex <= 50) {
-                    // Very wide, gentle logs
                     this.speed = 110 + Math.random() * 40;
                     this.spawnInterval = 3.2 + Math.random() * 0.8;
                     logWidth = 440;
@@ -1481,52 +1605,118 @@
             }
         }
 
-        renderBackground(ctx, cameraY) {
+        renderBackground(ctx, cameraY, world) {
             const screenY = PLAYER_SCREEN_Y - (this.worldY - cameraY);
             const topY = Math.floor(screenY - ROW_HEIGHT / 2);
             const rHeight = ROW_HEIGHT + 2; // +2 eliminates subpixel seams
 
             if (this.type === ROW_TYPES.GRASS) {
-                ctx.fillStyle = (Math.abs(this.rowIndex) % 2 === 0) ? '#48bb78' : '#38a169';
+                // Cartoon grass base alternating tones
+                const isEven = Math.abs(this.rowIndex) % 2 === 0;
+                ctx.fillStyle = isEven ? '#6ec923' : '#63be1b';
                 ctx.fillRect(0, topY, CANVAS_WIDTH, rHeight);
 
-                ctx.fillStyle = '#2f855a';
-                for (let x = 30; x < CANVAS_WIDTH; x += 110) {
-                    ctx.fillRect(x, topY + 12, 4, 14);
-                    ctx.fillRect(x + 12, topY + 16, 4, 10);
+                // Subtle darker grass seam at bottom
+                ctx.fillStyle = '#4c9613';
+                ctx.fillRect(0, topY + rHeight - 3, CANVAS_WIDTH, 3);
+
+                // Grass spot decals
+                if (assets.sprites.grassDecal) {
+                    const seed = Math.abs(this.rowIndex * 37) % 5;
+                    const spotX1 = (seed * 220 + 80) % (CANVAS_WIDTH - 120);
+                    ctx.drawImage(assets.sprites.grassDecal, spotX1, topY + 22, 61, 45);
+                    if (this.rowIndex % 2 === 0) {
+                        const spotX2 = (spotX1 + 480) % (CANVAS_WIDTH - 120);
+                        ctx.drawImage(assets.sprites.grassDecal, spotX2, topY + 45, 52, 38);
+                    }
                 }
 
-                // Decorative boundary fence on row -2 to frame the starting park
-                if (this.rowIndex === -2) {
-                    ctx.fillStyle = '#78350f';
-                    ctx.fillRect(0, topY + 36, CANVAS_WIDTH, 8);
-                    ctx.fillRect(0, topY + 68, CANVAS_WIDTH, 8);
-                    for (let px = 20; px < CANVAS_WIDTH; px += 80) {
-                        ctx.fillRect(px, topY + 24, 12, 60);
+                // Stepping stone paths
+                if (this.steppingStones && this.steppingStones.length > 0 && assets.sprites.steppingStone) {
+                    for (const stone of this.steppingStones) {
+                        ctx.drawImage(assets.sprites.steppingStone, stone.x - 45, topY + stone.y - 25, 90, 50);
+                    }
+                }
+
+                // Flowers & pebbles
+                if (this.decorations && this.decorations.length > 0) {
+                    for (const dec of this.decorations) {
+                        if (dec.type === 'flower' && assets.sprites.flower) {
+                            ctx.drawImage(assets.sprites.flower, dec.x, topY + dec.y, 37, 28);
+                        } else if (dec.type === 'pebble' && assets.sprites.pebble) {
+                            ctx.drawImage(assets.sprites.pebble, dec.x, topY + dec.y, 47, 41);
+                        }
                     }
                 }
             } else if (this.type === ROW_TYPES.ROAD) {
-                ctx.fillStyle = '#2d3748';
+                const prevRow = world ? world.rows.get(this.rowIndex - 1) : null;
+                const nextRow = world ? world.rows.get(this.rowIndex + 1) : null;
+                const hasBottomCurb = !prevRow || prevRow.type !== ROW_TYPES.ROAD;
+                const hasTopCurb = !nextRow || nextRow.type !== ROW_TYPES.ROAD;
+
+                ctx.fillStyle = '#4c525b';
                 ctx.fillRect(0, topY, CANVAS_WIDTH, rHeight);
 
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-                for (let x = 20; x < CANVAS_WIDTH; x += 90) {
-                    ctx.fillRect(x, topY + ROW_HEIGHT / 2 - 3, 50, 6);
+                if (assets.sprites.road) {
+                    ctx.drawImage(assets.sprites.road, 0, 0, 1530, 200, 0, topY, CANVAS_WIDTH, rHeight);
+                }
+
+                // Center dashed white lane markings
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+                for (let x = 30; x < CANVAS_WIDTH; x += 110) {
+                    ctx.fillRect(x, topY + ROW_HEIGHT / 2 - 4, 60, 8);
+                }
+
+                // Bottom sidewalk curb strip (separating road from grass or river below)
+                if (hasBottomCurb && assets.sprites.sidewalk) {
+                    const curbH = 34;
+                    ctx.drawImage(assets.sprites.sidewalk, 0, 0, 1502, 120, 0, topY + rHeight - curbH, CANVAS_WIDTH, curbH);
+                }
+
+                // Top sidewalk curb strip (separating road from grass or river above)
+                if (hasTopCurb && assets.sprites.sidewalk) {
+                    const curbH = 34;
+                    ctx.drawImage(assets.sprites.sidewalk, 0, 34, 1502, 120, 0, topY, CANVAS_WIDTH, curbH);
                 }
             } else if (this.type === ROW_TYPES.RIVER) {
-                const waterImg = assets.images.water;
-                if (waterImg && waterImg.complete && waterImg.naturalWidth > 0) {
-                    ctx.drawImage(waterImg, 0, 0, 1645, 680, 0, topY, CANVAS_WIDTH, rHeight);
-                } else {
-                    ctx.fillStyle = '#0284c7';
-                    ctx.fillRect(0, topY, CANVAS_WIDTH, rHeight);
+                const prevRow = world ? world.rows.get(this.rowIndex - 1) : null;
+                const nextRow = world ? world.rows.get(this.rowIndex + 1) : null;
+                const hasBottomBank = !prevRow || prevRow.type !== ROW_TYPES.RIVER;
+                const hasTopBank = !nextRow || nextRow.type !== ROW_TYPES.RIVER;
 
-                    ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
-                    for (let x = 15; x < CANVAS_WIDTH; x += 140) {
+                ctx.fillStyle = '#1de4ee';
+                ctx.fillRect(0, topY, CANVAS_WIDTH, rHeight);
+
+                if (assets.sprites.water) {
+                    const time = performance.now() / 1000;
+                    const offset = ((time * 30 * this.direction) % 300);
+                    ctx.save();
+                    ctx.globalAlpha = 0.88;
+                    ctx.drawImage(assets.sprites.water, 0, 0, 1645, 470, -150 + offset, topY, CANVAS_WIDTH + 300, rHeight);
+                    ctx.restore();
+                } else {
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
+                    for (let x = 60; x < CANVAS_WIDTH; x += 220) {
                         ctx.beginPath();
-                        ctx.roundRect(x, topY + 28, 70, 8, 4);
+                        ctx.ellipse(x + (this.rowIndex % 3) * 40, topY + ROW_HEIGHT / 2, 50, 16, 0, 0, Math.PI * 2);
                         ctx.fill();
                     }
+                }
+
+                // Bottom grassy shoreline trim
+                if (hasBottomBank && assets.sprites.riverBank) {
+                    const bankH = 26;
+                    ctx.drawImage(assets.sprites.riverBank, 0, 0, 1646, 75, 0, topY + rHeight - bankH, CANVAS_WIDTH, bankH);
+                }
+
+                // Top grassy shoreline trim
+                if (hasTopBank && assets.sprites.riverBank) {
+                    const bankH = 26;
+                    ctx.save();
+                    ctx.translate(0, topY + bankH);
+                    ctx.scale(1, -1);
+                    ctx.drawImage(assets.sprites.riverBank, 0, 0, 1646, 75, 0, 0, CANVAS_WIDTH, bankH);
+                    ctx.restore();
                 }
             } else if (this.type === ROW_TYPES.TRAIN) {
                 ctx.fillStyle = '#4a5568';
@@ -1554,35 +1744,89 @@
         renderObstacles(ctx, cameraY) {
             const screenY = PLAYER_SCREEN_Y - (this.worldY - cameraY);
 
-            // Trees on grass
+            // Obstacles and Props on Grass
             if (this.type === ROW_TYPES.GRASS) {
+                // 1. Draw Buildings (Cottage or Shop)
+                if (this.building) {
+                    if (this.building.type === 'cottage' && assets.sprites.cottage) {
+                        const bw = 330, bh = 304;
+                        ctx.save();
+                        ctx.translate(this.building.x, screenY - 20);
+                        ctx.fillStyle = 'rgba(0, 0, 0, 0.32)';
+                        ctx.beginPath();
+                        ctx.ellipse(0, bh / 2 - 12, bw * 0.44, 22, 0, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.drawImage(assets.sprites.cottage, -bw / 2, -bh / 2, bw, bh);
+                        ctx.restore();
+                    } else if (this.building.type === 'shop' && assets.sprites.shop) {
+                        const bw = 240, bh = 370;
+                        ctx.save();
+                        ctx.translate(this.building.x, screenY - 50);
+                        ctx.fillStyle = 'rgba(0, 0, 0, 0.32)';
+                        ctx.beginPath();
+                        ctx.ellipse(0, bh / 2 - 14, bw * 0.44, 22, 0, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.drawImage(assets.sprites.shop, -bw / 2, -bh / 2, bw, bh);
+                        ctx.restore();
+                    }
+                }
+
+                // 2. Draw Fences and Benches
+                if (this.decorations && this.decorations.length > 0) {
+                    for (const dec of this.decorations) {
+                        if (dec.type === 'fence' && assets.sprites.fence) {
+                            ctx.drawImage(assets.sprites.fence, dec.x - 75, screenY - 35, 150, 70);
+                        } else if (dec.type === 'bench' && assets.sprites.bench) {
+                            ctx.drawImage(assets.sprites.bench, dec.x - 70, screenY - 32, 140, 64);
+                        }
+                    }
+                }
+
+                // 3. Draw Trees and Bushes
                 this.obstacles.forEach(col => {
-                    const treeX = col * CELL_SIZE + CELL_SIZE / 2;
+                    const obsX = col * CELL_SIZE + CELL_SIZE / 2;
                     ctx.save();
-                    ctx.translate(treeX, screenY);
+                    ctx.translate(obsX, screenY);
 
-                    ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-                    ctx.beginPath();
-                    ctx.ellipse(0, 28, 38, 16, 0, 0, Math.PI * 2);
-                    ctx.fill();
+                    const isBush = this.obstacleTypes && this.obstacleTypes[col] === 'bush';
 
-                    ctx.fillStyle = '#78350f';
-                    ctx.fillRect(-10, -10, 20, 36);
+                    if (isBush && assets.sprites.bush) {
+                        ctx.fillStyle = 'rgba(0, 0, 0, 0.28)';
+                        ctx.beginPath();
+                        ctx.ellipse(0, 24, 40, 15, 0, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.drawImage(assets.sprites.bush, -55, -55, 110, 100);
+                    } else if (assets.sprites.tree) {
+                        ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+                        ctx.beginPath();
+                        ctx.ellipse(0, 36, 48, 18, 0, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.drawImage(assets.sprites.tree, -65, -130, 130, 172);
+                    } else {
+                        // Fallback procedural tree
+                        ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+                        ctx.beginPath();
+                        ctx.ellipse(0, 28, 38, 16, 0, 0, Math.PI * 2);
+                        ctx.fill();
 
-                    ctx.fillStyle = '#15803d';
-                    ctx.beginPath();
-                    ctx.arc(0, -28, 38, 0, Math.PI * 2);
-                    ctx.fill();
+                        ctx.fillStyle = '#78350f';
+                        ctx.fillRect(-10, -10, 20, 36);
 
-                    ctx.fillStyle = '#16a34a';
-                    ctx.beginPath();
-                    ctx.arc(-8, -34, 24, 0, Math.PI * 2);
-                    ctx.fill();
+                        ctx.fillStyle = '#15803d';
+                        ctx.beginPath();
+                        ctx.arc(0, -28, 38, 0, Math.PI * 2);
+                        ctx.fill();
+
+                        ctx.fillStyle = '#16a34a';
+                        ctx.beginPath();
+                        ctx.arc(-8, -34, 24, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
 
                     ctx.restore();
                 });
 
-                // Render Gold Coin
+                // 4. Render Gold Coin
                 if (this.coin && !this.coin.collected) {
                     const coinX = this.coin.col * CELL_SIZE + CELL_SIZE / 2;
                     ctx.save();
@@ -1876,7 +2120,7 @@
         }
 
         render(ctx, cameraY) {
-            this.rows.forEach(r => r.renderBackground(ctx, cameraY));
+            this.rows.forEach(r => r.renderBackground(ctx, cameraY, this));
             this.rows.forEach(r => r.renderObstacles(ctx, cameraY));
             this.eagle.render(ctx, cameraY);
         }
@@ -2040,10 +2284,68 @@
 
             window.addEventListener('restart-game', () => this.restart());
 
-            // Tap To Play start overlay binding
+            // Tap To Play start overlay & popup modals binding
             const startOverlay = document.getElementById('startOverlay');
+            const controlsModal = document.getElementById('controlsModal');
+            const rankModal = document.getElementById('rankModal');
+            const btnStartControls = document.getElementById('btnStartControls');
+            const btnCloseControls = document.getElementById('btnCloseControls');
+            const btnStartLeaderboard = document.getElementById('btnStartLeaderboard');
+            const btnCloseRank = document.getElementById('btnCloseRank');
+            const rankBestScore = document.getElementById('rankBestScore');
+
+            if (btnStartControls) {
+                const openControls = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    sound.playBump();
+                    if (controlsModal) controlsModal.classList.add('active');
+                };
+                btnStartControls.addEventListener('click', openControls);
+                btnStartControls.addEventListener('touchstart', openControls, { passive: false });
+            }
+
+            if (btnCloseControls) {
+                const closeControls = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    sound.playBump();
+                    if (controlsModal) controlsModal.classList.remove('active');
+                };
+                btnCloseControls.addEventListener('click', closeControls);
+                btnCloseControls.addEventListener('touchstart', closeControls, { passive: false });
+            }
+
+            if (btnStartLeaderboard) {
+                const openRank = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    sound.playCoin();
+                    if (rankBestScore) rankBestScore.textContent = this.highScore;
+                    if (rankModal) rankModal.classList.add('active');
+                };
+                btnStartLeaderboard.addEventListener('click', openRank);
+                btnStartLeaderboard.addEventListener('touchstart', openRank, { passive: false });
+            }
+
+            if (btnCloseRank) {
+                const closeRank = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    sound.playBump();
+                    if (rankModal) rankModal.classList.remove('active');
+                };
+                btnCloseRank.addEventListener('click', closeRank);
+                btnCloseRank.addEventListener('touchstart', closeRank, { passive: false });
+            }
+
             if (startOverlay) {
                 const triggerStart = (e) => {
+                    if (e.target.closest('#btnStartControls') || e.target.closest('#btnStartLeaderboard') ||
+                        (controlsModal && controlsModal.classList.contains('active')) ||
+                        (rankModal && rankModal.classList.contains('active'))) {
+                        return;
+                    }
                     e.preventDefault();
                     e.stopPropagation();
                     this.startGame();
@@ -2135,6 +2437,11 @@
             if (startOverlay) {
                 startOverlay.classList.remove('active');
             }
+            const controlsModal = document.getElementById('controlsModal');
+            if (controlsModal) controlsModal.classList.remove('active');
+            const rankModal = document.getElementById('rankModal');
+            if (rankModal) rankModal.classList.remove('active');
+
             sound.init();
             sound.playHop();
             this.player.tryHop(DIR.UP, this.world);
@@ -2188,6 +2495,12 @@
             if (modal) modal.classList.remove('active');
             const startOverlay = document.getElementById('startOverlay');
             if (startOverlay) startOverlay.classList.add('active');
+            const controlsModal = document.getElementById('controlsModal');
+            if (controlsModal) controlsModal.classList.remove('active');
+            const rankModal = document.getElementById('rankModal');
+            if (rankModal) rankModal.classList.remove('active');
+            const rankBestScore = document.getElementById('rankBestScore');
+            if (rankBestScore) rankBestScore.textContent = this.highScore;
             this.updateHUD();
         }
 
@@ -2211,6 +2524,10 @@
             if (modal) modal.classList.remove('active');
             const startOverlay = document.getElementById('startOverlay');
             if (startOverlay) startOverlay.classList.remove('active');
+            const controlsModal = document.getElementById('controlsModal');
+            if (controlsModal) controlsModal.classList.remove('active');
+            const rankModal = document.getElementById('rankModal');
+            if (rankModal) rankModal.classList.remove('active');
             this.updateHUD();
         }
 
