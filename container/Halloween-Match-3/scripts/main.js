@@ -126,7 +126,98 @@ class SoundManager {
       });
     } catch(e) {}
   }
+
+  playCelebrationSound(count) {
+    if (!this.ctx) return;
+    try {
+      const now = this.ctx.currentTime;
+      let notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6 (4-note chime)
+      if (count === 5) {
+        notes = [523.25, 659.25, 783.99, 987.77, 1046.50];
+      } else if (count === 6) {
+        notes = [440.00, 554.37, 659.25, 880.00, 1108.73, 1318.51];
+      } else if (count >= 7) {
+        notes = [523.25, 587.33, 659.25, 783.99, 880.00, 1046.50, 1318.51];
+      }
+
+      const noteSpacing = 0.052;
+      notes.forEach((freq, idx) => {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        const isLast = idx === notes.length - 1;
+        osc.type = isLast ? 'triangle' : 'sine';
+        const start = now + idx * noteSpacing;
+        const dur = isLast ? 0.65 : 0.24;
+
+        osc.frequency.setValueAtTime(freq, start);
+        gain.gain.setValueAtTime(0.001, start);
+        gain.gain.linearRampToValueAtTime(0.26, start + 0.015);
+        gain.gain.exponentialRampToValueAtTime(0.001, start + dur);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(start);
+        osc.stop(start + dur);
+      });
+
+      // Extra shimmering harmonic chord for 6+ matches
+      if (count >= 6) {
+        const chordStart = now + notes.length * noteSpacing * 0.8;
+        [1046.50, 1318.51, 1567.98].forEach((freq) => {
+          const cOsc = this.ctx.createOscillator();
+          const cGain = this.ctx.createGain();
+          cOsc.type = 'sine';
+          cOsc.frequency.setValueAtTime(freq, chordStart);
+          cGain.gain.setValueAtTime(0.09, chordStart);
+          cGain.gain.exponentialRampToValueAtTime(0.001, chordStart + 0.55);
+          cOsc.connect(cGain);
+          cGain.connect(this.ctx.destination);
+          cOsc.start(chordStart);
+          cOsc.stop(chordStart + 0.55);
+        });
+      }
+    } catch(e) {}
+  }
 }
+
+// Celebration Tiers for 4+ Chains (All 10 requested phrases)
+const CELEBRATION_CONFIG = {
+  4: {
+    phrases: ['Sweet!', 'Nice Move!', 'Lovely!'],
+    badge: '4 MATCH!',
+    theme: 'theme-honey'
+  },
+  5: {
+    phrases: ['Great Job!', 'Clever!', 'Well Done!'],
+    badge: '5 MATCH COMBO!',
+    theme: 'theme-caramel'
+  },
+  6: {
+    phrases: ['Spot On!', 'Wonderful!'],
+    badge: 'SUPER 6 MATCH!',
+    theme: 'theme-peach'
+  },
+  7: {
+    phrases: ['Superb!', 'Keep It Up!'],
+    badge: 'MEGA 7 MATCH!',
+    theme: 'theme-gold'
+  },
+  8: {
+    phrases: ['Wonderful!', 'Superb!'],
+    badge: 'EPIC 8 MATCH!',
+    theme: 'theme-lavender'
+  },
+  9: {
+    phrases: ['Spot On!', 'Great Job!', 'Superb!'],
+    badge: 'MONSTER 9 MATCH!',
+    theme: 'theme-gold'
+  },
+  10: {
+    phrases: ['Superb!', 'Wonderful!', 'Keep It Up!'],
+    badge: '10+ LEGENDARY MATCH!',
+    theme: 'theme-gold'
+  }
+};
 
 // --- MAIN GAME CLASS ---
 class HalloweenGame {
@@ -152,10 +243,15 @@ class HalloweenGame {
     this.timeLeft = GAME_DURATION_SECONDS;
     this.isGameOver = false;
 
-    // Animations & Particles
+    // Animations, Particles & Screen Shake
     this.particles = [];
     this.floatingScores = [];
     this.isFalling = false;
+    this.shakeDuration = 0;
+    this.shakeMagnitude = 0;
+    this.shakeOffset = { x: 0, y: 0 };
+    this.lastCelebrationPhrase = '';
+    this.celebrationTimeout = null;
 
     this.lastTime = performance.now();
 
@@ -218,6 +314,11 @@ class HalloweenGame {
     this.chain = [];
     this.particles = [];
     this.floatingScores = [];
+    this.shakeDuration = 0;
+    this.shakeOffset = { x: 0, y: 0 };
+    if (this.celebrationTimeout) clearTimeout(this.celebrationTimeout);
+    const celebrationContainer = document.getElementById('celebration-container');
+    if (celebrationContainer) celebrationContainer.innerHTML = '';
 
     // Hide Modal & reset redirect state
     const modal = document.getElementById('game-over-modal');
@@ -397,6 +498,22 @@ class HalloweenGame {
     // Play Sound
     this.sound.playMatchSuccess(matchCount);
 
+    // Trigger Celebration Popup, Audio Fanfare & Visual Effects for 4+ chains
+    if (matchCount >= 4) {
+      this.sound.playCelebrationSound(matchCount);
+      this.triggerCelebration(matchCount, matchScore);
+
+      // Spawn golden starburst particles at center of match
+      const avgX = matchedChain.reduce((sum, it) => sum + it.x, 0) / matchCount;
+      const avgY = matchedChain.reduce((sum, it) => sum + it.y, 0) / matchCount;
+      this.createStarBurst(avgX, avgY, Math.min(26, 12 + matchCount * 2));
+
+      // Juicy screen shake for 6+ chains
+      if (matchCount >= 6) {
+        this.shakeScreen(matchCount >= 8 ? 6 : 3.5, 0.22);
+      }
+    }
+
     // Spawn Floating Score
     const lastItem = matchedChain[matchedChain.length - 1];
     this.floatingScores.push({
@@ -425,6 +542,89 @@ class HalloweenGame {
     this.applyGravity();
   }
 
+  triggerCelebration(matchCount, matchScore) {
+    const container = document.getElementById('celebration-container');
+    if (!container) return;
+
+    // Remove any active celebration popup
+    container.innerHTML = '';
+    if (this.celebrationTimeout) clearTimeout(this.celebrationTimeout);
+
+    // Determine tier (4 to 10+)
+    const tierKey = Math.min(10, Math.max(4, matchCount));
+    const config = CELEBRATION_CONFIG[tierKey] || CELEBRATION_CONFIG[4];
+
+    // Pick phrase, alternating if possible
+    const candidates = config.phrases.filter(p => p !== this.lastCelebrationPhrase);
+    const pool = candidates.length > 0 ? candidates : config.phrases;
+    const phrase = pool[Math.floor(Math.random() * pool.length)];
+    this.lastCelebrationPhrase = phrase;
+
+    // Badge title
+    let badgeText = config.badge;
+    if (matchCount >= 10) {
+      badgeText = `${matchCount}X LEGENDARY MATCH!`;
+    }
+
+    // Build popup element
+    const popup = document.createElement('div');
+    popup.className = `celebration-popup ${config.theme}`;
+
+    // Rotating Sunburst
+    const sunburst = document.createElement('div');
+    sunburst.className = 'celebration-sunburst';
+    popup.appendChild(sunburst);
+
+    // Inner Content
+    const inner = document.createElement('div');
+    inner.className = 'celebration-inner';
+
+    // Main Phrase Text
+    const textEl = document.createElement('div');
+    textEl.className = 'celebration-text';
+    textEl.textContent = phrase;
+    inner.appendChild(textEl);
+
+    // Subtitle Badge
+    const badgeEl = document.createElement('div');
+    badgeEl.className = 'celebration-badge';
+    badgeEl.innerHTML = `<span>★</span> <span>${badgeText}</span> <span class="score-pill">+${matchScore}</span> <span>★</span>`;
+    inner.appendChild(badgeEl);
+
+    popup.appendChild(inner);
+
+    // Sparkles
+    const sparkles = document.createElement('div');
+    sparkles.className = 'celebration-sparkles';
+    const starSymbols = ['★', '✦', '✧', '★', '✦', '✧'];
+    for (let i = 0; i < 6; i++) {
+      const star = document.createElement('span');
+      star.className = 'sparkle-star';
+      star.textContent = starSymbols[i % starSymbols.length];
+      const angle = (Math.PI * 2 * i) / 6 + (Math.random() - 0.5) * 0.4;
+      const dist1 = 45 + Math.random() * 30;
+      const dist2 = 90 + Math.random() * 45;
+      star.style.setProperty('--tx', `${Math.cos(angle) * dist1}px`);
+      star.style.setProperty('--ty', `${Math.sin(angle) * dist1}px`);
+      star.style.setProperty('--ex', `${Math.cos(angle) * dist2}px`);
+      star.style.setProperty('--ey', `${Math.sin(angle) * dist2}px`);
+      star.style.left = '50%';
+      star.style.top = '40%';
+      star.style.animationDelay = `${i * 0.05}s`;
+      sparkles.appendChild(star);
+    }
+    popup.appendChild(sparkles);
+
+    container.appendChild(popup);
+
+    // Auto cleanup after 1.45s
+    this.celebrationTimeout = setTimeout(() => {
+      if (container.contains(popup)) {
+        container.removeChild(popup);
+      }
+    }, 1450);
+  }
+
   createBurst(x, y, color) {
     const count = 12;
     for (let i = 0; i < count; i++) {
@@ -440,6 +640,31 @@ class HalloweenGame {
         color
       });
     }
+  }
+
+  createStarBurst(x, y, count = 16) {
+    const starColors = ['#fff59d', '#ffeb3b', '#ffd700', '#ff9800', '#ffffff', '#00e5ff', '#ff4081', '#00e676'];
+    for (let i = 0; i < count; i++) {
+      const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.5;
+      const speed = 2.5 + Math.random() * 5.5;
+      this.particles.push({
+        x,
+        y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - 1.2,
+        size: 5 + Math.random() * 5,
+        alpha: 1,
+        color: starColors[Math.floor(Math.random() * starColors.length)],
+        isStar: true,
+        rotation: Math.random() * Math.PI * 2,
+        vRot: (Math.random() - 0.5) * 8
+      });
+    }
+  }
+
+  shakeScreen(magnitude = 4, duration = 0.2) {
+    this.shakeMagnitude = magnitude;
+    this.shakeDuration = duration;
   }
 
   applyGravity() {
@@ -548,8 +773,11 @@ class HalloweenGame {
       const p = this.particles[i];
       p.x += p.vx;
       p.y += p.vy;
-      p.vy += 0.12; // particle gravity
-      p.alpha -= 0.025;
+      p.vy += p.isStar ? 0.08 : 0.12; // Star particles float longer
+      p.alpha -= p.isStar ? 0.018 : 0.025;
+      if (p.isStar && p.vRot) {
+        p.rotation += p.vRot * dt;
+      }
       if (p.alpha <= 0) {
         this.particles.splice(i, 1);
       }
@@ -582,11 +810,27 @@ class HalloweenGame {
     } else {
       this.timeWarningPulse = 0;
     }
+
+    // 5. Update screen shake
+    if (this.shakeDuration > 0) {
+      this.shakeDuration -= dt;
+      this.shakeOffset.x = (Math.random() - 0.5) * 2 * this.shakeMagnitude;
+      this.shakeOffset.y = (Math.random() - 0.5) * 2 * this.shakeMagnitude;
+      if (this.shakeDuration <= 0) {
+        this.shakeOffset.x = 0;
+        this.shakeOffset.y = 0;
+      }
+    }
   }
 
   // --- RENDER ENGINE ---
   render() {
     this.ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+    this.ctx.save();
+    if (this.shakeOffset.x !== 0 || this.shakeOffset.y !== 0) {
+      this.ctx.translate(this.shakeOffset.x, this.shakeOffset.y);
+    }
 
     // 1. Draw Background
     if (this.images.sheet0) {
@@ -627,6 +871,8 @@ class HalloweenGame {
 
     // 6. Draw Particles & Popups
     this.renderEffects();
+
+    this.ctx.restore();
   }
 
   renderHUD() {
@@ -885,6 +1131,26 @@ class HalloweenGame {
     ctx.restore();
   }
 
+  drawStarPath(ctx, cx, cy, spikes, outerRadius, innerRadius) {
+    let rot = (Math.PI / 2) * 3;
+    const step = Math.PI / spikes;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - outerRadius);
+    for (let i = 0; i < spikes; i++) {
+      let x = cx + Math.cos(rot) * outerRadius;
+      let y = cy + Math.sin(rot) * outerRadius;
+      ctx.lineTo(x, y);
+      rot += step;
+
+      x = cx + Math.cos(rot) * innerRadius;
+      y = cy + Math.sin(rot) * innerRadius;
+      ctx.lineTo(x, y);
+      rot += step;
+    }
+    ctx.lineTo(cx, cy - outerRadius);
+    ctx.closePath();
+  }
+
   renderConnectorLine() {
     if (this.chain.length === 0) return;
 
@@ -961,9 +1227,19 @@ class HalloweenGame {
       this.ctx.save();
       this.ctx.globalAlpha = Math.max(0, p.alpha);
       this.ctx.fillStyle = p.color;
-      this.ctx.beginPath();
-      this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-      this.ctx.fill();
+
+      if (p.isStar) {
+        this.ctx.translate(p.x, p.y);
+        if (p.rotation) this.ctx.rotate(p.rotation);
+        this.ctx.shadowColor = p.color;
+        this.ctx.shadowBlur = 8;
+        this.drawStarPath(this.ctx, 0, 0, 4, p.size, p.size * 0.38);
+        this.ctx.fill();
+      } else {
+        this.ctx.beginPath();
+        this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        this.ctx.fill();
+      }
       this.ctx.restore();
     });
 

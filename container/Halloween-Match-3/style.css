@@ -200,3 +200,229 @@ canvas#gameCanvas {
   transform: translateY(1px);
   box-shadow: 0 2px 10px rgba(230, 81, 0, 0.4);
 }
+
+/* =========================================================================
+   🎉 CELEBRATION POPUPS (MATCH 4+ CHAINS)
+   ========================================================================= */
+
+.celebration-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 35;
+  overflow: hidden;
+}
+
+.celebration-popup {
+  position: absolute;
+  top: 36%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  animation: celebrationLifecycle 1.45s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+  will-change: transform, opacity;
+}
+
+/* Sunburst Light Ray Glow behind text - soft, dreamy ambient glow */
+.celebration-sunburst {
+  position: absolute;
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  background: repeating-conic-gradient(
+    from 0deg,
+    rgba(255, 215, 64, 0.16) 0deg 15deg,
+    rgba(255, 152, 0, 0.02) 15deg 30deg
+  );
+  -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 25%, rgba(0,0,0,0) 70%);
+  mask-image: radial-gradient(circle, rgba(0,0,0,1) 25%, rgba(0,0,0,0) 70%);
+  animation: sunburstSpin 8s linear infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Theme variants for sunburst - all gentle & soothing */
+.theme-pink .celebration-sunburst,
+.theme-peach .celebration-sunburst {
+  background: repeating-conic-gradient(
+    from 0deg,
+    rgba(255, 140, 170, 0.16) 0deg 15deg,
+    rgba(255, 64, 129, 0.02) 15deg 30deg
+  );
+}
+
+.theme-lavender .celebration-sunburst,
+.theme-purple .celebration-sunburst {
+  background: repeating-conic-gradient(
+    from 0deg,
+    rgba(206, 147, 216, 0.16) 0deg 15deg,
+    rgba(142, 36, 170, 0.02) 15deg 30deg
+  );
+}
+
+.theme-gold .celebration-sunburst,
+.theme-honey .celebration-sunburst,
+.theme-caramel .celebration-sunburst {
+  background: repeating-conic-gradient(
+    from 0deg,
+    rgba(255, 215, 64, 0.18) 0deg 15deg,
+    rgba(255, 143, 0, 0.02) 15deg 30deg
+  );
+}
+
+/* Celebration Text Wrapper & Animation */
+.celebration-inner {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  animation: celebrationFloat 1.2s ease-in-out infinite alternate;
+}
+
+.celebration-text {
+  font-family: 'Fredoka', cursive, sans-serif;
+  font-size: clamp(34px, 8.5vw, 50px);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  line-height: 1.1;
+  text-align: center;
+  white-space: nowrap;
+  -webkit-text-stroke: 2px #200830;
+  text-stroke: 2px #200830;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 4px 0 #200830) drop-shadow(0 6px 12px rgba(0, 0, 0, 0.65));
+}
+
+/* Eye-friendly, soothing, warm candy gradients */
+.theme-gold .celebration-text,
+.theme-honey .celebration-text {
+  background-image: linear-gradient(180deg, #ffffff 0%, #fff8e1 20%, #ffe082 55%, #ffb300 85%, #fb8c00 100%);
+  filter: drop-shadow(0 4px 0 #200830) drop-shadow(0 6px 14px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 10px rgba(255, 202, 40, 0.35));
+}
+
+.theme-caramel .celebration-text {
+  background-image: linear-gradient(180deg, #ffffff 0%, #fff3e0 20%, #ffcc80 55%, #ffa726 85%, #f57c00 100%);
+  filter: drop-shadow(0 4px 0 #200830) drop-shadow(0 6px 14px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 10px rgba(255, 167, 38, 0.35));
+}
+
+.theme-peach .celebration-text,
+.theme-pink .celebration-text {
+  background-image: linear-gradient(180deg, #ffffff 0%, #fce4ec 20%, #f8bbd0 55%, #f06292 85%, #e91e63 100%);
+  filter: drop-shadow(0 4px 0 #200830) drop-shadow(0 6px 14px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 10px rgba(240, 98, 146, 0.35));
+}
+
+.theme-lavender .celebration-text,
+.theme-purple .celebration-text {
+  background-image: linear-gradient(180deg, #ffffff 0%, #f3e5f5 20%, #e1bee7 55%, #ba68c8 85%, #8e24aa 100%);
+  filter: drop-shadow(0 4px 0 #200830) drop-shadow(0 6px 14px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 10px rgba(186, 104, 200, 0.35));
+}
+
+/* Subtitle Pill Badge (e.g. ★ 5 MATCH COMBO! ★) */
+.celebration-badge {
+  margin-top: 6px;
+  background: rgba(22, 9, 36, 0.9);
+  border: 2px solid #ffca28;
+  border-radius: 50px;
+  padding: 4px 18px;
+  color: #fff;
+  font-family: 'Fredoka', cursive, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6), 0 0 15px rgba(255, 202, 40, 0.5);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transform: translateY(0);
+}
+
+.celebration-badge .score-pill {
+  color: #ffd54f;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+/* Flying Star/Sparkle Particles around text */
+.celebration-sparkles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.sparkle-star {
+  position: absolute;
+  font-size: 20px;
+  color: #fff;
+  text-shadow: 0 0 10px #ffea00, 0 0 20px #ff9100;
+  animation: sparkleBurst 1.1s cubic-bezier(0.12, 0.8, 0.32, 1) forwards;
+}
+
+/* Keyframes */
+@keyframes sunburstSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes celebrationFloat {
+  0% { transform: translateY(0px) rotate(-1.5deg) scale(1); }
+  100% { transform: translateY(-6px) rotate(1.5deg) scale(1.03); }
+}
+
+@keyframes celebrationLifecycle {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -40%) scale(0.2) rotate(-12deg);
+  }
+  16% {
+    opacity: 1;
+    transform: translate(-50%, -52%) scale(1.22) rotate(3deg);
+  }
+  26% {
+    transform: translate(-50%, -50%) scale(0.96) rotate(-1deg);
+  }
+  34% {
+    transform: translate(-50%, -50%) scale(1) rotate(0deg);
+  }
+  75% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -75%) scale(1.18);
+  }
+}
+
+@keyframes sparkleBurst {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.2) rotate(0deg);
+  }
+  30% {
+    opacity: 1;
+    transform: translate(var(--tx, 30px), var(--ty, -30px)) scale(1.2) rotate(120deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--ex, 50px), var(--ey, -60px)) scale(0.4) rotate(260deg);
+  }
+}
