@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Froggy Cross the Road - Infinite Runner</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0f172a">
+
+    <link rel="manifest" href="appmanifest.json">
+    <link rel="icon" type="image/png" href="icons/icon-512.png">
+    <link rel="apple-touch-icon" sizes="128x128" href="icons/icon-128.png">
+    <link rel="apple-touch-icon" sizes="256x256" href="icons/icon-256.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="icons/icon-512.png">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="gameContainer">
+        <!-- Main Game Canvas (1080x1920 base logical resolution) -->
+        <canvas id="gameCanvas" width="1080" height="1920"></canvas>
+
+        <!-- Red Damage Flash Overlay -->
+        <div id="damageVignette"></div>
+
+        <!-- Top HUD (Distance in meters, 3 Lives, Best Record) -->
+        <div id="hudOverlay">
+            <div class="hud-box distance-box">
+                <span class="hud-label">DISTANCE</span>
+                <div class="hud-value-group">
+                    <span id="scoreDisplay" class="hud-value">0</span>
+                    <span class="hud-unit">m</span>
+                </div>
+            </div>
+
+            <div class="hud-box lives-box">
+                <span class="hud-label">LIVES</span>
+                <div id="livesDisplay" class="lives-icons">
+                    <span class="heart active" id="heart1">❤️</span>
+                    <span class="heart active" id="heart2">❤️</span>
+                    <span class="heart active" id="heart3">❤️</span>
+                </div>
+            </div>
+
+            <div class="hud-box best-box">
+                <span class="hud-label">BEST</span>
+                <div class="hud-value-group">
+                    <span id="highScoreDisplay" class="hud-value">0</span>
+                    <span class="hud-unit">m</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tap To Play Interactive Start Screen Overlay -->
+        <div id="startOverlay" class="active">
+            <div class="start-card">
+                <div class="frog-avatar-glow">
+                    <span class="frog-avatar">🐸</span>
+                </div>
+                <h1 class="game-logo">FROGGY ROAD</h1>
+                <p class="game-tagline">Infinite Crossing Adventure</p>
+
+                <div class="tap-banner">
+                    <span class="tap-pulse-icon">👆</span>
+                    <span class="tap-text">TAP TO PLAY</span>
+                </div>
+
+                <div class="guide-pills">
+                    <div class="guide-pill">
+                        <span class="pill-icon">▲</span>
+                        <span class="pill-text">Hop Forward</span>
+                    </div>
+                    <div class="guide-pill">
+                        <span class="pill-icon">◀ ▶</span>
+                        <span class="pill-text">Dodge Left / Right</span>
+                    </div>
+                    <div class="guide-pill highlight">
+                        <span class="pill-icon">❤️ x3</span>
+                        <span class="pill-text">3 Lives to Survive</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Touch D-Pad Overlay (Forward, Left, Right) -->
+        <div id="touchControls">
+            <button id="btnUp" class="touch-btn btn-up" aria-label="Hop Forward">▲</button>
+            <div class="touch-row">
+                <button id="btnLeft" class="touch-btn btn-left" aria-label="Hop Left">◀</button>
+                <button id="btnRight" class="touch-btn btn-right" aria-label="Hop Right">▶</button>
+            </div>
+        </div>
+
+        <!-- Game Over Modal -->
+        <div id="gameOverModal">
+            <div class="modal-card">
+                <h2 class="modal-title">GAME OVER</h2>
+                <div class="modal-scores">
+                    <div class="score-card">
+                        <span class="score-card-label">DISTANCE</span>
+                        <div class="score-val-wrap">
+                            <span id="finalScore" class="score-card-value">0</span>
+                            <span class="score-card-unit">m</span>
+                        </div>
+                    </div>
+                    <div class="score-card highlight">
+                        <span class="score-card-label">BEST</span>
+                        <div class="score-val-wrap">
+                            <span id="bestScore" class="score-card-value">0</span>
+                            <span class="score-card-unit">m</span>
+                        </div>
+                    </div>
+                </div>
+                <div id="modal-redirect-text" class="modal-redirect-text"></div>
+                <button id="restartBtn" class="action-btn">PLAY AGAIN</button>
+                <p class="modal-hint">Tap anywhere or press Space/Enter to restart</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Score API & Game Over Redirect Scripts -->
+    <script src="scoreapi.js"></script>
+    <script src="gameover.js"></script>
+    <!-- Endless Runner Game Script -->
+    <script src="game.js"></script>
+</body>
+</html>
