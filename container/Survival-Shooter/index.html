@@ -19,11 +19,11 @@
       <!-- HEADS-UP DISPLAY (HUD) -->
       <div id="hud">
         <!-- TOP ROW -->
-        <div>
+        <div class="top-row-container">
           <div class="top-bar">
-            <!-- TOP-LEFT: SOUND, PAUSE & WAVE PILL -->
+            <!-- TOP-LEFT: QUIT (CROSS), PAUSE & WAVE PILL -->
             <div class="top-left-group">
-              <button id="muteBtn" class="hud-btn" title="Toggle Sound">🔊</button>
+              <button id="closeBtn" class="hud-btn close-btn" title="Quit Game">✕</button>
               <button id="pauseBtn" class="hud-btn" title="Pause Game">⏸</button>
               <div class="hud-panel wave-pill">
                 <span id="waveDisplay" class="wave-badge">W1</span>
@@ -35,58 +35,38 @@
               <span id="scoreDisplay" class="score-value">0</span>
             </div>
 
-            <!-- TOP-RIGHT: COMPACT LIVES + CLOSE/CROSS ICON -->
+            <!-- TOP-RIGHT: SETTINGS & FULLSCREEN -->
             <div class="top-right-group">
-              <div class="hud-panel lives-card-compact">
-                <div id="heartsContainer">
-                  <span class="heart-icon alive">❤️</span>
-                  <span class="heart-icon alive">❤️</span>
-                  <span class="heart-icon alive">❤️</span>
-                </div>
-                <div class="health-bar-container">
-                  <div id="healthBarFill" class="health-bar-fill" style="width: 100%;"></div>
-                </div>
-              </div>
-              <button id="closeBtn" class="hud-btn close-btn" title="Close Game">✕</button>
+              <button id="settingsBtn" class="hud-btn settings-btn" title="Settings">⚙️</button>
+              <button id="fullscreenBtn" class="hud-btn fullscreen-btn" title="Toggle Fullscreen">⛶</button>
             </div>
           </div>
 
-          <!-- ACTIVE POWER-UPS TRAY -->
-          <div id="powerupsTray"></div>
+          <!-- LIVES & COMPACT ABILITIES ROW (POWERUPS TO THE LEFT OF HEART) -->
+          <div class="lives-status-row">
+            <div id="powerupsTray" class="powerups-tray-compact"></div>
+            <div class="lives-indicator-center">
+              <span class="heart-icon-large">❤️</span>
+              <span id="livesDisplay" class="lives-num">3</span>
+            </div>
+          </div>
         </div>
 
-        <!-- BOTTOM ROW -->
-        <div class="bottom-row">
-          <!-- BOTTOM-LEFT: WEAPON COLLECTION SLIDER DOCK -->
+        <!-- BOTTOM ROW (CENTERED DOCK - MATCHING DEMO.JPG & USER SPECS) -->
+        <div class="bottom-dock-centered">
+          <!-- SELECTED WEAPON BADGE (EXACTLY 10PX ABOVE SLIDER) -->
+          <div id="selectedGunBadge" class="selected-gun-badge" title="Selected Weapon">
+            <span class="gun-badge-icon">🔫</span>
+            <span id="selectedGunName">PISTOL</span>
+          </div>
+
+          <!-- WEAPON COLLECTION SLIDER DOCK -->
           <div class="weapons-slider-wrapper">
             <button id="wpSlideLeft" class="slider-arrow hidden" title="Slide Left">‹</button>
             <div id="weaponsContainer" class="weapons-container">
               <!-- Dynamically populated from player's unlocked weapons collection -->
             </div>
             <button id="wpSlideRight" class="slider-arrow hidden" title="Slide Right">›</button>
-          </div>
-
-          <!-- BOTTOM-RIGHT: MOBILE COMBAT DOCK -->
-          <div class="mobile-combat-dock">
-            <div class="combat-sub-actions">
-              <!-- AUTO-FIRE TOGGLE -->
-              <button id="autoFireBtn" class="hud-action-pill active" title="Toggle Auto-Fire">
-                <span class="pill-dot"></span>
-                <span id="autoFireText">AUTO: ON</span>
-              </button>
-              <!-- QUICK WEAPON SWITCH BUTTON -->
-              <button id="quickSwitchBtn" class="hud-action-pill switch-pill" title="Switch Weapon">
-                <span class="pill-icon">🔄</span>
-                <span id="quickSwitchName">PISTOL</span>
-              </button>
-            </div>
-            <!-- MAIN FIRE BUTTON -->
-            <button id="fireBtn" class="fire-action-btn" title="Fire / Aim Joystick">
-              <div class="fire-btn-inner">
-                <span class="fire-icon">🎯</span>
-                <span class="fire-text">FIRE</span>
-              </div>
-            </button>
           </div>
         </div>
       </div>
@@ -98,14 +78,19 @@
           <p class="modal-subtitle">Infinite World Mobile Survival Shooter</p>
 
           <div class="controls-hint">
-            <div>🕹️ <b>Left Joystick:</b> Touch & drag anywhere on the left screen to move in 360°!</div>
-            <div>🎯 <b>Auto-Aim:</b> Automatically locks onto nearest enemies with precision!</div>
-            <div>🔥 <b>Right Fire Button:</b> Tap/hold to shoot, or drag like a joystick to aim freely!</div>
-            <div>⚡ <b>Auto-Fire:</b> Toggle ON for relaxed one-handed survival play!</div>
-            <div>⭐ <b>Legendary Arsenal:</b> Defeat big Brutes/Orcs in Wave 11+ to unlock powerful weapons!</div>
-            <div>🔄 <b>Weapon Switch:</b> Tap dock, quick switch button, Q/E, or keys 1-8 / Scroll!</div>
+            <div>🕹️ <b>Left Joystick:</b> Touch & drag on left screen to move freely in 360°!</div>
+            <div>🎯 <b>Auto-Aim & Shoot:</b> Auto-locks onto nearest threats or drag right screen to aim!</div>
+            <div>💀 <b>Wave Boss Duels:</b> Each wave ends with a powerful Boss duel. Defeat it to advance!</div>
+            <div>🚨 <b>Tactical Radar:</b> Edge chevrons point to off-screen enemies, weapons & abilities!</div>
+            <div>👥 <b>Shadow Clone Ability:</b> Unlocks at Wave 15+! Multiplies squad firepower!</div>
+            <div>👻 <b>Ghost Cloak Ability:</b> Unlocks at Wave 18+! 10s of invisibility while shooting!</div>
+            <div>⚙️ <b>Settings:</b> Tap gear icon to toggle Sound and Auto Shoot/Fire anytime!</div>
+            <div>⭐ <b>Arsenal Collection:</b> Defeat waves and mini-bosses to unlock high-tier weapons!</div>
+            <div>👾 <b>15 Enemy Armies:</b> Scouts, commandos, shooters, heavy juggernauts & mech titans!</div>
+            <div>🔄 <b>Weapon Selection:</b> Tap weapon cards, bottom-center badge, Q/E, or keys 1-8!</div>
           </div>
 
+          <div id="loadingStatus" class="loading-status">Tap START DEFENSE to deploy! 🎖️</div>
           <button id="startBtn" class="action-btn">START DEFENSE</button>
         </div>
       </div>
@@ -120,6 +105,51 @@
             <button id="pauseRestartBtn" class="action-btn" style="background: #475569; color: white;">RESTART RUN</button>
             <button id="pauseQuitBtn" class="action-btn" style="background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #ef4444;">QUIT TO MENU</button>
           </div>
+        </div>
+      </div>
+
+      <!-- SETTINGS OVERLAY -->
+      <div id="settingsOverlay" class="overlay hidden">
+        <div class="modal-card settings-card">
+          <div class="settings-modal-header">
+            <h1 class="modal-title" style="font-size: 32px;">SETTINGS</h1>
+            <button id="settingsCloseBtn" class="hud-btn close-btn modal-close-btn" title="Close Settings">✕</button>
+          </div>
+          <p class="modal-subtitle">Audio & Combat Preferences</p>
+
+          <div class="settings-list">
+            <!-- SOUND EFFECTS TOGGLE -->
+            <div class="setting-item">
+              <div class="setting-info">
+                <span class="setting-icon">🔊</span>
+                <div class="setting-text-group">
+                  <div class="setting-name">SOUND EFFECTS</div>
+                  <div class="setting-desc">Procedural weapon & game SFX</div>
+                </div>
+              </div>
+              <button id="settingSoundToggle" class="toggle-pill active" title="Toggle Sound">
+                <span class="toggle-indicator"></span>
+                <span id="settingSoundText">ON</span>
+              </button>
+            </div>
+
+            <!-- AUTO SHOOT / AUTO FIRE TOGGLE -->
+            <div class="setting-item">
+              <div class="setting-info">
+                <span class="setting-icon">⚡</span>
+                <div class="setting-text-group">
+                  <div class="setting-name">AUTO SHOOT / FIRE</div>
+                  <div class="setting-desc">Auto-targets & fires at nearest enemy</div>
+                </div>
+              </div>
+              <button id="settingAutoFireToggle" class="toggle-pill active" title="Toggle Auto-Fire">
+                <span class="toggle-indicator"></span>
+                <span id="settingAutoFireText">ON</span>
+              </button>
+            </div>
+          </div>
+
+          <button id="settingsResumeBtn" class="action-btn" style="margin-top: 8px;">RESUME GAME</button>
         </div>
       </div>
 
