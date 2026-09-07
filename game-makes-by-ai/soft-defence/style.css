@@ -67,13 +67,19 @@ html, body {
   padding: max(16px, env(safe-area-inset-top, 16px)) max(16px, env(safe-area-inset-right, 16px)) max(18px, env(safe-area-inset-bottom, 18px)) max(16px, env(safe-area-inset-left, 16px));
 }
 
-/* --- TOP BAR --- */
+/* --- TOP BAR (ARMORED SLATE PANEL - DEMO_UI MATCH) --- */
 .top-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
   width: 100%;
   position: relative;
+  background: linear-gradient(180deg, #2b3544 0%, #1a202c 100%);
+  border: 2px solid #374151;
+  border-bottom: 3px solid #111827;
+  border-radius: 16px;
+  padding: 6px 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 .top-left-group {
@@ -138,7 +144,28 @@ html, body {
 }
 
 .lives-card-compact {
-  padding: 8px 12px;
+  padding: 6px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.health-bar-container {
+  width: 100%;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 2px;
+  margin-top: 4px;
+  overflow: hidden;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.health-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ef4444, #f87171);
+  box-shadow: 0 0 8px #ef4444;
+  border-radius: 2px;
+  transition: width 0.25s ease;
 }
 
 #heartsContainer {
@@ -257,31 +284,87 @@ html, body {
   gap: 12px;
 }
 
+.weapons-slider-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  max-width: calc(100% - 145px);
+  position: relative;
+  pointer-events: auto;
+  z-index: 10;
+}
+
+.slider-arrow {
+  background: rgba(24, 21, 36, 0.94);
+  border: 1.5px solid rgba(56, 189, 248, 0.5);
+  color: #38bdf8;
+  font-size: 22px;
+  font-weight: 800;
+  width: 26px;
+  height: 66px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  user-select: none;
+  touch-action: manipulation;
+  flex-shrink: 0;
+}
+
+.slider-arrow:hover {
+  background: rgba(56, 189, 248, 0.2);
+  border-color: #38bdf8;
+}
+
+.slider-arrow:active {
+  transform: scale(0.92);
+  background: rgba(56, 189, 248, 0.35);
+}
+
+.slider-arrow.hidden {
+  display: none !important;
+}
+
 .weapons-container {
   display: flex;
   gap: 8px;
-  background: rgba(24, 21, 36, 0.88);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(24, 21, 36, 0.92);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   padding: 6px 10px;
   border-radius: 16px;
   border: 1.5px solid rgba(255, 255, 255, 0.18);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
   pointer-events: auto;
   z-index: 10;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.weapons-container::-webkit-scrollbar {
+  display: none;
 }
 
 .weapon-btn {
-  background: rgba(255, 255, 255, 0.07);
-  border: 2px solid transparent;
-  border-radius: 10px;
-  padding: 4px 8px;
+  scroll-snap-align: center;
+  background: rgba(255, 255, 255, 0.06);
+  border: 2px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 5px 8px;
   display: flex;
   flex-direction: column;
   align-items: center;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-  min-width: 62px;
+  min-width: 68px;
+  flex-shrink: 0;
 }
 
 .weapon-btn:hover {
@@ -289,10 +372,10 @@ html, body {
 }
 
 .weapon-btn.active {
-  background: rgba(56, 189, 248, 0.22);
+  background: rgba(56, 189, 248, 0.24);
   border-color: #38bdf8;
   transform: translateY(-3px);
-  box-shadow: 0 4px 14px rgba(56, 189, 248, 0.5);
+  box-shadow: 0 4px 16px rgba(56, 189, 248, 0.55), inset 0 0 10px rgba(56, 189, 248, 0.2);
 }
 
 .weapon-key {

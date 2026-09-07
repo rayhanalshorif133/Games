@@ -284,6 +284,125 @@
       });
     }
 
+    playSMG() {
+      if (this.muted || !this.ctx) return;
+      this.init();
+      const t = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(850, t);
+      osc.frequency.exponentialRampToValueAtTime(320, t + 0.05);
+      gain.gain.setValueAtTime(0.2, t);
+      gain.gain.exponentialRampToValueAtTime(0.01, t + 0.05);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.05);
+    }
+
+    playAR() {
+      if (this.muted || !this.ctx) return;
+      this.init();
+      const t = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(480, t);
+      osc.frequency.exponentialRampToValueAtTime(140, t + 0.09);
+      gain.gain.setValueAtTime(0.25, t);
+      gain.gain.exponentialRampToValueAtTime(0.01, t + 0.09);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.09);
+    }
+
+    playPlasma() {
+      if (this.muted || !this.ctx) return;
+      this.init();
+      const t = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(1200, t);
+      osc.frequency.exponentialRampToValueAtTime(260, t + 0.16);
+      gain.gain.setValueAtTime(0.3, t);
+      gain.gain.exponentialRampToValueAtTime(0.01, t + 0.16);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.16);
+    }
+
+    playGatling() {
+      if (this.muted || !this.ctx) return;
+      this.init();
+      const t = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(320, t);
+      osc.frequency.exponentialRampToValueAtTime(90, t + 0.06);
+      gain.gain.setValueAtTime(0.28, t);
+      gain.gain.exponentialRampToValueAtTime(0.01, t + 0.06);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.06);
+    }
+
+    playSniper() {
+      if (this.muted || !this.ctx) return;
+      this.init();
+      const t = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(280, t);
+      osc.frequency.exponentialRampToValueAtTime(35, t + 0.35);
+      gain.gain.setValueAtTime(0.45, t);
+      gain.gain.exponentialRampToValueAtTime(0.01, t + 0.35);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.35);
+
+      const bufSize = Math.floor(this.ctx.sampleRate * 0.28);
+      const buffer = this.ctx.createBuffer(1, bufSize, this.ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufSize; i++) {
+        data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufSize * 0.2));
+      }
+      const noise = this.ctx.createBufferSource();
+      noise.buffer = buffer;
+      const nGain = this.ctx.createGain();
+      nGain.gain.setValueAtTime(0.4, t);
+      nGain.gain.exponentialRampToValueAtTime(0.01, t + 0.28);
+      noise.connect(nGain);
+      nGain.connect(this.ctx.destination);
+      noise.start(t);
+    }
+
+    playWeaponPickup() {
+      if (this.muted || !this.ctx) return;
+      this.init();
+      const notes = [523.25, 659.25, 783.99, 1046.5];
+      notes.forEach((freq, i) => {
+        const t = this.ctx.currentTime + i * 0.07;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, t);
+        gain.gain.setValueAtTime(0.35, t);
+        gain.gain.exponentialRampToValueAtTime(0.01, t + 0.25);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(t);
+        osc.stop(t + 0.25);
+      });
+    }
+
     playSwitch() {
       if (this.muted || !this.ctx) return;
       this.init();
@@ -308,7 +427,9 @@
   const WEAPONS = {
     1: {
       name: 'BLASTER PISTOL',
+      shortName: 'PISTOL',
       key: 'weapon_pistol',
+      bulletSprite: 'bullet_orb_red',
       cooldown: 250,
       damage: 28,
       speed: 18,
@@ -321,7 +442,9 @@
     },
     2: {
       name: 'RAPID RIFLE',
+      shortName: 'RIFLE',
       key: 'weapon_rifle',
+      bulletSprite: 'bullet_pulse_blue',
       cooldown: 95,
       damage: 15,
       speed: 21,
@@ -334,7 +457,9 @@
     },
     3: {
       name: 'HEAVY SHOTGUN',
+      shortName: 'SHOTGUN',
       key: 'weapon_shotgun',
+      bulletSprite: 'bullet_pellet_gold',
       cooldown: 600,
       damage: 20,
       speed: 16,
@@ -344,6 +469,86 @@
       bulletColor: '#ff5e00',
       bulletSize: 8,
       sound: () => SOUNDS.playShotgun(),
+    },
+    4: {
+      name: 'TACTICAL SMG',
+      shortName: 'SMG',
+      key: 'weapon_smg',
+      bulletSprite: 'bullet_pulse_cyan',
+      cooldown: 65,
+      damage: 28,
+      speed: 24,
+      spread: 0.12,
+      pellets: 1,
+      knockback: 4,
+      bulletColor: '#38bdf8',
+      bulletSize: 6,
+      sound: () => SOUNDS.playSMG(),
+    },
+    5: {
+      name: 'COMMANDO AR',
+      shortName: 'COMMANDO',
+      key: 'weapon_ar_launcher',
+      bulletSprite: 'bullet_pellet_gold',
+      cooldown: 110,
+      damage: 48,
+      speed: 25,
+      spread: 0.06,
+      pellets: 1,
+      knockback: 7,
+      bulletColor: '#fb923c',
+      bulletSize: 8,
+      hasGrenades: true,
+      sound: () => SOUNDS.playAR(),
+    },
+    6: {
+      name: 'PLASMA BLASTER',
+      shortName: 'PLASMA',
+      key: 'weapon_plasma',
+      bulletSprite: 'bullet_plasma',
+      cooldown: 180,
+      damage: 85,
+      speed: 21,
+      spread: 0,
+      pellets: 1,
+      knockback: 10,
+      bulletColor: '#60a5fa',
+      bulletSize: 14,
+      pierce: 4,
+      sound: () => SOUNDS.playPlasma(),
+    },
+    7: {
+      name: 'GATLING CANNON',
+      shortName: 'GATLING',
+      key: 'weapon_gatling',
+      bulletSprite: 'bullet_dart_gold',
+      cooldown: 55,
+      damage: 42,
+      speed: 26,
+      spread: 0.18,
+      pellets: 2,
+      knockback: 8,
+      bulletColor: '#facc15',
+      bulletSize: 7,
+      screenShake: 2.5,
+      sound: () => SOUNDS.playGatling(),
+    },
+    8: {
+      name: 'AM-SNIPER',
+      shortName: 'SNIPER',
+      key: 'weapon_sniper',
+      bulletSprite: 'bullet_laser',
+      cooldown: 750,
+      damage: 260,
+      speed: 40,
+      spread: 0,
+      pellets: 1,
+      knockback: 25,
+      bulletColor: '#f43f5e',
+      bulletSize: 11,
+      pierce: 99,
+      screenShake: 6,
+      sound: () => SOUNDS.playSniper(),
     },
   };
 
@@ -469,6 +674,11 @@
       weapon_pistol: { width: 64, height: 34 },
       weapon_rifle: { width: 90, height: 44 },
       weapon_shotgun: { width: 90, height: 27 },
+      weapon_gatling: { width: 110, height: 49 },
+      weapon_plasma: { width: 75, height: 44 },
+      weapon_sniper: { width: 125, height: 35 },
+      weapon_smg: { width: 85, height: 31 },
+      weapon_ar_launcher: { width: 95, height: 41 },
     },
   };
 
@@ -491,6 +701,26 @@
       'weapon_pistol',
       'weapon_rifle',
       'weapon_shotgun',
+      'weapon_gatling',
+      'weapon_plasma',
+      'weapon_sniper',
+      'weapon_smg',
+      'weapon_ar_launcher',
+      'bullet_orb_red',
+      'bullet_laser',
+      'bullet_pulse_cyan',
+      'bullet_pulse_blue',
+      'bullet_pellet_gold',
+      'bullet_plasma',
+      'bullet_rocket',
+      'bullet_dart_gold',
+      'bullet_heavy_dart',
+      'prop_rock_large',
+      'prop_rock_medium',
+      'prop_broken_metal',
+      'prop_water_puddle',
+      'prop_rock_small',
+      'prop_rock_cluster',
       'defense_ring',
       'crosshair',
       'muzzle_flash',
@@ -527,6 +757,72 @@
     return { x, y };
   }
 
+  // --- PROGRESSIVE WEAPON UNLOCK TIERS BY WAVE ---
+  // Player starts with 1 (Blaster Pistol). Upgraded weapons appear in field as waves advance!
+  const WAVE_WEAPON_TIERS = {
+    2: 2,  // Wave 2  -> Rapid Rifle
+    4: 3,  // Wave 4  -> Heavy Shotgun
+    6: 4,  // Wave 6  -> Tactical SMG
+    8: 5,  // Wave 8  -> Commando AR
+    10: 6, // Wave 10 -> Plasma Blaster
+    12: 7, // Wave 12 -> Devastator Gatling Cannon
+    14: 8, // Wave 14 -> Anti-Material Sniper
+  };
+
+  // --- PROCEDURAL ENVIRONMENT PROPS (ROCKS, METAL BARRICADES, PUDDLES) ---
+  const PROP_CHUNK_SIZE = 640;
+  const PROP_TYPES = [
+    { key: 'prop_rock_large', scale: 0.45, isObstacle: true, obstacleRadius: 62, shadowRadius: 75, shadowY: 28 },
+    { key: 'prop_rock_medium', scale: 0.50, isObstacle: true, obstacleRadius: 44, shadowRadius: 50, shadowY: 20 },
+    { key: 'prop_broken_metal', scale: 0.45, isObstacle: true, obstacleRadius: 48, shadowRadius: 54, shadowY: 18 },
+    { key: 'prop_water_puddle', scale: 0.55, isPuddle: true, isObstacle: false, shadowRadius: 0, shadowY: 0 },
+    { key: 'prop_rock_cluster', scale: 0.52, isObstacle: false, shadowRadius: 30, shadowY: 14 },
+    { key: 'prop_rock_small', scale: 0.50, isObstacle: false, shadowRadius: 20, shadowY: 10 },
+  ];
+
+  const chunkPropsCache = new Map();
+  function getPropsForChunk(cx, cy) {
+    const chunkKey = `${cx},${cy}`;
+    if (chunkPropsCache.has(chunkKey)) {
+      return chunkPropsCache.get(chunkKey);
+    }
+    if (chunkPropsCache.size > 250) {
+      chunkPropsCache.clear();
+    }
+
+    let seed = ((cx * 73856093) ^ (cy * 19349663)) >>> 0;
+    function rand() {
+      seed = (seed * 1664525 + 1013904223) >>> 0;
+      return (seed >>> 0) / 4294967296;
+    }
+
+    const count = Math.floor(rand() * 3) + 1;
+    const items = [];
+    for (let i = 0; i < count; i++) {
+      const typeIdx = Math.floor(rand() * PROP_TYPES.length);
+      const propDef = PROP_TYPES[typeIdx];
+      const relX = 60 + rand() * (PROP_CHUNK_SIZE - 120);
+      const relY = 60 + rand() * (PROP_CHUNK_SIZE - 120);
+      const wx = cx * PROP_CHUNK_SIZE + relX;
+      const wy = cy * PROP_CHUNK_SIZE + relY;
+
+      if (Math.hypot(wx, wy) < 260) continue;
+
+      const flipH = rand() > 0.5;
+      const rot = (rand() - 0.5) * 0.25;
+      items.push({
+        ...propDef,
+        x: wx,
+        y: wy,
+        flipH,
+        rot,
+      });
+    }
+
+    chunkPropsCache.set(chunkKey, items);
+    return items;
+  }
+
   // --- GAME STATE VARIABLES ---
   let gameState = 'START';
   let score = 0;
@@ -538,6 +834,7 @@
   let survivalTime = 0;
   let screenShake = 0;
   let currentWeaponId = 1;
+  let unlockedWeapons = [1]; // Start with only 1 weapon in hand!
 
   // Active Power-ups state
   const activePowerups = {
@@ -654,9 +951,17 @@
   }
 
   function cycleWeapon() {
-    let nextId = currentWeaponId + 1;
-    if (nextId > 3) nextId = 1;
-    selectWeapon(nextId);
+    if (!unlockedWeapons || unlockedWeapons.length <= 1) return;
+    const idx = unlockedWeapons.indexOf(currentWeaponId);
+    const nextIdx = (idx + 1) % unlockedWeapons.length;
+    selectWeapon(unlockedWeapons[nextIdx]);
+  }
+
+  function cycleWeaponPrev() {
+    if (!unlockedWeapons || unlockedWeapons.length <= 1) return;
+    const idx = unlockedWeapons.indexOf(currentWeaponId);
+    const prevIdx = (idx - 1 + unlockedWeapons.length) % unlockedWeapons.length;
+    selectWeapon(unlockedWeapons[prevIdx]);
   }
 
   function toggleAutoFire() {
@@ -690,12 +995,14 @@
   // --- INPUT LISTENERS ---
   window.addEventListener('keydown', (e) => {
     keys[e.code] = true;
-    if (e.key === '1') selectWeapon(1);
-    if (e.key === '2') selectWeapon(2);
-    if (e.key === '3') selectWeapon(3);
+    const keyNum = parseInt(e.key, 10);
+    if (!isNaN(keyNum) && unlockedWeapons.includes(keyNum)) {
+      selectWeapon(keyNum);
+    }
     if (e.code === 'KeyP' || e.code === 'Escape') togglePause();
     if (e.code === 'KeyF') toggleAutoFire();
-    if (e.code === 'KeyQ' || e.code === 'KeyE') cycleWeapon();
+    if (e.code === 'KeyQ') cycleWeaponPrev();
+    if (e.code === 'KeyE') cycleWeapon();
   });
   window.addEventListener('keyup', (e) => {
     keys[e.code] = false;
@@ -734,9 +1041,7 @@
     if (e.deltaY > 0) {
       cycleWeapon();
     } else if (e.deltaY < 0) {
-      let prevW = currentWeaponId - 1;
-      if (prevW < 1) prevW = 3;
-      selectWeapon(prevW);
+      cycleWeaponPrev();
     }
   });
 
@@ -944,7 +1249,9 @@
     camera.x = player.x - V_WIDTH / 2;
     camera.y = player.y - V_HEIGHT / 2;
 
+    unlockedWeapons = [1];
     currentWeaponId = 1;
+    renderWeaponsDock();
     updateWeaponUI();
 
     enemies = [];
@@ -1063,7 +1370,76 @@
     });
   }
 
-  // --- POWER-UP DROP SYSTEM ---
+  function spawnFieldWeaponDrop(weaponId) {
+    if (!WEAPONS[weaponId]) return;
+    const angle = Math.random() * Math.PI * 2;
+    const dist = 320 + Math.random() * 140;
+    const dropX = player.x + Math.cos(angle) * dist;
+    const dropY = player.y + Math.sin(angle) * dist;
+    drops.push({
+      x: dropX,
+      y: dropY,
+      type: 'WEAPON',
+      weaponId: weaponId,
+      bounceTick: Math.random() * Math.PI * 2,
+      life: 3600, // 60s
+    });
+    createShockwave(dropX, dropY, '#facc15', 220);
+    createSparks(dropX, dropY, 40, '#facc15');
+    addFloatText(dropX, dropY - 60, `${WEAPONS[weaponId].name} DISCOVERED! 🌟`, '#facc15', 30);
+  }
+
+  // --- WEAPON & POWER-UP DROP SYSTEM ---
+  function checkEnemyDrop(x, y, enemy) {
+    // 1. Check for Weapon Drops from Enemies according to progressive wave tiers
+    const maxTier = wave >= 14 ? 8 : (wave >= 12 ? 7 : (wave >= 10 ? 6 : (wave >= 8 ? 5 : (wave >= 6 ? 4 : (wave >= 4 ? 3 : (wave >= 2 ? 2 : 1))))));
+    const availableLocked = [];
+    for (let id = 2; id <= maxTier; id++) {
+      if (!unlockedWeapons.includes(id)) {
+        availableLocked.push(id);
+      }
+    }
+
+    if (availableLocked.length > 0) {
+      let shouldDropWeapon = false;
+      if (enemy.typeId === 4) { // RED BRUTE
+        // In Wave 11+, 100% guaranteed drop! In Wave 5-10, 60% chance; earlier waves 40%.
+        if (wave >= 11 || Math.random() < 0.60) {
+          shouldDropWeapon = true;
+        }
+      } else if (enemy.typeId === 2) { // GREEN ORC
+        // 45% chance in Wave 2+
+        if (Math.random() < 0.45) {
+          shouldDropWeapon = true;
+        }
+      } else {
+        // Minion / Bat: 12% chance if player still only has starter pistol in wave 2+
+        if (unlockedWeapons.length === 1 && wave >= 2 && Math.random() < 0.12) {
+          shouldDropWeapon = true;
+        }
+      }
+
+      if (shouldDropWeapon) {
+        const pickedWeaponId = availableLocked[Math.floor(Math.random() * availableLocked.length)];
+        drops.push({
+          x,
+          y,
+          type: 'WEAPON',
+          weaponId: pickedWeaponId,
+          bounceTick: Math.random() * Math.PI * 2,
+          life: 2400, // 40 seconds on ground
+        });
+        createShockwave(x, y, '#facc15', 180);
+        createSparks(x, y, 35, '#facc15');
+        addFloatText(x, y - 60, 'UPGRADED WEAPON DROPPED! ⭐', '#facc15', 28);
+        return;
+      }
+    }
+
+    // 2. Regular Power-Up Drop
+    checkDropPowerup(x, y);
+  }
+
   function checkDropPowerup(x, y) {
     // 24% chance to drop a powerup
     if (Math.random() > 0.24) return;
@@ -1096,6 +1472,26 @@
   }
 
   function collectPowerup(drop) {
+    if (drop.type === 'WEAPON') {
+      const wId = drop.weaponId;
+      const wp = WEAPONS[wId];
+      SOUNDS.playWeaponPickup();
+
+      if (!unlockedWeapons.includes(wId)) {
+        unlockedWeapons.push(wId);
+        unlockedWeapons.sort((a, b) => a - b);
+      }
+      selectWeapon(wId);
+      renderWeaponsDock();
+
+      screenShake = 10;
+      createShockwave(drop.x, drop.y, '#facc15', 180);
+      createSparks(drop.x, drop.y, 40, '#facc15');
+      createSparks(drop.x, drop.y, 20, '#ffffff');
+      addFloatText(player.x, player.y - 80, `UNLOCKED: ${wp.name}! 🌟`, '#facc15', 30);
+      return;
+    }
+
     const info = drop.info;
     SOUNDS.playPowerup();
 
@@ -1129,6 +1525,7 @@
           score += proto.score;
           addFloatText(e.x, e.y - 30, `+${proto.score}`, proto.color, 26);
           createEnemyDeathFX(e.x, e.y, proto);
+          checkEnemyDrop(e.x, e.y, e);
           enemies.splice(i, 1);
         }
       }
@@ -1183,6 +1580,7 @@
   function shootWeapon() {
     const now = Date.now();
     const wp = WEAPONS[currentWeaponId];
+    if (!wp) return;
     const isRapid = activePowerups.RAPID > 0;
     const cooldown = isRapid ? wp.cooldown * 0.55 : wp.cooldown;
 
@@ -1209,13 +1607,27 @@
       timer: 4,
     };
 
-    // Recoil
-    player.vx -= Math.cos(baseAngle) * (wp.pellets > 1 ? 2.8 : 1.0);
-    player.vy -= Math.sin(baseAngle) * (wp.pellets > 1 ? 2.8 : 1.0);
-    if (wp.pellets > 1) screenShake = Math.max(screenShake, 7);
+    // Recoil & screen shake
+    const recoilForce = wp.pellets > 1 ? 2.8 : (wp.knockback ? Math.min(wp.knockback * 0.14, 3.5) : 1.0);
+    player.vx -= Math.cos(baseAngle) * recoilForce;
+    player.vy -= Math.sin(baseAngle) * recoilForce;
+
+    if (wp.screenShake) {
+      screenShake = Math.max(screenShake, wp.screenShake);
+    } else if (wp.pellets > 1) {
+      screenShake = Math.max(screenShake, 6);
+    }
+
+    // Commando AR grenade tracking (every 3rd shot launches explosive rocket grenade)
+    player.shotCount = (player.shotCount || 0) + 1;
+    const isGrenade = wp.hasGrenades && (player.shotCount % 3 === 0);
 
     // Number of streams
     const streamOffsets = isRapid ? [-0.14, 0, 0.14] : [0];
+
+    // Perpendicular offsets for dual-barrel Gatling Cannon
+    const perpX = -Math.sin(baseAngle);
+    const perpY = Math.cos(baseAngle);
 
     streamOffsets.forEach((streamAngle) => {
       for (let p = 0; p < wp.pellets; p++) {
@@ -1223,19 +1635,45 @@
         if (wp.spread > 0) {
           angle += (Math.random() - 0.5) * wp.spread;
         }
+
+        let spawnX = muzzleX;
+        let spawnY = muzzleY;
+        if (wp.pellets === 2) {
+          const sign = p === 0 ? 1 : -1;
+          spawnX += perpX * 9 * sign;
+          spawnY += perpY * 9 * sign;
+        }
+
+        const isExplosiveRound = isGrenade && p === 0;
+        const bulletDmg = isExplosiveRound ? wp.damage * 2.2 : (isRapid ? wp.damage * 1.2 : wp.damage);
+        const bulletColor = isExplosiveRound ? '#ea580c' : (isRapid ? '#ff3b30' : wp.bulletColor);
+        const bulletSize = isExplosiveRound ? 13 : (isRapid ? wp.bulletSize + 2 : wp.bulletSize);
+        const bulletSprite = isExplosiveRound ? 'bullet_rocket' : (wp.bulletSprite || 'bullet_orb_red');
+
         bullets.push({
-          x: muzzleX,
-          y: muzzleY,
-          vx: Math.cos(angle) * wp.speed,
-          vy: Math.sin(angle) * wp.speed,
-          damage: isRapid ? wp.damage * 1.2 : wp.damage,
-          color: isRapid ? '#ff3b30' : wp.bulletColor,
-          size: isRapid ? wp.bulletSize + 2 : wp.bulletSize,
-          knockback: wp.knockback,
-          life: 80,
+          x: spawnX,
+          y: spawnY,
+          vx: Math.cos(angle) * (isExplosiveRound ? wp.speed * 0.85 : wp.speed),
+          vy: Math.sin(angle) * (isExplosiveRound ? wp.speed * 0.85 : wp.speed),
+          damage: bulletDmg,
+          color: bulletColor,
+          size: bulletSize,
+          sprite: bulletSprite,
+          knockback: isExplosiveRound ? 18 : wp.knockback,
+          life: 90,
+          pierce: isExplosiveRound ? 0 : (wp.pierce || 0),
+          isExplosive: isExplosiveRound,
+          isPlasma: wp.key === 'weapon_plasma',
+          isSniper: wp.key === 'weapon_sniper',
+          blastRadius: 150,
+          hitEnemies: new Set(),
         });
       }
     });
+
+    if (isGrenade) {
+      addFloatText(muzzleX, muzzleY - 24, '🚀 GRENADE!', '#fb923c', 20);
+    }
   }
 
   // --- ENEMY SPAWNING AROUND CAMERA ---
@@ -1265,7 +1703,18 @@
 
     let typeId = 1;
     const rand = Math.random();
-    if (wave >= 4 && rand < 0.22) {
+    if (wave >= 11) {
+      // Wave 11+: High tier big enemy onslaught (Red Brutes & Orcs drop legendary weapons!)
+      if (rand < 0.38) {
+        typeId = 4; // Red Brute (20 pts)
+      } else if (rand < 0.68) {
+        typeId = 2; // Green Orc (10 pts)
+      } else if (rand < 0.88) {
+        typeId = 3; // Flying Bat (15 pts)
+      } else {
+        typeId = 1; // Purple Minion (5 pts)
+      }
+    } else if (wave >= 4 && rand < 0.22) {
       typeId = 4; // Red Brute (20 pts)
     } else if (wave >= 3 && rand < 0.42) {
       typeId = 3; // Flying Bat (15 pts)
@@ -1396,8 +1845,16 @@
     if (waveTimer > 28) {
       waveTimer = 0;
       wave++;
-      waveBanner = { text: `WAVE ${wave} - DANGER SURGE!`, timer: 140 };
-      spawnInterval = Math.max(380, 1300 - (wave - 1) * 105);
+      const tierWeaponId = WAVE_WEAPON_TIERS[wave];
+      if (tierWeaponId && !unlockedWeapons.includes(tierWeaponId)) {
+        spawnFieldWeaponDrop(tierWeaponId);
+        waveBanner = { text: `WAVE ${wave} - NEW WEAPON DROPPED: ${WEAPONS[tierWeaponId].name}! ⭐`, timer: 200 };
+      } else if (wave === 11) {
+        waveBanner = { text: 'WAVE 11 - LEGENDARY WEAPONS UNLEASHED! ⭐', timer: 180 };
+      } else {
+        waveBanner = { text: `WAVE ${wave} - DANGER SURGE!`, timer: 140 };
+      }
+      spawnInterval = Math.max(340, 1300 - (wave - 1) * 105);
       SOUNDS.playWave();
       addFloatText(player.x, player.y - 120, `WAVE ${wave}!`, '#fbbf24', 36);
       updateHUD();
@@ -1482,6 +1939,28 @@
     player.vy *= 0.82;
     player.x += player.vx;
     player.y += player.vy;
+
+    // Soft collision against Environment Rock/Barricade Obstacles
+    const pChunkX = Math.floor(player.x / PROP_CHUNK_SIZE);
+    const pChunkY = Math.floor(player.y / PROP_CHUNK_SIZE);
+    for (let cx = pChunkX - 1; cx <= pChunkX + 1; cx++) {
+      for (let cy = pChunkY - 1; cy <= pChunkY + 1; cy++) {
+        const cProps = getPropsForChunk(cx, cy);
+        for (let i = 0; i < cProps.length; i++) {
+          const pr = cProps[i];
+          if (!pr.isObstacle) continue;
+          const dx = player.x - pr.x;
+          const dy = player.y - (pr.y + (pr.shadowY || 0) * 0.4);
+          const dist = Math.hypot(dx, dy);
+          const minDist = pr.obstacleRadius + player.radius * 0.6;
+          if (dist < minDist && dist > 0.001) {
+            const push = (minDist - dist) * 0.4;
+            player.x += (dx / dist) * push;
+            player.y += (dy / dist) * push;
+          }
+        }
+      }
+    }
 
     // Follow Camera (smooth lerp toward player)
     const targetCamX = player.x - V_WIDTH / 2;
@@ -1576,12 +2055,77 @@
       b.y += b.vy;
       b.life--;
 
-      let hit = false;
+      // Visual tracers for sniper, plasma, and explosive rounds
+      if (b.isSniper && Math.random() < 0.4) {
+        particles.push({
+          x: b.x,
+          y: b.y,
+          vx: 0,
+          vy: 0,
+          color: '#f43f5e',
+          size: 3.5,
+          alpha: 0.8,
+          decay: 0.08,
+        });
+      } else if (b.isPlasma && Math.random() < 0.45) {
+        particles.push({
+          x: b.x + (Math.random() - 0.5) * 6,
+          y: b.y + (Math.random() - 0.5) * 6,
+          vx: (Math.random() - 0.5) * 1.5,
+          vy: (Math.random() - 0.5) * 1.5,
+          color: '#60a5fa',
+          size: 6,
+          alpha: 0.85,
+          decay: 0.07,
+        });
+      } else if (b.isExplosive && Math.random() < 0.5) {
+        particles.push({
+          x: b.x,
+          y: b.y,
+          vx: (Math.random() - 0.5) * 1.2,
+          vy: (Math.random() - 0.5) * 1.2,
+          color: '#fb923c',
+          size: 5,
+          alpha: 0.75,
+          decay: 0.06,
+        });
+      }
+
+      let bulletDead = false;
+
       for (let j = enemies.length - 1; j >= 0; j--) {
         const e = enemies[j];
+        if (b.hitEnemies && b.hitEnemies.has(e)) continue;
+
         const dist = Math.hypot(b.x - e.x, b.y - e.y);
         if (dist < e.radius + b.size) {
-          hit = true;
+          if (!b.hitEnemies) b.hitEnemies = new Set();
+          b.hitEnemies.add(e);
+
+          if (b.isExplosive) {
+            // Detonate explosive rocket grenade
+            createShockwave(b.x, b.y, '#f97316', b.blastRadius || 150);
+            createSparks(b.x, b.y, 25, '#fb923c');
+            createSparks(b.x, b.y, 15, '#ffffff');
+            SOUNDS.playExplosion(false);
+            screenShake = Math.max(screenShake, 8);
+
+            enemies.forEach((splashE) => {
+              const sDist = Math.hypot(splashE.x - b.x, splashE.y - b.y);
+              const maxR = b.blastRadius || 150;
+              if (sDist < maxR) {
+                const splashDmg = b.damage * (1 - sDist / (maxR * 1.15));
+                splashE.hp -= splashDmg;
+                splashE.hitTimer = 6;
+                addFloatText(splashE.x + (Math.random() - 0.5) * 15, splashE.y - 20, `${Math.round(splashDmg)}`, '#fb923c', 22);
+              }
+            });
+
+            bulletDead = true;
+            break;
+          }
+
+          // Direct Hit
           e.hp -= b.damage;
           e.hitTimer = 6;
           SOUNDS.playHit();
@@ -1593,31 +2137,41 @@
           createSparks(b.x, b.y, 5, e.color);
           addFloatText(e.x + (Math.random() - 0.5) * 20, e.y - 18, `${Math.round(b.damage)}`, '#fef08a', 20);
 
-          if (e.hp <= 0) {
-            // ENEMY DESTROYED (Score based: 5, 10, 15, 20)
-            const proto = ENEMY_TYPES[e.typeId];
-            SOUNDS.playExplosion(proto.radius > 40);
-            kills++;
-
-            const earned = proto.score;
-            score += earned;
-            addFloatText(e.x, e.y - 35, `+${earned}`, proto.color, 32);
-
-            createEnemyDeathFX(e.x, e.y, proto);
-            checkDropPowerup(e.x, e.y);
-
-            if (score > highScore) {
-              highScore = score;
-              localStorage.setItem('circle_def_high', highScore);
-            }
-            updateHUD();
-            enemies.splice(j, 1);
+          if (b.pierce && b.pierce > 0) {
+            b.pierce--;
+            // Piercing round penetrates through
+          } else {
+            bulletDead = true;
+            break;
           }
-          break;
         }
       }
 
-      if (hit || b.life <= 0) {
+      // Check for destroyed enemies
+      for (let j = enemies.length - 1; j >= 0; j--) {
+        const e = enemies[j];
+        if (e.hp <= 0) {
+          const proto = ENEMY_TYPES[e.typeId];
+          SOUNDS.playExplosion(proto.radius > 40);
+          kills++;
+
+          const earned = proto.score;
+          score += earned;
+          addFloatText(e.x, e.y - 35, `+${earned}`, proto.color, 32);
+
+          createEnemyDeathFX(e.x, e.y, proto);
+          checkEnemyDrop(e.x, e.y, e);
+
+          if (score > highScore) {
+            highScore = score;
+            localStorage.setItem('circle_def_high', highScore);
+          }
+          updateHUD();
+          enemies.splice(j, 1);
+        }
+      }
+
+      if (bulletDead || b.life <= 0) {
         bullets.splice(i, 1);
       }
     }
@@ -1747,29 +2301,20 @@
       CTX.translate(shakeX, shakeY);
     }
 
-    // Background Color: #6D6987
-    CTX.fillStyle = '#6D6987';
+    // Atmospheric Battlefield Ground (Warm apocalyptic rose/crimson radial gradient matching demo_ui.png)
+    const bgGrad = CTX.createRadialGradient(
+      V_WIDTH / 2,
+      V_HEIGHT / 2,
+      100,
+      V_WIDTH / 2,
+      V_HEIGHT / 2,
+      V_HEIGHT * 0.72
+    );
+    bgGrad.addColorStop(0, '#865b6c');
+    bgGrad.addColorStop(0.55, '#684555');
+    bgGrad.addColorStop(1, '#472d3b');
+    CTX.fillStyle = bgGrad;
     CTX.fillRect(0, 0, V_WIDTH, V_HEIGHT);
-
-    // Infinite World Grid (seamless wrapping with camera)
-    CTX.strokeStyle = 'rgba(255, 255, 255, 0.06)';
-    CTX.lineWidth = 1.5;
-    const gridSize = 120;
-    const offsetX = -(camera.x % gridSize);
-    const offsetY = -(camera.y % gridSize);
-
-    for (let x = offsetX; x < V_WIDTH + gridSize; x += gridSize) {
-      CTX.beginPath();
-      CTX.moveTo(x, 0);
-      CTX.lineTo(x, V_HEIGHT);
-      CTX.stroke();
-    }
-    for (let y = offsetY; y < V_HEIGHT + gridSize; y += gridSize) {
-      CTX.beginPath();
-      CTX.moveTo(0, y);
-      CTX.lineTo(V_WIDTH, y);
-      CTX.stroke();
-    }
 
     // WORLD SPACE RENDERING (Translated by Camera)
     CTX.save();
@@ -1794,6 +2339,34 @@
       }
     }
 
+    // Visible Chunks Bounds for Props
+    const minPropChunkX = Math.floor((camera.x - 180) / PROP_CHUNK_SIZE);
+    const maxPropChunkX = Math.floor((camera.x + V_WIDTH + 180) / PROP_CHUNK_SIZE);
+    const minPropChunkY = Math.floor((camera.y - 180) / PROP_CHUNK_SIZE);
+    const maxPropChunkY = Math.floor((camera.y + V_HEIGHT + 180) / PROP_CHUNK_SIZE);
+
+    // Render Ground Water Puddles (drawn on ground)
+    for (let cx = minPropChunkX; cx <= maxPropChunkX; cx++) {
+      for (let cy = minPropChunkY; cy <= maxPropChunkY; cy++) {
+        const cProps = getPropsForChunk(cx, cy);
+        for (let i = 0; i < cProps.length; i++) {
+          const pr = cProps[i];
+          if (!pr.isPuddle) continue;
+          const img = IMAGES[pr.key];
+          if (!img) continue;
+          CTX.save();
+          CTX.translate(pr.x, pr.y);
+          if (pr.flipH) CTX.scale(-1, 1);
+          CTX.rotate(pr.rot);
+          CTX.globalAlpha = 0.75;
+          const pw = img.width * pr.scale;
+          const ph = img.height * pr.scale;
+          CTX.drawImage(img, -pw / 2, -ph / 2, pw, ph);
+          CTX.restore();
+        }
+      }
+    }
+
     // Ground Decals / Splatter
     groundDecals.forEach((gd) => {
       CTX.save();
@@ -1805,11 +2378,44 @@
       CTX.restore();
     });
 
+    // Environment Prop Shadows (Rocks, Barricades, Clusters)
+    for (let cx = minPropChunkX; cx <= maxPropChunkX; cx++) {
+      for (let cy = minPropChunkY; cy <= maxPropChunkY; cy++) {
+        const cProps = getPropsForChunk(cx, cy);
+        for (let i = 0; i < cProps.length; i++) {
+          const pr = cProps[i];
+          if (pr.isPuddle || pr.shadowRadius <= 0) continue;
+          drawShadow(pr.x, pr.y + pr.shadowY, pr.shadowRadius);
+        }
+      }
+    }
+
     // Shadows
     enemies.forEach((e) => {
       drawShadow(e.x, e.y + e.radius * 0.85, e.radius * 1.3);
     });
     drawShadow(player.x, player.y + 26, 42);
+
+    // Environment Props (Rocks, Metal Barricades, Clusters)
+    for (let cx = minPropChunkX; cx <= maxPropChunkX; cx++) {
+      for (let cy = minPropChunkY; cy <= maxPropChunkY; cy++) {
+        const cProps = getPropsForChunk(cx, cy);
+        for (let i = 0; i < cProps.length; i++) {
+          const pr = cProps[i];
+          if (pr.isPuddle) continue;
+          const img = IMAGES[pr.key];
+          if (!img) continue;
+          CTX.save();
+          CTX.translate(pr.x, pr.y);
+          if (pr.flipH) CTX.scale(-1, 1);
+          CTX.rotate(pr.rot);
+          const pw = img.width * pr.scale;
+          const ph = img.height * pr.scale;
+          CTX.drawImage(img, -pw / 2, -ph / 2, pw, ph);
+          CTX.restore();
+        }
+      }
+    }
 
     // Speed Ghost Trails
     playerGhostTrails.forEach((tr) => {
@@ -1822,29 +2428,95 @@
 
     // Collectible Drops
     drops.forEach((d) => {
-      const bob = Math.sin(d.bounceTick) * 8;
+      const bob = Math.sin(d.bounceTick * 2.2) * 8;
       CTX.save();
-      // Drop Shadow
-      drawShadow(d.x, d.y + 18, 22);
 
-      // Glowing aura
-      CTX.fillStyle = d.info.color;
-      CTX.shadowColor = d.info.color;
-      CTX.shadowBlur = 18;
-      CTX.beginPath();
-      CTX.arc(d.x, d.y + bob, 26, 0, Math.PI * 2);
-      CTX.fill();
+      if (d.type === 'WEAPON') {
+        const wp = WEAPONS[d.weaponId];
+        const img = IMAGES[wp ? wp.key : ''];
 
-      // Border ring
-      CTX.strokeStyle = '#ffffff';
-      CTX.lineWidth = 3;
-      CTX.stroke();
+        // Drop Shadow
+        drawShadow(d.x, d.y + 22, 34);
 
-      // Icon
-      CTX.font = '24px Rajdhani, sans-serif';
-      CTX.textAlign = 'center';
-      CTX.textBaseline = 'middle';
-      CTX.fillText(d.info.icon, d.x, d.y + bob);
+        // Golden beacon aura
+        const auraRadius = 38 + Math.sin(d.bounceTick * 3) * 5;
+        const grad = CTX.createRadialGradient(d.x, d.y + bob, 4, d.x, d.y + bob, auraRadius);
+        grad.addColorStop(0, 'rgba(250, 204, 21, 0.85)');
+        grad.addColorStop(0.5, 'rgba(251, 146, 60, 0.4)');
+        grad.addColorStop(1, 'rgba(250, 204, 21, 0)');
+        CTX.fillStyle = grad;
+        CTX.beginPath();
+        CTX.arc(d.x, d.y + bob, auraRadius, 0, Math.PI * 2);
+        CTX.fill();
+
+        // Outer rotating halo ring
+        CTX.strokeStyle = '#facc15';
+        CTX.lineWidth = 2.5;
+        CTX.shadowColor = '#facc15';
+        CTX.shadowBlur = 14;
+        CTX.beginPath();
+        CTX.ellipse(d.x, d.y + bob, 34, 16, d.bounceTick * 1.5, 0, Math.PI * 2);
+        CTX.stroke();
+
+        // 3D Spinning Weapon Sprite
+        if (img) {
+          CTX.save();
+          CTX.translate(d.x, d.y + bob);
+          const spinScaleX = Math.cos(d.bounceTick * 2.2) * 0.75;
+          CTX.scale(spinScaleX, 0.75);
+          CTX.shadowColor = '#facc15';
+          CTX.shadowBlur = 16;
+          CTX.drawImage(img, -img.width / 2, -img.height / 2);
+          CTX.restore();
+        }
+
+        // Floating name tag badge
+        if (wp) {
+          CTX.font = '800 18px Rajdhani, sans-serif';
+          CTX.textAlign = 'center';
+          CTX.fillStyle = '#fef08a';
+          CTX.shadowColor = '#000000';
+          CTX.shadowBlur = 8;
+          CTX.fillText(`⭐ ${wp.name} ⭐`, d.x, d.y + bob - 36);
+        }
+
+        // Sparkles rising
+        if (Math.random() < 0.15) {
+          particles.push({
+            x: d.x + (Math.random() - 0.5) * 36,
+            y: d.y + bob + (Math.random() - 0.5) * 12,
+            vx: (Math.random() - 0.5) * 1,
+            vy: -1.2 - Math.random() * 1.5,
+            color: '#facc15',
+            size: Math.random() * 4 + 2,
+            alpha: 1.0,
+            decay: 0.04,
+          });
+        }
+      } else {
+        // Drop Shadow
+        drawShadow(d.x, d.y + 18, 22);
+
+        // Glowing aura
+        CTX.fillStyle = d.info.color;
+        CTX.shadowColor = d.info.color;
+        CTX.shadowBlur = 18;
+        CTX.beginPath();
+        CTX.arc(d.x, d.y + bob, 26, 0, Math.PI * 2);
+        CTX.fill();
+
+        // Border ring
+        CTX.strokeStyle = '#ffffff';
+        CTX.lineWidth = 3;
+        CTX.stroke();
+
+        // Icon
+        CTX.font = '24px Rajdhani, sans-serif';
+        CTX.textAlign = 'center';
+        CTX.textBaseline = 'middle';
+        CTX.fillText(d.info.icon, d.x, d.y + bob);
+      }
+
       CTX.restore();
     });
 
@@ -1906,15 +2578,45 @@
       }
     }
 
-    // Bullets
+    // Bullets (Sprite-based rendering with glow)
     bullets.forEach((b) => {
       CTX.save();
-      CTX.fillStyle = b.color;
-      CTX.shadowColor = b.color;
-      CTX.shadowBlur = 12;
-      CTX.beginPath();
-      CTX.arc(b.x, b.y, b.size, 0, Math.PI * 2);
-      CTX.fill();
+      CTX.translate(b.x, b.y);
+      const bAngle = Math.atan2(b.vy, b.vx);
+      CTX.rotate(bAngle);
+
+      const spriteImg = IMAGES[b.sprite];
+      if (spriteImg) {
+        CTX.shadowColor = b.color;
+        CTX.shadowBlur = 14;
+
+        let bw = b.size * 3.4;
+        let bh = b.size * 2.2;
+        if (b.isSniper || b.sprite === 'bullet_laser') {
+          bw = 64;
+          bh = 18;
+        } else if (b.isPlasma || b.sprite === 'bullet_plasma') {
+          bw = 38;
+          bh = 30;
+        } else if (b.isExplosive || b.sprite === 'bullet_rocket') {
+          bw = 46;
+          bh = 22;
+        } else if (b.sprite === 'bullet_dart_gold' || b.sprite === 'bullet_heavy_dart') {
+          bw = 36;
+          bh = 16;
+        } else if (b.sprite === 'bullet_orb_red' || b.sprite === 'bullet_pellet_gold') {
+          bw = b.size * 2.5;
+          bh = b.size * 2.5;
+        }
+        CTX.drawImage(spriteImg, -bw / 2, -bh / 2, bw, bh);
+      } else {
+        CTX.fillStyle = b.color;
+        CTX.shadowColor = b.color;
+        CTX.shadowBlur = 12;
+        CTX.beginPath();
+        CTX.arc(0, 0, b.size, 0, Math.PI * 2);
+        CTX.fill();
+      }
       CTX.restore();
     });
 
@@ -2237,14 +2939,72 @@
         heartsContainer.appendChild(heart);
       }
     }
+
+    // Glowing Health Bar Fill (matching demo_ui.png)
+    const healthBarFill = document.getElementById('healthBarFill');
+    if (healthBarFill) {
+      const pct = Math.max(0, Math.min(100, (player.lives / 3) * 100));
+      healthBarFill.style.width = `${pct}%`;
+    }
+  }
+
+  function renderWeaponsDock() {
+    const container = document.querySelector('.weapons-container');
+    if (!container) return;
+    container.innerHTML = '';
+
+    unlockedWeapons.forEach((id) => {
+      const wp = WEAPONS[id];
+      if (!wp) return;
+      const btn = document.createElement('div');
+      btn.id = `wpBtn${id}`;
+      btn.className = `weapon-btn${id === currentWeaponId ? ' active' : ''}`;
+      btn.title = `${wp.name} [${id}]`;
+      btn.innerHTML = `
+        <span class="weapon-key">[${id}]</span>
+        <img src="assets/${wp.key}.png" alt="${wp.shortName || wp.name}">
+        <span class="weapon-name">${wp.shortName || wp.name}</span>
+      `;
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        selectWeapon(id);
+      });
+      btn.addEventListener('touchstart', (e) => {
+        e.stopPropagation();
+        selectWeapon(id);
+      }, { passive: true });
+      btn.addEventListener('touchend', (e) => {
+        e.stopPropagation();
+      }, { passive: true });
+      container.appendChild(btn);
+    });
+
+    // Slider arrows visibility (>3 weapons)
+    const slideLeftBtn = document.getElementById('wpSlideLeft');
+    const slideRightBtn = document.getElementById('wpSlideRight');
+    if (slideLeftBtn && slideRightBtn) {
+      if (unlockedWeapons.length > 3) {
+        slideLeftBtn.classList.remove('hidden');
+        slideRightBtn.classList.remove('hidden');
+      } else {
+        slideLeftBtn.classList.add('hidden');
+        slideRightBtn.classList.add('hidden');
+      }
+    }
+
+    const quickName = document.getElementById('quickSwitchName');
+    if (quickName && WEAPONS[currentWeaponId]) {
+      quickName.innerText = WEAPONS[currentWeaponId].shortName || WEAPONS[currentWeaponId].name;
+    }
   }
 
   function updateWeaponUI() {
-    [1, 2, 3].forEach((id) => {
+    unlockedWeapons.forEach((id) => {
       const btn = document.getElementById(`wpBtn${id}`);
       if (btn) {
         if (id === currentWeaponId) {
           btn.classList.add('active');
+          btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
         } else {
           btn.classList.remove('active');
         }
@@ -2253,7 +3013,7 @@
 
     const quickName = document.getElementById('quickSwitchName');
     if (quickName && WEAPONS[currentWeaponId]) {
-      quickName.innerText = WEAPONS[currentWeaponId].name;
+      quickName.innerText = WEAPONS[currentWeaponId].shortName || WEAPONS[currentWeaponId].name;
     }
   }
 
@@ -2347,16 +3107,6 @@
     document.getElementById('muteBtn').innerText = SOUNDS.muted ? '🔇' : '🔊';
   });
 
-  [1, 2, 3].forEach((id) => {
-    const btn = document.getElementById(`wpBtn${id}`);
-    if (btn) {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        selectWeapon(id);
-      });
-    }
-  });
-
   // Quick Weapon Switch button
   const quickSwitchBtn = document.getElementById('quickSwitchBtn');
   if (quickSwitchBtn) {
@@ -2423,14 +3173,40 @@
     });
   }
 
+  // Weapon Collection Slider Navigation Arrows
+  const slideLeftBtn = document.getElementById('wpSlideLeft');
+  const slideRightBtn = document.getElementById('wpSlideRight');
+  const weaponsContainer = document.getElementById('weaponsContainer');
+  if (slideLeftBtn && weaponsContainer) {
+    slideLeftBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      weaponsContainer.scrollBy({ left: -140, behavior: 'smooth' });
+    });
+    slideLeftBtn.addEventListener('touchstart', (e) => {
+      e.stopPropagation();
+      weaponsContainer.scrollBy({ left: -140, behavior: 'smooth' });
+    }, { passive: true });
+  }
+  if (slideRightBtn && weaponsContainer) {
+    slideRightBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      weaponsContainer.scrollBy({ left: 140, behavior: 'smooth' });
+    });
+    slideRightBtn.addEventListener('touchstart', (e) => {
+      e.stopPropagation();
+      weaponsContainer.scrollBy({ left: 140, behavior: 'smooth' });
+    }, { passive: true });
+  }
+
   // Stop touch propagation on HUD buttons
-  document.querySelectorAll('.hud-btn, .weapon-btn, .action-btn, .hud-action-pill, .fire-action-btn').forEach((el) => {
+  document.querySelectorAll('.hud-btn, .weapon-btn, .action-btn, .hud-action-pill, .fire-action-btn, .slider-arrow').forEach((el) => {
     el.addEventListener('touchstart', (e) => e.stopPropagation(), { passive: true });
     el.addEventListener('touchend', (e) => e.stopPropagation(), { passive: true });
   });
 
   loadAssets().then(() => {
     updateHUD();
+    renderWeaponsDock();
     updateWeaponUI();
     updateAutoFireUI();
     document.getElementById('startOverlay').classList.remove('hidden');
