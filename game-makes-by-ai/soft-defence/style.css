@@ -64,7 +64,7 @@ html, body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 20px 20px 22px 20px;
+  padding: max(16px, env(safe-area-inset-top, 16px)) max(16px, env(safe-area-inset-right, 16px)) max(18px, env(safe-area-inset-bottom, 18px)) max(16px, env(safe-area-inset-left, 16px));
 }
 
 /* --- TOP BAR --- */
@@ -247,58 +247,41 @@ html, body {
   transition: width 0.1s linear;
 }
 
-/* --- BOTTOM ROW: BOTTOM-LEFT PAUSE & WEAPONS DOCK --- */
+/* --- BOTTOM ROW: WEAPONS DOCK & MOBILE COMBAT CONTROLS --- */
 .bottom-row {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
   width: 100%;
   pointer-events: none;
-}
-
-.pause-btn-bottom {
-  width: 50px;
-  height: 50px;
-  font-size: 22px;
-  border-radius: 14px;
-  pointer-events: auto;
-  background: rgba(24, 21, 36, 0.9);
-  border: 1.5px solid rgba(255, 255, 255, 0.22);
-}
-
-.pause-btn-bottom:hover {
-  background: rgba(56, 189, 248, 0.25);
-  border-color: #38bdf8;
+  gap: 12px;
 }
 
 .weapons-container {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   background: rgba(24, 21, 36, 0.88);
   backdrop-filter: blur(12px);
-  padding: 8px 14px;
-  border-radius: 18px;
+  -webkit-backdrop-filter: blur(12px);
+  padding: 6px 10px;
+  border-radius: 16px;
   border: 1.5px solid rgba(255, 255, 255, 0.18);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
   pointer-events: auto;
-}
-
-.bottom-spacer {
-  width: 50px;
-  pointer-events: none;
+  z-index: 10;
 }
 
 .weapon-btn {
   background: rgba(255, 255, 255, 0.07);
   border: 2px solid transparent;
-  border-radius: 12px;
-  padding: 6px 12px;
+  border-radius: 10px;
+  padding: 4px 8px;
   display: flex;
   flex-direction: column;
   align-items: center;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-  min-width: 82px;
+  min-width: 62px;
 }
 
 .weapon-btn:hover {
@@ -308,31 +291,167 @@ html, body {
 .weapon-btn.active {
   background: rgba(56, 189, 248, 0.22);
   border-color: #38bdf8;
-  transform: translateY(-4px);
-  box-shadow: 0 6px 18px rgba(56, 189, 248, 0.5);
+  transform: translateY(-3px);
+  box-shadow: 0 4px 14px rgba(56, 189, 248, 0.5);
 }
 
 .weapon-key {
-  font-size: 10px;
+  font-size: 9px;
   background: rgba(255, 255, 255, 0.18);
   border-radius: 4px;
-  padding: 1px 6px;
+  padding: 1px 4px;
   font-weight: 700;
   margin-bottom: 2px;
 }
 
 .weapon-name {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.5px;
   text-align: center;
 }
 
 .weapon-btn img {
-  height: 28px;
+  height: 24px;
   object-fit: contain;
   margin: 2px 0;
-  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.6));
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
+}
+
+/* --- MOBILE COMBAT DOCK (RIGHT SIDE) --- */
+.mobile-combat-dock {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  pointer-events: auto;
+  z-index: 10;
+}
+
+.combat-sub-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.hud-action-pill {
+  background: rgba(24, 21, 36, 0.88);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1.5px solid rgba(255, 255, 255, 0.18);
+  border-radius: 18px;
+  color: #e2e8f0;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  padding: 5px 10px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  pointer-events: auto;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.hud-action-pill:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.hud-action-pill:active {
+  transform: scale(0.93);
+}
+
+.hud-action-pill.active {
+  border-color: #4ade80;
+  color: #4ade80;
+  background: rgba(34, 197, 94, 0.2);
+  box-shadow: 0 0 12px rgba(74, 222, 128, 0.4);
+}
+
+.pill-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #64748b;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hud-action-pill.active .pill-dot {
+  background: #4ade80;
+  box-shadow: 0 0 6px #4ade80;
+}
+
+.switch-pill {
+  border-color: rgba(56, 189, 248, 0.35);
+}
+
+.switch-pill:hover, .switch-pill:active {
+  border-color: #38bdf8;
+  color: #38bdf8;
+}
+
+.pill-icon {
+  font-size: 13px;
+  line-height: 1;
+}
+
+/* MAIN FIRE / AIM JOYSTICK BUTTON */
+.fire-action-btn {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  border: 2.5px solid rgba(239, 68, 68, 0.85);
+  background: radial-gradient(circle, rgba(239, 68, 68, 0.35) 0%, rgba(24, 21, 36, 0.95) 75%);
+  box-shadow: 0 0 18px rgba(239, 68, 68, 0.4), 0 6px 20px rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  pointer-events: auto;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.1s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  touch-action: none;
+}
+
+.fire-action-btn:hover {
+  border-color: #f87171;
+  box-shadow: 0 0 24px rgba(239, 68, 68, 0.6), 0 6px 20px rgba(0, 0, 0, 0.6);
+}
+
+.fire-action-btn:active,
+.fire-action-btn.pressed {
+  transform: scale(0.92);
+  border-color: #ff2a4b;
+  box-shadow: 0 0 32px rgba(255, 42, 75, 0.85), 0 4px 15px rgba(0, 0, 0, 0.8);
+  background: radial-gradient(circle, rgba(239, 68, 68, 0.65) 0%, rgba(24, 21, 36, 0.98) 75%);
+}
+
+.fire-btn-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.fire-icon {
+  font-size: 26px;
+  line-height: 1;
+  filter: drop-shadow(0 0 6px #ef4444);
+}
+
+.fire-text {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: #ffedd5;
+  margin-top: 2px;
 }
 
 /* --- OVERLAYS --- */
@@ -462,4 +581,49 @@ html, body {
 
 .action-btn:active {
   transform: translateY(1px);
+}
+
+/* --- RESPONSIVE MOBILE SCALING --- */
+@media (max-width: 480px) {
+  .weapon-btn {
+    min-width: 50px;
+    padding: 3px 6px;
+  }
+  .weapon-btn img {
+    height: 20px;
+  }
+  .weapon-name {
+    font-size: 10px;
+  }
+  .weapon-key {
+    display: none;
+  }
+  .fire-action-btn {
+    width: 68px;
+    height: 68px;
+  }
+  .fire-icon {
+    font-size: 22px;
+  }
+  .hud-action-pill {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+  .lives-card-compact {
+    padding: 6px 10px;
+  }
+  .score-value {
+    font-size: 34px;
+  }
+  .modal-card {
+    padding: 24px 18px;
+    gap: 12px;
+  }
+  .modal-title {
+    font-size: 28px;
+  }
+  .controls-hint {
+    font-size: 13px;
+    padding: 10px 12px;
+  }
 }
