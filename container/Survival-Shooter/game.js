@@ -814,8 +814,8 @@
       icon: '👥',
       name: 'SHADOW CLONE',
       color: '#c084fc',
-      duration: 10,
-      desc: 'Clones multiply firepower simultaneously!',
+      duration: 30,
+      desc: 'Clones multiply firepower simultaneously for 30s!',
     },
     VANISH: {
       id: 'VANISH',
@@ -1034,12 +1034,12 @@
   // --- PROCEDURAL ENVIRONMENT PROPS (ROCKS, METAL BARRICADES, PUDDLES) ---
   const PROP_CHUNK_SIZE = 640;
   const PROP_TYPES = [
-    { key: 'prop_rock_large', scale: 0.45, isObstacle: true, obstacleRadius: 62, shadowRadius: 75, shadowY: 28 },
-    { key: 'prop_rock_medium', scale: 0.50, isObstacle: true, obstacleRadius: 44, shadowRadius: 50, shadowY: 20 },
-    { key: 'prop_broken_metal', scale: 0.45, isObstacle: true, obstacleRadius: 48, shadowRadius: 54, shadowY: 18 },
+    { key: 'prop_rock_large', scale: 0.45, isObstacle: true, obstacleRadius: 70, shadowRadius: 75, shadowY: 28 },
+    { key: 'prop_rock_medium', scale: 0.50, isObstacle: true, obstacleRadius: 55, shadowRadius: 50, shadowY: 20 },
+    { key: 'prop_broken_metal', scale: 0.45, isObstacle: true, obstacleRadius: 52, shadowRadius: 54, shadowY: 18 },
     { key: 'prop_water_puddle', scale: 0.55, isPuddle: true, isObstacle: false, shadowRadius: 0, shadowY: 0 },
-    { key: 'prop_rock_cluster', scale: 0.52, isObstacle: false, shadowRadius: 30, shadowY: 14 },
-    { key: 'prop_rock_small', scale: 0.50, isObstacle: false, shadowRadius: 20, shadowY: 10 },
+    { key: 'prop_rock_cluster', scale: 0.52, isObstacle: true, obstacleRadius: 48, shadowRadius: 30, shadowY: 14 },
+    { key: 'prop_rock_small', scale: 0.50, isObstacle: true, obstacleRadius: 38, shadowRadius: 20, shadowY: 10 },
   ];
 
   const chunkPropsCache = new Map();
@@ -1099,7 +1099,7 @@
   let unlockedWeapons = [1]; // Start with only 1 weapon in hand!
 
   // Wave Progression State
-  let waveState = 'REGULAR'; // 'REGULAR', 'BOSS_INCOMING', 'BOSS_FIGHT', 'PORTAL_OPENING', 'PORTAL_PULL', 'TIME_WARP', 'WAVE_ARRIVAL'
+  let waveState = 'REGULAR'; // 'REGULAR', 'BOSS_INCOMING', 'BOSS_FIGHT', 'BOSS_REWARD', 'WAVE_ARRIVAL'
   let waveRegularKills = 0;
   let waveBossCountdown = 0;
   let waveBoss = null;
@@ -1248,22 +1248,45 @@
     );
   }
 
-  function getNearestEnemy() {
-    let nearest = null;
-    let minDist = Infinity;
+  function getSmartTarget() {
+    // 1st Priority: Nearest incoming enemy bullet heading towards player
+    let nearestBullet = null;
+    let minBulletDist = 680;
+
+    for (let i = 0; i < enemyBullets.length; i++) {
+      const eb = enemyBullets[i];
+      const d = Math.hypot(eb.x - player.x, eb.y - player.y);
+      if (d < minBulletDist) {
+        minBulletDist = d;
+        nearestBullet = {
+          x: eb.x,
+          y: eb.y,
+          radius: eb.radius || 8,
+          hp: 1,
+          isBullet: true,
+        };
+      }
+    }
+
+    if (nearestBullet) {
+      return nearestBullet;
+    }
+
+    // 2nd Priority: Nearest enemy
+    let nearestEnemy = null;
+    let minEnemyDist = Infinity;
     for (let i = 0; i < enemies.length; i++) {
       const e = enemies[i];
       if (e.hp <= 0 || e.isDying) continue;
-      // Strictly must be within visible screen viewport
       if (!isEnemyOnScreen(e, 0)) continue;
 
       const d = Math.hypot(e.x - player.x, e.y - player.y);
-      if (d < minDist) {
-        minDist = d;
-        nearest = e;
+      if (d < minEnemyDist) {
+        minEnemyDist = d;
+        nearestEnemy = e;
       }
     }
-    return nearest;
+    return nearestEnemy;
   }
 
   function cycleWeapon() {
@@ -1712,7 +1735,7 @@
     });
   }
 
-  function spawnFieldWeaponDrop(weaponId) {
+  function spawnFieldWeaponDrop(weaponId, isBossReward = false) {
     if (!WEAPONS[weaponId]) return;
     const angle = Math.random() * Math.PI * 2;
     const dist = 320 + Math.random() * 140;
@@ -1725,6 +1748,7 @@
       weaponId: weaponId,
       bounceTick: Math.random() * Math.PI * 2,
       life: 3600, // 60s
+      isBossReward: isBossReward,
     });
     createShockwave(dropX, dropY, '#facc15', 220);
     createSparks(dropX, dropY, 40, '#facc15');
@@ -1938,13 +1962,13 @@
       // Continuous doubling: 1 -> 2 -> 4 -> 8 -> 16 -> 32
       const nextCount = cloneSquad.count === 1 ? 2 : cloneSquad.count * 2;
       cloneSquad.count = Math.min(32, nextCount);
-      cloneSquad.timer = 10;
-      cloneSquad.maxTimer = 10;
+      cloneSquad.timer = 30;
+      cloneSquad.maxTimer = 30;
 
       screenShake = 14 + Math.min(cloneSquad.count * 2, 22);
       createShockwave(player.x, player.y, '#c084fc', 200 + cloneSquad.count * 12);
       createSparks(player.x, player.y, 35 + cloneSquad.count * 4, '#c084fc');
-      addFloatText(player.x, player.y - 70, `👥 CLONE SQUAD x${cloneSquad.count}! (10s)`, '#c084fc', 32);
+      addFloatText(player.x, player.y - 70, `👥 CLONE SQUAD x${cloneSquad.count}! (30s)`, '#c084fc', 32);
 
       initOrUpdateClones();
       updatePowerupTray();
@@ -1954,7 +1978,7 @@
       createShockwave(player.x, player.y, '#eab308', 900);
       addFloatText(player.x, player.y - 70, 'TACTICAL NUKE! 💥', '#eab308', 36);
 
-      // Kill all visible enemies
+      // Kill all visible minion enemies; deal chunk damage to Boss (does NOT insta-delete Boss)
       const camLeft = camera.x - 100;
       const camRight = camera.x + V_WIDTH + 100;
       const camTop = camera.y - 100;
@@ -1963,13 +1987,19 @@
       for (let i = enemies.length - 1; i >= 0; i--) {
         const e = enemies[i];
         if (!e.isDying && e.x >= camLeft && e.x <= camRight && e.y >= camTop && e.y <= camBottom) {
-          const proto = ENEMY_TYPES[e.typeId];
-          kills++;
-          score += proto.score;
-          addFloatText(e.x, e.y - 30, `+${proto.score}`, proto.color, 26);
-          createEnemyDeathFX(e.x, e.y, proto);
-          checkEnemyDrop(e.x, e.y, e);
-          enemies.splice(i, 1);
+          if (e.isWaveBoss) {
+            e.hp -= 400;
+            e.hitTimer = 10;
+            addFloatText(e.x, e.y - 40, '-400 NUKE BLAST!', '#ef4444', 32);
+          } else {
+            const proto = ENEMY_TYPES[e.typeId] || ENEMY_TYPES[1];
+            kills++;
+            score += proto.score;
+            addFloatText(e.x, e.y - 30, `+${proto.score}`, proto.color, 26);
+            createEnemyDeathFX(e.x, e.y, proto);
+            checkEnemyDrop(e.x, e.y, e);
+            enemies.splice(i, 1);
+          }
         }
       }
       updateHUD();
@@ -2329,7 +2359,7 @@
 
     const scale = Math.min(1.48, Math.max(0.92, proto.scale * 1.35 + (currentWave - 1) * 0.025));
     const radius = Math.round(proto.radius * (scale / proto.scale));
-    const speed = Math.min(2.5, Math.max(1.4, proto.speed * 0.85 + currentWave * 0.035));
+    const speed = Math.min(3.2, Math.max(2.0, proto.speed * 1.1 + currentWave * 0.05));
 
     const bossObj = {
       isWaveBoss: true,
@@ -2374,7 +2404,7 @@
   // --- PLAYER HURT & 3 LIVES ---
   function hurtPlayer() {
     if (player.invincibleTimer > 0 || player.dead || activePowerups.VANISH > 0 ||
-        waveState === 'PORTAL_OPENING' || waveState === 'PORTAL_PULL' || waveState === 'TIME_WARP' || waveState === 'WAVE_ARRIVAL') return;
+        waveState === 'BOSS_REWARD' || waveState === 'WAVE_ARRIVAL') return;
 
     // Shield Absorb
     if (activePowerups.SHIELD) {
@@ -2487,198 +2517,94 @@
         }
       }
     } else if (waveState === 'BOSS_INCOMING') {
-      waveBossCountdown -= dt;
-      if (waveBossCountdown <= 0) {
-        waveState = 'BOSS_FIGHT';
-        waveBoss = spawnWaveBoss(wave);
-        waveBanner = { text: `⚔️ BOSS DUEL: ${waveBoss.bossName}!`, timer: 180 };
-      }
+      waveState = 'BOSS_FIGHT';
+      waveBoss = spawnWaveBoss(wave);
+      waveBanner = { text: `⚔️ BOSS DUEL: ${waveBoss.bossName}!`, timer: 140 };
     } else if (waveState === 'BOSS_FIGHT') {
-      // Check if boss has been eliminated
-      if (!waveBoss || waveBoss.hp <= 0 || waveBoss.isDying) {
-        waveState = 'PORTAL_OPENING';
-        waveCinematicTimer = 1.4;
-        portal.active = true;
-        portal.x = waveBoss ? waveBoss.x : player.x;
-        portal.y = waveBoss ? waveBoss.y : player.y;
-        portal.radius = 0;
-        portal.swirl = 0;
-        portal.particles = [];
+      // Boss stays active for infinite time until player actually defeats the boss (hp <= 0)
+      if (waveBoss && (waveBoss.hp <= 0 || waveBoss.isDying)) {
+        const rewardX = waveBoss ? waveBoss.x : player.x;
+        const rewardY = waveBoss ? waveBoss.y : player.y;
 
         score += 1000 * wave;
-        SOUNDS.playPortalOpen();
-        screenShake = 28;
-        waveBanner = { text: `🌀 TIME RIFT OPENING! ENTERING NEXT ERA... 🌀`, timer: 180 };
-        addFloatText(portal.x, portal.y - 120, `+${1000 * wave} BOSS BOUNTY! 🏆`, '#facc15', 38);
+        SOUNDS.playNuke();
+        screenShake = 0; // Zero screen shake delay
 
-        // Clear all enemy projectiles and eliminate weak minions
-        enemyBullets.length = 0;
-        enemies.forEach((e) => {
-          if (!e.isDying && !e.isWaveBoss) {
-            e.isDying = true;
-            e.animState = 'death';
-            e.animFrame = 0;
-            createEnemyDeathFX(e.x, e.y, ENEMY_TYPES[e.typeId] || ENEMY_TYPES[1]);
-          }
-        });
-
-        // Guaranteed Boss Spoils of War!
+        // --- RANDOM BOSS REWARD SELECTION ---
         const maxTier = wave >= 14 ? 8 : (wave >= 12 ? 7 : (wave >= 10 ? 6 : (wave >= 8 ? 5 : (wave >= 6 ? 4 : (wave >= 4 ? 3 : (wave >= 2 ? 2 : 1))))));
         const availableLocked = [];
         for (let id = 2; id <= maxTier; id++) {
           if (!unlockedWeapons.includes(id)) availableLocked.push(id);
         }
-        if (availableLocked.length > 0) {
-          spawnFieldWeaponDrop(availableLocked[0]);
-        } else {
-          let rewardKey = 'RAPID';
-          if (wave >= 17) rewardKey = 'VANISH';
-          else if (wave >= 14) rewardKey = 'CLONE';
-          else rewardKey = 'LIFE';
 
-          const pInfo = POWERUP_TYPES[rewardKey];
+        // Build possible reward pool
+        const rewardPool = [];
+        if (availableLocked.length > 0) rewardPool.push('WEAPON');
+        rewardPool.push('POWER', 'LIFE', 'CLONE');
+
+        const chosenReward = rewardPool[Math.floor(Math.random() * rewardPool.length)];
+
+        if (chosenReward === 'WEAPON') {
+          // Drop next locked weapon
+          spawnFieldWeaponDrop(availableLocked[0], true);
+          addFloatText(rewardX, rewardY - 60, '🔫 NEW WEAPON!', '#facc15', 30);
+        } else if (chosenReward === 'LIFE') {
+          // Drop extra life
+          const pInfo = POWERUP_TYPES['LIFE'];
           drops.push({
-            x: portal.x + (Math.random() - 0.5) * 140,
-            y: portal.y + (Math.random() - 0.5) * 140,
-            type: rewardKey,
+            x: rewardX + (Math.random() - 0.5) * 80,
+            y: rewardY + (Math.random() - 0.5) * 80,
+            type: 'LIFE',
             info: pInfo,
             bounceTick: 0,
             life: 2400,
+            isBossReward: true,
           });
-        }
-        updateHUD();
-      }
-    } else if (waveState === 'PORTAL_OPENING') {
-      waveCinematicTimer -= dt;
-      portal.radius += (portal.maxRadius - portal.radius) * 0.12;
-      portal.swirl += dt * 4.5;
-
-      if (Math.random() < 0.65) {
-        const pAng = Math.random() * Math.PI * 2;
-        const pDist = portal.radius + 60 + Math.random() * 80;
-        portal.particles.push({
-          x: portal.x + Math.cos(pAng) * pDist,
-          y: portal.y + Math.sin(pAng) * pDist,
-          ang: pAng,
-          dist: pDist,
-          speed: 3.5 + Math.random() * 4,
-          size: Math.random() * 5 + 2,
-          color: Math.random() < 0.5 ? '#38bdf8' : '#c084fc',
-        });
-      }
-
-      if (waveCinematicTimer <= 0) {
-        waveState = 'PORTAL_PULL';
-        waveCinematicTimer = 1.6;
-        SOUNDS.playTimeWarp();
-        waveBanner = { text: `⚡ ENTERING SUBTERRANEAN TIME TUNNEL... ⚡`, timer: 140 };
-      }
-    } else if (waveState === 'PORTAL_PULL') {
-      waveCinematicTimer -= dt;
-      portal.swirl += dt * 6.5;
-
-      const pToPortalDx = portal.x - player.x;
-      const pToPortalDy = portal.y - player.y;
-      const pDist = Math.hypot(pToPortalDx, pToPortalDy) || 1;
-
-      // Smooth gravitational vacuum suction into tunnel
-      const pullSpeed = Math.min(24, Math.max(8, pDist * 0.18));
-      player.x += (pToPortalDx / pDist) * pullSpeed;
-      player.y += (pToPortalDy / pDist) * pullSpeed;
-      player.vx = 0;
-      player.vy = 0;
-
-      if (cloneSquad.count > 1) {
-        cloneSquad.clones.forEach((clone) => {
-          const cdx = portal.x - clone.x;
-          const cdy = portal.y - clone.y;
-          const cDist = Math.hypot(cdx, cdy) || 1;
-          clone.x += (cdx / cDist) * pullSpeed;
-          clone.y += (cdy / cDist) * pullSpeed;
-        });
-      }
-
-      // Gravitational vortex suction particles
-      if (Math.random() < 0.75) {
-        const pAng = Math.random() * Math.PI * 2;
-        const pDist = portal.radius + 40 + Math.random() * 80;
-        portal.particles.push({
-          x: portal.x + Math.cos(pAng) * pDist,
-          y: portal.y + Math.sin(pAng) * pDist,
-          ang: pAng,
-          dist: pDist,
-          speed: 4.5 + Math.random() * 5,
-          size: Math.random() * 5 + 2,
-          color: Math.random() < 0.5 ? '#38bdf8' : '#c084fc',
-        });
-      }
-
-      // Vacuum collect nearby drops as player plunges into rift
-      for (let dIdx = drops.length - 1; dIdx >= 0; dIdx--) {
-        const d = drops[dIdx];
-        const distToP = Math.hypot(player.x - d.x, player.y - d.y);
-        const distToPort = Math.hypot(portal.x - d.x, portal.y - d.y);
-        if (distToP < 140 || distToPort < portal.radius * 0.85) {
-          applyPowerup(d);
-          drops.splice(dIdx, 1);
-        }
-      }
-
-      if (pDist < 45 || waveCinematicTimer <= 0) {
-        createShockwave(portal.x, portal.y, '#38bdf8', 350);
-        screenShake = 24;
-        waveState = 'TIME_WARP';
-        waveCinematicTimer = 1.8;
-      }
-    } else if (waveState === 'TIME_WARP') {
-      waveCinematicTimer -= dt;
-      screenShake = Math.max(screenShake, 8);
-      player.x = portal.x;
-      player.y = portal.y;
-      player.vx = 0;
-      player.vy = 0;
-
-      if (waveCinematicTimer <= 0) {
-        wave++;
-        waveState = 'WAVE_ARRIVAL';
-        waveCinematicTimer = 0.85;
-
-        // Player drops from the sky onto the new arena
-        player.x = portal.x;
-        player.y = portal.y;
-        player.vx = 0;
-        player.vy = 0;
-
-        if (wave === 15) {
-          waveBanner = { text: 'WAVE 15 - SHADOW CLONE ABILITY UNLOCKED! 👥', timer: 200 };
-          const info = POWERUP_TYPES['CLONE'];
-          drops.push({ x: player.x + 80, y: player.y, type: 'CLONE', info, bounceTick: 0, life: 1800 });
-        } else if (wave === 18) {
-          waveBanner = { text: 'WAVE 18 - GHOST CLOAK ABILITY UNLOCKED! 👻', timer: 200 };
-          const info = POWERUP_TYPES['VANISH'];
-          drops.push({ x: player.x + 80, y: player.y, type: 'VANISH', info, bounceTick: 0, life: 1800 });
+          addFloatText(rewardX, rewardY - 60, '❤️ EXTRA LIFE!', '#ff2a4b', 30);
+        } else if (chosenReward === 'CLONE') {
+          // Drop clone powerup (lasts 30s)
+          const pInfo = POWERUP_TYPES['CLONE'];
+          drops.push({
+            x: rewardX + (Math.random() - 0.5) * 80,
+            y: rewardY + (Math.random() - 0.5) * 80,
+            type: 'CLONE',
+            info: pInfo,
+            bounceTick: 0,
+            life: 2400,
+            isBossReward: true,
+          });
+          addFloatText(rewardX, rewardY - 60, '👥 SHADOW CLONE (30s)!', '#c084fc', 30);
         } else {
-          waveBanner = { text: `⚔️ TIME WARP COMPLETE! ARRIVED: WAVE ${wave}!`, timer: 180 };
+          // Drop random power boost
+          const powerOptions = ['RAPID', 'SPEED', 'SHIELD', 'NUKE'];
+          const powerKey = powerOptions[Math.floor(Math.random() * powerOptions.length)];
+          const pInfo = POWERUP_TYPES[powerKey];
+          drops.push({
+            x: rewardX + (Math.random() - 0.5) * 80,
+            y: rewardY + (Math.random() - 0.5) * 80,
+            type: powerKey,
+            info: pInfo,
+            bounceTick: 0,
+            life: 2400,
+            isBossReward: true,
+          });
+          addFloatText(rewardX, rewardY - 60, `⚡ ${pInfo.name}!`, pInfo.color, 30);
         }
 
-        SOUNDS.playMeteorLanding();
-        createShockwave(player.x, player.y, '#38bdf8', 440);
-        createSparks(player.x, player.y, 60, '#38bdf8');
-        screenShake = 30;
-        updateHUD();
-      }
-    } else if (waveState === 'WAVE_ARRIVAL') {
-      waveCinematicTimer -= dt;
-      player.vx = 0;
-      player.vy = 0;
-      if (waveCinematicTimer <= 0) {
+        // Instantly advance wave with zero delay!
+        wave++;
         waveState = 'REGULAR';
         waveTimer = 0;
         waveRegularKills = 0;
         waveBoss = null;
-        portal.active = false;
-        portal.particles = [];
-        spawnInterval = Math.max(500, 1400 - (wave - 1) * 60);
+        spawnInterval = Math.max(300, 1400 - (wave - 1) * 60);
+
+        waveBanner = { text: `⚔️ WAVE ${wave} INCOMING! GET READY!`, timer: 160 };
+        SOUNDS.playMeteorLanding();
+        createShockwave(rewardX, rewardY, '#facc15', 300);
+        createSparks(rewardX, rewardY, 40, '#facc15');
+
+        updateHUD();
       }
     }
     if (waveBanner.timer > 0) waveBanner.timer--;
@@ -2760,10 +2686,10 @@
     }
 
     // Cinematic Transition Check: suppress user control & shooting
-    const isCinematicTransition = (waveState === 'PORTAL_PULL' || waveState === 'TIME_WARP' || waveState === 'WAVE_ARRIVAL');
+    const isCinematicTransition = (waveState === 'BOSS_REWARD' || waveState === 'WAVE_ARRIVAL');
 
-    // Update Smart Nearest Enemy
-    lockedEnemy = isCinematicTransition ? null : getNearestEnemy();
+    // Update Smart Nearest Target (1st Priority: incoming enemy bullet, 2nd Priority: enemy)
+    lockedEnemy = isCinematicTransition ? null : getSmartTarget();
     lockReticleTick += dt * 4;
 
     // Movement Inputs (WASD + Virtual Joystick)
@@ -2972,7 +2898,56 @@
         });
       }
 
+      // Check collision against obstacle stone props FIRST
+      const bChunkX = Math.floor(b.x / PROP_CHUNK_SIZE);
+      const bChunkY = Math.floor(b.y / PROP_CHUNK_SIZE);
+      let hitStoneB = false;
+      for (let cx = bChunkX - 1; cx <= bChunkX + 1 && !hitStoneB; cx++) {
+        for (let cy = bChunkY - 1; cy <= bChunkY + 1 && !hitStoneB; cy++) {
+          const cProps = getPropsForChunk(cx, cy);
+          for (let pi = 0; pi < cProps.length; pi++) {
+            const pr = cProps[pi];
+            if (!pr.isObstacle) continue;
+            const pdx = b.x - pr.x;
+            const pdy = b.y - (pr.y + (pr.shadowY || 0) * 0.35);
+            if (Math.hypot(pdx, pdy) < pr.obstacleRadius + b.size) {
+              createSparks(b.x, b.y, 8, '#94a3b8');
+              if (b.isExplosive) {
+                createShockwave(b.x, b.y, '#f97316', b.blastRadius || 150);
+                createSparks(b.x, b.y, 20, '#fb923c');
+                SOUNDS.playExplosion(false);
+              }
+              hitStoneB = true;
+              break;
+            }
+          }
+        }
+      }
+      if (hitStoneB) {
+        bullets.splice(i, 1);
+        continue;
+      }
+
       let bulletDead = false;
+
+      // Bullet to Bullet Interception (Fire target 1st enemy bullet)
+      for (let ebi = enemyBullets.length - 1; ebi >= 0; ebi--) {
+        const eb = enemyBullets[ebi];
+        const ebDist = Math.hypot(b.x - eb.x, b.y - eb.y);
+        if (ebDist < b.size + eb.radius + 8) {
+          createSparks(b.x, b.y, 12, '#facc15');
+          createSparks(eb.x, eb.y, 8, '#ef4444');
+          SOUNDS.playHit();
+          enemyBullets.splice(ebi, 1);
+          bulletDead = true;
+          break;
+        }
+      }
+
+      if (bulletDead) {
+        bullets.splice(i, 1);
+        continue;
+      }
 
       for (let j = enemies.length - 1; j >= 0; j--) {
         const e = enemies[j];
@@ -3073,7 +3048,7 @@
 
     if (now - lastSpawnTime > currentSpawnInterval) {
       lastSpawnTime = now;
-      if (waveState === 'REGULAR') {
+      if (waveState === 'REGULAR' || waveState === 'BOSS_FIGHT') {
         for (let s = 0; s < spawnBatch; s++) {
           spawnEnemy();
         }
@@ -3178,6 +3153,14 @@
         }
       }
 
+      // Boss always advances toward player at all times even while shooting!
+      if (e.isWaveBoss && !e.isDying && !player.dead && !isPlayerVanished && e.animState === 'shoot') {
+        const bossMoveAngle = Math.atan2(edy, edx);
+        e.x += Math.cos(bossMoveAngle) * e.speed;
+        e.y += Math.sin(bossMoveAngle) * e.speed;
+        e.facingLeft = edx < 0;
+      }
+
       // Boss Special Attacks (Seismic shockwaves)
       if (e.isWaveBoss && !e.isDying) {
         if (e.shockwaveTimer > 0) e.shockwaveTimer--;
@@ -3209,6 +3192,29 @@
       eb.x += eb.vx;
       eb.y += eb.vy;
       eb.life--;
+
+      // Check collision against obstacle props (large stones/rocks cover)
+      const ebChunkX = Math.floor(eb.x / PROP_CHUNK_SIZE);
+      const ebChunkY = Math.floor(eb.y / PROP_CHUNK_SIZE);
+      let hitStone = false;
+      for (let cx = ebChunkX - 1; cx <= ebChunkX + 1 && !hitStone; cx++) {
+        for (let cy = ebChunkY - 1; cy <= ebChunkY + 1 && !hitStone; cy++) {
+          const cProps = getPropsForChunk(cx, cy);
+          for (let pi = 0; pi < cProps.length; pi++) {
+            const pr = cProps[pi];
+            if (!pr.isObstacle) continue;
+            const pdx = eb.x - pr.x;
+            const pdy = eb.y - (pr.y + (pr.shadowY || 0) * 0.35);
+            if (Math.hypot(pdx, pdy) < pr.obstacleRadius + eb.radius) {
+              createSparks(eb.x, eb.y, 8, '#94a3b8');
+              enemyBullets.splice(i, 1);
+              hitStone = true;
+              break;
+            }
+          }
+        }
+      }
+      if (hitStone) continue;
 
       if (!player.dead && !isPlayerVanished) {
         const pDist = Math.hypot(eb.x - player.x, eb.y - player.y);
@@ -3682,267 +3688,11 @@
 
   // --- QUANTUM GROUND PORTAL & TIME WARP RENDERING ---
   function drawQuantumPortal() {
-    if (!portal.active || portal.radius <= 1) return;
-
-    CTX.save();
-    CTX.translate(portal.x, portal.y);
-
-    const r = portal.radius;
-    const swirl = portal.swirl;
-
-    // 1. Fractured Subterranean Ground Crater (Surongo Opening Rim)
-    CTX.save();
-    CTX.globalAlpha = 0.55;
-    CTX.strokeStyle = '#38bdf8';
-    CTX.lineWidth = 4;
-    CTX.shadowColor = '#38bdf8';
-    CTX.shadowBlur = 20;
-    CTX.beginPath();
-    const crackPoints = 16;
-    for (let i = 0; i <= crackPoints; i++) {
-      const a = (i / crackPoints) * Math.PI * 2;
-      const crackDist = r * (1.12 + Math.sin(i * 3.7 + swirl) * 0.1);
-      const cx = Math.cos(a) * crackDist;
-      const cy = Math.sin(a) * crackDist * 0.72; // Isometric perspective foreshortening
-      if (i === 0) CTX.moveTo(cx, cy);
-      else CTX.lineTo(cx, cy);
-    }
-    CTX.closePath();
-    CTX.stroke();
-    CTX.restore();
-
-    // 2. Deep Subterranean Void Crater (Bottomless Ground Tunnel)
-    CTX.save();
-    const holeGrad = CTX.createRadialGradient(0, 0, 0, 0, 0, r);
-    holeGrad.addColorStop(0, '#020617'); // Pitch black bottomless abyss
-    holeGrad.addColorStop(0.35, '#0b0f19');
-    holeGrad.addColorStop(0.7, '#1e1b4b');
-    holeGrad.addColorStop(0.9, '#38bdf8');
-    holeGrad.addColorStop(1, 'rgba(56, 189, 248, 0)');
-    CTX.fillStyle = holeGrad;
-    CTX.beginPath();
-    CTX.ellipse(0, 0, r, r * 0.72, 0, 0, Math.PI * 2);
-    CTX.fill();
-    CTX.restore();
-
-    // 3. Swirling Accretion Disk / Time Vortex Arms
-    CTX.save();
-    CTX.rotate(swirl);
-    const arms = 4;
-    for (let a = 0; a < arms; a++) {
-      const baseA = (a * Math.PI * 2) / arms;
-      CTX.strokeStyle = a % 2 === 0 ? 'rgba(56, 189, 248, 0.85)' : 'rgba(192, 132, 252, 0.85)';
-      CTX.lineWidth = 3.5;
-      CTX.shadowColor = a % 2 === 0 ? '#38bdf8' : '#c084fc';
-      CTX.shadowBlur = 16;
-      CTX.beginPath();
-      for (let step = 0; step < 28; step++) {
-        const t = step / 28;
-        const armR = r * (0.18 + t * 0.84);
-        const theta = baseA + t * 2.8;
-        const ax = Math.cos(theta) * armR;
-        const ay = Math.sin(theta) * armR * 0.72;
-        if (step === 0) CTX.moveTo(ax, ay);
-        else CTX.lineTo(ax, ay);
-      }
-      CTX.stroke();
-    }
-    CTX.restore();
-
-    // 4. Inner Counter-Rotating Violet Energy Ring
-    CTX.save();
-    CTX.rotate(-swirl * 1.5);
-    CTX.strokeStyle = '#c084fc';
-    CTX.lineWidth = 3;
-    CTX.shadowColor = '#c084fc';
-    CTX.shadowBlur = 18;
-    CTX.setLineDash([12, 10]);
-    CTX.beginPath();
-    CTX.ellipse(0, 0, r * 0.52, r * 0.38, 0, 0, Math.PI * 2);
-    CTX.stroke();
-    CTX.setLineDash([]);
-    CTX.restore();
-
-    // 5. Singularity Core Event Horizon
-    CTX.save();
-    const coreGrad = CTX.createRadialGradient(0, 0, 0, 0, 0, r * 0.28);
-    coreGrad.addColorStop(0, '#ffffff');
-    coreGrad.addColorStop(0.3, '#38bdf8');
-    coreGrad.addColorStop(0.7, '#6366f1');
-    coreGrad.addColorStop(1, 'rgba(99, 102, 241, 0)');
-    CTX.fillStyle = coreGrad;
-    CTX.beginPath();
-    CTX.ellipse(0, 0, r * 0.28, r * 0.2, 0, 0, Math.PI * 2);
-    CTX.fill();
-    CTX.restore();
-
-    // 6. Infalling Vacuum Particles Vortex
-    if (portal.particles && portal.particles.length > 0) {
-      CTX.save();
-      portal.particles.forEach((p) => {
-        CTX.fillStyle = p.color;
-        CTX.shadowColor = p.color;
-        CTX.shadowBlur = 10;
-        CTX.beginPath();
-        CTX.arc(p.x - portal.x, (p.y - portal.y) * 0.72, p.size, 0, Math.PI * 2);
-        CTX.fill();
-      });
-      CTX.restore();
-    }
-
-    CTX.restore();
+    return; // No funnel/portal rendered
   }
 
   function drawTimeWarpTunnel() {
-    if (waveState !== 'TIME_WARP' && waveState !== 'WAVE_ARRIVAL') return;
-
-    CTX.save();
-
-    const cx = V_WIDTH / 2;
-    const cy = V_HEIGHT / 2;
-    const now = Date.now() * 0.001;
-
-    // Fullscreen fade overlay
-    let tunnelAlpha = 1.0;
-    if (waveState === 'WAVE_ARRIVAL') {
-      tunnelAlpha = Math.max(0, (waveCinematicTimer - 0.2) / 0.65);
-    }
-    if (tunnelAlpha <= 0) {
-      CTX.restore();
-      return;
-    }
-
-    // 1. Deep Space Warp Vignette Backdrop
-    const bgGrad = CTX.createRadialGradient(cx, cy, 60, cx, cy, V_HEIGHT * 0.65);
-    bgGrad.addColorStop(0, `rgba(15, 23, 42, ${0.88 * tunnelAlpha})`);
-    bgGrad.addColorStop(0.4, `rgba(30, 27, 75, ${0.92 * tunnelAlpha})`);
-    bgGrad.addColorStop(0.8, `rgba(12, 10, 26, ${0.96 * tunnelAlpha})`);
-    bgGrad.addColorStop(1, `rgba(2, 6, 23, ${0.98 * tunnelAlpha})`);
-    CTX.fillStyle = bgGrad;
-    CTX.fillRect(0, 0, V_WIDTH, V_HEIGHT);
-
-    // 2. Radiating Hyperspace Speed Streaks
-    timeWarpLines.forEach((line) => {
-      // Advance streak radially outward
-      line.dist += line.speed * (waveState === 'TIME_WARP' ? 1.6 : 0.8);
-      if (line.dist > 1100) {
-        line.dist = Math.random() * 80 + 20;
-        line.angle = Math.random() * Math.PI * 2;
-      }
-
-      const x1 = cx + Math.cos(line.angle) * line.dist;
-      const y1 = cy + Math.sin(line.angle) * line.dist;
-      const x2 = cx + Math.cos(line.angle) * (line.dist + line.len);
-      const y2 = cy + Math.sin(line.angle) * (line.dist + line.len);
-
-      CTX.save();
-      CTX.strokeStyle = line.color;
-      CTX.lineWidth = line.width * (line.dist / 500 + 0.5);
-      CTX.globalAlpha = Math.min(1, line.dist / 200) * tunnelAlpha;
-      CTX.shadowColor = line.color;
-      CTX.shadowBlur = 12;
-      CTX.beginPath();
-      CTX.moveTo(x1, y1);
-      CTX.lineTo(x2, y2);
-      CTX.stroke();
-      CTX.restore();
-    });
-
-    // 3. Expanding Concentric Wormhole Rings
-    const ringCount = 5;
-    for (let i = 0; i < ringCount; i++) {
-      const ringPhase = ((now * 2.2 + i / ringCount) % 1);
-      const ringRadius = 50 + ringPhase * 850;
-      const ringAlpha = (1 - ringPhase) * 0.7 * tunnelAlpha;
-
-      CTX.save();
-      CTX.strokeStyle = i % 2 === 0 ? '#38bdf8' : '#c084fc';
-      CTX.lineWidth = 3 + ringPhase * 6;
-      CTX.globalAlpha = ringAlpha;
-      CTX.shadowColor = i % 2 === 0 ? '#38bdf8' : '#c084fc';
-      CTX.shadowBlur = 20;
-      CTX.beginPath();
-      CTX.arc(cx, cy, ringRadius, 0, Math.PI * 2);
-      CTX.stroke();
-      CTX.restore();
-    }
-
-    // 4. Center Singularity Flash
-    const pulseSize = 45 + Math.sin(now * 14) * 15;
-    const centerGrad = CTX.createRadialGradient(cx, cy, 0, cx, cy, pulseSize * 2.2);
-    centerGrad.addColorStop(0, `rgba(255, 255, 255, ${0.95 * tunnelAlpha})`);
-    centerGrad.addColorStop(0.35, `rgba(56, 189, 248, ${0.85 * tunnelAlpha})`);
-    centerGrad.addColorStop(0.7, `rgba(192, 132, 252, ${0.45 * tunnelAlpha})`);
-    centerGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-    CTX.fillStyle = centerGrad;
-    CTX.beginPath();
-    CTX.arc(cx, cy, pulseSize * 2.2, 0, Math.PI * 2);
-    CTX.fill();
-
-    // 5. Cinematic HUD Overlay (Sci-Fi Time-Warp Coordinates)
-    if (waveState === 'TIME_WARP') {
-      const warpProgress = Math.min(1, Math.max(0, (1.8 - waveCinematicTimer) / 1.8));
-      const warpPct = Math.floor(warpProgress * 100);
-
-      CTX.save();
-      CTX.textAlign = 'center';
-
-      // Header Tag
-      CTX.font = '800 24px Rajdhani, monospace, sans-serif';
-      CTX.fillStyle = '#38bdf8';
-      CTX.shadowColor = '#38bdf8';
-      CTX.shadowBlur = 12;
-      CTX.fillText('⚡ SUBTERRANEAN TIME RIFT ACTIVE ⚡', cx, cy - 240);
-
-      // Main Title
-      CTX.font = '900 46px Rajdhani, sans-serif';
-      CTX.fillStyle = '#ffffff';
-      CTX.shadowColor = '#c084fc';
-      CTX.shadowBlur = 24;
-      CTX.fillText('TRAVERSING TIME TUNNEL', cx, cy - 180);
-
-      // Destination Wave
-      CTX.font = '800 36px Rajdhani, sans-serif';
-      CTX.fillStyle = '#facc15';
-      CTX.shadowColor = '#facc15';
-      CTX.shadowBlur = 18;
-      CTX.fillText(`WARPING TO WAVE ${wave + 1}...`, cx, cy + 180);
-
-      // Traversal Progress Bar
-      const pbW = 420;
-      const pbH = 14;
-      const pbx = cx - pbW / 2;
-      const pby = cy + 225;
-
-      // Track
-      CTX.fillStyle = 'rgba(255, 255, 255, 0.12)';
-      CTX.fillRect(pbx, pby, pbW, pbH);
-
-      // Fill
-      const pbGrad = CTX.createLinearGradient(pbx, pby, pbx + pbW, pby);
-      pbGrad.addColorStop(0, '#38bdf8');
-      pbGrad.addColorStop(0.5, '#c084fc');
-      pbGrad.addColorStop(1, '#facc15');
-      CTX.fillStyle = pbGrad;
-      CTX.shadowColor = '#38bdf8';
-      CTX.shadowBlur = 14;
-      CTX.fillRect(pbx, pby, pbW * warpProgress, pbH);
-
-      // Border
-      CTX.strokeStyle = 'rgba(255, 255, 255, 0.35)';
-      CTX.lineWidth = 1.5;
-      CTX.strokeRect(pbx, pby, pbW, pbH);
-
-      // Percentage Text
-      CTX.font = '700 18px Rajdhani, monospace, sans-serif';
-      CTX.fillStyle = '#94a3b8';
-      CTX.shadowBlur = 0;
-      CTX.fillText(`SPACETIME DRIFT: ${warpPct}% | WARP FACTOR 9.8`, cx, pby + 36);
-
-      CTX.restore();
-    }
-
-    CTX.restore();
+    return; // No time tunnel rendered
   }
 
   // --- RENDER PIPELINE ---
@@ -4415,18 +4165,19 @@
       CTX.restore();
     });
 
-    // Smart Target Lock Reticle on nearest enemy (World Space)
-    if (lockedEnemy && lockedEnemy.hp > 0 && !lockedEnemy.isDying && isEnemyOnScreen(lockedEnemy, 0) && (autoFireEnabled || aimControl.active || mouse.down)) {
+    // Smart Target Lock Reticle on target (incoming bullet or enemy)
+    if (lockedEnemy && (lockedEnemy.isBullet || (lockedEnemy.hp > 0 && !lockedEnemy.isDying && isEnemyOnScreen(lockedEnemy, 0))) && (autoFireEnabled || aimControl.active || mouse.down)) {
       CTX.save();
       CTX.translate(lockedEnemy.x, lockedEnemy.y);
       CTX.rotate(lockReticleTick);
 
-      const rSize = lockedEnemy.radius + 18;
-      const cornerLen = 14;
+      const rSize = lockedEnemy.radius + (lockedEnemy.isBullet ? 10 : 18);
+      const cornerLen = lockedEnemy.isBullet ? 8 : 14;
 
-      CTX.strokeStyle = '#4ade80';
+      const retColor = lockedEnemy.isBullet ? '#f59e0b' : '#4ade80';
+      CTX.strokeStyle = retColor;
       CTX.lineWidth = 3;
-      CTX.shadowColor = '#4ade80';
+      CTX.shadowColor = retColor;
       CTX.shadowBlur = 12;
 
       // 4 Corner Brackets
