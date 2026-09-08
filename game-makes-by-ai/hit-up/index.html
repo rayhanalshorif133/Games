@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Hit Up: King's Tower Smash</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="icon" type="image/png" href="icons/icon-512.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="game-container">
+    <canvas id="gameCanvas" width="1080" height="1920"></canvas>
+
+    <!-- Top Corner Quick Buttons -->
+    <div id="top-controls">
+      <button id="btn-mute" class="hud-btn" title="Toggle Sound" aria-label="Mute/Unmute">🔊</button>
+      <button id="btn-pause" class="hud-btn" title="Pause Game" aria-label="Pause">⏸️</button>
+    </div>
+
+    <!-- On-Screen Virtual Controls for Mobile & Touch -->
+    <div id="touch-controls">
+      <!-- Movement Controls -->
+      <div class="control-cluster left-cluster">
+        <button id="btn-left" class="touch-btn move-btn" aria-label="Move Left">
+          <svg viewBox="0 0 24 24"><path fill="currentColor" d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+        </button>
+        <button id="btn-right" class="touch-btn move-btn" aria-label="Move Right">
+          <svg viewBox="0 0 24 24"><path fill="currentColor" d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+        </button>
+      </div>
+
+      <!-- Action Controls -->
+      <div class="control-cluster right-cluster">
+        <button id="btn-up-smash" class="touch-btn action-btn up-smash-btn" aria-label="Upward Smash">
+          <span class="btn-icon">🔨</span>
+          <span class="btn-text">UP SMASH</span>
+        </button>
+        <button id="btn-attack" class="touch-btn action-btn hammer-btn" aria-label="Hammer Attack">
+          <span class="btn-icon">🔨</span>
+          <span class="btn-text">SMASH</span>
+        </button>
+        <button id="btn-jump" class="touch-btn action-btn jump-btn" aria-label="Jump">
+          <span class="btn-icon">⬆️</span>
+          <span class="btn-text">JUMP</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="scripts/bundle.js"></script>
+</body>
+</html>
