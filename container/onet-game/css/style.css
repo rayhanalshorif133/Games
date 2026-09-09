@@ -1,0 +1,84 @@
+@import url('https://fonts.googleapis.com/css2?family=Passion+One:wght@400;700;900&display=swap');
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: radial-gradient(circle at center top, #2b2158 0%, #15112a 60%, #0d0a1b 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Passion One', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, cursive, sans-serif;
+}
+
+#game-wrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+#game-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  max-width: calc(100vh * (1080 / 1920));
+  max-height: calc(100vw * (1920 / 1080));
+  aspect-ratio: 1080 / 1920;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+  background-color: #1b1632;
+}
+
+#gameCanvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: auto;
+  cursor: pointer;
+}
+
+/* Toast message for web share or alerts */
+#toast {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.8);
+  background: rgba(18, 14, 38, 0.95);
+  color: #ffffff;
+  padding: 18px 36px;
+  border-radius: 40px;
+  border: 3px solid #ffcc00;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  pointer-events: none;
+  opacity: 0;
+  transition: all 0.25s ease-out;
+  z-index: 1000;
+  text-align: center;
+  white-space: nowrap;
+}
+
+#toast.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
