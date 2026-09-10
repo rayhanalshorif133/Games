@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Road Rush Infinite - Combat Edition</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="game-container">
+    <canvas id="gameCanvas" width="1080" height="1920"></canvas>
+
+    <!-- Top Status Bar: Health, Gold, KOs -->
+    <div id="combat-hud-top">
+      <!-- Player HP Bar with Frame -->
+      <div id="hp-bar-wrapper">
+        <div id="hp-bar-inner">
+          <div id="hp-fill"></div>
+        </div>
+        <img id="hp-frame" src="images/assets/UserInterface/HpBar01.png" alt="HP Bar" />
+        <span id="hp-text">100 / 100 HP</span>
+      </div>
+
+      <!-- Gold / Cash Bar with Frame -->
+      <div id="gold-bar-wrapper">
+        <img id="gold-frame" src="images/assets/UserInterface/Goldbar.png" alt="Gold Bar" />
+        <span id="gold-text">$ 0</span>
+      </div>
+
+      <!-- Trophy / KO Counter -->
+      <div id="ko-counter-wrapper">
+        <img id="trophy-icon" src="images/assets/UserInterface/Trophy.png" alt="Trophy" />
+        <span id="ko-text">K.O. 0</span>
+      </div>
+    </div>
+
+    <!-- Secondary HUD Cards: Speed, Distance, Score, Time -->
+    <div id="hud-top">
+      <div class="hud-card">
+        <div class="hud-label">SPEED</div>
+        <div id="hud-speed" class="hud-value">0 <span class="unit">km/h</span></div>
+      </div>
+      <div class="hud-card">
+        <div class="hud-label">DISTANCE</div>
+        <div id="hud-distance" class="hud-value">0 <span class="unit">m</span></div>
+      </div>
+      <div class="hud-card">
+        <div class="hud-label">SCORE</div>
+        <div id="hud-score" class="hud-value">0</div>
+      </div>
+      <div class="hud-card">
+        <div class="hud-label">TIME</div>
+        <div id="hud-timer" class="hud-value">00:00.0</div>
+      </div>
+    </div>
+
+    <!-- Difficulty Tier Banner -->
+    <div id="tier-badge" class="tier-easy">TIER: EASY (0-30s)</div>
+
+    <!-- Bottom Controls: Left Attack Button, Right Brake Button -->
+    <div id="controls-bottom">
+      <!-- Dedicated Attack / Fist Button -->
+      <div id="attack-button-wrapper">
+        <img id="attack-button-img" src="images/assets/UserInterface/ActionBtn.png" alt="Attack Button" draggable="false" />
+        <span class="control-key-hint">PUNCH / SWING [F / J]</span>
+      </div>
+
+      <!-- Brake Heat Bar & Brake Button -->
+      <div id="brake-group">
+        <div id="brake-heat-container">
+          <div class="brake-label">BRAKE HEAT</div>
+          <div id="brake-bar-bg">
+            <div id="brake-bar-fill"></div>
+          </div>
+        </div>
+        <div id="brake-button-wrapper">
+          <img id="brake-button-img" src="images/assets/ui/break_button.png" alt="Brake Button" draggable="false" />
+          <span class="control-key-hint">BRAKE [SPACE / S]</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Desktop Steering Helper Hints -->
+    <div id="controls-hint">
+      <span>Steer: [A/D] or Drag | Attack: [F/J] or Click Attack | Brake: [Space/S]</span>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div id="game-over-screen" class="hidden">
+      <div class="modal-box">
+        <h1 class="crash-title">WRECKED!</h1>
+        <div class="stats-grid">
+          <div class="stat-row"><span>Rivals Defeated (K.O.):</span><strong id="final-kos">0</strong></div>
+          <div class="stat-row"><span>Cash Collected:</span><strong id="final-cash">$ 0</strong></div>
+          <div class="stat-row"><span>Survival Time:</span><strong id="final-time">0s</strong></div>
+          <div class="stat-row"><span>Distance:</span><strong id="final-distance">0 m</strong></div>
+          <div class="stat-row"><span>Final Score:</span><strong id="final-score">0</strong></div>
+        </div>
+        <button id="btn-restart" class="action-btn">RACE AGAIN</button>
+      </div>
+    </div>
+
+    <!-- Start Overlay -->
+    <div id="start-screen">
+      <div class="start-box">
+        <h1 class="game-logo-text">ROAD RUSH</h1>
+        <h2 class="game-sub-text">COMBAT RACER</h2>
+        <p class="start-desc">1080x1920 Full Combat Arcade</p>
+        <ul class="rules-list">
+          <li><strong>🥊 Attack Rivals:</strong> Press [F / J] or tap Attack button to swing and knock down side bikers!</li>
+          <li><strong>🛑 Brake:</strong> Hold [Space / S] or tap Brake to dodge tight traffic and traps.</li>
+          <li><strong>💰 Collect Loot:</strong> Defeat enemy bikers to collect cash coins and score massive points.</li>
+          <li><strong>❤️ Health:</strong> Keep your HP above 0. Don't let enemies hit you!</li>
+        </ul>
+        <button id="btn-start" class="action-btn pulse">START ENGINE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modular JavaScript Architecture -->
+  <script src="js/AssetLoader.js"></script>
+  <script src="js/InfiniteRoadSpawner.js"></script>
+  <script src="js/GameManager.js"></script>
+  <script src="js/PlayerController.js"></script>
+  <script src="js/EnemyBiker.js"></script>
+  <script src="js/CombatSystem.js"></script>
+  <script src="js/TrafficController.js"></script>
+  <script src="js/GameHUD.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

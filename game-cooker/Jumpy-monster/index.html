@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0b1c17">
+  <title>Frogie - Jumpy Cross</title>
+  <link rel="icon" type="image/png" href="icons/icon-128.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Game Canvas -->
+  <canvas id="gameCanvas"></canvas>
+
+  <!-- Top In-Game HUD -->
+  <div id="hud" class="hidden">
+    <div class="hud-capsule">
+      <span class="hud-icon">🏆</span>
+      <span id="hudScore" class="hud-value">0000</span>
+    </div>
+
+    <div class="timer-wrapper">
+      <div class="hud-capsule">
+        <span class="hud-icon">⏱️</span>
+        <span id="hudTimer" class="hud-value">00:30</span>
+      </div>
+      <div class="timer-bar-bg">
+        <div id="timerBar" class="timer-bar"></div>
+      </div>
+    </div>
+
+    <button id="muteBtn" class="hud-btn" aria-label="Toggle sound">🔊</button>
+  </div>
+
+  <!-- On-Screen 4-Arrow Touch Controls (D-Pad UI) -->
+  <div id="dpadContainer">
+    <button id="btnUp" class="dpad-btn" aria-label="Up">▲</button>
+    <button id="btnLeft" class="dpad-btn" aria-label="Left">◀</button>
+    <div class="dpad-center-guide">
+      <div class="dpad-center-dot"></div>
+    </div>
+    <button id="btnRight" class="dpad-btn" aria-label="Right">▶</button>
+    <button id="btnDown" class="dpad-btn" aria-label="Down">▼</button>
+  </div>
+
+  <!-- First-Time Animated Swipe Tutorial -->
+  <div id="tutorialOverlay" class="hidden">
+    <div class="swipe-hand-anim">
+      <div class="swipe-trail"></div>
+      <div class="swipe-circle"></div>
+    </div>
+    <div class="tutorial-card">
+      <div class="tutorial-title">SWIPE TO JUMP!</div>
+      <div class="tutorial-subtitle">যেকোনো দিকে সুইপ করুন বা নিচের বাটন চাপুন</div>
+    </div>
+  </div>
+
+  <!-- Asset Preloading Screen -->
+  <div id="loadingOverlay" class="overlay">
+    <div class="spinner"></div>
+    <div class="loading-text">Loading Frogie World...</div>
+    <div class="progress-container">
+      <div id="loadingBar" class="progress-bar"></div>
+    </div>
+  </div>
+
+  <!-- Main Menu / Start Screen -->
+  <div id="menuOverlay" class="overlay hidden">
+    <div class="modal-card">
+      <img src="images/new/Logo.png" alt="Frogie Logo" class="modal-logo">
+      <button id="startBtn" class="btn-primary">START GAME</button>
+      <div class="controls-hint">
+        🎮 <strong>Controls:</strong><br>
+        Swipe on screen &bull; Tap arrow buttons &bull; Keyboard Arrow Keys / WASD
+      </div>
+    </div>
+  </div>
+
+  <!-- Game Over Screen -->
+  <div id="gameoverOverlay" class="overlay hidden">
+    <div class="modal-card">
+      <div class="modal-title">GAME OVER</div>
+      <div class="score-stats">
+        <div class="stat-item">
+          <span class="stat-label">Score</span>
+          <span id="finalScore" class="stat-val">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Best</span>
+          <span id="bestScore" class="stat-val">0</span>
+        </div>
+      </div>
+      <button id="restartBtn" class="btn-primary">PLAY AGAIN</button>
+    </div>
+  </div>
+
+  <!-- Game Entry Point -->
+  <script type="module" src="js/game.js"></script>
+</body>
+</html>
