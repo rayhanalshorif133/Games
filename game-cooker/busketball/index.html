@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Realistic Basketball 2D - 3 Min Challenge</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0b0f19">
+  <meta name="description" content="Realistic 2D Basketball Game - 3-Minute Shootout Challenge (1080x1920)">
+  
+  <!-- Construct 3 Style Favicon & Stylesheet -->
+  <link rel="icon" type="image/svg+xml" href="images/icon.svg">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Construct 3 Style Canvas Container (Preserves 1080x1920 9:16 Aspect Ratio) -->
+  <div id="c3-canvas-wrapper">
+    <!-- Game Canvas -->
+    <canvas id="c3-canvas" width="1080" height="1920"></canvas>
+
+    <!-- In-Game UI Overlay Layer -->
+    <div id="ui-layer">
+      <!-- Top HUD Header -->
+      <div class="hud-header">
+        <!-- Score Box -->
+        <div class="hud-panel">
+          <span class="hud-label">Score</span>
+          <span id="hud-score" class="hud-value score">0</span>
+        </div>
+
+        <!-- 3-Minute Timer Box -->
+        <div class="hud-panel">
+          <span class="hud-label">Time</span>
+          <span id="hud-timer" class="hud-value timer">03:00</span>
+        </div>
+
+        <!-- Streak Multiplier Box -->
+        <div class="hud-panel">
+          <span class="hud-label">Streak</span>
+          <span class="hud-value streak"><span class="streak-flame">🔥</span><span id="hud-streak">0</span></span>
+        </div>
+
+        <!-- Controls (Sound & Pause) -->
+        <div class="hud-actions">
+          <button id="btn-sound" class="hud-btn" title="Toggle Sound" aria-label="Toggle Sound">🔊</button>
+          <button id="btn-pause" class="hud-btn" title="Pause Game" aria-label="Pause Game">⏸</button>
+        </div>
+      </div>
+
+      <!-- Secondary Sub-Bar (Baskets Made & Accuracy) -->
+      <div class="hud-sub-bar">
+        <div class="badge-pill">
+          BASKETS: <span id="hud-baskets">0</span>
+        </div>
+        <div class="badge-pill">
+          ACCURACY: <span id="hud-accuracy">0%</span>
+        </div>
+      </div>
+
+      <!-- Aiming Drag Hint -->
+      <div id="drag-hint">
+        <span>🏀</span> DRAG &amp; RELEASE TO SHOOT
+      </div>
+    </div>
+
+    <!-- Start Challenge Modal Overlay -->
+    <div id="start-modal" class="modal-overlay">
+      <div class="card-modal">
+        <div class="modal-title">BASKETBALL<br><span>3-MIN SHOOTOUT</span></div>
+        <div class="modal-subtitle">৩ মিনিটের মধ্যে সর্বোচ্চ সংখ্যক বল বাস্কেট করো!</div>
+
+        <ul class="instruction-list">
+          <li>🎯 <span>Aim:</span> Touch/Click &amp; pull back to see the arc guide.</li>
+          <li>🏀 <span>Shoot:</span> Release to launch with backspin.</li>
+          <li>✨ <span>Swish:</span> Clean shot without rim hit gives <span>+3 PTS</span>!</li>
+          <li>🔥 <span>Streak:</span> Consecutive baskets multiply score!</li>
+        </ul>
+
+        <button id="btn-start-play" class="btn-cta">START 3-MIN GAME</button>
+      </div>
+    </div>
+
+    <!-- Game Over Summary Modal Overlay -->
+    <div id="gameover-modal" class="modal-overlay hidden">
+      <div class="card-modal">
+        <div id="go-rank" class="badge-rank">ALL-STAR 🌟</div>
+        <div class="modal-title">TIME'S <span>UP!</span></div>
+        <div class="modal-subtitle">৩ মিনিট সম্পন্ন! আপনার পারফরম্যান্স:</div>
+
+        <div class="stats-grid">
+          <div class="stat-box highlight">
+            <div id="go-baskets" class="stat-num gold">0</div>
+            <div class="stat-desc">BASKETS SCORED 🏀</div>
+          </div>
+          <div class="stat-box">
+            <div id="go-score" class="stat-num">0</div>
+            <div class="stat-desc">TOTAL SCORE</div>
+          </div>
+          <div class="stat-box">
+            <div id="go-swishes" class="stat-num">0</div>
+            <div class="stat-desc">SWISHES ✨</div>
+          </div>
+          <div class="stat-box">
+            <div id="go-accuracy" class="stat-num">0%</div>
+            <div class="stat-desc">ACCURACY</div>
+          </div>
+          <div class="stat-box">
+            <div id="go-streak" class="stat-num">0</div>
+            <div class="stat-desc">BEST STREAK 🔥</div>
+          </div>
+        </div>
+
+        <button id="btn-play-again" class="btn-cta">PLAY AGAIN</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Game Scripts (Construct 3 Module Pattern) -->
+  <script src="scripts/audio.js"></script>
+  <script src="scripts/net.js"></script>
+  <script src="scripts/physics.js"></script>
+  <script src="scripts/render.js"></script>
+  <script src="scripts/main.js"></script>
+</body>
+</html>
+
