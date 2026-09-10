@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Flappy Zigzag - 1000x600 UI Banner</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            background-color: #03030a;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            font-family: 'Rajdhani', sans-serif;
+            color: #ffffff;
+            margin: 0;
+            overflow: auto;
+        }
+
+        .banner-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .banner-frame {
+            width: 1000px;
+            height: 600px;
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 0 50px rgba(0, 243, 255, 0.35), 0 0 100px rgba(255, 0, 127, 0.2), inset 0 0 20px rgba(0, 243, 255, 0.2);
+            border: 2px solid rgba(0, 243, 255, 0.6);
+            background: #070714;
+        }
+
+        #bannerCanvas {
+            width: 1000px;
+            height: 600px;
+            display: block;
+        }
+
+        .btn-toolbar {
+            display: flex;
+            gap: 16px;
+            margin-top: 10px;
+        }
+
+        .toolbar-btn {
+            padding: 12px 24px;
+            border-radius: 14px;
+            background: rgba(10, 15, 35, 0.85);
+            border: 1.5px solid var(--neon-primary);
+            color: #ffffff;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.25);
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .toolbar-btn:hover {
+            transform: translateY(-2px);
+            background: var(--neon-primary);
+            color: #070714;
+            box-shadow: 0 0 25px var(--neon-primary);
+        }
+
+        .toolbar-btn.secondary {
+            border-color: var(--neon-secondary);
+            box-shadow: 0 0 15px rgba(255, 0, 127, 0.25);
+        }
+
+        .toolbar-btn.secondary:hover {
+            background: var(--neon-secondary);
+            color: #ffffff;
+            box-shadow: 0 0 25px var(--neon-secondary);
+        }
+    </style>
+</head>
+<body>
+
+<div class="banner-container">
+    <div class="banner-frame">
+        <!-- Exact 1000 x 600 Canvas -->
+        <canvas id="bannerCanvas" width="1000" height="600"></canvas>
+    </div>
+
+    <div class="btn-toolbar">
+        <button id="btn-download" class="toolbar-btn">
+            <span>💾 DOWNLOAD 1000x600 PNG</span>
+        </button>
+        <a href="index.html" class="toolbar-btn secondary">
+            <span>🎮 PLAY GAME</span>
+        </a>
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById('bannerCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const W = 1000;
+    const H = 600;
+
+    const COLORS = {
+        primary: '#00f3ff',    // Neon Cyan
+        secondary: '#ff007f',  // Neon Magenta
+        accent: '#ffe600',     // Neon Gold Coin
+        bgDark: '#070714',
+        bgNavy: '#0d0d26',
+        grid: 'rgba(0, 243, 255, 0.12)'
+    };
+
+    function drawBanner() {
+        ctx.clearRect(0, 0, W, H);
+
+        // 1. Background Gradient
+        const grad = ctx.createLinearGradient(0, 0, W, H);
+        grad.addColorStop(0, '#050512');
+        grad.addColorStop(0.5, '#0b0b24');
+        grad.addColorStop(1, '#050512');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, W, H);
+
+        // 2. Cyberpunk Perspective Grid (Floor)
+        ctx.save();
+        ctx.strokeStyle = COLORS.grid;
+        ctx.lineWidth = 1.5;
+
+        // Vertical radiating perspective grid lines
+        const vanishingX = W / 2;
+        const vanishingY = 180;
+        for (let x = -300; x <= W + 300; x += 65) {
+            ctx.beginPath();
+            ctx.moveTo(vanishingX, vanishingY);
+            ctx.lineTo(x, H);
+            ctx.stroke();
+        }
+
+        // Horizontal perspective lines
+        for (let y = vanishingY + 30; y <= H; y += (y - vanishingY) * 0.28 + 12) {
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(W, y);
+            ctx.stroke();
+        }
+        ctx.restore();
+
+        // 3. Twinkling Neon Stars
+        ctx.save();
+        for (let i = 0; i < 45; i++) {
+            const sx = (Math.sin(i * 99) * 0.5 + 0.5) * W;
+            const sy = (Math.cos(i * 37) * 0.5 + 0.5) * (H * 0.65);
+            ctx.fillStyle = i % 2 === 0 ? 'rgba(0, 243, 255, 0.75)' : 'rgba(255, 0, 127, 0.75)';
+            ctx.fillRect(sx, sy, (i % 3) + 1.5, (i % 3) + 1.5);
+        }
+        ctx.restore();
+
+        // 4. Glowing Neon Gates
+        drawLaserGate(W * 0.48, 290, 260, 26);
+        drawLaserGate(W * 0.82, 420, 200, 22);
+
+        // 5. Zigzag Trail of Glowing Coins
+        const coinPoints = [
+            { x: 120, y: 520 },
+            { x: 200, y: 440 },
+            { x: 280, y: 380 },
+            { x: 360, y: 330 },
+            { x: 440, y: 290 },
+            { x: 520, y: 290 },
+            { x: 600, y: 330 },
+            { x: 680, y: 380 },
+            { x: 760, y: 430 },
+            { x: 840, y: 470 },
+            { x: 920, y: 410 }
+        ];
+
+        // Draw connecting neon dashed guide path
+        ctx.save();
+        ctx.strokeStyle = 'rgba(255, 230, 0, 0.25)';
+        ctx.lineWidth = 3;
+        ctx.setLineDash([8, 8]);
+        ctx.beginPath();
+        coinPoints.forEach((pt, idx) => {
+            if (idx === 0) ctx.moveTo(pt.x, pt.y);
+            else ctx.lineTo(pt.x, pt.y);
+        });
+        ctx.stroke();
+        ctx.restore();
+
+        // Draw each glowing coin
+        coinPoints.forEach((pt, idx) => {
+            drawCoin(pt.x, pt.y, 16);
+        });
+
+        // 6. 🧲 Glowing Magnet Power-Up & Suction Vortex
+        drawMagnetPowerUp(180, 280);
+
+        // Magnetic Attraction Stream (Coins flying towards magnet)
+        drawSuctionArc(180, 280, 360, 330);
+        drawSuctionArc(180, 280, 280, 380);
+
+        // 7. Player Neon Ship with glowing light trail
+        drawPlayerShip(500, 285);
+
+        // 8. HUD Elements based on Game UI
+        drawHUDElements();
+
+        // 9. Central Hero Title & Badges
+        drawHeroText();
+    }
+
+    function setGlow(color, blur) {
+        ctx.shadowColor = color;
+        ctx.shadowBlur = blur;
+    }
+
+    function drawLaserGate(cx, cy, gapSize, thickness) {
+        ctx.save();
+        setGlow(COLORS.secondary, 22);
+        ctx.strokeStyle = COLORS.secondary;
+        ctx.lineWidth = thickness;
+        ctx.lineCap = 'round';
+
+        // Left laser bar
+        ctx.beginPath();
+        ctx.moveTo(cx - gapSize / 2 - 140, cy);
+        ctx.lineTo(cx - gapSize / 2, cy);
+        ctx.stroke();
+
+        // Right laser bar
+        ctx.beginPath();
+        ctx.moveTo(cx + gapSize / 2, cy);
+        ctx.lineTo(cx + gapSize / 2 + 140, cy);
+        ctx.stroke();
+
+        // Inner white hot core
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.moveTo(cx - gapSize / 2 - 140, cy);
+        ctx.lineTo(cx - gapSize / 2, cy);
+        ctx.moveTo(cx + gapSize / 2, cy);
+        ctx.lineTo(cx + gapSize / 2 + 140, cy);
+        ctx.stroke();
+
+        // End cap nodes
+        ctx.fillStyle = COLORS.secondary;
+        ctx.beginPath();
+        ctx.arc(cx - gapSize / 2, cy, thickness / 2 + 3, 0, Math.PI * 2);
+        ctx.arc(cx + gapSize / 2, cy, thickness / 2 + 3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+    }
+
+    function drawCoin(x, y, radius) {
+        ctx.save();
+        setGlow(COLORS.accent, 16);
+        ctx.fillStyle = COLORS.accent;
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(x, y, radius * 0.45, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+    }
+
+    function drawMagnetPowerUp(x, y) {
+        ctx.save();
+        // Pulsing magnetic wave rings
+        setGlow(COLORS.primary, 26);
+        ctx.strokeStyle = 'rgba(0, 243, 255, 0.45)';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.arc(x, y, 46, 0, Math.PI * 2);
+        ctx.arc(x, y, 62, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Sphere
+        ctx.fillStyle = 'rgba(10, 25, 60, 0.9)';
+        ctx.beginPath();
+        ctx.arc(x, y, 32, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = COLORS.primary;
+        ctx.lineWidth = 3.5;
+        ctx.stroke();
+
+        // 🧲 Icon
+        ctx.font = '32px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('🧲', x, y + 1);
+
+        // Power-Up Label
+        ctx.font = 'bold 13px Orbitron, sans-serif';
+        ctx.fillStyle = COLORS.primary;
+        ctx.fillText('MAGNET', x, y + 46);
+        ctx.restore();
+    }
+
+    function drawSuctionArc(targetX, targetY, sourceX, sourceY) {
+        ctx.save();
+        setGlow(COLORS.primary, 14);
+        ctx.strokeStyle = 'rgba(0, 243, 255, 0.6)';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([4, 6]);
+
+        ctx.beginPath();
+        ctx.moveTo(sourceX, sourceY);
+        const midX = (sourceX + targetX) / 2;
+        const midY = (sourceY + targetY) / 2 - 25;
+        ctx.quadraticCurveTo(midX, midY, targetX, targetY);
+        ctx.stroke();
+
+        // Flying mini-coin
+        drawCoin(midX, midY, 11);
+        ctx.restore();
+    }
+
+    function drawPlayerShip(x, y) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(-Math.PI / 4);
+
+        // Light trail ribbon
+        setGlow(COLORS.primary, 24);
+        ctx.strokeStyle = 'rgba(0, 243, 255, 0.65)';
+        ctx.lineWidth = 14;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(-110, 80);
+        ctx.quadraticCurveTo(-50, 40, 0, 20);
+        ctx.stroke();
+
+        // Neon Arrow Body
+        ctx.fillStyle = COLORS.primary;
+        ctx.beginPath();
+        ctx.moveTo(0, -32);
+        ctx.lineTo(26, 26);
+        ctx.lineTo(0, 10);
+        ctx.lineTo(-26, 26);
+        ctx.closePath();
+        ctx.fill();
+
+        // Inner glowing core
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.moveTo(0, -18);
+        ctx.lineTo(12, 12);
+        ctx.lineTo(0, 4);
+        ctx.lineTo(-12, 12);
+        ctx.closePath();
+        ctx.fill();
+
+        // Thruster flame
+        setGlow(COLORS.secondary, 20);
+        ctx.fillStyle = COLORS.secondary;
+        ctx.beginPath();
+        ctx.moveTo(-10, 12);
+        ctx.lineTo(0, 36);
+        ctx.lineTo(10, 12);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+    }
+
+    function drawHUDElements() {
+        ctx.save();
+
+        // 1. Top-Left: Settings (⚙️) & Cross (✕) & 3 Lives (❤️❤️❤️)
+        drawHudBtn(55, 40, '⚙️', COLORS.primary);
+        drawHudBtn(115, 40, '✕', COLORS.secondary);
+
+        setGlow(COLORS.secondary, 12);
+        ctx.fillStyle = 'rgba(10, 15, 35, 0.85)';
+        ctx.strokeStyle = 'rgba(255, 0, 127, 0.5)';
+        ctx.lineWidth = 1.5;
+        roundRect(ctx, 33, 70, 104, 30, 10, true, true);
+        ctx.font = '16px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('❤️ ❤️ ❤️', 85, 92);
+
+        // 2. Top-Center: Stopwatch Timer & Magnet Badge
+        // Timer
+        setGlow(COLORS.primary, 14);
+        ctx.fillStyle = 'rgba(8, 12, 28, 0.88)';
+        ctx.strokeStyle = 'rgba(0, 243, 255, 0.6)';
+        ctx.lineWidth = 1.5;
+        roundRect(ctx, W / 2 - 90, 24, 180, 40, 20, true, true);
+
+        ctx.font = 'bold 18px Orbitron, monospace';
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'center';
+        ctx.fillText('⏱️ 01:24.8', W / 2, 51);
+
+        // Magnet Active Badge
+        setGlow(COLORS.accent, 16);
+        ctx.fillStyle = 'rgba(0, 243, 255, 0.22)';
+        ctx.strokeStyle = COLORS.accent;
+        ctx.lineWidth = 1.5;
+        roundRect(ctx, W / 2 - 75, 72, 150, 28, 14, true, true);
+
+        ctx.font = 'bold 13px Orbitron, monospace';
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText('🧲 08.5s ACTIVE', W / 2, 91);
+
+        // 3. Top-Right: Score & Best Record
+        setGlow(COLORS.primary, 20);
+        ctx.font = '900 38px Orbitron, sans-serif';
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'right';
+        ctx.fillText('148', W - 45, 52);
+
+        setGlow(COLORS.accent, 10);
+        ctx.font = '700 13px Orbitron, sans-serif';
+        ctx.fillStyle = COLORS.accent;
+        ctx.fillText('BEST: 320', W - 45, 72);
+
+        ctx.restore();
+    }
+
+    function drawHudBtn(x, y, icon, color) {
+        ctx.save();
+        setGlow(color, 14);
+        ctx.fillStyle = 'rgba(10, 15, 35, 0.85)';
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 1.5;
+        roundRect(ctx, x - 22, y - 22, 44, 44, 12, true, true);
+
+        ctx.font = '20px sans-serif';
+        ctx.fillStyle = color;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(icon, x, y + 1);
+        ctx.restore();
+    }
+
+    function drawHeroText() {
+        ctx.save();
+        ctx.textAlign = 'center';
+
+        // Main Title: FLAPPY ZIGZAG
+        setGlow(COLORS.primary, 36);
+        ctx.font = '900 58px Orbitron, sans-serif';
+        ctx.fillStyle = '#ffffff';
+        ctx.letterSpacing = '3px';
+        ctx.fillText('FLAPPY ZIGZAG', W / 2, 165);
+
+        // Sub-badge: NEON ARCADE EDITION
+        setGlow(COLORS.secondary, 20);
+        ctx.font = '800 15px Orbitron, sans-serif';
+        ctx.fillStyle = COLORS.secondary;
+        ctx.fillText('⚡ NEON CYBER ARCADE • PORTRAIT HD ⚡', W / 2, 200);
+
+        // Bottom Banner Feature Pills
+        drawFeaturePill(W * 0.24, 555, '⏱️ LIVE PLAYTIME TIMER');
+        drawFeaturePill(W * 0.50, 555, '🧲 MAGNET POWER-UP');
+        drawFeaturePill(W * 0.76, 555, '💰 COIN LINE STREAKS');
+
+        ctx.restore();
+    }
+
+    function drawFeaturePill(x, y, text) {
+        ctx.save();
+        setGlow(COLORS.primary, 10);
+        ctx.fillStyle = 'rgba(13, 13, 33, 0.85)';
+        ctx.strokeStyle = 'rgba(0, 243, 255, 0.4)';
+        ctx.lineWidth = 1.2;
+        roundRect(ctx, x - 110, y - 18, 220, 36, 18, true, true);
+
+        ctx.font = '700 12px Orbitron, sans-serif';
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(text, x, y + 1);
+        ctx.restore();
+    }
+
+    function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.lineTo(x + width - radius, y);
+        ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+        ctx.lineTo(x + width, y + height - radius);
+        ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+        ctx.lineTo(x + radius, y + height);
+        ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+        ctx.lineTo(x, y + radius);
+        ctx.quadraticCurveTo(x, y, x + radius, y);
+        ctx.closePath();
+        if (fill) ctx.fill();
+        if (stroke) ctx.stroke();
+    }
+
+    // Initial render
+    window.addEventListener('load', drawBanner);
+    drawBanner();
+
+    // Download PNG listener
+    document.getElementById('btn-download').addEventListener('click', () => {
+        const link = document.createElement('a');
+        link.download = 'flappy_zigzag_banner_1000x600.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    });
+</script>
+
+</body>
+</html>
+

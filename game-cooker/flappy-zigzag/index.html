@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Flappy Zigzag - Neon Arcade</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <meta name="description" content="2D Neon Flappy Zigzag Arcade Game (1080x1920) with glowing effects, procedural sound, customizable settings, and live timer.">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="icons/icon-512.png">
+</head>
+<body>
+
+<div id="game-container">
+    <div id="game-wrapper">
+        <!-- 1080 x 1920 Internal HD Canvas -->
+        <canvas id="gameCanvas" width="1080" height="1920"></canvas>
+
+        <!-- Heads-Up Display (HUD) -->
+        <div id="hud">
+            <!-- Top-Left: Settings (⚙️), Cross (✕) & 3 Lives (❤️❤️❤️) -->
+            <div id="hud-left">
+                <div class="hud-left-btns">
+                    <button id="btn-settings" class="hud-btn" title="Settings" aria-label="Settings">⚙️</button>
+                    <button id="btn-cross" class="hud-btn danger-btn" title="Exit / Pause" aria-label="Exit or Pause">✕</button>
+                </div>
+                <div id="hud-lives" class="hud-lives-container" title="3 Lives">
+                    <span class="life-heart" id="life-1">❤️</span>
+                    <span class="life-heart" id="life-2">❤️</span>
+                    <span class="life-heart" id="life-3">❤️</span>
+                </div>
+            </div>
+
+            <!-- Top-Center: Playtime Live Stopwatch & Active Power-Ups -->
+            <div id="hud-center">
+                <div class="hud-timer-badge">
+                    <span class="timer-icon">⏱️</span>
+                    <span id="hud-timer">00:00.0</span>
+                </div>
+                <div id="hud-powerups-row" class="hud-powerups-row">
+                    <div id="hud-magnet-badge" class="hud-status-badge magnet hidden">
+                        <span>🧲</span><span id="hud-magnet-timer">10.0s</span>
+                    </div>
+                    <div id="hud-mult-badge" class="hud-status-badge multiplier hidden">
+                        <span>🔥 2X</span><span id="hud-mult-timer">8.0s</span>
+                    </div>
+                    <div id="hud-shield-badge" class="hud-status-badge shield hidden">
+                        <span>🛡️ SHIELD</span>
+                    </div>
+                    <div id="hud-boost-badge" class="hud-status-badge boost hidden">
+                        <span>🚀 BOOST!</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top-Right: Current Score & Best Score -->
+            <div id="hud-right">
+                <div class="score-box">
+                    <div id="hud-score">0</div>
+                    <div id="hud-best">BEST: 0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Start Screen Overlay -->
+        <div id="start-overlay" class="modal-overlay">
+            <div class="modal-panel">
+                <div class="start-title">FLAPPY<br>ZIGZAG</div>
+                <div class="start-subtitle">⚡ NEON CYBER EDITION ⚡</div>
+
+                <div class="instructions-card">
+                    <div class="instruction-item">
+                        <span class="key-badge">❤️❤️❤️ 3 LIVES</span>
+                        <span>Take up to 3 hits with recovery invincibility!</span>
+                    </div>
+                    <div class="instruction-item">
+                        <span class="key-badge">TAP / CLICK</span>
+                        <span>Flap & Switch Zigzag Direction (↖ ↔ ↗)</span>
+                    </div>
+                    <div class="instruction-item">
+                        <span class="key-badge">🧲 MAGNET & 🔥 2X</span>
+                        <span>Suck up all nearby coins & double your points!</span>
+                    </div>
+                    <div class="instruction-item">
+                        <span class="key-badge">� BOOST & 🛡️ SHIELD</span>
+                        <span>Supersonic laser-smashing & damage absorption!</span>
+                    </div>
+                    <div class="instruction-item">
+                        <span class="key-badge">💎 GEM & ❤️ HEAL</span>
+                        <span>Mega gems (+10 pts) and life recovery hearts!</span>
+                    </div>
+                </div>
+
+                <button id="btn-start-game" class="neon-btn">
+                    <span>▶ PLAY GAME</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Settings Modal -->
+        <div id="settings-modal" class="modal-overlay hidden">
+            <div class="modal-panel">
+                <div class="modal-header">
+                    <div class="modal-title">⚙ SETTINGS</div>
+                    <button id="btn-close-settings" class="modal-close-btn" aria-label="Close Settings">✕</button>
+                </div>
+
+                <!-- SFX Sound -->
+                <div class="setting-row">
+                    <div class="setting-label">
+                        <span>🔊 Sound Effects</span>
+                    </div>
+                    <div class="setting-ctrl">
+                        <input type="range" id="slider-sfx-vol" min="0" max="100" value="70">
+                        <label class="cyber-switch">
+                            <input type="checkbox" id="toggle-sfx" checked>
+                            <span class="switch-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- BGM Music -->
+                <div class="setting-row">
+                    <div class="setting-label">
+                        <span>🎵 Synth BGM</span>
+                    </div>
+                    <div class="setting-ctrl">
+                        <input type="range" id="slider-bgm-vol" min="0" max="100" value="35">
+                        <label class="cyber-switch">
+                            <input type="checkbox" id="toggle-bgm" checked>
+                            <span class="switch-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Neon Theme -->
+                <div class="setting-row">
+                    <div class="setting-label">
+                        <span>🎨 Neon Theme</span>
+                    </div>
+                    <select id="select-theme" class="cyber-select">
+                        <option value="cyberpunk">Cyber Cyan / Pink</option>
+                        <option value="matrix">Emerald Matrix</option>
+                        <option value="solar">Solar Amber</option>
+                        <option value="violet">Electric Violet</option>
+                    </select>
+                </div>
+
+                <!-- Glow Quality -->
+                <div class="setting-row">
+                    <div class="setting-label">
+                        <span>✨ Glow Bloom</span>
+                    </div>
+                    <select id="select-glow" class="cyber-select">
+                        <option value="ultra">Ultra Bloom</option>
+                        <option value="high" selected>High Glow</option>
+                        <option value="med">Medium</option>
+                        <option value="low">Performance (Off)</option>
+                    </select>
+                </div>
+
+                <!-- Difficulty -->
+                <div class="setting-row">
+                    <div class="setting-label">
+                        <span>⚡ Game Speed</span>
+                    </div>
+                    <select id="select-diff" class="cyber-select">
+                        <option value="normal" selected>Normal</option>
+                        <option value="fast">Fast</option>
+                        <option value="insane">Insane</option>
+                    </select>
+                </div>
+
+                <!-- Reset High Score -->
+                <button id="btn-reset-best" class="neon-btn outline-btn">
+                    <span>↺ Reset High Score</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Pause / Cross Exit Modal -->
+        <div id="pause-modal" class="modal-overlay hidden">
+            <div class="modal-panel">
+                <div class="modal-header">
+                    <div class="modal-title">⏸ GAME PAUSED</div>
+                </div>
+
+                <p style="text-align:center; color:#94a3b8; font-size:16px;">
+                    Game is paused. Resume, restart, or return to the main menu.
+                </p>
+
+                <button id="btn-resume" class="neon-btn">
+                    <span>▶ RESUME</span>
+                </button>
+                <button id="btn-restart-pause" class="neon-btn secondary-btn">
+                    <span>↺ RESTART RUN</span>
+                </button>
+                <button id="btn-quit-menu" class="neon-btn outline-btn">
+                    <span>⌂ QUIT TO MENU</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Game Over Modal -->
+        <div id="gameover-modal" class="modal-overlay hidden">
+            <div class="modal-panel">
+                <div class="gameover-title">CRITICAL FAILURE</div>
+
+                <div id="go-new-best-badge" class="new-best-badge" style="display:none;">
+                    ★ NEW RECORD! ★
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card featured">
+                        <div class="stat-label">FINAL SCORE</div>
+                        <div id="go-score" class="stat-value">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">BEST RECORD</div>
+                        <div id="go-best" class="stat-value">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">TIME SURVIVED</div>
+                        <div id="go-time" class="stat-value" style="font-size:22px;">00:00.0</div>
+                    </div>
+                </div>
+
+                <button id="btn-retry" class="neon-btn">
+                    <span>↺ PLAY AGAIN</span>
+                </button>
+                <button id="btn-menu-go" class="neon-btn outline-btn">
+                    <span>⌂ MAIN MENU</span>
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="scripts/audio.js"></script>
+<script src="scripts/game.js"></script>
+
+</body>
+</html>
