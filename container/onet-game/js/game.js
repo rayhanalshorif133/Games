@@ -118,6 +118,10 @@ class OnetGame {
           const targetState = params.get('state');
           if (targetState === 'playing') {
             this.startNewGame(1);
+            const customTime = params.get('time');
+            if (customTime !== null) {
+              this.timeLeft = Math.max(0, parseFloat(customTime));
+            }
           } else if (targetState === 'settings') {
             this.openSettings();
           } else if (targetState === 'leaderboard') {
@@ -946,6 +950,11 @@ class OnetGame {
     this.particles.spawnWinConfetti(80);
     window.soundEngine.playWin();
 
+    // Dispatch score on level win
+    if (window.SendScoreAPI && typeof window.SendScoreAPI.sendScore === 'function') {
+      window.SendScoreAPI.sendScore(this.score, this.level, { won: true, timeLeft: Math.ceil(this.timeLeft), timeBonus });
+    }
+
     setTimeout(() => {
       this.state = GAME_STATE.RESULT;
     }, 900);
@@ -959,6 +968,12 @@ class OnetGame {
     }
     this.saveLeaderboardScore(this.score, this.level);
     window.soundEngine.playGameOver();
+
+    // Dispatch score on game over
+    if (window.SendScoreAPI && typeof window.SendScoreAPI.sendScore === 'function') {
+      window.SendScoreAPI.sendScore(this.score, this.level, { won: false, timeLeft: 0 });
+    }
+
     this.state = GAME_STATE.RESULT;
   }
 
@@ -1421,29 +1436,49 @@ class OnetGame {
       ctx.restore();
     }
 
-    // Digital seconds badge next to Clock Bar when time <= 30s
-    if (this.timeLeft <= 30 && this.timeLeft > 0) {
-      const secNum = Math.ceil(this.timeLeft);
-      const secStr = secNum < 10 ? `0${secNum}s` : `${secNum}s`;
-      const badgePulse = this.timeLeft <= 10 ? 1 + Math.sin(now * 0.025) * 0.12 : 1.0;
+    // Digital Countdown Timer Display (m:ss format, counting down continuously)
+    if (this.timeLeft >= 0) {
+      const totalSec = Math.max(0, Math.ceil(this.timeLeft));
+      const mins = Math.floor(totalSec / 60);
+      const secs = totalSec % 60;
+      const timeStr = `${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}`;
+
+      const badgePulse = this.timeLeft <= 10
+        ? 1.0 + Math.sin(now * 0.025) * 0.08
+        : (this.timeLeft <= 30 ? 1.0 + Math.sin(now * 0.012) * 0.04 : 1.0);
 
       ctx.save();
-      ctx.translate(slotX + slotW - 55, slotY + 13);
+      ctx.translate(540, slotY + 13);
       ctx.scale(badgePulse, badgePulse);
 
-      ctx.fillStyle = this.timeLeft <= 10 ? 'rgba(255, 23, 68, 0.95)' : 'rgba(255, 145, 0, 0.92)';
-      ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = 3;
+      // Background pill styling based on urgency
+      if (this.timeLeft <= 10) {
+        ctx.fillStyle = 'rgba(255, 23, 68, 0.95)';
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 3;
+      } else if (this.timeLeft <= 30) {
+        ctx.fillStyle = 'rgba(230, 81, 0, 0.92)';
+        ctx.strokeStyle = '#ffd54f';
+        ctx.lineWidth = 3;
+      } else {
+        ctx.fillStyle = 'rgba(26, 9, 38, 0.88)';
+        ctx.strokeStyle = '#ffd54f';
+        ctx.lineWidth = 2.5;
+      }
+
       ctx.beginPath();
-      ctx.roundRect(-48, -18, 96, 36, 18);
+      ctx.roundRect(-68, -20, 136, 40, 20);
       ctx.fill();
       ctx.stroke();
 
-      ctx.font = '900 26px "Passion One", sans-serif';
+      ctx.font = '900 30px "Passion One", sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
+      ctx.strokeStyle = '#1d0c2b';
+      ctx.lineWidth = 5;
+      ctx.strokeText(timeStr, 0, 1);
       ctx.fillStyle = '#ffffff';
-      ctx.fillText(secStr, 0, 1);
+      ctx.fillText(timeStr, 0, 1);
       ctx.restore();
     }
 
@@ -1452,7 +1487,7 @@ class OnetGame {
       const cbAlpha = Math.min(1, this.comboBanner.timer / 0.4);
       ctx.save();
       ctx.globalAlpha = cbAlpha;
-      ctx.translate(540, 280);
+      ctx.translate(540, 305);
       ctx.scale(this.comboBanner.scale, this.comboBanner.scale);
 
       const cbWidth = 380;
