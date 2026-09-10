@@ -236,6 +236,64 @@ class ParticleManager {
     }
   }
 
+  spawnPraiseBurst(x, y, count = 26) {
+    const colors = ['#fffa65', '#00f0ff', '#ff2a85', '#ff9900', '#00ff88', '#ffffff'];
+    // Expanding glowing ring
+    this.particles.push({
+      x: x,
+      y: y,
+      isRing: true,
+      currentRadius: 10,
+      expandSpeed: 380,
+      lineWidth: 7,
+      color: '#fffa65',
+      alpha: 1,
+      life: 0,
+      maxLife: 0.42,
+      vx: 0, vy: 0, rotation: 0, rotSpeed: 0
+    });
+
+    for (let i = 0; i < count; i++) {
+      const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.35;
+      const speed = 180 + Math.random() * 420;
+      this.particles.push({
+        x: x,
+        y: y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - 100,
+        size: 16 + Math.random() * 18,
+        color: colors[i % colors.length],
+        alpha: 1,
+        life: 0,
+        maxLife: 0.65 + Math.random() * 0.35,
+        rotation: Math.random() * Math.PI * 2,
+        rotSpeed: (Math.random() - 0.5) * 16,
+        isStar: Math.random() > 0.35,
+        isConfetti: Math.random() > 0.6
+      });
+    }
+  }
+
+  spawnFlameSparks(x, y, count = 4) {
+    const flameColors = ['#ffea00', '#ff5722', '#ff1744', '#ff9100'];
+    for (let i = 0; i < count; i++) {
+      this.particles.push({
+        x: x + (Math.random() - 0.5) * 60,
+        y: y + (Math.random() - 0.5) * 20,
+        vx: (Math.random() - 0.5) * 90,
+        vy: -120 - Math.random() * 160,
+        size: 8 + Math.random() * 12,
+        color: flameColors[Math.floor(Math.random() * flameColors.length)],
+        alpha: 1,
+        life: 0,
+        maxLife: 0.45 + Math.random() * 0.25,
+        rotation: Math.random() * Math.PI * 2,
+        rotSpeed: (Math.random() - 0.5) * 10,
+        isStar: Math.random() > 0.5
+      });
+    }
+  }
+
   update(dt) {
     for (let i = this.particles.length - 1; i >= 0; i--) {
       const p = this.particles[i];
@@ -319,23 +377,32 @@ class ParticleManager {
   }
 }
 
-// Floating Scores & Combos
+// Floating Scores, Praise Badges & Combos
 class FloatingTextManager {
   constructor() {
     this.items = [];
   }
 
-  spawn(text, x, y, color = '#ffeb3b', size = 48, scale = 1.2) {
+  spawn(text, x, y, color = '#ffeb3b', size = 48, baseScale = 1.0, options = {}) {
     this.items.push({
       text,
-      x,
-      y,
+      x: Math.max(160, Math.min(920, x)),
+      y: y,
       color,
       size,
-      scale,
+      baseScale,
+      scale: 0.2,
       life: 0,
-      maxLife: 0.9,
-      alpha: 1
+      maxLife: options.duration || 1.15,
+      alpha: 1,
+      isPraise: options.isPraise || false,
+      subText: options.subText || null,
+      subColor: options.subColor || '#fffa65',
+      strokeColor: options.strokeColor || '#210d3a',
+      glowColor: options.glowColor || null,
+      bgBadge: options.bgBadge || false,
+      driftY: options.driftY || 80,
+      rot: options.isPraise ? (Math.random() - 0.5) * 0.12 : 0
     });
   }
 
@@ -347,10 +414,23 @@ class FloatingTextManager {
         this.items.splice(i, 1);
         continue;
       }
-      it.y -= 90 * dt;
+      it.y -= it.driftY * dt;
       const progress = it.life / it.maxLife;
-      it.alpha = Math.max(0, 1 - progress);
-      it.scale = 1 + Math.sin(progress * Math.PI) * 0.25;
+
+      // Elastic pop-in at start, gentle settle, fade out at end
+      if (progress < 0.2) {
+        const t = progress / 0.2;
+        // Elastic overshoot
+        it.scale = it.baseScale * (1 + 0.35 * Math.sin(t * Math.PI));
+        it.alpha = Math.min(1, t * 2);
+      } else if (progress < 0.75) {
+        it.scale = it.baseScale;
+        it.alpha = 1;
+      } else {
+        const t = (progress - 0.75) / 0.25;
+        it.scale = it.baseScale * (1 + t * 0.15);
+        it.alpha = Math.max(0, 1 - t);
+      }
     }
   }
 
@@ -358,21 +438,60 @@ class FloatingTextManager {
     ctx.save();
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
+
     for (const it of this.items) {
       ctx.save();
       ctx.globalAlpha = it.alpha;
       ctx.translate(it.x, it.y);
+      ctx.rotate(it.rot);
       ctx.scale(it.scale, it.scale);
+
+      // Optional glowing backdrop badge for major praise
+      if (it.bgBadge) {
+        ctx.font = `900 ${it.size}px "Passion One", sans-serif`;
+        const textMetrics = ctx.measureText(it.text);
+        const badgeW = textMetrics.width + 70;
+        const badgeH = it.size * (it.subText ? 1.8 : 1.3);
+
+        ctx.fillStyle = 'rgba(20, 10, 42, 0.78)';
+        ctx.strokeStyle = it.color;
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.roundRect(-badgeW / 2, -badgeH / 2, badgeW, badgeH, 24);
+        ctx.fill();
+        ctx.stroke();
+      }
+
+      // Neon Shadow Glow
+      if (it.glowColor) {
+        ctx.shadowColor = it.glowColor;
+        ctx.shadowBlur = 20;
+      }
+
+      // Main Text
       ctx.font = `900 ${it.size}px "Passion One", sans-serif`;
 
-      // Thick stroke outline for cartoon look
-      ctx.strokeStyle = '#2b1055';
-      ctx.lineWidth = 10;
+      // Thick stroke outline for arcade 3D pop
+      ctx.strokeStyle = it.strokeColor;
+      ctx.lineWidth = Math.max(8, Math.round(it.size * 0.18));
       ctx.lineJoin = 'round';
-      ctx.strokeText(it.text, 0, 0);
+      ctx.strokeText(it.text, 0, it.subText ? -it.size * 0.22 : 0);
 
       ctx.fillStyle = it.color;
-      ctx.fillText(it.text, 0, 0);
+      ctx.fillText(it.text, 0, it.subText ? -it.size * 0.22 : 0);
+
+      // Sub-text (e.g. +150 PTS or COMBO x2!)
+      if (it.subText) {
+        const subSize = Math.round(it.size * 0.56);
+        ctx.font = `900 ${subSize}px "Passion One", sans-serif`;
+        ctx.strokeStyle = '#1b082e';
+        ctx.lineWidth = 6;
+        ctx.strokeText(it.subText, 0, it.size * 0.42);
+
+        ctx.fillStyle = it.subColor;
+        ctx.fillText(it.subText, 0, it.size * 0.42);
+      }
+
       ctx.restore();
     }
     ctx.restore();

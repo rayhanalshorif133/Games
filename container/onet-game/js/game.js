@@ -55,6 +55,18 @@ class OnetGame {
     // Combos
     this.comboCount = 0;
     this.lastMatchTime = 0;
+    this.comboBanner = {
+      count: 0,
+      timer: 0,
+      maxTimer: 3.5,
+      text: '',
+      scale: 1.0
+    };
+
+    // Time Warning Reminder State
+    this.timeWarning30 = false;
+    this.timeWarning15 = false;
+    this.lastTickSec = -1;
 
     // Layout configuration (1080x1920) - Compact sleek grid matching preview
     this.gridConfig = {
@@ -574,11 +586,19 @@ class OnetGame {
     this.level = level;
     this.score = 0;
     this.comboCount = 0;
+    this.lastMatchTime = 0;
     this.selectedTile = null;
     this.activeConnection = null;
     this.destroyingTiles = [];
     this.activeHint = null;
     this.isLevelWon = false;
+
+    // Reset warnings and combo banner
+    this.timeWarning30 = false;
+    this.timeWarning15 = false;
+    this.lastTickSec = -1;
+    this.comboBanner = { count: 0, timer: 0, maxTimer: 3.5, text: '', scale: 1.0 };
+    this.btnTimePowerup.pulse = 0;
 
     // Time increases slightly with level, base 180s
     this.timeMax = Math.max(120, 190 - level * 10);
@@ -594,7 +614,12 @@ class OnetGame {
     this.state = GAME_STATE.PLAYING;
 
     window.soundEngine.playClick();
-    this.floaters.spawn(`LEVEL ${this.level}!`, 540, 960, '#fffa65', 72);
+    this.floaters.spawn(`LEVEL ${this.level}!`, 540, 960, '#fffa65', 72, 1.2, {
+      glowColor: '#ffea00',
+      strokeColor: '#381404',
+      bgBadge: true,
+      duration: 1.3
+    });
   }
 
   getTileAtPos(x, y) {
@@ -763,19 +788,24 @@ class OnetGame {
     // High energy particle bursts with shockwaves & stars
     this.particles.spawnMatchBurst(x1, y1);
     this.particles.spawnMatchBurst(x2, y2);
+    this.particles.spawnPraiseBurst((x1 + x2) / 2, (y1 + y2) / 2);
 
     // Audio & Screen Shake
     window.soundEngine.playTileExplode();
 
-    if (now - this.lastMatchTime < 3500) {
+    const elapsedSinceLast = now - this.lastMatchTime;
+    if (elapsedSinceLast < 3500 && this.lastMatchTime > 0) {
       this.comboCount++;
     } else {
       this.comboCount = 1;
     }
     this.lastMatchTime = now;
-    window.soundEngine.playMatch(this.comboCount);
 
-    this.shake.start(10, 0.22);
+    // Play ascending harmonic chords and praise fanfare
+    window.soundEngine.playMatch(this.comboCount);
+    window.soundEngine.playPraise(this.comboCount);
+
+    this.shake.start(this.comboCount >= 3 ? 14 : 8, 0.22);
 
     // Calculate score
     const baseScore = 100;
@@ -783,10 +813,93 @@ class OnetGame {
     const earned = baseScore + comboBonus;
     this.score += earned;
 
-    if (this.comboCount > 1) {
-      this.floaters.spawn(`+${earned} (COMBO x${this.comboCount}!)`, (x1 + x2) / 2, (y1 + y2) / 2, '#ff3388', 56);
+    // Determine appreciation compliment & theme
+    const singlePraises = [
+      'GREAT MATCH! ✨',
+      'NICE CATCH! 🎯',
+      'SUPERB! 🌟',
+      'SWEET! 🍬',
+      'GOOD JOB! 👍',
+      'CLEVER! 💡',
+      'PERFECT! 💯',
+      'EXCELLENT! 💎'
+    ];
+    const speedPraises = [
+      'SPEED MATCH! ⚡',
+      'QUICK REFLEX! 🚀',
+      'LIGHTNING FAST! ⚡'
+    ];
+
+    let praiseText = '';
+    let praiseColor = '#fffa65';
+    let glowColor = '#ffeb3b';
+    let strokeColor = '#240a3d';
+    let badge = false;
+    let bannerText = '';
+
+    if (this.comboCount >= 5) {
+      praiseText = 'ULTRA GODLIKE! 👑';
+      praiseColor = '#ff2a85';
+      glowColor = '#ff007f';
+      strokeColor = '#3a001a';
+      badge = true;
+      bannerText = `👑 GODLIKE x${this.comboCount}!`;
+    } else if (this.comboCount === 4) {
+      praiseText = 'MEGA COMBO! 🌟';
+      praiseColor = '#ff9100';
+      glowColor = '#ff3d00';
+      strokeColor = '#3a1200';
+      badge = true;
+      bannerText = `🌟 MEGA COMBO x4!`;
+    } else if (this.comboCount === 3) {
+      praiseText = 'SUPER COMBO! ⚡';
+      praiseColor = '#00f0ff';
+      glowColor = '#00e5ff';
+      strokeColor = '#00253a';
+      badge = true;
+      bannerText = `⚡ SUPER COMBO x3!`;
+    } else if (this.comboCount === 2) {
+      praiseText = 'DOUBLE HIT! 🔥';
+      praiseColor = '#ffea00';
+      glowColor = '#ff9100';
+      strokeColor = '#3a2000';
+      badge = true;
+      bannerText = `🔥 COMBO x2!`;
+    } else if (elapsedSinceLast < 1600 && elapsedSinceLast > 0) {
+      praiseText = speedPraises[Math.floor(Math.random() * speedPraises.length)];
+      praiseColor = '#00ffcc';
+      glowColor = '#00e676';
+      strokeColor = '#00331e';
     } else {
-      this.floaters.spawn(`+${earned}`, (x1 + x2) / 2, (y1 + y2) / 2, '#ffeb3b', 52);
+      praiseText = singlePraises[Math.floor(Math.random() * singlePraises.length)];
+      praiseColor = '#fffa65';
+      glowColor = '#ffcc00';
+      strokeColor = '#2b1055';
+    }
+
+    // Floating praise badge at connection midpoint
+    const midX = (x1 + x2) / 2;
+    const midY = (y1 + y2) / 2;
+    this.floaters.spawn(praiseText, midX, midY, praiseColor, badge ? 58 : 50, 1.15, {
+      isPraise: true,
+      subText: `+${earned} PTS`,
+      subColor: '#ffffff',
+      glowColor: glowColor,
+      strokeColor: strokeColor,
+      bgBadge: badge,
+      duration: 1.25,
+      driftY: 95
+    });
+
+    // Update active combo streak banner
+    if (this.comboCount >= 2) {
+      this.comboBanner = {
+        count: this.comboCount,
+        timer: 3.5,
+        maxTimer: 3.5,
+        text: bannerText,
+        scale: 1.35
+      };
     }
   }
 
@@ -868,7 +981,25 @@ class OnetGame {
     if (this.powerups.time <= 0 || this.state !== GAME_STATE.PLAYING) return;
     this.powerups.time--;
     this.timeLeft = Math.min(this.timeMax, this.timeLeft + 20);
-    this.floaters.spawn('+20s TIME!', 270, 1620, '#00e5ff', 52);
+
+    // Reset warnings if time was restored
+    if (this.timeLeft > 30) {
+      this.timeWarning30 = false;
+      this.timeWarning15 = false;
+      this.lastTickSec = -1;
+      this.btnTimePowerup.pulse = 0;
+    } else if (this.timeLeft > 15) {
+      this.timeWarning15 = false;
+      this.lastTickSec = -1;
+    }
+
+    this.floaters.spawn('+20s TIME ADDED! ⏰', 270, 1580, '#00ff88', 56, 1.2, {
+      duration: 1.4,
+      glowColor: '#00ff88',
+      strokeColor: '#003311',
+      bgBadge: true,
+      driftY: 70
+    });
     window.soundEngine.playTimeBonus();
   }
 
@@ -877,7 +1008,12 @@ class OnetGame {
     this.powerups.roll--;
     this.selectedTile = null;
     this.onet.shuffleRemaining(this.grid);
-    this.floaters.spawn('SHUFFLED!', 540, 960, '#76ff03', 60);
+    this.floaters.spawn('SHUFFLED! 🎲', 540, 960, '#76ff03', 60, 1.2, {
+      duration: 1.2,
+      glowColor: '#76ff03',
+      strokeColor: '#123800',
+      bgBadge: true
+    });
     window.soundEngine.playShuffle();
   }
 
@@ -899,7 +1035,12 @@ class OnetGame {
 
     this.particles.spawnHintSparkles(x1, y1);
     this.particles.spawnHintSparkles(x2, y2);
-    this.floaters.spawn('HINT FOUND!', 540, 960, '#fffa65', 56);
+    this.floaters.spawn('HINT FOUND! 💡', 540, 960, '#fffa65', 58, 1.2, {
+      duration: 1.2,
+      glowColor: '#ffea00',
+      strokeColor: '#3d2b00',
+      bgBadge: true
+    });
     window.soundEngine.playHint();
   }
 
@@ -919,14 +1060,68 @@ class OnetGame {
     this.particles.update(dt);
     this.floaters.update(dt);
 
-    // Gameplay Timer
+    // Update Combo Banner Timer & Sparks
+    if (this.comboBanner.timer > 0) {
+      this.comboBanner.timer -= dt;
+      if (this.comboBanner.timer <= 0) {
+        this.comboCount = 0;
+        this.comboBanner.timer = 0;
+      }
+      if (this.comboBanner.scale > 1.0) {
+        this.comboBanner.scale = Math.max(1.0, this.comboBanner.scale - dt * 1.8);
+      }
+      if (this.comboBanner.count >= 2 && Math.random() < 0.35) {
+        this.particles.spawnFlameSparks(540 + (Math.random() - 0.5) * 260, 280);
+      }
+    }
+
+    // Gameplay Timer & Progressive Warnings
     if (this.state === GAME_STATE.PLAYING && !this.activeConnection && (!this.destroyingTiles || this.destroyingTiles.length === 0)) {
       this.timeLeft -= dt;
       if (this.timeLeft <= 0) {
         this.timeLeft = 0;
         this.triggerGameOver();
-      } else if (this.timeLeft <= 10 && Math.floor(this.timeLeft) !== Math.floor(this.timeLeft + dt)) {
-        window.soundEngine.playTick();
+      } else {
+        // Warning 1: <= 30 seconds
+        if (this.timeLeft <= 30 && !this.timeWarning30) {
+          this.timeWarning30 = true;
+          window.soundEngine.playTimeWarning();
+          this.floaters.spawn('⏳ 30s LEFT! HURRY UP!', 540, 520, '#ffea00', 64, 1.25, {
+            duration: 1.6,
+            glowColor: '#ff9100',
+            strokeColor: '#4a1505',
+            bgBadge: true,
+            driftY: 60
+          });
+          this.btnTimePowerup.pulse = 1;
+        }
+
+        // Warning 2: <= 15 seconds
+        if (this.timeLeft <= 15 && !this.timeWarning15) {
+          this.timeWarning15 = true;
+          window.soundEngine.playTimeCritical();
+          this.floaters.spawn('⚠️ 15s LEFT! TIME RUNNING OUT!', 540, 520, '#ff1744', 66, 1.3, {
+            duration: 1.6,
+            glowColor: '#ff0055',
+            strokeColor: '#3d0014',
+            bgBadge: true,
+            driftY: 60
+          });
+          this.shake.start(8, 0.28);
+          this.btnTimePowerup.pulse = 1;
+        }
+
+        // Critical Final Countdown Ticker: <= 10 seconds (10, 9, 8... 1)
+        if (this.timeLeft <= 10 && this.timeLeft > 0) {
+          const curSec = Math.ceil(this.timeLeft);
+          if (curSec !== this.lastTickSec) {
+            this.lastTickSec = curSec;
+            window.soundEngine.playUrgentTick(curSec);
+            if (curSec <= 5) {
+              this.shake.start(4, 0.12);
+            }
+          }
+        }
       }
     }
 
@@ -1126,6 +1321,24 @@ class OnetGame {
       ctx.fillRect(0, 0, 1080, 1920);
     }
 
+    // Urgent Red Vignette & Border Pulse when time <= 15 seconds
+    if (this.timeLeft <= 15 && this.timeLeft > 0) {
+      const pulseAlpha = 0.22 + Math.sin(now * 0.012) * 0.16;
+      ctx.save();
+      // Edge warning border
+      ctx.strokeStyle = `rgba(255, 23, 68, ${pulseAlpha * 1.5})`;
+      ctx.lineWidth = 14;
+      ctx.strokeRect(7, 7, 1066, 1906);
+
+      // Radial vignette glow
+      const grad = ctx.createRadialGradient(540, 960, 500, 540, 960, 1050);
+      grad.addColorStop(0, 'rgba(255, 0, 60, 0)');
+      grad.addColorStop(1, `rgba(255, 0, 60, ${pulseAlpha * 0.55})`);
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 1080, 1920);
+      ctx.restore();
+    }
+
     // Top Bar Image
     const topBar = this.assets.get('Top_Bar');
     const tbX = 50;
@@ -1177,13 +1390,90 @@ class OnetGame {
       ctx.roundRect(slotX, slotY, fillW, slotH, 13);
       ctx.clip();
       ctx.drawImage(clockBar, slotX, slotY, slotW, slotH);
+
+      // Flashing urgent red/gold tint when time <= 15s
+      if (this.timeLeft <= 15) {
+        const flashAlpha = 0.35 + Math.sin(now * 0.02) * 0.3;
+        ctx.fillStyle = `rgba(255, 23, 68, ${flashAlpha})`;
+        ctx.fillRect(slotX, slotY, fillW, slotH);
+      }
       ctx.restore();
     }
 
-    // Clock Icon
+    // Clock Icon with warning wobble & pulse when time is running low
     const clockIcon = this.assets.get('Clock_Icon');
     if (clockIcon) {
-      ctx.drawImage(clockIcon, slotX - 32, slotY - 14, 56, 54);
+      ctx.save();
+      const iconCx = slotX - 4;
+      const iconCy = slotY + 13;
+      ctx.translate(iconCx, iconCy);
+
+      if (this.timeLeft <= 15) {
+        const wobble = Math.sin(now * 0.035) * 0.22;
+        const pulse = 1.0 + Math.sin(now * 0.03) * 0.25;
+        ctx.rotate(wobble);
+        ctx.scale(pulse, pulse);
+      } else if (this.timeLeft <= 30) {
+        const pulse = 1.0 + Math.sin(now * 0.015) * 0.12;
+        ctx.scale(pulse, pulse);
+      }
+      ctx.drawImage(clockIcon, -28, -27, 56, 54);
+      ctx.restore();
+    }
+
+    // Digital seconds badge next to Clock Bar when time <= 30s
+    if (this.timeLeft <= 30 && this.timeLeft > 0) {
+      const secNum = Math.ceil(this.timeLeft);
+      const secStr = secNum < 10 ? `0${secNum}s` : `${secNum}s`;
+      const badgePulse = this.timeLeft <= 10 ? 1 + Math.sin(now * 0.025) * 0.12 : 1.0;
+
+      ctx.save();
+      ctx.translate(slotX + slotW - 55, slotY + 13);
+      ctx.scale(badgePulse, badgePulse);
+
+      ctx.fillStyle = this.timeLeft <= 10 ? 'rgba(255, 23, 68, 0.95)' : 'rgba(255, 145, 0, 0.92)';
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.roundRect(-48, -18, 96, 36, 18);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.font = '900 26px "Passion One", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText(secStr, 0, 1);
+      ctx.restore();
+    }
+
+    // Active Combo Streak Banner when combo >= 2
+    if (this.comboBanner.timer > 0 && this.comboBanner.count >= 2) {
+      const cbAlpha = Math.min(1, this.comboBanner.timer / 0.4);
+      ctx.save();
+      ctx.globalAlpha = cbAlpha;
+      ctx.translate(540, 280);
+      ctx.scale(this.comboBanner.scale, this.comboBanner.scale);
+
+      const cbWidth = 380;
+      const cbHeight = 44;
+      ctx.fillStyle = 'rgba(22, 10, 42, 0.88)';
+      ctx.strokeStyle = '#ff9100';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.roundRect(-cbWidth / 2, -cbHeight / 2, cbWidth, cbHeight, 22);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.font = '900 34px "Passion One", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.strokeStyle = '#3e1500';
+      ctx.lineWidth = 6;
+      ctx.strokeText(this.comboBanner.text, 0, 2);
+      ctx.fillStyle = '#ffea00';
+      ctx.fillText(this.comboBanner.text, 0, 2);
+      ctx.restore();
     }
 
     // Render Tile Grid
@@ -1209,6 +1499,40 @@ class OnetGame {
     this.btnTimePowerup.render(ctx, this.assets);
     this.btnRollPowerup.render(ctx, this.assets);
     this.btnHintPowerup.render(ctx, this.assets);
+
+    // Pulsing highlight ring on +Time button when time is low (<= 25s) and player has stock
+    if (this.timeLeft <= 25 && this.powerups.time > 0 && this.state === GAME_STATE.PLAYING) {
+      const btnCx = this.btnTimePowerup.x + this.btnTimePowerup.w / 2;
+      const btnCy = this.btnTimePowerup.y + this.btnTimePowerup.h / 2;
+      const glowScale = 1.0 + Math.sin(now * 0.015) * 0.12;
+
+      ctx.save();
+      ctx.strokeStyle = '#00ff88';
+      ctx.lineWidth = 6;
+      ctx.shadowColor = '#00ff88';
+      ctx.shadowBlur = 18;
+      ctx.beginPath();
+      ctx.arc(btnCx, btnCy, (this.btnTimePowerup.w / 2 + 10) * glowScale, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // "USE +TIME!" bounce tag above button
+      const tagBounce = Math.sin(now * 0.014) * 6;
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = '#00e676';
+      ctx.strokeStyle = '#003314';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.roundRect(btnCx - 64, this.btnTimePowerup.y - 34 + tagBounce, 128, 30, 15);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.font = '900 22px "Passion One", sans-serif';
+      ctx.fillStyle = '#ffffff';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('USE +TIME! ⏰', btnCx, this.btnTimePowerup.y - 19 + tagBounce);
+      ctx.restore();
+    }
 
     // Labels under powerup buttons
     ctx.font = '900 38px "Passion One", sans-serif';

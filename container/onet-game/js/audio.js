@@ -435,6 +435,126 @@ class SoundEngine {
     osc.stop(now + 0.03);
   }
 
+  playUrgentTick(secondsLeft = 10) {
+    if (!this.soundEnabled) return;
+    this.init();
+    if (!this.ctx) return;
+    this.vibrate(secondsLeft <= 3 ? 35 : 20);
+
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    // Frequency rises sharply from 750Hz up to 1800Hz in final seconds
+    const urgency = Math.max(1, 11 - Math.min(10, secondsLeft));
+    const startFreq = 650 + urgency * 110;
+
+    osc.type = secondsLeft <= 3 ? 'triangle' : 'sine';
+    osc.frequency.setValueAtTime(startFreq, now);
+    osc.frequency.exponentialRampToValueAtTime(startFreq * 0.5, now + 0.06);
+
+    const vol = 0.18 + urgency * 0.02;
+    gain.gain.setValueAtTime(vol, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 0.06);
+  }
+
+  playTimeWarning() {
+    if (!this.soundEnabled) return;
+    this.init();
+    if (!this.ctx) return;
+    this.vibrate(30);
+
+    const now = this.ctx.currentTime;
+    const notes = [659.25, 880.00]; // E5 -> A5 friendly chime
+    notes.forEach((freq, i) => {
+      const noteTime = now + i * 0.1;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, noteTime);
+
+      gain.gain.setValueAtTime(0.2, noteTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, noteTime + 0.3);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start(noteTime);
+      osc.stop(noteTime + 0.3);
+    });
+  }
+
+  playTimeCritical() {
+    if (!this.soundEnabled) return;
+    this.init();
+    if (!this.ctx) return;
+    this.vibrate(60);
+
+    const now = this.ctx.currentTime;
+    const notes = [987.77, 880.00, 987.77]; // Urgent beep-beep
+    notes.forEach((freq, i) => {
+      const noteTime = now + i * 0.08;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(freq, noteTime);
+
+      const filter = this.ctx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(1200, noteTime);
+      filter.Q.setValueAtTime(2.0, noteTime);
+
+      gain.gain.setValueAtTime(0.22, noteTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, noteTime + 0.16);
+
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start(noteTime);
+      osc.stop(noteTime + 0.16);
+    });
+  }
+
+  playPraise(comboTier = 1) {
+    if (!this.soundEnabled) return;
+    this.init();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+    let notes = [523.25, 659.25, 783.99, 1046.50]; // Bright chime
+    if (comboTier >= 3) {
+      notes = [523.25, 659.25, 783.99, 1046.50, 1318.51, 1567.98]; // Extended fanfare
+    }
+
+    notes.forEach((freq, i) => {
+      const noteTime = now + i * 0.045;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, noteTime);
+
+      const dur = i === notes.length - 1 ? 0.45 : 0.2;
+      gain.gain.setValueAtTime(0.14, noteTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, noteTime + dur);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start(noteTime);
+      osc.stop(noteTime + dur);
+    });
+  }
+
   // --- Procedural Cheerful Background Music (BGM) ---
 
   startBGM() {
