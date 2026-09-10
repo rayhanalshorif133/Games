@@ -58,16 +58,17 @@ class SoundManager {
     }
 
     // Ball Lift Sound - Crisp soft ascending bubble pop
-    playBallLift() {
+    playBallLift(pitchIndex = 0) {
         if (!this.soundEnabled || !this.ctx) return;
         try {
+            const pitchMult = 1 + pitchIndex * 0.12;
             const t = this.ctx.currentTime;
             const osc = this.ctx.createOscillator();
             const gain = this.ctx.createGain();
 
             osc.type = 'sine';
-            osc.frequency.setValueAtTime(320, t);
-            osc.frequency.exponentialRampToValueAtTime(650, t + 0.08);
+            osc.frequency.setValueAtTime(320 * pitchMult, t);
+            osc.frequency.exponentialRampToValueAtTime(650 * pitchMult, t + 0.08);
 
             gain.gain.setValueAtTime(0.3, t);
             gain.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
@@ -80,17 +81,18 @@ class SoundManager {
         } catch (e) { }
     }
 
-    // Ball Drop / Clink Sound - Resonant glass/marble impact
-    playBallDrop() {
+    // Ball Drop / Clink Sound - Resonant glass/marble impact with harmonic overtone
+    playBallDrop(pitchIndex = 0) {
         if (!this.soundEnabled || !this.ctx) return;
         try {
+            const pitchMult = 1 + pitchIndex * 0.15;
             const t = this.ctx.currentTime;
             // Primary tone
             const osc1 = this.ctx.createOscillator();
             const gain1 = this.ctx.createGain();
             osc1.type = 'triangle';
-            osc1.frequency.setValueAtTime(440, t);
-            osc1.frequency.exponentialRampToValueAtTime(280, t + 0.14);
+            osc1.frequency.setValueAtTime(440 * pitchMult, t);
+            osc1.frequency.exponentialRampToValueAtTime(280 * pitchMult, t + 0.14);
             gain1.gain.setValueAtTime(0.35, t);
             gain1.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
 
@@ -98,8 +100,8 @@ class SoundManager {
             const osc2 = this.ctx.createOscillator();
             const gain2 = this.ctx.createGain();
             osc2.type = 'sine';
-            osc2.frequency.setValueAtTime(1420, t);
-            gain2.gain.setValueAtTime(0.18, t);
+            osc2.frequency.setValueAtTime(1420 * pitchMult, t);
+            gain2.gain.setValueAtTime(0.2, t);
             gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
 
             osc1.connect(gain1);

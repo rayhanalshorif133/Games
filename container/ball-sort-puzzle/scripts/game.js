@@ -104,7 +104,15 @@
         chest: 'assets/chest.png',
         fox_best: 'assets/fox_best.png',
         raccoon_hot: 'assets/raccoon_hot.png',
-        btn_free_coins: 'assets/btn_free_coins.png'
+        btn_free_coins: 'assets/btn_free_coins.png',
+        btn_play_new: 'assets/btn_play_new.png',
+        btn_round_play: 'assets/btn_round_play.png',
+        char_beaver_wave: 'assets/char_beaver_wave.png',
+        nav_shop: 'assets/nav_shop.png',
+        nav_news: 'assets/nav_news.png',
+        nav_wheel: 'assets/nav_wheel.png',
+        nav_trophy: 'assets/nav_trophy.png',
+        nav_crown: 'assets/nav_crown.png'
     };
 
     const assets = {};
@@ -269,9 +277,9 @@
             this.canvas.width = V_WIDTH;
             this.canvas.height = V_HEIGHT;
 
-            // State management: PLAYING, PAUSED, LEVEL_WIN, LEVEL_SELECT, SPIN_WHEEL, PROFILE, SHOP
-            this.state = 'PLAYING';
-            this.previousState = 'PLAYING';
+            // State management: HOME, PLAYING, PAUSED, LEVEL_WIN, LEVEL_SELECT, SPIN_WHEEL, PROFILE, SHOP, SETTINGS
+            this.state = 'HOME';
+            this.previousState = 'HOME';
 
             // User Persistent Data
             this.loadUserData();
@@ -282,8 +290,8 @@
             this.selectedTube = null; // Currently lifted ball index
             this.moveHistory = []; // Stack of moves { from, to, ball }
 
-            // Active Ball Transfer Animation
-            this.activeAnim = null; // { ballColor, fromTube, toTube, progress, duration, path... }
+            // Active Ball Transfer Animation Queue
+            this.activeBallAnims = [];
             this.tubeBounce = {}; // { tubeIndex: { scaleX, scaleY, velX, velY } }
             this.screenShake = 0;
 
@@ -326,17 +334,34 @@
             // Setup
             this.setupEventListeners();
             this.initLevel(this.currentLevel);
+            // Default screen is HOME on startup
+            this.state = 'HOME';
 
             // Start Main Loop
             this.lastTime = performance.now();
             requestAnimationFrame(this.gameLoop.bind(this));
         }
 
+        get activeAnim() {
+            return this.activeBallAnims && this.activeBallAnims.length > 0;
+        }
+
+        openSettingsModal() {
+            window.soundManager.playClick();
+            this.previousState = this.state;
+            this.state = 'SETTINGS';
+        }
+
+        closeSettingsModal() {
+            window.soundManager.playClick();
+            this.state = (this.previousState && this.previousState !== 'SETTINGS') ? this.previousState : 'HOME';
+        }
+
         loadUserData() {
             const def = {
                 currentLevel: 1,
                 highestUnlocked: 1,
-                coins: 250,
+                points: 0,
                 selectedChar: 'beaver',
                 stars: {}, // levelNum -> stars (1-3)
                 completedLevels: []
@@ -344,6 +369,9 @@
             try {
                 const data = localStorage.getItem('bsp_userdata');
                 this.userData = data ? Object.assign(def, JSON.parse(data)) : def;
+                if (typeof this.userData.points !== 'number') {
+                    this.userData.points = 0;
+                }
             } catch (e) {
                 this.userData = def;
             }
@@ -368,8 +396,9 @@
             this.tubes = JSON.parse(JSON.stringify(rawLevel));
             this.selectedTube = null;
             this.moveHistory = [];
-            this.activeAnim = null;
+            this.activeBallAnims = [];
             this.tubeBounce = {};
+            this.extraTubeAdded = false;
             this.state = 'PLAYING';
 
             this.calculateTubeLayouts();
@@ -458,12 +487,24 @@
         }
 
         // --- GAMEPLAY MECHANICS ---
+        getTopMatchingInfo(tubeIndex) {
+            const tube = this.tubes[tubeIndex];
+            if (!tube || tube.length === 0) return { color: null, count: 0 };
+            const color = tube[tube.length - 1];
+            let count = 0;
+            for (let i = tube.length - 1; i >= 0; i--) {
+                if (tube[i] === color) count++;
+                else break;
+            }
+            return { color, count };
+        }
+
         handleTubeClick(tubeIndex) {
-            if (this.state !== 'PLAYING' || this.activeAnim) return;
+            if (this.state !== 'PLAYING' || (this.activeBallAnims && this.activeBallAnims.length > 0)) return;
 
             const tube = this.tubes[tubeIndex];
 
-            // Case 1: No tube currently selected -> Lift top ball
+            // Case 1: No tube currently selected -> Lift top matching ball(s)
             if (this.selectedTube === null) {
                 if (tube.length === 0) {
                     // Empty tube, cannot select
@@ -472,18 +513,18 @@
                     return;
                 }
 
-                // Lift top ball
+                // Lift top matching ball(s)
                 this.selectedTube = tubeIndex;
-                window.soundManager.playBallLift();
-                this.triggerTubeBounce(tubeIndex, 0.95, 1.06);
+                window.soundManager.playBallLift(0);
+                this.triggerTubeBounce(tubeIndex, 0.94, 1.08);
                 return;
             }
 
-            // Case 2: Clicking the same tube -> Put ball back down
+            // Case 2: Clicking the same tube -> Put balls back down
             if (this.selectedTube === tubeIndex) {
                 this.selectedTube = null;
-                window.soundManager.playBallDrop();
-                this.triggerTubeBounce(tubeIndex, 1.05, 0.95);
+                window.soundManager.playBallDrop(0);
+                this.triggerTubeBounce(tubeIndex, 1.06, 0.94);
                 return;
             }
 
@@ -491,10 +532,10 @@
             const srcTubeIndex = this.selectedTube;
             const srcTube = this.tubes[srcTubeIndex];
             const dstTube = this.tubes[tubeIndex];
-            const movingBall = srcTube[srcTube.length - 1];
+            const srcInfo = this.getTopMatchingInfo(srcTubeIndex);
 
             const isValidMove = (dstTube.length < 4) &&
-                (dstTube.length === 0 || dstTube[dstTube.length - 1] === movingBall);
+                (dstTube.length === 0 || dstTube[dstTube.length - 1] === srcInfo.color);
 
             if (!isValidMove) {
                 // Invalid move!
@@ -508,69 +549,75 @@
                 return;
             }
 
-            // Valid Move! Execute transfer animation
+            // Valid Move! Calculate number of matching balls to transfer together
+            const availableSpace = 4 - dstTube.length;
+            const moveCount = Math.min(srcInfo.count, availableSpace);
+
             this.selectedTube = null;
-            srcTube.pop(); // Remove from source
+
+            // Pop moving balls from source tube (from top down)
+            const movingBalls = [];
+            for (let k = 0; k < moveCount; k++) {
+                movingBalls.push(srcTube.pop());
+            }
 
             // Record move in undo stack
-            this.moveHistory.push({ from: srcTubeIndex, to: tubeIndex, ball: movingBall });
+            this.moveHistory.push({
+                from: srcTubeIndex,
+                to: tubeIndex,
+                count: moveCount,
+                color: srcInfo.color
+            });
 
             const srcLayout = this.tubeLayouts[srcTubeIndex];
             const dstLayout = this.tubeLayouts[tubeIndex];
-            const targetSlotIndex = dstTube.length; // target level
+            const baseDstSlot = dstTube.length;
 
-            const startX = srcLayout.cx;
-            const startY = srcLayout.hoverY;
-            const endX = dstLayout.cx;
-            const endY = dstLayout.slots[targetSlotIndex];
+            // Dynamic Bezier arc calculation based on distance
+            const dx = Math.abs(dstLayout.cx - srcLayout.cx);
+            const dy = Math.abs(dstLayout.cy - srcLayout.cy);
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            const arcHeight = Math.min(240, 110 + dist * 0.16);
 
-            const peakY = Math.min(srcLayout.hoverY, dstLayout.hoverY) - 120;
+            this.activeBallAnims = [];
+            for (let k = 0; k < moveCount; k++) {
+                const ballColor = movingBalls[k];
+                const targetSlot = baseDstSlot + k;
 
-            this.activeAnim = {
-                ball: movingBall,
-                from: srcTubeIndex,
-                to: tubeIndex,
-                startX: startX,
-                startY: startY,
-                controlX: (startX + endX) / 2,
-                controlY: peakY,
-                endX: endX,
-                endY: endY,
-                dropStartY: dstLayout.mouthY,
-                t: 0,
-                duration: 0.38, // seconds
-                phase: 'ARC' // 'ARC' then 'DROP'
-            };
+                const startX = srcLayout.cx;
+                const startY = srcLayout.hoverY + k * (srcLayout.ballSize * 0.92);
+                const endX = dstLayout.cx;
+                const endY = dstLayout.slots[targetSlot];
+                const peakY = Math.min(srcLayout.hoverY, dstLayout.hoverY) - arcHeight - (moveCount - 1 - k) * 20;
 
-            window.soundManager.playBallLift();
-        }
-
-        finishMoveAnimation() {
-            if (!this.activeAnim) return;
-
-            const toIndex = this.activeAnim.to;
-            const ball = this.activeAnim.ball;
-            this.tubes[toIndex].push(ball);
-
-            // Landing sound and impact bounce
-            window.soundManager.playBallDrop();
-            this.triggerTubeBounce(toIndex, 1.15, 0.85);
-
-            // Small dust bubbles at tube bottom
-            const dstLayout = this.tubeLayouts[toIndex];
-            this.particles.emitBubbles(dstLayout.cx, dstLayout.y + dstLayout.h - 20, 8);
-
-            // Check if this destination tube is newly completed (4 balls of same color)
-            if (this.tubes[toIndex].length === 4 && this.tubes[toIndex].every(b => b === ball)) {
-                window.soundManager.playTubeComplete();
-                this.particles.emitSparkles(dstLayout.cx, dstLayout.y + 30, 35, BALL_COLORS_MAP[ball].color);
-                this.companion.jumpVel = -15; // Companion jumps excitedly!
+                this.activeBallAnims.push({
+                    ball: ballColor,
+                    from: srcTubeIndex,
+                    to: tubeIndex,
+                    index: k,
+                    total: moveCount,
+                    startX: startX,
+                    startY: startY,
+                    controlX: (startX + endX) / 2,
+                    controlY: peakY,
+                    endX: endX,
+                    endY: endY,
+                    dropStartY: dstLayout.mouthY,
+                    delay: k * 0.11, // staggered flight
+                    elapsed: 0,
+                    duration: 0.34,
+                    phase: 'WAIT',
+                    currentX: startX,
+                    currentY: startY,
+                    scaleX: 1,
+                    scaleY: 1,
+                    hasPlayedLiftSound: false,
+                    landed: false
+                });
             }
 
-            this.activeAnim = null;
-
-            // Check win condition
-            this.checkWinCondition();
+            this.currentHint = null;
+            this.triggerTubeBounce(srcTubeIndex, 0.92, 1.1);
         }
 
         checkWinCondition() {
@@ -599,9 +646,20 @@
             this.winStarsAnim = [0, 0, 0];
             this.winAnimTimer = 0;
 
-            // Give rewards
-            const rewardCoins = 25;
-            this.userData.coins += rewardCoins;
+            // Level-based point gain
+            const earnedPoints = this.currentLevel * 100;
+            this.lastEarnedPoints = earnedPoints;
+            this.userData.points = (this.userData.points || 0) + earnedPoints;
+
+            // Transmit Score via SendScoreAPI
+            if (window.SendScoreAPI && typeof window.SendScoreAPI.sendScore === 'function') {
+                window.SendScoreAPI.sendScore(this.userData.points, this.currentLevel, {
+                    levelPoints: earnedPoints,
+                    totalPoints: this.userData.points,
+                    stars: 3,
+                    moveCount: this.moveHistory ? this.moveHistory.length : 0
+                });
+            }
 
             // Save completed level
             if (!this.userData.completedLevels.includes(this.currentLevel)) {
@@ -621,42 +679,45 @@
         }
 
         undoMove() {
-            if (this.moveHistory.length === 0 || this.activeAnim || this.state !== 'PLAYING') return;
+            if (this.moveHistory.length === 0 || (this.activeBallAnims && this.activeBallAnims.length > 0) || this.state !== 'PLAYING') return;
 
             const lastMove = this.moveHistory.pop();
-            const { from, to, ball } = lastMove;
+            const { from, to, count, color } = lastMove;
 
-            // Remove ball from 'to' and place back into 'from'
             this.selectedTube = null;
-            const b = this.tubes[to].pop();
-            this.tubes[from].push(b);
 
-            window.soundManager.playBallDrop();
+            // Pop 'count' balls from 'to' and place back into 'from'
+            const num = count || 1;
+            for (let k = 0; k < num; k++) {
+                const b = this.tubes[to].pop();
+                this.tubes[from].push(b !== undefined ? b : color);
+            }
+
+            window.soundManager.playBallDrop(0);
             this.triggerTubeBounce(from, 1.1, 0.9);
+            this.triggerTubeBounce(to, 0.95, 1.05);
+
+            const fromLayout = this.tubeLayouts[from];
+            if (fromLayout) {
+                this.particles.emitBubbles(fromLayout.cx, fromLayout.y + fromLayout.h - 20, 8);
+            }
         }
 
         addExtraTubeBooster() {
             if (this.state !== 'PLAYING' || this.activeAnim) return;
 
-            // Check if player has already added extra tube (maximum 1 extra tube)
+            // Check if player has already added extra tube (maximum 1 extra tube per level)
             if (this.extraTubeAdded) {
                 this.showCompanionSpeech("Already added!");
                 return;
             }
 
-            if (this.userData.coins >= 50) {
-                this.userData.coins -= 50;
-                this.saveUserData();
-                this.extraTubeAdded = true;
-                this.tubes.push([]);
-                this.calculateTubeLayouts();
-                window.soundManager.playCoin();
-                this.particles.emitSparkles(V_WIDTH / 2, V_HEIGHT / 2, 40, '#ffeb3b');
-                this.showCompanionSpeech("+1 Extra Tube!");
-            } else {
-                window.soundManager.playError();
-                this.showCompanionSpeech("Need 50 coins!");
-            }
+            this.extraTubeAdded = true;
+            this.tubes.push([]);
+            this.calculateTubeLayouts();
+            window.soundManager.playBallLift(0);
+            this.particles.emitSparkles(V_WIDTH / 2, V_HEIGHT / 2, 40, '#ffeb3b');
+            this.showCompanionSpeech("+1 Extra Tube!");
         }
 
         showHint() {
@@ -754,20 +815,117 @@
                 }
             }
 
-            // Ball Transfer Animation
-            if (this.activeAnim) {
-                const anim = this.activeAnim;
-                anim.t += dt / anim.duration;
+            // Staggered Multi-Ball Transfer Animation Loop
+            if (this.activeBallAnims && this.activeBallAnims.length > 0) {
+                let allFinished = true;
 
-                if (anim.phase === 'ARC') {
-                    if (anim.t >= 0.75) {
-                        // Switch to drop phase
+                for (let i = 0; i < this.activeBallAnims.length; i++) {
+                    const anim = this.activeBallAnims[i];
+                    if (anim.landed) continue;
+
+                    allFinished = false;
+                    anim.elapsed += dt;
+
+                    if (anim.elapsed < anim.delay) {
+                        // Ball is hovering while waiting for its turn
+                        anim.phase = 'WAIT';
+                        const hoverBob = Math.sin(Date.now() * 0.008 + anim.index) * 4;
+                        anim.currentX = anim.startX;
+                        anim.currentY = anim.startY + hoverBob;
+                        anim.scaleX = 1.0;
+                        anim.scaleY = 1.0;
+                        continue;
+                    }
+
+                    // Flight progress
+                    const flightTime = anim.elapsed - anim.delay;
+                    const totalDuration = anim.duration + 0.14; // arc + drop duration
+                    const normalizedT = Math.min(1.0, flightTime / totalDuration);
+
+                    if (!anim.hasPlayedLiftSound) {
+                        anim.hasPlayedLiftSound = true;
+                        window.soundManager.playBallLift(anim.index);
+                    }
+
+                    // Emit subtle sparkling dust during flight
+                    if (Math.random() < 0.3) {
+                        const ballColorHex = BALL_COLORS_MAP[anim.ball] ? BALL_COLORS_MAP[anim.ball].color : '#ffffff';
+                        this.particles.emitBubbles(anim.currentX, anim.currentY, 1, ballColorHex);
+                    }
+
+                    if (normalizedT <= 0.68) {
+                        // Phase 1: Smooth Bezier Arc
+                        anim.phase = 'ARC';
+                        const arcT = normalizedT / 0.68;
+                        const easedArcT = arcT < 0.5 ? 2 * arcT * arcT : 1 - Math.pow(-2 * arcT + 2, 2) / 2;
+                        const u = 1 - easedArcT;
+
+                        anim.currentX = u * u * anim.startX + 2 * u * easedArcT * anim.controlX + easedArcT * easedArcT * anim.endX;
+                        anim.currentY = u * u * anim.startY + 2 * u * easedArcT * anim.controlY + easedArcT * easedArcT * anim.dropStartY;
+
+                        // Slight flight aerodynamic stretch
+                        anim.scaleX = 0.94;
+                        anim.scaleY = 1.08;
+                    } else {
+                        // Phase 2: Accelerated Drop into tube
                         anim.phase = 'DROP';
+                        anim.currentX = anim.endX;
+                        const dropT = (normalizedT - 0.68) / 0.32;
+                        const easedDrop = dropT * dropT; // gravity acceleration
+                        anim.currentY = anim.dropStartY + (anim.endY - anim.dropStartY) * easedDrop;
+
+                        if (dropT > 0.85) {
+                            // Impact squash
+                            anim.scaleX = 1.22;
+                            anim.scaleY = 0.82;
+                        } else {
+                            anim.scaleX = 0.96;
+                            anim.scaleY = 1.06;
+                        }
+                    }
+
+                    // Check if this individual ball has reached destination slot
+                    if (normalizedT >= 1.0) {
+                        anim.landed = true;
+                        anim.scaleX = 1.0;
+                        anim.scaleY = 1.0;
+
+                        // Push ball into destination tube
+                        this.tubes[anim.to].push(anim.ball);
+
+                        // Individual ball landing sound with melodic pitch variation
+                        window.soundManager.playBallDrop(anim.index);
+
+                        // Impact bounce on destination tube
+                        this.triggerTubeBounce(anim.to, 1.1 + anim.index * 0.03, 0.88 - anim.index * 0.03);
+
+                        // Emit landing splash particles
+                        const ballColorHex = BALL_COLORS_MAP[anim.ball] ? BALL_COLORS_MAP[anim.ball].color : '#ffffff';
+                        this.particles.emitBubbles(anim.endX, anim.endY, 6, ballColorHex);
                     }
                 }
 
-                if (anim.t >= 1.0) {
-                    this.finishMoveAnimation();
+                if (allFinished) {
+                    // All balls in batch have completed transfer!
+                    const lastAnim = this.activeBallAnims[this.activeBallAnims.length - 1];
+                    const toIndex = lastAnim.to;
+                    const color = lastAnim.ball;
+                    const dstLayout = this.tubeLayouts[toIndex];
+
+                    // Check if destination tube is completed (4 balls of same color)
+                    if (this.tubes[toIndex].length === 4 && this.tubes[toIndex].every(b => b === color)) {
+                        window.soundManager.playTubeComplete();
+                        const colorHex = BALL_COLORS_MAP[color] ? BALL_COLORS_MAP[color].color : '#4caf50';
+                        this.particles.emitSparkles(dstLayout.cx, dstLayout.y + 30, 40, colorHex);
+                        this.particles.emitConfetti(dstLayout.cx, dstLayout.y + 80, 30);
+                        this.companion.jumpVel = -16; // Companion cheers excitedly!
+                        this.showCompanionSpeech("Awesome sort!");
+                    }
+
+                    this.activeBallAnims = [];
+
+                    // Check level win condition
+                    this.checkWinCondition();
                 }
             }
 
@@ -828,29 +986,40 @@
             // Draw Subtle Background Decors / Clouds / Bubbles
             this.drawBackgroundElements(ctx);
 
-            // Draw Gameplay Scene (Tubes, Balls, Companion, Bottom Bar)
-            this.drawCompanionGrass(ctx);
-            this.drawTubesAndBalls(ctx);
-            this.drawCompanion(ctx);
-            this.drawTopBar(ctx);
-            this.drawBottomBar(ctx);
+            if (this.state === 'HOME' || (this.state === 'SETTINGS' && this.previousState === 'HOME')) {
+                // Render Home Page
+                this.renderHomeScreen(ctx);
+                this.particles.draw(ctx);
+            } else {
+                // Draw Gameplay Scene (Tubes, Balls, Companion, Bottom Bar)
+                this.drawCompanionGrass(ctx);
+                this.drawTubesAndBalls(ctx);
+                this.drawCompanion(ctx);
+                this.drawTopBar(ctx);
+                this.drawBottomBar(ctx);
 
-            // Draw Particles (Confetti, sparkles)
-            this.particles.draw(ctx);
+                // Draw Particles (Confetti, sparkles)
+                this.particles.draw(ctx);
 
-            // Draw Screen Overlays (Modals)
-            if (this.state === 'LEVEL_WIN') {
-                this.renderLevelWinOverlay(ctx);
-            } else if (this.state === 'PAUSED') {
-                this.renderPauseOverlay(ctx);
-            } else if (this.state === 'LEVEL_SELECT') {
-                this.renderLevelSelectScreen(ctx);
-            } else if (this.state === 'SPIN_WHEEL') {
-                this.renderSpinWheelScreen(ctx);
-            } else if (this.state === 'PROFILE') {
-                this.renderProfileScreen(ctx);
-            } else if (this.state === 'SHOP') {
-                this.renderShopScreen(ctx);
+                // Draw Screen Overlays (Modals)
+                if (this.state === 'LEVEL_WIN') {
+                    this.renderLevelWinOverlay(ctx);
+                } else if (this.state === 'PAUSED') {
+                    this.renderPauseOverlay(ctx);
+                } else if (this.state === 'LEVEL_SELECT') {
+                    this.renderLevelSelectScreen(ctx);
+                } else if (this.state === 'SPIN_WHEEL') {
+                    this.renderSpinWheelScreen(ctx);
+                } else if (this.state === 'PROFILE') {
+                    this.renderProfileScreen(ctx);
+                } else if (this.state === 'SHOP') {
+                    this.renderShopScreen(ctx);
+                }
+            }
+
+            // Settings Modal overlays on whatever screen it was opened from
+            if (this.state === 'SETTINGS') {
+                this.renderSettingsModal(ctx);
             }
 
             ctx.restore();
@@ -1006,61 +1175,130 @@
             ctx.fillText(`Level ${this.currentLevel}`, V_WIDTH / 2, barY);
             ctx.restore();
 
-            // Right: Coin Counter Capsule
-            const coinX = V_WIDTH - 150;
+            // Right: Points Counter Capsule
+            const scoreX = V_WIDTH - 150;
             ctx.save();
-            // Pill background
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
             ctx.beginPath();
-            ctx.roundRect(coinX - 120, barY - 35, 180, 70, 35);
+            ctx.roundRect(scoreX - 120, barY - 35, 200, 70, 35);
             ctx.fill();
+            ctx.strokeStyle = '#2b6562';
+            ctx.lineWidth = 4;
+            ctx.stroke();
 
-            // Coin text
-            ctx.fillStyle = '#f39c12';
-            ctx.font = 'bold 36px Fredoka, sans-serif';
-            ctx.textAlign = 'left';
+            // Points text with star
+            ctx.fillStyle = '#f57f17';
+            ctx.font = 'bold 32px Fredoka, sans-serif';
+            ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText(`${this.userData.coins}`, coinX - 100, barY + 2);
-
-            // Coin icon with plus
-            if (assets.coin_plus) {
-                ctx.drawImage(assets.coin_plus, coinX + 15, barY - 40, 80, 80);
-                this.registerButton(coinX - 120, barY - 35, 220, 70, () => {
-                    window.soundManager.playClick();
-                    this.openSpinWheel();
-                });
-            }
+            ctx.fillText(`⭐ ${this.userData.points || 0}`, scoreX - 20, barY + 2);
             ctx.restore();
         }
 
         drawBottomBar(ctx) {
-            const barY = 1810;
+            ctx.save();
+
+            // Right floating action dock for buttons
+            const dockW = 590;
+            const dockH = 150;
+            const dockX = V_WIDTH - dockW - 40; // 450 to 1040
+            const dockY = 1725;
+
+            // Dock Glass Background
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.94)';
+            ctx.beginPath();
+            ctx.roundRect(dockX, dockY, dockW, dockH, 44);
+            ctx.fill();
+            ctx.strokeStyle = '#2b6562';
+            ctx.lineWidth = 4;
+            ctx.stroke();
+
+            // Inner subtle border
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.roundRect(dockX + 6, dockY + 6, dockW - 12, dockH - 12, 38);
+            ctx.stroke();
+
             const items = [
-                { id: 'replay', label: 'replay', icon: assets.icon_replay, x: 500 },
-                { id: 'undo', label: 'undo', icon: assets.icon_undo, x: 670 },
-                { id: 'skip', label: 'skip', icon: assets.icon_skip, x: 840 }
+                {
+                    id: 'replay',
+                    label: 'Restart',
+                    icon: assets.icon_replay,
+                    color1: '#ffa726',
+                    color2: '#f57c00',
+                    cx: dockX + 100,
+                    cy: dockY + 60
+                },
+                {
+                    id: 'undo',
+                    label: 'Undo',
+                    icon: assets.icon_undo,
+                    color1: '#42a5f5',
+                    color2: '#1976d2',
+                    cx: dockX + 295,
+                    cy: dockY + 60,
+                    badge: this.moveHistory.length > 0 ? this.moveHistory.length : null
+                },
+                {
+                    id: 'skip',
+                    label: '+1 Tube',
+                    icon: assets.icon_skip,
+                    color1: '#66bb6a',
+                    color2: '#2e7d32',
+                    cx: dockX + 490,
+                    cy: dockY + 60
+                }
             ];
 
-            ctx.save();
-            for (const it of items) {
-                const bx = it.x;
-                const by = barY;
+            items.forEach(it => {
+                const r = 44;
 
-                // Draw icon
+                // Elevated circular button
+                const bGrad = ctx.createRadialGradient(it.cx - 10, it.cy - 12, 4, it.cx, it.cy, r);
+                bGrad.addColorStop(0, it.color1);
+                bGrad.addColorStop(1, it.color2);
+                ctx.fillStyle = bGrad;
+                ctx.beginPath();
+                ctx.arc(it.cx, it.cy, r, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 3.5;
+                ctx.stroke();
+
+                // Icon
                 if (it.icon) {
-                    const iconSize = 72;
-                    ctx.drawImage(it.icon, bx - iconSize / 2, by - iconSize / 2 - 14, iconSize, iconSize);
+                    const isz = 52;
+                    ctx.drawImage(it.icon, it.cx - isz / 2, it.cy - isz / 2, isz, isz);
                 }
 
-                // Label
-                ctx.fillStyle = '#ffffff';
-                ctx.font = 'bold 26px Fredoka, sans-serif';
+                // Label below
+                ctx.fillStyle = '#2b5c59';
+                ctx.font = 'bold 24px Fredoka, sans-serif';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'top';
-                ctx.fillText(it.label, bx, by + 26);
+                ctx.fillText(it.label, it.cx, it.cy + r + 8);
+
+                // Badges
+                if (it.badge !== null && it.badge !== undefined) {
+                    // Move counter badge on Undo
+                    ctx.fillStyle = '#e91e63';
+                    ctx.beginPath();
+                    ctx.arc(it.cx + 32, it.cy - 24, 18, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 2.5;
+                    ctx.stroke();
+
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = 'bold 20px Fredoka, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(`${it.badge}`, it.cx + 32, it.cy - 24);
+                }
 
                 // Button hit target
-                this.registerButton(bx - 60, by - 60, 120, 130, () => {
+                this.registerButton(it.cx - 65, it.cy - 50, 130, 125, () => {
                     window.soundManager.playClick();
                     if (it.id === 'replay') {
                         this.initLevel(this.currentLevel);
@@ -1070,7 +1308,8 @@
                         this.addExtraTubeBooster();
                     }
                 });
-            }
+            });
+
             ctx.restore();
         }
 
@@ -1087,7 +1326,7 @@
                 ctx.scale(bounce.scaleX, bounce.scaleY);
                 ctx.translate(-layout.cx, -(layout.y + layout.h));
 
-                // If tube is currently suggested by Hint, draw glowing ring
+                // If tube is currently suggested by Hint, draw glowing animated ring
                 if (this.currentHint && (this.currentHint.from === i || this.currentHint.to === i)) {
                     ctx.strokeStyle = this.currentHint.from === i ? '#ffeb3b' : '#4caf50';
                     ctx.lineWidth = 6;
@@ -1108,13 +1347,23 @@
                     ctx.fill();
                 }
 
-                // 2. Draw Balls inside tube
+                // 2. Draw Balls inside tube (with multi-ball stacked lift hover)
+                const isSelected = (this.selectedTube === i);
+                const selInfo = isSelected ? this.getTopMatchingInfo(i) : null;
+                const liftedCount = selInfo ? selInfo.count : 0;
+                const stationaryCount = tube.length - liftedCount;
+
                 for (let bIndex = 0; bIndex < tube.length; bIndex++) {
-                    // If this ball is currently lifted by selection, draw it floating
-                    if (this.selectedTube === i && bIndex === tube.length - 1) {
+                    if (isSelected && bIndex >= stationaryCount) {
+                        // Lifted matching top ball
+                        const stackIndex = bIndex - stationaryCount;
+                        const distFromTop = (liftedCount - 1) - stackIndex;
                         const hoverFloat = Math.sin(Date.now() * 0.008) * 6;
-                        this.drawBall(ctx, layout.cx, layout.hoverY + hoverFloat, layout.ballSize, tube[bIndex], true);
+                        const ballY = layout.hoverY + hoverFloat + distFromTop * (layout.ballSize * 0.92);
+
+                        this.drawBall(ctx, layout.cx, ballY, layout.ballSize, tube[bIndex], true);
                     } else {
+                        // Resting ball inside tube
                         const sy = layout.slots[bIndex];
                         this.drawBall(ctx, layout.cx, sy, layout.ballSize, tube[bIndex], false);
                     }
@@ -1139,9 +1388,12 @@
                 });
             }
 
-            // Draw active flying ball animation
-            if (this.activeAnim) {
-                this.drawActiveBallAnimation(ctx);
+            // Draw active flying ball animations
+            if (this.activeBallAnims && this.activeBallAnims.length > 0) {
+                for (const anim of this.activeBallAnims) {
+                    if (anim.landed) continue;
+                    this.drawActiveBallAnimation(ctx, anim);
+                }
             }
         }
 
@@ -1151,9 +1403,10 @@
             const img = assets[ballInfo.key];
 
             if (isHovering) {
-                // Soft glow halo
+                // Soft glowing aura
+                const pulse = 1 + Math.sin(Date.now() * 0.01) * 0.15;
                 ctx.shadowColor = ballInfo.color;
-                ctx.shadowBlur = 24;
+                ctx.shadowBlur = 24 * pulse;
             }
 
             if (img) {
@@ -1167,49 +1420,443 @@
 
                 // Glossy 3D shine
                 const grad = ctx.createRadialGradient(x - size * 0.18, y - size * 0.18, size * 0.05, x, y, size / 2);
-                grad.addColorStop(0, 'rgba(255,255,255,0.7)');
-                grad.addColorStop(0.5, 'rgba(255,255,255,0.1)');
-                grad.addColorStop(1, 'rgba(0,0,0,0.25)');
+                grad.addColorStop(0, 'rgba(255,255,255,0.75)');
+                grad.addColorStop(0.5, 'rgba(255,255,255,0.15)');
+                grad.addColorStop(1, 'rgba(0,0,0,0.3)');
                 ctx.fillStyle = grad;
                 ctx.fill();
             }
             ctx.restore();
         }
 
-        drawActiveBallAnimation(ctx) {
-            const anim = this.activeAnim;
-            let curX = anim.startX;
-            let curY = anim.startY;
-            let scaleX = 1.0;
-            let scaleY = 1.0;
+        drawActiveBallAnimation(ctx, anim) {
+            const size = this.tubeLayouts[anim.to] ? this.tubeLayouts[anim.to].ballSize : 110;
+            ctx.save();
+            ctx.translate(anim.currentX, anim.currentY);
+            ctx.scale(anim.scaleX, anim.scaleY);
+            this.drawBall(ctx, 0, 0, size, anim.ball, true);
+            ctx.restore();
+        }
 
-            const t = anim.t;
+        // --- HOME SCREEN & SETTINGS MODAL ---
 
-            if (t <= 0.65) {
-                // Quadratic Bezier Arc over tubes
-                const arcT = t / 0.65;
-                const u = 1 - arcT;
-                curX = u * u * anim.startX + 2 * u * arcT * anim.controlX + arcT * arcT * anim.endX;
-                curY = u * u * anim.startY + 2 * u * arcT * anim.controlY + arcT * arcT * anim.dropStartY;
+        renderHomeScreen(ctx) {
+            ctx.save();
+
+            // 1. Top Bar: Settings Button (Left) & Level Icon Capsule (Right)
+            const barY = 110;
+
+            // Settings Button (Left circle)
+            const setX = 90;
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.beginPath();
+            ctx.arc(setX, barY, 45, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#2b6562';
+            ctx.lineWidth = 4;
+            ctx.stroke();
+
+            if (assets.btn_settings) {
+                ctx.drawImage(assets.btn_settings, setX - 35, barY - 35, 70, 70);
+            }
+            this.registerButton(setX - 45, barY - 45, 90, 90, () => {
+                this.openSettingsModal();
+            });
+
+            // Top Right: Level Capsule with Level Trophy Icon (Replaces coins)
+            const lvlPillW = 240;
+            const lvlPillH = 74;
+            const lvlPillX = V_WIDTH - 90 - lvlPillW;
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.94)';
+            ctx.beginPath();
+            ctx.roundRect(lvlPillX, barY - lvlPillH / 2, lvlPillW, lvlPillH, 37);
+            ctx.fill();
+            ctx.strokeStyle = '#2b6562';
+            ctx.lineWidth = 4;
+            ctx.stroke();
+
+            // Gold emblem for level icon
+            const emblemX = lvlPillX + 38;
+            ctx.fillStyle = '#ffb300';
+            ctx.beginPath();
+            ctx.arc(emblemX, barY, 24, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#f57f17';
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+
+            ctx.font = '26px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('🏆', emblemX, barY + 1);
+
+            // Level Text
+            ctx.fillStyle = '#2b5c59';
+            ctx.font = 'bold 36px Fredoka, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(`Level ${this.userData.currentLevel || 1}`, emblemX + 34, barY + 2);
+
+            this.registerButton(lvlPillX, barY - lvlPillH / 2, lvlPillW, lvlPillH, () => {
+                window.soundManager.playClick();
+                this.state = 'LEVEL_SELECT';
+            });
+
+            // 2. Animated Floating Game Logo
+            const logoBob = Math.sin(Date.now() * 0.003) * 12;
+            const logoY = 350 + logoBob;
+
+            if (assets.logo_balls_sort) {
+                const img = assets.logo_balls_sort;
+                const lw = 680;
+                const lh = (img.height / img.width) * lw;
+                ctx.drawImage(img, V_WIDTH / 2 - lw / 2, logoY - lh / 2, lw, lh);
             } else {
-                // Drop straight down into tube with acceleration
-                curX = anim.endX;
-                const dropT = (t - 0.65) / 0.35;
-                const easedDrop = dropT * dropT; // quadratic ease in (gravity)
-                curY = anim.dropStartY + (anim.endY - anim.dropStartY) * easedDrop;
-
-                // Squash & stretch right near the end
-                if (dropT > 0.85) {
-                    scaleX = 1.2;
-                    scaleY = 0.8;
-                }
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 80px Fredoka, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('BALL SORT', V_WIDTH / 2, logoY - 40);
+                ctx.fillText('PUZZLE', V_WIDTH / 2, logoY + 40);
             }
 
-            const size = this.tubeLayouts[anim.to].ballSize;
+            // 3. Player Cumulative Points Badge
+            const badgeY = 515;
+            const badgeW = 460;
+            const badgeH = 80;
+            const badgeX = (V_WIDTH - badgeW) / 2;
+
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+            ctx.beginPath();
+            ctx.roundRect(badgeX, badgeY, badgeW, badgeH, 40);
+            ctx.fill();
+            ctx.strokeStyle = '#2b6562';
+            ctx.lineWidth = 4;
+            ctx.stroke();
+
+            // Points text with star
+            ctx.fillStyle = '#f57f17';
+            ctx.font = 'bold 40px Fredoka, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(`⭐ Points: ${this.userData.points || 0}`, V_WIDTH / 2, badgeY + badgeH / 2);
+
+            // 4. Interactive Decorative Tubes on Wood Shelf
+            const shelfY = 890;
+            // Wooden shelf
+            ctx.fillStyle = '#c7925b';
+            ctx.beginPath();
+            ctx.roundRect(V_WIDTH / 2 - 280, shelfY + 70, 560, 24, 12);
+            ctx.fill();
+            ctx.fillStyle = '#a6723e';
+            ctx.fillRect(V_WIDTH / 2 - 260, shelfY + 94, 520, 10);
+
+            // 3 showcase tubes
+            const showTubes = [
+                { cx: V_WIDTH / 2 - 160, balls: [0, 0, 0, 0] }, // 4 Blue
+                { cx: V_WIDTH / 2, balls: [2, 2, 2] },         // 3 Pink
+                { cx: V_WIDTH / 2 + 160, balls: [1, 1, 1, 1] } // 4 Green
+            ];
+
+            const stW = 90;
+            const stH = 260;
+            const sBallSize = 52;
+
+            showTubes.forEach((st, idx) => {
+                const tx = st.cx - stW / 2;
+                const ty = shelfY - stH + 70;
+
+                // Glass tube back
+                if (assets.tube) {
+                    ctx.drawImage(assets.tube, tx, ty, stW, stH);
+                } else {
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
+                    ctx.beginPath();
+                    ctx.roundRect(tx, ty, stW, stH, 20);
+                    ctx.fill();
+                }
+
+                // Draw balls in showcase tube
+                const step = (stH - 30 - sBallSize) / 3;
+                const bottomY = ty + stH - 18 - sBallSize / 2;
+
+                st.balls.forEach((bId, bIdx) => {
+                    const by = bottomY - bIdx * step;
+                    this.drawBall(ctx, st.cx, by, sBallSize, bId, false);
+                });
+
+                // Glass overlay
+                if (assets.tube_overlay) {
+                    ctx.drawImage(assets.tube_overlay, tx, ty, stW, stH);
+                }
+
+                // Floating bouncing ball for middle tube
+                if (idx === 1) {
+                    const hopY = ty - 32 + Math.sin(Date.now() * 0.008) * 10;
+                    this.drawBall(ctx, st.cx, hopY, sBallSize, 2, true);
+                }
+            });
+
+            // 5. Mascot Companion on Seamless Rolling Green Landscape
+            const compY = 1240;
+            const charObj = CHARACTERS.find(c => c.id === this.companion.charId) || CHARACTERS[0];
+            const compImg = assets[charObj.normal] || assets.char_beaver;
+
+            // Rolling grass hills extending seamlessly to bottom of screen
+            ctx.fillStyle = '#5cb84d';
+            ctx.beginPath();
+            ctx.ellipse(V_WIDTH / 2, 1720, 720, 420, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#6ec85c';
+            ctx.beginPath();
+            ctx.ellipse(V_WIDTH / 2, 1760, 640, 360, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            if (compImg) {
+                const idleBob = Math.sin(Date.now() * 0.004) * 8;
+                const cw = 250;
+                const ch = (compImg.height / compImg.width) * cw;
+                const cx = V_WIDTH / 2;
+                const cy = compY + this.companion.jumpY + idleBob;
+
+                ctx.save();
+                ctx.translate(cx, cy);
+                const scaleX = this.companion.jumpY < -5 ? 0.94 : 1.0;
+                const scaleY = this.companion.jumpY < -5 ? 1.06 : 1.0;
+                ctx.scale(scaleX, scaleY);
+                ctx.drawImage(compImg, -cw / 2, -ch / 2, cw, ch);
+                ctx.restore();
+
+                // Speech Bubble
+                const speech = "Tap to Play!";
+                this.drawSpeechBubble(ctx, cx + 80, cy - ch / 2 - 20, speech);
+
+                // Tap companion for cute reaction
+                this.registerButton(cx - cw / 2, cy - ch / 2, cw, ch, () => {
+                    window.soundManager.playBallLift(0);
+                    this.companion.jumpVel = -15;
+                    this.particles.emitSparkles(cx, cy, 25, '#ffeb3b');
+                });
+            }
+
+            // 6. Big Glowing "TAP TO PLAY" Button
+            const btnPulse = 1.0 + Math.sin(Date.now() * 0.006) * 0.035;
+            const playBtnW = 540;
+            const playBtnH = 135;
+            const playBtnY = 1580;
+            const playBtnX = V_WIDTH / 2;
+
             ctx.save();
-            ctx.translate(curX, curY);
-            ctx.scale(scaleX, scaleY);
-            this.drawBall(ctx, 0, 0, size, anim.ball, true);
+            ctx.translate(playBtnX, playBtnY);
+            ctx.scale(btnPulse, btnPulse);
+
+            // Deep Button Shadow
+            ctx.fillStyle = 'rgba(27, 94, 32, 0.35)';
+            ctx.beginPath();
+            ctx.roundRect(-playBtnW / 2, -playBtnH / 2 + 12, playBtnW, playBtnH, 44);
+            ctx.fill();
+
+            // Button Body Gradient (Lush Emerald / Lime Green)
+            const btnGrad = ctx.createLinearGradient(0, -playBtnH / 2, 0, playBtnH / 2);
+            btnGrad.addColorStop(0, '#81c784');
+            btnGrad.addColorStop(0.35, '#4caf50');
+            btnGrad.addColorStop(1, '#2e7d32');
+            ctx.fillStyle = btnGrad;
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 6;
+            ctx.beginPath();
+            ctx.roundRect(-playBtnW / 2, -playBtnH / 2, playBtnW, playBtnH, 44);
+            ctx.fill();
+            ctx.stroke();
+
+            // Inner Top Highlight Glare
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.32)';
+            ctx.beginPath();
+            ctx.roundRect(-playBtnW / 2 + 10, -playBtnH / 2 + 8, playBtnW - 20, playBtnH / 2 - 6, 36);
+            ctx.fill();
+
+            // Play Triangle Icon
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            const triX = -170;
+            ctx.moveTo(triX - 16, -24);
+            ctx.lineTo(triX + 24, 0);
+            ctx.lineTo(triX - 16, 24);
+            ctx.closePath();
+            ctx.fill();
+
+            // Text "TAP TO PLAY"
+            ctx.font = '900 52px Fredoka, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            // 3D Text Shadow
+            ctx.fillStyle = '#1b5e20';
+            ctx.fillText('TAP TO PLAY', 25, 4);
+
+            // Front Text
+            ctx.fillStyle = '#ffffff';
+            ctx.fillText('TAP TO PLAY', 25, 0);
+
+            ctx.restore();
+
+            // Register Play Button Click -> Start Current Level!
+            const hitW = playBtnW * 1.1;
+            const hitH = playBtnH * 1.1;
+            this.registerButton(playBtnX - hitW / 2, playBtnY - hitH / 2, hitW, hitH, () => {
+                window.soundManager.playClick();
+                this.companion.jumpVel = -16;
+                this.particles.emitConfetti(V_WIDTH / 2, playBtnY, 80);
+                this.initLevel(this.userData.currentLevel || 1);
+                this.state = 'PLAYING';
+            });
+
+            ctx.restore();
+        }
+
+        drawHomeFooterNav(ctx) {
+            // Deprecated - footer removed per user request
+        }
+
+        renderSettingsModal(ctx) {
+            ctx.save();
+            // Darkened modal backdrop
+            ctx.fillStyle = 'rgba(16, 44, 42, 0.72)';
+            ctx.fillRect(0, 0, V_WIDTH, V_HEIGHT);
+
+            const cardW = 720;
+            const cardH = 620;
+            const cardX = (V_WIDTH - cardW) / 2;
+            const cardY = (V_HEIGHT - cardH) / 2 - 30;
+
+            // Card Shadow
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
+            ctx.beginPath();
+            ctx.roundRect(cardX, cardY + 12, cardW, cardH, 44);
+            ctx.fill();
+
+            // Card Body
+            const cardGrad = ctx.createLinearGradient(0, cardY, 0, cardY + cardH);
+            cardGrad.addColorStop(0, '#ffffff');
+            cardGrad.addColorStop(1, '#f3faf9');
+            ctx.fillStyle = cardGrad;
+            ctx.strokeStyle = '#2b6562';
+            ctx.lineWidth = 6;
+            ctx.beginPath();
+            ctx.roundRect(cardX, cardY, cardW, cardH, 44);
+            ctx.fill();
+            ctx.stroke();
+
+            // Header Title "Settings"
+            ctx.fillStyle = '#2b5c59';
+            ctx.font = 'bold 58px Fredoka, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('Settings', V_WIDTH / 2, cardY + 80);
+
+            // Close Button (Circle close)
+            const closeX = cardX + cardW - 70;
+            const closeY = cardY + 70;
+            if (assets.btn_circle_close) {
+                ctx.drawImage(assets.btn_circle_close, closeX - 35, closeY - 35, 70, 70);
+            } else {
+                ctx.fillStyle = '#e57373';
+                ctx.beginPath();
+                ctx.arc(closeX, closeY, 32, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 36px Fredoka, sans-serif';
+                ctx.fillText('✕', closeX, closeY);
+            }
+            this.registerButton(closeX - 45, closeY - 45, 90, 90, () => {
+                this.closeSettingsModal();
+            });
+
+            // 1. Sound Row
+            const soundY = cardY + 205;
+            // Row background pill
+            ctx.fillStyle = 'rgba(232, 245, 244, 0.8)';
+            ctx.beginPath();
+            ctx.roundRect(cardX + 50, soundY - 50, cardW - 100, 100, 28);
+            ctx.fill();
+
+            // Sound Label
+            ctx.fillStyle = '#2b5c59';
+            ctx.font = 'bold 42px Fredoka, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText('Sound FX', cardX + 85, soundY - 6);
+            ctx.font = '24px Fredoka, sans-serif';
+            ctx.fillStyle = '#78909c';
+            ctx.fillText('Game sound effects', cardX + 85, soundY + 26);
+
+            // Sound Toggle
+            const soundToggleImg = window.soundManager.soundEnabled ? assets.toggle_on : assets.toggle_off;
+            const toggleW = 160;
+            const toggleH = 72;
+            const toggleX = cardX + cardW - 90 - toggleW;
+            if (soundToggleImg) {
+                ctx.drawImage(soundToggleImg, toggleX, soundY - toggleH / 2, toggleW, toggleH);
+            }
+            this.registerButton(toggleX - 10, soundY - 45, toggleW + 20, 90, () => {
+                const nextState = !window.soundManager.soundEnabled;
+                window.soundManager.setSound(nextState);
+                if (nextState) {
+                    window.soundManager.playBallDrop(0);
+                }
+            });
+
+            // 2. Music Row
+            const musicY = cardY + 335;
+            ctx.fillStyle = 'rgba(232, 245, 244, 0.8)';
+            ctx.beginPath();
+            ctx.roundRect(cardX + 50, musicY - 50, cardW - 100, 100, 28);
+            ctx.fill();
+
+            ctx.fillStyle = '#2b5c59';
+            ctx.font = 'bold 42px Fredoka, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText('Music', cardX + 85, musicY - 6);
+            ctx.font = '24px Fredoka, sans-serif';
+            ctx.fillStyle = '#78909c';
+            ctx.fillText('Background melody', cardX + 85, musicY + 26);
+
+            const musicToggleImg = window.soundManager.musicEnabled ? assets.toggle_on : assets.toggle_off;
+            if (musicToggleImg) {
+                ctx.drawImage(musicToggleImg, toggleX, musicY - toggleH / 2, toggleW, toggleH);
+            }
+            this.registerButton(toggleX - 10, musicY - 45, toggleW + 20, 90, () => {
+                const nextState = !window.soundManager.musicEnabled;
+                window.soundManager.setMusic(nextState);
+                if (window.soundManager.soundEnabled) {
+                    window.soundManager.playClick();
+                }
+            });
+
+            // 3. Done Button
+            const doneBtnW = 340;
+            const doneBtnH = 95;
+            const doneBtnX = V_WIDTH / 2 - doneBtnW / 2;
+            const doneBtnY = cardY + 475;
+
+            ctx.fillStyle = '#4caf50';
+            ctx.beginPath();
+            ctx.roundRect(doneBtnX, doneBtnY, doneBtnW, doneBtnH, 32);
+            ctx.fill();
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 4;
+            ctx.stroke();
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 42px Fredoka, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('DONE', V_WIDTH / 2, doneBtnY + doneBtnH / 2);
+
+            this.registerButton(doneBtnX, doneBtnY, doneBtnW, doneBtnH, () => {
+                this.closeSettingsModal();
+            });
+
             ctx.restore();
         }
 
@@ -1254,21 +1901,34 @@
 
             // "Level X completed" Text
             ctx.fillStyle = '#2b5c59';
-            ctx.font = 'bold 58px Fredoka, sans-serif';
+            ctx.font = 'bold 56px Fredoka, sans-serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText(`Level ${this.currentLevel}`, V_WIDTH / 2, cardY + 330);
-            ctx.fillText(`completed`, V_WIDTH / 2, cardY + 400);
+            ctx.fillText(`Level ${this.currentLevel}`, V_WIDTH / 2, cardY + 320);
+            ctx.fillText(`completed!`, V_WIDTH / 2, cardY + 380);
 
-            // Reward badge (+25 coins)
-            ctx.fillStyle = '#f39c12';
-            ctx.font = 'bold 38px Fredoka, sans-serif';
-            ctx.fillText(`+25 Coins!`, V_WIDTH / 2, cardY + 490);
+            // Level-based Points Reward Card
+            const ptsY = cardY + 480;
+            ctx.fillStyle = 'rgba(255, 179, 0, 0.14)';
+            ctx.beginPath();
+            ctx.roundRect(V_WIDTH / 2 - 240, ptsY - 50, 480, 100, 32);
+            ctx.fill();
+            ctx.strokeStyle = '#ffb300';
+            ctx.lineWidth = 3.5;
+            ctx.stroke();
+
+            ctx.fillStyle = '#f57f17';
+            ctx.font = 'bold 44px Fredoka, sans-serif';
+            ctx.fillText(`+${this.lastEarnedPoints || (this.currentLevel * 100)} Points!`, V_WIDTH / 2, ptsY - 10);
+
+            ctx.font = 'bold 24px Fredoka, sans-serif';
+            ctx.fillStyle = '#2b5c59';
+            ctx.fillText(`Total Score: ${this.userData.points || 0} pts`, V_WIDTH / 2, ptsY + 28);
 
             // Buttons: "next" (green) and "quit" (coral red)
             const btnW = 310;
             const btnH = 115;
-            const btnY = cardY + 620;
+            const btnY = cardY + 630;
 
             // Next Button
             const nextX = V_WIDTH / 2 - btnW - 20;
@@ -1287,7 +1947,7 @@
                 this.initLevel(this.currentLevel + 1);
             });
 
-            // Quit Button
+            // Quit Button -> Goes to HOME
             const quitX = V_WIDTH / 2 + 20;
             if (assets.btn_quit) {
                 ctx.drawImage(assets.btn_quit, quitX, btnY, btnW, btnH);
@@ -1301,7 +1961,7 @@
             }
             this.registerButton(quitX, btnY, btnW, btnH, () => {
                 window.soundManager.playClick();
-                this.state = 'LEVEL_SELECT';
+                this.state = 'HOME';
             });
 
             ctx.restore();
@@ -1340,7 +2000,7 @@
             }
             this.registerButton(btnX, quitY, btnW, btnH, () => {
                 window.soundManager.playClick();
-                this.state = 'LEVEL_SELECT';
+                this.state = 'HOME';
             });
 
             // Back / Resume Button (Green pill)
@@ -1359,8 +2019,7 @@
             if (assets.btn_settings) {
                 ctx.drawImage(assets.btn_settings, setX - 35, setY - 35, 70, 70);
                 this.registerButton(setX - 35, setY - 35, 70, 70, () => {
-                    window.soundManager.playClick();
-                    this.state = 'PROFILE';
+                    this.openSettingsModal();
                 });
             }
 
@@ -1378,7 +2037,7 @@
                 ctx.drawImage(assets.btn_circle_back, 45, barY - 45, 90, 90);
                 this.registerButton(45, barY - 45, 90, 90, () => {
                     window.soundManager.playClick();
-                    this.state = 'PLAYING';
+                    this.state = 'HOME';
                 });
             }
 
@@ -1388,14 +2047,18 @@
             ctx.textBaseline = 'middle';
             ctx.fillText('Levels', V_WIDTH / 2, barY);
 
-            // Coins counter
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+            // Points counter capsule
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
             ctx.beginPath();
-            ctx.roundRect(V_WIDTH - 240, barY - 35, 180, 70, 35);
+            ctx.roundRect(V_WIDTH - 250, barY - 35, 190, 70, 35);
             ctx.fill();
-            ctx.fillStyle = '#f39c12';
-            ctx.font = 'bold 36px Fredoka, sans-serif';
-            ctx.fillText(`${this.userData.coins}`, V_WIDTH - 150, barY + 2);
+            ctx.strokeStyle = '#2b6562';
+            ctx.lineWidth = 3.5;
+            ctx.stroke();
+
+            ctx.fillStyle = '#f57f17';
+            ctx.font = 'bold 30px Fredoka, sans-serif';
+            ctx.fillText(`⭐ ${this.userData.points || 0}`, V_WIDTH - 155, barY + 2);
 
             // Category Tab selector
             const cat = window.CATEGORIES[this.currentCategoryIndex] || window.CATEGORIES[0];
@@ -1507,9 +2170,6 @@
                 }
             }
 
-            // Bottom Navigation bar
-            this.drawBottomNav(ctx);
-
             ctx.restore();
         }
 
@@ -1517,37 +2177,66 @@
             const navY = 1810;
             ctx.save();
 
-            // Bottom grass navigation pill
-            ctx.fillStyle = '#6cb75e';
+            // Bottom grass navigation dock
+            ctx.fillStyle = '#5fad52';
             ctx.beginPath();
-            ctx.roundRect(0, 1730, V_WIDTH, 190, [48, 48, 0, 0]);
+            ctx.roundRect(0, 1720, V_WIDTH, 200, [54, 54, 0, 0]);
+            ctx.fill();
+
+            // Wave highlight
+            ctx.fillStyle = '#78c96c';
+            ctx.beginPath();
+            ctx.roundRect(0, 1720, V_WIDTH, 20, [54, 54, 0, 0]);
             ctx.fill();
 
             const charObj = CHARACTERS.find(c => c.id === this.companion.charId) || CHARACTERS[0];
             const profileIcon = assets[charObj.avatar] || assets.avatar_beaver;
 
             const items = [
-                { id: 'shop', icon: assets.nav_shop },
-                { id: 'levels', icon: assets.nav_news },
-                { id: 'wheel', icon: assets.nav_wheel },
-                { id: 'trophy', icon: assets.nav_trophy },
-                { id: 'profile', icon: profileIcon }
+                { id: 'shop', label: 'Shop', icon: assets.nav_shop },
+                { id: 'levels', label: 'Levels', icon: assets.nav_news },
+                { id: 'wheel', label: 'Wheel', icon: assets.nav_wheel },
+                { id: 'profile', label: 'Mascot', icon: profileIcon },
+                { id: 'home', label: 'Home', icon: assets.btn_circle_back }
             ];
 
             const spacing = V_WIDTH / items.length;
             items.forEach((item, idx) => {
                 const ix = spacing * idx + spacing / 2;
+                const isActive = (item.id === 'shop' && this.state === 'SHOP') ||
+                                 (item.id === 'levels' && this.state === 'LEVEL_SELECT') ||
+                                 (item.id === 'wheel' && this.state === 'SPIN_WHEEL') ||
+                                 (item.id === 'profile' && this.state === 'PROFILE') ||
+                                 (item.id === 'home' && this.state === 'HOME');
+
+                // Elevated circle
+                ctx.fillStyle = isActive ? '#ffffff' : 'rgba(255, 255, 255, 0.9)';
+                ctx.beginPath();
+                ctx.arc(ix, navY - 20, isActive ? 48 : 42, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = isActive ? '#ffeb3b' : '#388e3c';
+                ctx.lineWidth = isActive ? 4.5 : 3;
+                ctx.stroke();
+
                 if (item.icon) {
-                    const sz = item.id === 'wheel' ? 100 : (item.id === 'profile' ? 84 : 74);
-                    ctx.drawImage(item.icon, ix - sz / 2, navY - sz / 2, sz, sz);
+                    const sz = item.id === 'wheel' ? 66 : (item.id === 'profile' ? 62 : 54);
+                    ctx.drawImage(item.icon, ix - sz / 2, navY - 20 - sz / 2, sz, sz);
                 }
-                this.registerButton(ix - 55, navY - 60, 110, 120, () => {
+
+                // Label below
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 24px Fredoka, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(item.label, ix, navY + 42);
+
+                this.registerButton(ix - 55, navY - 65, 110, 135, () => {
                     window.soundManager.playClick();
                     if (item.id === 'shop') this.state = 'SHOP';
                     else if (item.id === 'levels') this.state = 'LEVEL_SELECT';
                     else if (item.id === 'wheel') this.openSpinWheel();
                     else if (item.id === 'profile') this.state = 'PROFILE';
-                    else if (item.id === 'trophy') this.openSpinWheel();
+                    else if (item.id === 'home') this.state = 'HOME';
                 });
             });
             ctx.restore();
@@ -1953,7 +2642,18 @@
                 // Test modes for automated verification
                 const params = new URLSearchParams(window.location.search);
                 const test = params.get('test');
-                if (test === 'lift') {
+                if (test === 'play') {
+                    window.game.state = 'PLAYING';
+                } else if (test === 'home') {
+                    window.game.state = 'HOME';
+                } else if (test === 'settings') {
+                    window.game.openSettingsModal();
+                } else if (test === 'lift') {
+                    window.game.state = 'PLAYING';
+                    window.game.handleTubeClick(0);
+                } else if (test === 'multilift') {
+                    window.game.state = 'PLAYING';
+                    window.game.tubes = [[0, 1, 1, 1], [0, 0, 0, 1], []];
                     window.game.handleTubeClick(0);
                 } else if (test === 'win') {
                     window.game.handleLevelWin();
@@ -1968,6 +2668,7 @@
                 } else if (test === 'pause') {
                     window.game.state = 'PAUSED';
                 } else if (test === 'level5') {
+                    window.game.state = 'PLAYING';
                     window.game.initLevel(5);
                 }
             }
