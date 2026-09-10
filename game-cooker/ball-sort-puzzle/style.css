@@ -1,0 +1,109 @@
+@font-face {
+    font-family: 'Fredoka';
+    src: url('fonts/Fredoka-Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Fredoka';
+    src: url('fonts/Fredoka-SemiBold.ttf') format('truetype');
+    font-weight: 600;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Fredoka';
+    src: url('fonts/Fredoka-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: #2b5c59;
+    font-family: 'Fredoka', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#game-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    max-width: calc(100vh * (1080 / 1920));
+    max-height: calc(100vw * (1920 / 1080));
+    aspect-ratio: 1080 / 1920;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    background-color: #81c7c5;
+    overflow: hidden;
+}
+
+#game-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    cursor: pointer;
+    touch-action: none;
+}
+
+#loading-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, #8ad3d0 0%, #68b8b5 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    color: #ffffff;
+    transition: opacity 0.4s ease;
+}
+
+#loading-logo {
+    width: 50%;
+    max-width: 320px;
+    margin-bottom: 30px;
+    animation: pulse 1.8s ease-in-out infinite;
+}
+
+.spinner {
+    width: 60px;
+    height: 60px;
+    border: 6px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #ffffff;
+    animation: spin 0.9s linear infinite;
+    margin-bottom: 20px;
+}
+
+#loading-text {
+    font-size: 24px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.15);
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
