@@ -1,0 +1,17 @@
+{
+  "version": 1726053124000,
+  "fileList": [
+    "index.html",
+    "style.css",
+    "scoresendapi.js",
+    "audio.js",
+    "particles.js",
+    "game.js",
+    "banner.png",
+    "data.json",
+    "scripts/scoresendapi.js",
+    "scripts/audio.js",
+    "scripts/particles.js",
+    "scripts/game.js"
+  ]
+}

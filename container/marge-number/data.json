@@ -1,0 +1,14 @@
+{
+  "project": {
+    "name": "Drop & Merge Numbers",
+    "version": "1.0.0.0",
+    "author": "GameCooker",
+    "description": "2D Mobile Drop & Merge Numbers Puzzle Game - 2048 Arcade Shooter",
+    "viewport": {
+      "width": 1080,
+      "height": 1920,
+      "scale": "letterbox"
+    },
+    "firstLayout": "Game"
+  }
+}

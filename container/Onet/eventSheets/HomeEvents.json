@@ -1,9 +1,0 @@
-{
-  "name": "HomeEvents",
-  "events": [
-    {
-      "eventType": "comment",
-      "text": "Controls home menu navigation, sound/music toggles, leaderboard, and play actions"
-    }
-  ]
-}

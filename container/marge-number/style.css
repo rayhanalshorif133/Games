@@ -1,0 +1,936 @@
+/* style.css - Construct 3 Style 2D Mobile Drop & Merge Numbers Puzzle Game */
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700;800;900&family=Outfit:wght@500;600;700;800;900&display=swap');
+
+:root {
+  --bg-dark: #090b12;
+  --bg-board: #0e1220;
+  --bg-column: #15192b;
+  --bg-column-alt: #121524;
+  --bg-card: #1c2136;
+  --border-card: #2c3352;
+  --text-main: #ffffff;
+  --text-muted: #8b95b8;
+  --accent-gold: #f59e0b;
+  --accent-coin: #fbbf24;
+
+  /* Construct 3 Stylized Candy Palette (Top Gradient, Bottom Gradient, 3D Bevel) */
+  --c-2-top: #22d3ee; --c-2-bot: #06b6d4; --b-2: #0891b2;
+  --c-4-top: #60a5fa; --c-4-bot: #2563eb; --b-4: #1d4ed8;
+  --c-8-top: #a78bfa; --c-8-bot: #7c3aed; --b-8: #5b21b6;
+  --c-16-top: #e879f9; --c-16-bot: #c026d3; --b-16: #86198f;
+  --c-32-top: #fb7185; --c-32-bot: #e11d48; --b-32: #9f1239;
+  --c-64-top: #f87171; --c-64-bot: #dc2626; --b-64: #991b1b;
+  --c-128-top: #fb923c; --c-128-bot: #ea580c; --b-128: #9a3412;
+  --c-256-top: #fde047; --c-256-bot: #ca8a04; --b-256: #854d0e;
+  --c-512-top: #34d399; --c-512-bot: #059669; --b-512: #065f46;
+  --c-1024-top: #2dd4bf; --c-1024-bot: #0d9488; --b-1024: #115e59;
+  --c-2048-top: #ec4899; --c-2048-bot: #8b5cf6; --b-2048: #831843;
+  --c-4096-top: #fbbf24; --c-4096-bot: #ea580c; --b-4096: #701a75;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--bg-dark);
+  font-family: 'Fredoka', 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: none;
+}
+
+/* Background Ambient Glows & Arcade Vignette */
+body::before {
+  content: '';
+  position: fixed;
+  top: 20%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(124, 58, 237, 0.16) 0%, rgba(9, 11, 18, 0) 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Construct 3 Game Machine Container (Responsive Mobile Game Frame) */
+#game-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  max-width: 480px;
+  background: linear-gradient(180deg, #141829 0%, #0c0f1a 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  box-shadow: 0 0 60px rgba(0, 0, 0, 0.9), 0 0 0 1.5px rgba(255, 255, 255, 0.06);
+  z-index: 1;
+}
+
+/* Header Section */
+#header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px 6px 18px;
+  width: 100%;
+  z-index: 10;
+}
+
+.icon-btn {
+  background: linear-gradient(180deg, #242a42 0%, #171b2e 100%);
+  border: 1.5px solid #333c5e;
+  border-radius: 12px;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #0d101c, 0 5px 8px rgba(0, 0, 0, 0.4);
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.icon-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #0d101c;
+}
+
+/* Score Plaque Area */
+#score-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+#current-score {
+  font-size: 38px;
+  font-weight: 900;
+  line-height: 1;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+  text-shadow: 0 3px 0 rgba(0, 0, 0, 0.4), 0 0 12px rgba(255, 255, 255, 0.2);
+  transition: transform 0.12s ease;
+}
+
+#current-score.pop {
+  transform: scale(1.22);
+  color: #fde047;
+}
+
+#best-score-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 15px;
+  font-weight: 800;
+  color: #94a3b8;
+  margin-top: 3px;
+}
+
+#best-score-badge svg {
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+}
+
+/* Milestone Goal Chest Badge */
+#milestone-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+#milestone-badge:active {
+  transform: scale(0.92);
+}
+
+.milestone-box {
+  width: 44px;
+  height: 42px;
+  border-radius: 11px;
+  background: linear-gradient(180deg, #fbbf24 0%, #d97706 100%);
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 0 #854d0e, 0 6px 10px rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+  text-shadow: 0 2px 0 rgba(113, 63, 18, 0.6);
+  position: relative;
+  overflow: hidden;
+}
+
+.milestone-box::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  height: 38%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.45) 0%, transparent 100%);
+  border-radius: 8px 8px 3px 3px;
+  pointer-events: none;
+}
+
+.milestone-label {
+  font-size: 12px;
+  font-weight: 800;
+  color: #f1f5f9;
+  margin-top: 4px;
+  letter-spacing: 0.3px;
+}
+
+/* Toolbar: Coins & Boosters */
+#toolbar-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 18px 8px 18px;
+  z-index: 10;
+}
+
+/* Shiny Coin Display */
+.coin-display {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.coin-icon-hex {
+  width: 32px;
+  height: 32px;
+  filter: drop-shadow(0 2px 5px rgba(245, 158, 11, 0.45));
+}
+
+#coin-count {
+  font-size: 24px;
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: -0.3px;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.4);
+}
+
+/* Construct 3 3D Arcade Booster Buttons */
+.boosters-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.booster-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.booster-btn {
+  width: 46px;
+  height: 46px;
+  background: linear-gradient(180deg, #252c46 0%, #181d30 100%);
+  border: 1.5px solid #3b456d;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  box-shadow: 0 4px 0 #101422, 0 6px 10px rgba(0, 0, 0, 0.4);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.15s ease;
+  overflow: hidden;
+}
+
+.booster-btn::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 3px;
+  right: 3px;
+  height: 36%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.25) 0%, transparent 100%);
+  border-radius: 10px 10px 4px 4px;
+  pointer-events: none;
+}
+
+.booster-btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #101422;
+}
+
+.booster-btn.active {
+  border-color: #facc15;
+  background: linear-gradient(180deg, #3730a3 0%, #1e1b4b 100%);
+  animation: pulse-booster 0.9s infinite alternate;
+}
+
+@keyframes pulse-booster {
+  from { box-shadow: 0 0 0 2px rgba(250, 204, 21, 0.3), 0 4px 0 #101422; }
+  to { box-shadow: 0 0 0 5px rgba(250, 204, 21, 0.7), 0 4px 0 #101422; }
+}
+
+.booster-cost {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.mini-coin {
+  width: 13px;
+  height: 13px;
+}
+
+/* Active Booster Banner */
+#booster-overlay-banner {
+  position: absolute;
+  top: 116px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(15, 18, 29, 0.94);
+  border: 1.5px solid #facc15;
+  color: #fde047;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 800;
+  display: none;
+  align-items: center;
+  gap: 8px;
+  z-index: 40;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+  animation: pulse-banner 1s infinite alternate;
+}
+
+#booster-cancel-btn {
+  background: none;
+  border: none;
+  color: #f87171;
+  font-weight: 900;
+  cursor: pointer;
+  font-size: 15px;
+  line-height: 1;
+}
+
+@keyframes pulse-banner {
+  from { transform: translateX(-50%) scale(0.98); }
+  to { transform: translateX(-50%) scale(1.02); }
+}
+
+/* Playing Grid Wrapper (Board Container) */
+#grid-wrapper {
+  position: relative;
+  flex: 1;
+  margin: 4px 14px 8px 14px;
+  border-radius: 18px;
+  background: radial-gradient(circle at 50% 25%, #15192c 0%, #0b0e18 100%);
+  border: 2px solid #222a44;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: inset 0 3px 12px rgba(0, 0, 0, 0.7), 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* 5 Vertical Column Tracks - Construct 3 Translucent Lanes */
+#tracks-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  padding: 0 8px;
+  pointer-events: none;
+}
+
+.grid-track {
+  flex: 1;
+  height: 100%;
+  position: relative;
+  border-right: 1px solid rgba(255, 255, 255, 0.03);
+  transition: background 0.15s ease;
+}
+
+.grid-track:first-child {
+  border-left: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.grid-track::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.015);
+  transform: translateX(-50%);
+}
+
+.grid-track.active-track {
+  background: linear-gradient(180deg, rgba(99, 102, 241, 0.14) 0%, rgba(99, 102, 241, 0.02) 100%);
+}
+
+.grid-track.active-track::before {
+  background: rgba(99, 102, 241, 0.25);
+  box-shadow: 0 0 6px rgba(99, 102, 241, 0.4);
+}
+
+/* Aim Laser Beam Guide (Construct 3 Bubble/Tile Shooter Pattern) */
+#aim-laser {
+  position: absolute;
+  pointer-events: none;
+  z-index: 4;
+  display: none;
+  width: 4px;
+  transform: translateX(-50%);
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(99, 102, 241, 0.95) 0px,
+    rgba(99, 102, 241, 0.95) 8px,
+    transparent 8px,
+    transparent 16px
+  );
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.7);
+  animation: laserFlow 0.5s linear infinite;
+  border-radius: 2px;
+}
+
+@keyframes laserFlow {
+  from { background-position: 0 0; }
+  to { background-position: 0 32px; }
+}
+
+/* Game Over Danger / Deadline Threshold Line */
+#danger-line {
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  height: 0;
+  border-top: 2px dashed rgba(244, 63, 94, 0.45);
+  pointer-events: none;
+  z-index: 8;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+#danger-line::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -2px;
+  height: 3px;
+  background: linear-gradient(90deg, transparent 0%, rgba(244, 63, 94, 0.15) 15%, rgba(244, 63, 94, 0.65) 50%, rgba(244, 63, 94, 0.15) 85%, transparent 100%);
+  box-shadow: 0 0 8px rgba(244, 63, 94, 0.4);
+}
+
+.danger-label {
+  position: absolute;
+  right: 24px;
+  top: -11px;
+  background: #181d30;
+  border: 1.5px solid rgba(244, 63, 94, 0.6);
+  color: #fca5a5;
+  font-family: 'Fredoka', 'Outfit', sans-serif;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  padding: 1px 8px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6), 0 0 6px rgba(244, 63, 94, 0.3);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  pointer-events: none;
+  transition: all 0.2s ease;
+}
+
+/* Urgent state when blocks are close to game over */
+#danger-line.danger-urgent {
+  border-top-color: #f43f5e;
+  animation: dangerPulse 0.8s infinite alternate ease-in-out;
+}
+
+#danger-line.danger-urgent::before {
+  background: linear-gradient(90deg, transparent 0%, rgba(244, 63, 94, 0.4) 15%, rgba(244, 63, 94, 1) 50%, rgba(244, 63, 94, 0.4) 85%, transparent 100%);
+  box-shadow: 0 0 14px rgba(244, 63, 94, 0.9);
+}
+
+#danger-line.danger-urgent .danger-label {
+  background: #e11d48;
+  color: #ffffff;
+  border-color: #ffe4e6;
+  box-shadow: 0 0 12px rgba(225, 29, 72, 0.9);
+  animation: labelPulse 0.8s infinite alternate ease-in-out;
+}
+
+@keyframes dangerPulse {
+  from { opacity: 0.55; filter: drop-shadow(0 0 2px #f43f5e); }
+  to { opacity: 1; filter: drop-shadow(0 0 8px #f43f5e); }
+}
+
+@keyframes labelPulse {
+  from { transform: scale(0.96); }
+  to { transform: scale(1.06); }
+}
+
+/* Blocks Layer */
+#blocks-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: auto;
+}
+
+/* ==========================================================================
+   CONSTRUCT 3 ASSET TILES: Compact, 3D Beveled Candy/Acrylic Blocks
+   ========================================================================== */
+.block {
+  position: absolute;
+  border-radius: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Fredoka', 'Outfit', sans-serif;
+  font-weight: 800;
+  font-size: 21px;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+  box-sizing: border-box;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.45);
+  border: 1.5px solid rgba(255, 255, 255, 0.32);
+  transition: transform 0.16s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.15s ease;
+  will-change: transform, left, top;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+/* Construct 3 Curved Glossy Dome Highlight */
+.block::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 3px;
+  right: 3px;
+  height: 42%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.48) 0%, rgba(255, 255, 255, 0.08) 75%, transparent 100%);
+  border-radius: 9px 9px 5px 5px;
+  pointer-events: none;
+}
+
+/* Subtle 3D bottom bevel rim */
+.block::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 5px;
+  right: 5px;
+  height: 3px;
+  background: rgba(0, 0, 0, 0.18);
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+/* Flying Projectile Glowing Comet Effect */
+.block.block-flying {
+  filter: brightness(1.22) drop-shadow(0 0 10px currentColor);
+  box-shadow: 0 0 18px var(--b, #6366f1), 0 0 32px rgba(99, 102, 241, 0.5);
+  pointer-events: none;
+  z-index: 35;
+  transition: none !important;
+}
+
+/* Text Size Variations based on Number Length */
+.block.text-md {
+  font-size: 17px;
+  letter-spacing: -0.5px;
+}
+
+.block.text-sm {
+  font-size: 14px;
+  letter-spacing: -0.6px;
+}
+
+/* Match Hint Pulse */
+.block.match-hint {
+  box-shadow: 0 0 0 2px #facc15, 0 4px 0 var(--b, #4338ca), 0 6px 12px rgba(0, 0, 0, 0.4);
+  animation: match-pulse 0.9s infinite alternate;
+}
+
+@keyframes match-pulse {
+  from { transform: scale(1); }
+  to { transform: scale(1.06); }
+}
+
+/* Construct 3 Color & Bevel Themes */
+.val-2 {
+  --b: var(--b-2);
+  background: linear-gradient(180deg, var(--c-2-top) 0%, var(--c-2-bot) 100%);
+  box-shadow: 0 4px 0 var(--b-2), 0 6px 10px rgba(0, 0, 0, 0.35);
+}
+
+.val-4 {
+  --b: var(--b-4);
+  background: linear-gradient(180deg, var(--c-4-top) 0%, var(--c-4-bot) 100%);
+  box-shadow: 0 4px 0 var(--b-4), 0 6px 10px rgba(0, 0, 0, 0.35);
+}
+
+.val-8 {
+  --b: var(--b-8);
+  background: linear-gradient(180deg, var(--c-8-top) 0%, var(--c-8-bot) 100%);
+  box-shadow: 0 4px 0 var(--b-8), 0 6px 10px rgba(0, 0, 0, 0.35);
+}
+
+.val-16 {
+  --b: var(--b-16);
+  background: linear-gradient(180deg, var(--c-16-top) 0%, var(--c-16-bot) 100%);
+  box-shadow: 0 4px 0 var(--b-16), 0 6px 10px rgba(0, 0, 0, 0.35);
+}
+
+.val-32 {
+  --b: var(--b-32);
+  background: linear-gradient(180deg, var(--c-32-top) 0%, var(--c-32-bot) 100%);
+  box-shadow: 0 4px 0 var(--b-32), 0 6px 10px rgba(0, 0, 0, 0.35);
+}
+
+.val-64 {
+  --b: var(--b-64);
+  background: linear-gradient(180deg, var(--c-64-top) 0%, var(--c-64-bot) 100%);
+  box-shadow: 0 4px 0 var(--b-64), 0 6px 10px rgba(0, 0, 0, 0.35);
+}
+
+.val-128 {
+  --b: var(--b-128);
+  background: linear-gradient(180deg, var(--c-128-top) 0%, var(--c-128-bot) 100%);
+  box-shadow: 0 4px 0 var(--b-128), 0 6px 10px rgba(0, 0, 0, 0.35);
+}
+
+.val-256 {
+  --b: var(--b-256);
+  background: linear-gradient(180deg, var(--c-256-top) 0%, var(--c-256-bot) 100%);
+  box-shadow: 0 4px 0 var(--b-256), 0 6px 10px rgba(0, 0, 0, 0.35);
+}
+
+.val-512 {
+  --b: var(--b-512);
+  background: linear-gradient(180deg, var(--c-512-top) 0%, var(--c-512-bot) 100%);
+  box-shadow: 0 4px 0 var(--b-512), 0 6px 10px rgba(0, 0, 0, 0.35);
+}
+
+.val-1024 {
+  --b: var(--b-1024);
+  background: linear-gradient(180deg, var(--c-1024-top) 0%, var(--c-1024-bot) 100%);
+  box-shadow: 0 4px 0 var(--b-1024), 0 0 16px rgba(45, 212, 191, 0.5);
+}
+
+.val-2048 {
+  --b: var(--b-2048);
+  background: linear-gradient(135deg, #f43f5e 0%, #ec4899 35%, #8b5cf6 70%, #06b6d4 100%);
+  box-shadow: 0 4px 0 var(--b-2048), 0 0 20px rgba(236, 72, 153, 0.65);
+  animation: rainbow-candy 2.4s infinite alternate;
+}
+
+@keyframes rainbow-candy {
+  0% { filter: hue-rotate(0deg) brightness(1); }
+  100% { filter: hue-rotate(40deg) brightness(1.12); }
+}
+
+.val-4096 {
+  --b: var(--b-4096);
+  background: linear-gradient(135deg, #fbbf24 0%, #f97316 45%, #e11d48 100%);
+  box-shadow: 0 4px 0 var(--b-4096), 0 0 24px rgba(245, 158, 11, 0.7);
+}
+
+/* Landing Preview Ghost Block */
+#preview-slot {
+  position: absolute;
+  border-radius: 13px;
+  border: 2px dashed rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.2), inset 0 0 10px rgba(255, 255, 255, 0.1);
+  pointer-events: none;
+  z-index: 5;
+  display: none;
+  animation: dash-pulse 1.1s infinite alternate ease-in-out;
+}
+
+@keyframes dash-pulse {
+  from { border-color: rgba(255, 255, 255, 0.45); transform: scale(0.97); }
+  to { border-color: rgba(255, 255, 255, 0.95); transform: scale(1.02); }
+}
+
+/* Finger Guide Indicator */
+#guide-finger {
+  position: absolute;
+  width: 42px;
+  height: 42px;
+  pointer-events: none;
+  z-index: 25;
+  transform: translate(-50%, -50%);
+  display: none;
+  animation: finger-bounce 1s infinite alternate ease-in-out;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6));
+}
+
+@keyframes finger-bounce {
+  from { transform: translate(-30%, 8%) rotate(-5deg); }
+  to { transform: translate(-30%, 0px) rotate(0deg); }
+}
+
+/* Bottom Launcher Bar (Construct 3 Launch Pad) */
+#launcher-bar {
+  position: relative;
+  display: flex;
+  padding: 0 8px 14px 8px;
+  z-index: 10;
+}
+
+.launcher-slot {
+  flex: 1;
+  position: relative;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: transparent;
+}
+
+.launcher-slot::before {
+  content: '';
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: #131726;
+  border: 1.5px solid #232a42;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.5);
+  transition: all 0.15s ease;
+}
+
+.launcher-slot.active-slot::before {
+  border-color: #6366f1;
+  background: #1c223a;
+  box-shadow: 0 0 12px rgba(99, 102, 241, 0.35), inset 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.launcher-slot::after {
+  content: '▲';
+  font-size: 11px;
+  color: #3b4465;
+  position: absolute;
+  top: 4px;
+  transition: all 0.15s ease;
+  pointer-events: none;
+}
+
+.launcher-slot.active-slot::after {
+  color: #818cf8;
+  transform: translateY(-2px);
+  text-shadow: 0 0 8px rgba(99, 102, 241, 0.8);
+}
+
+/* Projectile Block in Launcher */
+#projectile-block {
+  position: absolute;
+  cursor: grab;
+  z-index: 20;
+  pointer-events: none;
+  will-change: transform;
+}
+
+/* Particle Canvas Overlay */
+#particle-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 30;
+}
+
+/* Modals & Dialogs (Arcade Pop) */
+.modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(8, 10, 16, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s ease;
+}
+
+.modal-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-card {
+  background: linear-gradient(180deg, #20263e 0%, #131726 100%);
+  border: 2px solid #333c5e;
+  border-radius: 24px;
+  padding: 28px 24px;
+  width: 85%;
+  max-width: 350px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7);
+  transform: scale(0.85);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.modal-overlay.open .modal-card {
+  transform: scale(1);
+}
+
+.modal-title {
+  font-size: 26px;
+  font-weight: 900;
+  color: #ffffff;
+  margin-bottom: 10px;
+  letter-spacing: -0.3px;
+}
+
+.modal-score-box {
+  background: #0d101a;
+  border-radius: 14px;
+  padding: 14px 18px;
+  width: 100%;
+  margin: 14px 0;
+  border: 1px solid #23283c;
+}
+
+.modal-score-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 5px 0;
+  font-size: 15px;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.modal-score-row span:last-child {
+  font-size: 19px;
+  color: #fff;
+  font-weight: 900;
+}
+
+.modal-btn-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.btn-primary {
+  background: linear-gradient(180deg, #6366f1 0%, #4f46e5 100%);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: 14px;
+  padding: 13px 20px;
+  color: #fff;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #3730a3, 0 8px 16px rgba(99, 102, 241, 0.35);
+  transition: transform 0.1s ease;
+}
+
+.btn-primary:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #3730a3;
+}
+
+.btn-secondary {
+  background: #252b42;
+  border: 1.5px solid #363e60;
+  border-radius: 14px;
+  padding: 12px 20px;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.1s ease, color 0.15s ease;
+}
+
+.btn-secondary:active {
+  transform: scale(0.96);
+  color: #fff;
+}
+
+.milestone-unlocked-card {
+  border-color: #f59e0b;
+  box-shadow: 0 0 35px rgba(245, 158, 11, 0.45);
+}
+
+/* ==========================================================================
+   JUICY ANIMATIONS & PHYSICS (Construct 3 Squash, Stretch & Bounces)
+   ========================================================================== */
+@keyframes blockSquash {
+  0% { transform: scale(1, 1); }
+  28% { transform: scale(1.18, 0.84); }
+  60% { transform: scale(0.93, 1.07); }
+  82% { transform: scale(1.03, 0.98); }
+  100% { transform: scale(1, 1); }
+}
+
+.block-squash {
+  animation: blockSquash 0.28s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+}
+
+@keyframes blockPopMerge {
+  0% { transform: scale(0.6); }
+  45% { transform: scale(1.24); }
+  72% { transform: scale(0.94); }
+  100% { transform: scale(1); }
+}
+
+.block-merge-pop {
+  animation: blockPopMerge 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-4px); }
+  40%, 80% { transform: translateX(4px); }
+}
+
+.shake-grid {
+  animation: shake 0.25s ease;
+}

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="description" content="2D Mobile Drop & Merge Numbers Puzzle Game - Construct 3 Style Arcade Shooter!">
+  <meta name="theme-color" content="#0a0c14">
+  <title>Drop & Merge Numbers - 2048 Arcade Shooter</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700;800;900&family=Outfit:wght@500;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div id="game-container">
+
+    <!-- Header Section -->
+    <header id="header-bar">
+      <!-- Pause Button -->
+      <button id="pause-btn" class="icon-btn" aria-label="Pause Game">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+          <rect x="5" y="4" width="5" height="16" rx="2.5" />
+          <rect x="14" y="4" width="5" height="16" rx="2.5" />
+        </svg>
+      </button>
+
+      <!-- Center Score & Trophy Plaque -->
+      <div id="score-container">
+        <div id="current-score">0</div>
+        <div id="best-score-badge">
+          <svg viewBox="0 0 24 24" width="16" height="16">
+            <path fill="#facc15" d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94A5.01 5.01 0 0 0 11 15.9V19H7v2h10v-2h-4v-3.1a5.01 5.01 0 0 0 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z"/>
+          </svg>
+          <span id="best-score">0</span>
+        </div>
+      </div>
+
+      <!-- Milestone Goal Chest / Badge -->
+      <div id="milestone-badge" title="Target Milestone">
+        <div id="milestone-val" class="milestone-box">128</div>
+        <span class="milestone-label">Locked</span>
+      </div>
+    </header>
+
+    <!-- Toolbar: Coins & Boosters -->
+    <section id="toolbar-bar">
+      <!-- Coins Counter with Shiny Token -->
+      <div class="coin-display">
+        <svg class="coin-icon-hex" viewBox="0 0 36 36">
+          <defs>
+            <linearGradient id="coinGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#fef08a"/>
+              <stop offset="40%" stop-color="#f59e0b"/>
+              <stop offset="100%" stop-color="#d97706"/>
+            </linearGradient>
+            <linearGradient id="coinRim" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#b45309"/>
+              <stop offset="100%" stop-color="#78350f"/>
+            </linearGradient>
+          </defs>
+          <polygon points="18,2 32,10 32,26 18,34 4,26 4,10" fill="url(#coinRim)"/>
+          <polygon points="18,4 30,11 30,25 18,32 6,25 6,11" fill="url(#coinGrad)"/>
+          <circle cx="18" cy="18" r="7" fill="#d97706" opacity="0.6"/>
+          <polygon points="18,13 19.5,16.5 23.5,17 20.5,19.5 21.5,23.5 18,21.5 14.5,23.5 15.5,19.5 12.5,17 16.5,16.5" fill="#ffffff"/>
+        </svg>
+        <span id="coin-count">100</span>
+      </div>
+
+      <!-- 3 Arcade Boosters with 3D Depth & Pricing -->
+      <div class="boosters-group">
+        <!-- Hammer Booster -->
+        <div class="booster-item">
+          <button id="booster-hammer" class="booster-btn" aria-label="Hammer Booster">
+            <svg width="30" height="30" viewBox="0 0 36 36" style="transform: rotate(-12deg);">
+              <defs>
+                <linearGradient id="hamHead" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#c084fc"/>
+                  <stop offset="100%" stop-color="#7e22ce"/>
+                </linearGradient>
+                <linearGradient id="hamHandle" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#f87171"/>
+                  <stop offset="100%" stop-color="#b91c1c"/>
+                </linearGradient>
+              </defs>
+              <!-- Hammer Head -->
+              <rect x="6" y="6" width="24" height="12" rx="4" fill="url(#hamHead)" stroke="#581c87" stroke-width="1.5" />
+              <rect x="4" y="9" width="28" height="6" rx="2" fill="#e9d5ff" opacity="0.7"/>
+              <!-- Hammer Handle -->
+              <rect x="15" y="17" width="6" height="16" rx="3" fill="url(#hamHandle)" stroke="#7f1d1d" stroke-width="1.2" />
+              <circle cx="18" cy="30" r="3" fill="#facc15" />
+              <rect x="14" y="21" width="8" height="2" fill="#fef08a" />
+            </svg>
+          </button>
+          <div class="booster-cost">
+            <svg class="mini-coin" viewBox="0 0 20 20">
+              <circle cx="10" cy="10" r="8" fill="#f59e0b" />
+              <circle cx="10" cy="10" r="5" fill="#fef08a" />
+            </svg>
+            <span>200</span>
+          </div>
+        </div>
+
+        <!-- Swap Booster -->
+        <div class="booster-item">
+          <button id="booster-swap" class="booster-btn" aria-label="Swap Booster">
+            <svg width="30" height="30" viewBox="0 0 36 36">
+              <!-- Two Overlapping Colorful Arcade Tiles -->
+              <rect x="5" y="6" width="16" height="16" rx="4" fill="#ea580c" stroke="#9a3412" stroke-width="1.2" />
+              <rect x="7" y="8" width="12" height="4" rx="2" fill="#ffedd5" opacity="0.6"/>
+              <rect x="15" y="14" width="16" height="16" rx="4" fill="#dc2626" stroke="#991b1b" stroke-width="1.2" />
+              <rect x="17" y="16" width="12" height="4" rx="2" fill="#fee2e2" opacity="0.6"/>
+              <!-- Curved Swap Arrows -->
+              <path d="M12 14 A 7 7 0 0 1 24 10 M24 10 L20 7 M24 10 L22 13" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+              <path d="M24 22 A 7 7 0 0 1 12 26 M12 26 L16 29 M12 26 L14 23" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+            </svg>
+          </button>
+          <div class="booster-cost">
+            <svg class="mini-coin" viewBox="0 0 20 20">
+              <circle cx="10" cy="10" r="8" fill="#f59e0b" />
+              <circle cx="10" cy="10" r="5" fill="#fef08a" />
+            </svg>
+            <span>225</span>
+          </div>
+        </div>
+
+        <!-- Undo Booster -->
+        <div class="booster-item">
+          <button id="booster-undo" class="booster-btn" aria-label="Undo Booster">
+            <svg width="30" height="30" viewBox="0 0 36 36">
+              <rect x="4" y="4" width="28" height="28" rx="8" fill="#7c3aed" stroke="#5b21b6" stroke-width="1.2"/>
+              <rect x="6" y="6" width="24" height="7" rx="3" fill="#ddd6fe" opacity="0.5"/>
+              <path d="M24 21 C24 15.5 20 13 13 14 M13 14 L17 10 M13 14 L17 18" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+            </svg>
+          </button>
+          <div class="booster-cost">
+            <svg class="mini-coin" viewBox="0 0 20 20">
+              <circle cx="10" cy="10" r="8" fill="#f59e0b" />
+              <circle cx="10" cy="10" r="5" fill="#fef08a" />
+            </svg>
+            <span>20</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Active Booster Banner -->
+    <div id="booster-overlay-banner">
+      <span id="booster-banner-text">🔨 Tap any block to smash it!</span>
+      <button id="booster-cancel-btn">✕</button>
+    </div>
+
+    <!-- Playing Board Grid -->
+    <main id="grid-wrapper">
+      <!-- 5 Vertical Column Tracks -->
+      <div id="tracks-container">
+        <div class="grid-track" data-col="0"></div>
+        <div class="grid-track" data-col="1"></div>
+        <div class="grid-track" data-col="2"></div>
+        <div class="grid-track" data-col="3"></div>
+        <div class="grid-track" data-col="4"></div>
+      </div>
+
+      <!-- Aiming Laser Beam -->
+      <div id="aim-laser"></div>
+
+      <!-- Game Over Danger / Deadline Threshold Line -->
+      <div id="danger-line">
+        <span class="danger-label">⚠️ DANGER LINE</span>
+      </div>
+
+      <!-- Blocks Container -->
+      <div id="blocks-container"></div>
+
+      <!-- Landing Preview Ghost Block -->
+      <div id="preview-slot"></div>
+
+      <!-- Finger Guide Indicator -->
+      <div id="guide-finger">
+        <svg viewBox="0 0 64 64" width="42" height="42">
+          <g filter="drop-shadow(0px 4px 6px rgba(0,0,0,0.5))">
+            <path d="M28,8 C28,4 32,4 32,8 L32,28 L35,28 C35,24 40,24 40,28 L40,31 C40,28 45,28 45,31 L45,34 C45,31 50,31 50,34 L50,44 C50,54 42,60 32,60 C22,60 16,52 16,42 L16,36 C16,32 20,32 22,35 L26,38 L28,8 Z" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+            <path d="M22,56 L42,56 C44,56 46,58 46,60 L18,60 C18,58 20,56 22,56 Z" fill="#e2e8f0"/>
+          </g>
+      </div>
+    </main>
+
+    <!-- Bottom Launcher Area -->
+    <footer id="launcher-bar">
+      <div class="launcher-slot" data-col="0"></div>
+      <div class="launcher-slot active-slot" data-col="1">
+        <div id="projectile-block" class="block val-2">2</div>
+      </div>
+      <div class="launcher-slot" data-col="2"></div>
+      <div class="launcher-slot" data-col="3"></div>
+      <div class="launcher-slot" data-col="4"></div>
+    </footer>
+
+    <!-- Canvas Particle Overlay -->
+    <canvas id="particle-canvas"></canvas>
+
+    <!-- Pause Modal -->
+    <div id="pause-modal" class="modal-overlay">
+      <div class="modal-card">
+        <h2 class="modal-title">Game Paused</h2>
+        <div class="modal-btn-group">
+          <button id="resume-btn" class="btn-primary">Resume</button>
+          <button id="sound-toggle-btn" class="btn-secondary">Sound: ON 🔊</button>
+          <button id="restart-btn" class="btn-secondary">Restart Game</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div id="game-over-modal" class="modal-overlay">
+      <div class="modal-card">
+        <h2 class="modal-title" style="color: #f43f5e;">Out of Moves!</h2>
+        <p style="color: var(--text-muted); font-size: 15px; margin-bottom: 8px;">A column reached the bottom!</p>
+        
+        <div class="modal-score-box">
+          <div class="modal-score-row">
+            <span>Final Score</span>
+            <span id="final-score-val">0</span>
+          </div>
+          <div class="modal-score-row">
+            <span>High Score</span>
+            <span id="high-score-val">0</span>
+          </div>
+        </div>
+
+        <div class="modal-btn-group">
+          <button id="continue-game-btn" class="btn-primary" style="background: linear-gradient(180deg, #10b981 0%, #059669 100%); box-shadow: 0 4px 0 #047857;">
+            Revive & Clear 3 Rows (🪙 100)
+          </button>
+          <button id="play-again-btn" class="btn-secondary">Play Again</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Milestone Celebration Modal -->
+    <div id="milestone-modal" class="modal-overlay">
+      <div class="modal-card milestone-unlocked-card">
+        <div style="font-size: 50px; margin-bottom: 5px;">🏆</div>
+        <h2 class="modal-title" style="color: #facc15;">Goal Unlocked!</h2>
+        <p id="milestone-text" style="color: #ffffff; font-size: 17px; margin-bottom: 12px; font-weight: 700;">
+          You reached block 512!
+        </p>
+        <div class="coin-display" style="justify-content: center; margin-bottom: 18px;">
+          <svg class="coin-icon-hex" viewBox="0 0 36 36" style="width: 28px; height: 28px;">
+            <polygon points="18,2 32,10 32,26 18,34 4,26 4,10" fill="#f59e0b"/>
+            <circle cx="18" cy="18" r="6" fill="#fbbf24" />
+          </svg>
+          <span style="font-size: 22px; font-weight: 900; color: #fbbf24;">+150 Coins</span>
+        </div>
+        <button id="claim-milestone-btn" class="btn-primary" style="width: 100%;">Claim & Continue</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="scoresendapi.js"></script>
+  <script src="audio.js"></script>
+  <script src="particles.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
