@@ -1,0 +1,19 @@
+{
+  "name": "Powerup",
+  "plugin-id": "Sprite",
+  "sid": 1005,
+  "isGlobal": false,
+  "instanceVariables": [
+    {
+      "name": "powerupType",
+      "type": "string",
+      "initialValue": "hint"
+    },
+    {
+      "name": "count",
+      "type": "number",
+      "initialValue": 3
+    }
+  ],
+  "behaviorTypes": []
+}

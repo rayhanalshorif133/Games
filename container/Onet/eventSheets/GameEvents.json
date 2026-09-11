@@ -1,0 +1,9 @@
+{
+  "name": "GameEvents",
+  "events": [
+    {
+      "eventType": "comment",
+      "text": "Core Onet connect-2 mechanics, pathfinding, timer, tile elimination, and powerups handled via scripts/game.js and scripts/onet.js"
+    }
+  ]
+}

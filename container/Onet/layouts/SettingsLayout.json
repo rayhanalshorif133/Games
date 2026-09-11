@@ -1,0 +1,20 @@
+{
+  "name": "SettingsLayout",
+  "width": 1080,
+  "height": 1920,
+  "eventSheet": "HomeEvents",
+  "layers": [
+    {
+      "name": "Overlay",
+      "parallaxX": 0,
+      "parallaxY": 0,
+      "transparent": true
+    },
+    {
+      "name": "Dialog",
+      "parallaxX": 0,
+      "parallaxY": 0,
+      "transparent": true
+    }
+  ]
+}
