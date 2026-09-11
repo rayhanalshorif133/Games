@@ -1,0 +1,12 @@
+{
+  "name": "Ball",
+  "plugin-id": "Sprite",
+  "sid": 1002,
+  "isGlobal": false,
+  "instanceVariables": [
+    { "name": "speed", "type": "number", "initialValue": 15 },
+    { "name": "radius", "type": "number", "initialValue": 17 }
+  ],
+  "behaviorTypes": []
+}
+

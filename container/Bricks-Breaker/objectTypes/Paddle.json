@@ -1,0 +1,12 @@
+{
+  "name": "Paddle",
+  "plugin-id": "Sprite",
+  "sid": 1001,
+  "isGlobal": false,
+  "instanceVariables": [
+    { "name": "baseWidth", "type": "number", "initialValue": 220 },
+    { "name": "speed", "type": "number", "initialValue": 0 }
+  ],
+  "behaviorTypes": []
+}
+
