@@ -1,0 +1,3 @@
+send_score_api.js function er kono change hbena
+
+send_score_api.js er er moddhe sendScore function game over hole call koraw

@@ -1,0 +1,54 @@
+/* style.css - Construct 3 Style Responsive Game Layout */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: #1a020c;
+    background-image: 
+        radial-gradient(circle at 50% 30%, #3e071e 0%, #150109 100%);
+    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#gameContainer {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+#gameCanvas {
+    display: block;
+    touch-action: none;
+    /* Crisp rendering */
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    box-shadow: 0 0 50px rgba(240, 29, 93, 0.25), 0 25px 60px rgba(0, 0, 0, 0.7);
+    border-radius: 8px;
+    background-color: #e41355;
+    cursor: default;
+}
+
+/* When in full mobile portrait, remove border-radius and shadow for clean edge-to-edge immersion */
+@media (max-aspect-ratio: 9/16) {
+    #gameCanvas {
+        border-radius: 0;
+        box-shadow: none;
+    }
+}

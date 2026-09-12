@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Tower Stacker 2D</title>
+
+  <!-- Mobile Web App & PWA Optimization (Construct 3 Standard) -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#8fc87c">
+  <meta name="description" content="Tower Stacker 2D - 1080x1920 Mobile Responsive Arcade">
+  <link rel="manifest" href="appmanifest.json">
+  <link rel="icon" type="image/png" href="icons/icon-512.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rubik:wght@700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=3.2">
+</head>
+<body>
+  <div id="game-wrapper">
+    <div id="game-container">
+      <!-- 1080x1920 High Resolution Canvas -->
+      <canvas id="game-canvas" width="1080" height="1920"></canvas>
+
+      <!-- Top HUD Bar -->
+      <div id="hud-bar" class="hud-layer">
+        <div class="hud-left">
+          <div class="hud-box hud-score-box">
+            <span class="hud-tag">SCORE</span>
+            <span id="hud-score" class="hud-val">0</span>
+          </div>
+        </div>
+        <div class="hud-right">
+          <div class="hud-box hud-best-box">
+            <span class="hud-tag">BEST</span>
+            <span id="hud-best" class="hud-val">14</span>
+          </div>
+          <button id="btn-sound" class="hud-sound-btn" aria-label="Toggle Sound" title="Sound Mute/Unmute">
+            <svg id="icon-sound-on" viewBox="0 0 24 24" width="26" height="26" fill="currentColor">
+              <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+            </svg>
+            <svg id="icon-sound-off" viewBox="0 0 24 24" width="26" height="26" fill="currentColor" class="hidden">
+              <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27l4.73 4.73H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Start Screen Overlay -->
+      <div id="start-overlay" class="game-overlay active">
+        <div class="overlay-card">
+          <div class="mascot-row">
+            <div class="mascot-box box-orange">
+              <div class="mascot-eye"><div class="mascot-pupil"></div></div>
+              <div class="mascot-eye"><div class="mascot-pupil"></div></div>
+            </div>
+            <div class="mascot-box box-cyan">
+              <div class="mascot-eye"><div class="mascot-pupil"></div></div>
+              <div class="mascot-eye"><div class="mascot-pupil"></div></div>
+            </div>
+            <div class="mascot-box box-green">
+              <div class="mascot-eye"><div class="mascot-pupil"></div></div>
+              <div class="mascot-eye"><div class="mascot-pupil"></div></div>
+            </div>
+          </div>
+          <h1 class="arcade-title">TOWER<br>STACK</h1>
+          <p class="arcade-subtitle">1 Miss = Game Over! Stack as high as you can!</p>
+          <button id="btn-start-play" class="arcade-btn pulse-glow">TAP TO PLAY</button>
+          <div class="arcade-hint">📱 Tap Anywhere / ⌨️ Space to Drop</div>
+        </div>
+      </div>
+
+      <!-- Game Over Overlay -->
+      <div id="gameover-overlay" class="game-overlay hidden">
+        <div class="overlay-card">
+          <h2 class="arcade-title title-gameover">GAME OVER</h2>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <span class="stat-title">SCORE</span>
+              <span id="end-score" class="stat-num">0</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-title">BEST</span>
+              <span id="end-best" class="stat-num">14</span>
+            </div>
+          </div>
+          <div id="badge-new-record" class="record-badge hidden">🏆 NEW RECORD!</div>
+          <div class="details-row">
+            <span>PERFECT DROPS: <b id="end-perfect">0</b></span>
+            <span>MAX COMBO: <b id="end-combo">0</b></span>
+          </div>
+          <button id="btn-try-again" class="arcade-btn pulse-glow">TRY AGAIN</button>
+          <button id="btn-main-menu" class="arcade-btn btn-secondary">MAIN MENU</button>
+        </div>
+      </div>
+
+      <!-- Floating Combo Notification -->
+      <div id="combo-banner" class="combo-banner hidden">PERFECT!</div>
+    </div>
+  </div>
+
+  <!-- Score API & Construct 3 Modular Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="send_score_api.js"></script>
+  <script src="scripts/audio.js?v=3.2"></script>
+  <script src="scripts/particles.js?v=3.2"></script>
+  <script src="scripts/physics.js?v=3.2"></script>
+  <script src="scripts/entities.js?v=3.2"></script>
+  <script src="scripts/ui.js?v=3.2"></script>
+  <script src="scripts/game.js?v=3.2"></script>
+  <script src="scripts/main.js?v=3.2"></script>
+</body>
+</html>

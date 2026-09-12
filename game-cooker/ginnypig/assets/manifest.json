@@ -1,0 +1,15 @@
+{
+  "name": "Coin Drop Piggy Bank",
+  "version": "1.0.0",
+  "orientation": "portrait",
+  "logicalSize": {
+    "width": 1080,
+    "height": 1920
+  },
+  "scoreApi": "sendscoreapi.js",
+  "audioEngine": "WebAudio Procedural Synthesizer",
+  "assets": {
+    "images": [],
+    "audio": []
+  }
+}
