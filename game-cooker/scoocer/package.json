@@ -1,0 +1,16 @@
+{
+  "name": "2d-multiplayer-soccer",
+  "version": "1.0.0",
+  "description": "2D Multiplayer Soccer Game with 4-Digit Room Codes and Construct 3 build architecture",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": ["soccer", "multiplayer", "html5-game", "canvas", "websocket"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
+}
+

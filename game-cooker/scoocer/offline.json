@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "fileList": [
+    "index.html",
+    "style.css",
+    "scripts/peerjs.min.js",
+    "scripts/main.js",
+    "scripts/game.js",
+    "scripts/physics.js",
+    "scripts/network.js",
+    "scripts/effects.js",
+    "scripts/audio.js",
+    "scripts/ui.js",
+    "Assets/Football Field.png",
+    "Assets/soccer-ball.png",
+    "Assets/Game Bar-Red.png",
+    "Assets/Game Bar-yellow.png",
+    "Assets/Score Bar.png",
+    "Assets/Menu BG.png",
+    "Assets/Game Mode Blank.png",
+    "Assets/Lobby Blank.png",
+    "Assets/Create Room.png",
+    "Assets/Join With code.png",
+    "Assets/Show Room List.png",
+    "Assets/Enter button-blue.png",
+    "Assets/Ready Button.png",
+    "Assets/Font/Fredoka-Bold.ttf"
+  ]
+}
+

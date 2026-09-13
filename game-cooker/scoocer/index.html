@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>2D Soccer Multiplayer Game</title>
+    <link rel="manifest" href="appmanifest.json">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <div id="canvas-container">
+            <!-- 2D Canvas calibrated to Football Field.png (752 x 1344) -->
+            <canvas id="gameCanvas" width="752" height="1344"></canvas>
+
+            <!-- UI Overlay Elements -->
+            <div id="ui-layer">
+
+                <!-- In-Game HUD -->
+                <div id="game-hud" class="hidden">
+                    <div class="hud-top-bar">
+                        <div class="hud-pill">
+                            <span>⏱️</span>
+                            <span id="hud-time">0:00</span>
+                        </div>
+                        <div class="hud-pill">
+                            <span>📶</span>
+                            <span id="hud-ping">-- ms</span>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <button id="btn-mute" class="hud-btn" title="Toggle Sound">🔊</button>
+                            <button id="btn-exit-game" class="hud-btn" title="Exit Match">✕</button>
+                        </div>
+                    </div>
+
+                    <!-- Custom Score Bar HUD matching Assets/Score Bar.png -->
+                    <div class="score-bar-wrap">
+                        <div id="hud-p1-name" class="score-player score-p1">PLAYER 1</div>
+                        <div id="hud-score" class="score-center">0 - 0</div>
+                        <div id="hud-p2-name" class="score-player score-p2">PLAYER 2</div>
+                    </div>
+                </div>
+
+                <!-- 3... 2... 1... Kickoff Countdown -->
+                <div id="countdown-overlay" class="hidden">3</div>
+
+                <!-- 1. Select Mode Screen (Matches football game asset-02.jpg) -->
+                <div id="menu-screen" class="screen">
+                    <div class="modal-card">
+                        <img src="Assets/soccer-ball.png" class="modal-top-icon" alt="Soccer Ball">
+                        <h1 class="modal-title">SELECT MODE</h1>
+
+                        <div class="btn-stack">
+                            <button id="btn-create-room" class="btn-img">
+                                <img src="Assets/Create Room.png" alt="Create Room">
+                            </button>
+
+                            <button id="btn-join-code" class="btn-img">
+                                <img src="Assets/Join With code.png" alt="Join With Code">
+                            </button>
+
+                            <button id="btn-show-rooms" class="btn-img">
+                                <img src="Assets/Show Room List.png" alt="Show Room List">
+                            </button>
+
+                            <div class="secondary-btns">
+                                <button id="btn-play-ai" class="btn-secondary">🤖 PRACTICE VS AI</button>
+                                <button id="btn-play-local" class="btn-secondary alt">👥 LOCAL 2 PLAYER</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Lobby Screen (Matches football game asset-03.jpg with 4-Digit Room Code) -->
+                <div id="lobby-screen" class="screen hidden">
+                    <div class="modal-card">
+                        <img src="Assets/soccer-ball.png" class="modal-top-icon" alt="Lobby Icon">
+                        <h1 class="modal-title">LOBBY</h1>
+
+                        <!-- 4-Digit Room Code Header -->
+                        <div class="room-code-badge">
+                            <div>
+                                <div class="code-title">ROOM CODE</div>
+                                <div id="lobby-room-code" class="code-digits">----</div>
+                            </div>
+                            <button id="btn-copy-code" class="btn-copy">COPY</button>
+                        </div>
+
+                        <!-- Player Name Input -->
+                        <input id="lobby-name-input" class="custom-input" type="text" maxlength="16" placeholder="ENTER YOUR NAME HERE" value="Player 1">
+
+                        <!-- Player Slots Status -->
+                        <div class="lobby-slots">
+                            <div id="lobby-p1-status" class="player-slot">
+                                <span class="slot-name">Player 1 (Host)</span>
+                                <span class="slot-badge waiting">NOT READY</span>
+                            </div>
+                            <div id="lobby-p2-status" class="player-slot">
+                                <span class="slot-name waiting">Waiting for Player 2...</span>
+                            </div>
+                        </div>
+
+                        <div id="lobby-status-msg" class="status-msg">Share the 4-digit code with your opponent!</div>
+
+                        <div class="modal-actions">
+                            <button id="btn-lobby-back" class="btn-action-back">LEAVE</button>
+                            <button id="btn-lobby-ready" class="btn-action-primary">READY</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Join with Code Modal -->
+                <div id="join-modal" class="screen hidden">
+                    <div class="modal-card">
+                        <img src="Assets/soccer-ball.png" class="modal-top-icon" alt="Soccer Ball">
+                        <h1 class="modal-title">JOIN ROOM</h1>
+
+                        <input id="join-name-input" class="custom-input" type="text" maxlength="16" placeholder="ENTER YOUR NAME HERE" value="Player 2">
+                        <input id="join-code-input" class="custom-input code-input" type="text" maxlength="4" placeholder="4-DIGIT CODE" pattern="[0-9]*" inputmode="numeric">
+
+                        <div id="join-error-msg" class="error-msg"></div>
+
+                        <div class="modal-actions">
+                            <button id="btn-join-back" class="btn-action-back">BACK</button>
+                            <button id="btn-join-enter" class="btn-action-primary blue">ENTER</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. Show Room List Modal -->
+                <div id="room-list-modal" class="screen hidden">
+                    <div class="modal-card">
+                        <img src="Assets/soccer-ball.png" class="modal-top-icon" alt="Soccer Ball">
+                        <h1 class="modal-title">ROOM LIST</h1>
+
+                        <div id="room-list-items" class="room-list-box">
+                            <!-- Dynamic Room Cards will be injected here -->
+                        </div>
+
+                        <div class="modal-actions">
+                            <button id="btn-room-list-back" class="btn-action-back">BACK</button>
+                            <button id="btn-refresh-rooms" class="btn-action-primary blue">REFRESH</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. Game Over / Victory Modal -->
+                <div id="game-over-modal" class="screen hidden">
+                    <div class="modal-card">
+                        <div class="trophy-icon">🏆</div>
+                        <h1 id="winner-title" class="modal-title">PLAYER 1 WINS!</h1>
+                        <div id="final-score-text" class="final-score-box">5 - 0</div>
+
+                        <div class="modal-actions">
+                            <button id="btn-gameover-menu" class="btn-action-back">MENU</button>
+                            <button id="btn-rematch" class="btn-action-primary">REMATCH</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Modular Game Scripts in Construct 3 Export Pattern -->
+    <script src="scripts/peerjs.min.js"></script>
+    <script src="scripts/audio.js"></script>
+    <script src="scripts/effects.js"></script>
+    <script src="scripts/physics.js"></script>
+    <script src="scripts/network.js"></script>
+    <script src="scripts/ui.js"></script>
+    <script src="scripts/game.js"></script>
+    <script src="scripts/main.js"></script>
+</body>
+</html>
+

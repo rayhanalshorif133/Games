@@ -1,0 +1,18 @@
+{
+  "name": "Soccer Game 2D Multiplayer",
+  "short_name": "Soccer2D",
+  "description": "2D Real-time Multiplayer Soccer Game with 4-Digit Room Codes",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0d2644",
+  "theme_color": "#1b62a5",
+  "icons": [
+    {
+      "src": "Assets/soccer-ball.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
+
