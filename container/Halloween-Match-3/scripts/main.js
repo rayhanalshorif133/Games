@@ -7,17 +7,15 @@
  * - Particle explosions & floating score popups
  * - Web Audio API procedural sound synthesis
  * - Authentic Halloween graphics & HUD
- * - Integrated ScoreAPI for remote score submission
  */
 
-import { ScoreAPI } from '../scoreapi.js';
 import { GameOverController } from '../gameover.js';
 
 // =========================================================================
 // ⏱️ GAME DURATION CONFIGURATION (গেমের সময় নির্ধারণ)
 // =========================================================================
 // এখানে গেমের সময় সেকেন্ডে সেট করুন (যেমন: 30 = 30 সেকেন্ড, 300 = 5 মিনিট)
-export const GAME_DURATION_SECONDS = 300; // 👈 CHANGE GAME DURATION HERE (in seconds)
+export const GAME_DURATION_SECONDS = 30; // 👈 CHANGE GAME DURATION HERE (in seconds)
 // =========================================================================
 
 // Pulsing red alert activates during the final seconds
@@ -519,13 +517,6 @@ class HalloweenGame {
       this.grid[item.col][item.row] = null; // Clear cell
     });
 
-    // Send score to backend API via ScoreAPI
-    ScoreAPI.sendScore(this.score, {
-      matchCount,
-      matchType: SPRITES.items[matchedChain[0].type].name,
-      matchScore
-    });
-
     // Apply gravity and refill grid
     this.applyGravity();
   }
@@ -702,12 +693,20 @@ class HalloweenGame {
     this.isGameOver = true;
     if (this.timerInterval) clearInterval(this.timerInterval);
 
-    // Final score submission
-    ScoreAPI.sendScore(this.score, {
-      isFinal: true,
-      highScore: this.highScore,
-      durationPlayed: GAME_DURATION_SECONDS
-    });
+    // Call sendScore function from send_score_api.js on Game Over
+    if (typeof sendScore === 'function') {
+      try {
+        sendScore(this.score);
+      } catch (e) {
+        console.error('[GameOver] sendScore error:', e);
+      }
+    } else if (typeof window !== 'undefined' && typeof window.sendScore === 'function') {
+      try {
+        window.sendScore(this.score);
+      } catch (e) {
+        console.error('[GameOver] window.sendScore error:', e);
+      }
+    }
 
     const modal = document.getElementById('game-over-modal');
     const scoreEl = document.getElementById('modal-score');
