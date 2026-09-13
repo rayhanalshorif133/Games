@@ -590,9 +590,9 @@
       const coinGain = Math.max(1, Math.floor(newVal / 16)) * comboCount;
       coins += coinGain;
 
-      // Transmit score update via ScoreSendAPI
-      if (typeof window.sendScore === 'function') {
-        window.sendScore(score, Math.round(Math.log2(targetMilestone)), {
+      // Transmit score update via ScoreSendAPI if available
+      if (typeof window.ScoreSendAPI !== 'undefined' && typeof window.ScoreSendAPI.sendScore === 'function') {
+        window.ScoreSendAPI.sendScore(score, Math.round(Math.log2(targetMilestone)), {
           coins,
           maxTile: newVal,
           combo: comboCount,
@@ -665,8 +665,8 @@
       milestoneText.textContent = `You reached block ${targetMilestone}!`;
       milestoneModal.classList.add('open');
 
-      if (typeof window.sendScore === 'function') {
-        window.sendScore(score, Math.round(Math.log2(targetMilestone)), {
+      if (typeof window.ScoreSendAPI !== 'undefined' && typeof window.ScoreSendAPI.sendScore === 'function') {
+        window.ScoreSendAPI.sendScore(score, Math.round(Math.log2(targetMilestone)), {
           milestoneReached: targetMilestone,
           coins,
           maxTile: maxVal
@@ -691,12 +691,19 @@
       highScoreVal.textContent = bestScore;
       gameOverModal.classList.add('open');
 
-      if (typeof window.sendScore === 'function') {
-        window.sendScore(score, Math.round(Math.log2(targetMilestone)), {
-          isGameOver: true,
-          coins,
-          highScore: bestScore
-        });
+      // Call sendScore function from send_score_api.js on Game Over
+      if (typeof sendScore === 'function') {
+        try {
+          sendScore(score);
+        } catch (e) {
+          console.error('[GameOver] sendScore error:', e);
+        }
+      } else if (typeof window !== 'undefined' && typeof window.sendScore === 'function') {
+        try {
+          window.sendScore(score);
+        } catch (e) {
+          console.error('[GameOver] window.sendScore error:', e);
+        }
       }
     }
   }
