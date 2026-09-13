@@ -1,0 +1,28 @@
+{
+  "name": "Cook by Number",
+  "short_name": "CookByNumber",
+  "description": "Realistic 2D Puzzle Game: Wire cooking pods, drag recipe boxes, and roll the numbered ball to hit the computer's target recipe!",
+  "start_url": "index.html",
+  "display": "fullscreen",
+  "orientation": "portrait",
+  "background_color": "#0d131a",
+  "theme_color": "#ff7b25",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
+
