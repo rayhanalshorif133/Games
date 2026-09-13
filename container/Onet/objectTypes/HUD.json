@@ -1,0 +1,24 @@
+{
+  "name": "HUD",
+  "plugin-id": "Sprite",
+  "sid": 1003,
+  "isGlobal": false,
+  "instanceVariables": [
+    {
+      "name": "score",
+      "type": "number",
+      "initialValue": 0
+    },
+    {
+      "name": "level",
+      "type": "number",
+      "initialValue": 1
+    },
+    {
+      "name": "timeLeft",
+      "type": "number",
+      "initialValue": 180
+    }
+  ],
+  "behaviorTypes": []
+}

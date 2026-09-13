@@ -1,0 +1,19 @@
+{
+  "name": "Board",
+  "plugin-id": "Sprite",
+  "sid": 1002,
+  "isGlobal": false,
+  "instanceVariables": [
+    {
+      "name": "rows",
+      "type": "number",
+      "initialValue": 11
+    },
+    {
+      "name": "cols",
+      "type": "number",
+      "initialValue": 6
+    }
+  ],
+  "behaviorTypes": []
+}

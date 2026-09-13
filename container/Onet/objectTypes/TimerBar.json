@@ -1,0 +1,24 @@
+{
+  "name": "TimerBar",
+  "plugin-id": "Sprite",
+  "sid": 1004,
+  "isGlobal": false,
+  "instanceVariables": [
+    {
+      "name": "maxTime",
+      "type": "number",
+      "initialValue": 180
+    },
+    {
+      "name": "currentTime",
+      "type": "number",
+      "initialValue": 180
+    },
+    {
+      "name": "percentage",
+      "type": "number",
+      "initialValue": 100
+    }
+  ],
+  "behaviorTypes": []
+}

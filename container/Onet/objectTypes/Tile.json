@@ -1,0 +1,34 @@
+{
+  "name": "Tile",
+  "plugin-id": "Sprite",
+  "sid": 1001,
+  "isGlobal": false,
+  "instanceVariables": [
+    {
+      "name": "type",
+      "type": "number",
+      "initialValue": 1
+    },
+    {
+      "name": "row",
+      "type": "number",
+      "initialValue": 0
+    },
+    {
+      "name": "col",
+      "type": "number",
+      "initialValue": 0
+    },
+    {
+      "name": "isSelected",
+      "type": "boolean",
+      "initialValue": false
+    },
+    {
+      "name": "isHinted",
+      "type": "boolean",
+      "initialValue": false
+    }
+  ],
+  "behaviorTypes": []
+}
