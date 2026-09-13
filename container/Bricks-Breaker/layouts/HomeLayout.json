@@ -1,0 +1,22 @@
+{
+  "name": "HomeLayout",
+  "width": 1080,
+  "height": 1920,
+  "eventSheet": "HomeEvents",
+  "layers": [
+    {
+      "name": "BackgroundGrid",
+      "parallaxX": 1,
+      "parallaxY": 1,
+      "transparent": false,
+      "backgroundColor": [7, 4, 21, 1]
+    },
+    {
+      "name": "UI",
+      "parallaxX": 0,
+      "parallaxY": 0,
+      "transparent": true
+    }
+  ]
+}
+

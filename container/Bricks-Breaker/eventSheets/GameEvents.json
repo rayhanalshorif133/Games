@@ -1,0 +1,10 @@
+{
+  "name": "GameEvents",
+  "events": [
+    {
+      "eventType": "comment",
+      "text": "Core game mechanics handled via scripts/game.js and scripts/audio.js"
+    }
+  ]
+}
+

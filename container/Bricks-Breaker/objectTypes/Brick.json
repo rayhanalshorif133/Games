@@ -1,0 +1,13 @@
+{
+  "name": "Brick",
+  "plugin-id": "Sprite",
+  "sid": 1003,
+  "isGlobal": false,
+  "instanceVariables": [
+    { "name": "hp", "type": "number", "initialValue": 1 },
+    { "name": "points", "type": "number", "initialValue": 5 },
+    { "name": "brickType", "type": "string", "initialValue": "red" }
+  ],
+  "behaviorTypes": []
+}
+

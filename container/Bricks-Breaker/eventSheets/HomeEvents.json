@@ -1,0 +1,10 @@
+{
+  "name": "HomeEvents",
+  "events": [
+    {
+      "eventType": "comment",
+      "text": "Controls home menu navigation, level selection, and settings"
+    }
+  ]
+}
+
