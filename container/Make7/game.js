@@ -1108,38 +1108,54 @@ class Make7GamePortrait {
         // Settings Button
         const btnSettings = document.getElementById('btn-settings');
         if (btnSettings) {
-            btnSettings.addEventListener('click', () => {
+            btnSettings.onclick = (e) => {
+                if (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
                 window.sounds.playTap();
                 this.updateSettingsUI();
                 document.getElementById('modal-settings').style.display = 'flex';
-            });
+            };
         }
 
         // Settings Close Button
         const btnSettingsClose = document.getElementById('btn-settings-close');
         if (btnSettingsClose) {
-            btnSettingsClose.addEventListener('click', () => {
+            btnSettingsClose.onclick = (e) => {
+                if (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
                 window.sounds.playTap();
                 document.getElementById('modal-settings').style.display = 'none';
-            });
+            };
         }
 
         // Toggle Music Button
         const toggleMusic = document.getElementById('toggle-music');
         if (toggleMusic) {
-            toggleMusic.addEventListener('click', () => {
+            toggleMusic.onclick = (e) => {
+                if (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
                 window.sounds.toggleMusic();
                 this.updateSettingsUI();
-            });
+            };
         }
 
         // Toggle Sound FX Button
         const toggleSound = document.getElementById('toggle-sound');
         if (toggleSound) {
-            toggleSound.addEventListener('click', () => {
+            toggleSound.onclick = (e) => {
+                if (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
                 window.sounds.toggleSound();
                 this.updateSettingsUI();
-            });
+            };
         }
 
         // Pause Modal Buttons
@@ -1163,17 +1179,19 @@ class Make7GamePortrait {
 
     updateSettingsUI() {
         const toggleMusic = document.getElementById('toggle-music');
-        if (toggleMusic) {
-            const isMusic = window.sounds.musicEnabled;
+        if (toggleMusic && window.sounds) {
+            const isMusic = !!window.sounds.musicEnabled;
             toggleMusic.classList.toggle('active', isMusic);
-            toggleMusic.querySelector('.toggle-label-text').textContent = isMusic ? 'ON' : 'OFF';
+            const label = toggleMusic.querySelector('.toggle-label-text');
+            if (label) label.textContent = isMusic ? 'ON' : 'OFF';
         }
 
         const toggleSound = document.getElementById('toggle-sound');
-        if (toggleSound) {
-            const isSound = window.sounds.soundEnabled;
+        if (toggleSound && window.sounds) {
+            const isSound = !!window.sounds.soundEnabled;
             toggleSound.classList.toggle('active', isSound);
-            toggleSound.querySelector('.toggle-label-text').textContent = isSound ? 'ON' : 'OFF';
+            const label = toggleSound.querySelector('.toggle-label-text');
+            if (label) label.textContent = isSound ? 'ON' : 'OFF';
         }
     }
 
@@ -1340,5 +1358,7 @@ window.addEventListener('orientationchange', () => {
 
 window.addEventListener('load', () => {
     resizePortraitViewport();
-    window.game = new Make7GamePortrait();
+    if (!window.game && typeof Make7GamePortrait !== 'undefined') {
+        window.game = new Make7GamePortrait();
+    }
 });

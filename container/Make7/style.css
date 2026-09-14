@@ -570,6 +570,9 @@ html, body {
     align-items: center;
     padding: 0 8px;
     outline: none;
+    touch-action: manipulation;
+    pointer-events: auto;
+    z-index: 10;
 }
 
 .toggle-pill.active {
@@ -586,6 +589,7 @@ html, body {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
     transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     transform: translateX(0);
+    pointer-events: none;
 }
 
 .toggle-pill.active .toggle-thumb {
@@ -600,6 +604,7 @@ html, body {
     color: #cbb49f;
     right: 20px;
     transition: all 0.2s;
+    pointer-events: none;
 }
 
 .toggle-pill.active .toggle-label-text {

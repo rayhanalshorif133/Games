@@ -33,6 +33,11 @@ class SoundManager {
     }
 
     toggleSound() {
+        if (!this.ctx) {
+            this.init();
+        } else if (this.ctx.state === 'suspended') {
+            this.ctx.resume();
+        }
         this.soundEnabled = !this.soundEnabled;
         localStorage.setItem('make7_sound', this.soundEnabled);
         if (this.soundEnabled) this.playTap();
@@ -40,6 +45,11 @@ class SoundManager {
     }
 
     toggleMusic() {
+        if (!this.ctx) {
+            this.init();
+        } else if (this.ctx.state === 'suspended') {
+            this.ctx.resume();
+        }
         this.musicEnabled = !this.musicEnabled;
         localStorage.setItem('make7_music', this.musicEnabled);
         if (this.musicEnabled) {
