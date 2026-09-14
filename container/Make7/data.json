@@ -1,0 +1,43 @@
+{
+  "project": {
+    "name": "MAKE 7",
+    "version": "1.0.0.0",
+    "author": "Game Cooker",
+    "uniqueId": "make7_puzzle_wood_1080x1920",
+    "viewportWidth": 1080,
+    "viewportHeight": 1920,
+    "orientation": "portrait",
+    "pixelRounding": false,
+    "fullscreenMode": "letterbox-scale",
+    "sampling": "bilinear",
+    "useLoaderLayout": false
+  },
+  "layouts": [
+    {
+      "name": "GameLayout",
+      "width": 1080,
+      "height": 1920,
+      "eventSheet": "GameEvents"
+    }
+  ],
+  "objectTypes": [
+    { "name": "Background", "pluginId": "Sprite", "texture": "images/wood_bg.jpg" },
+    { "name": "BoardSlot", "pluginId": "Sprite", "texture": "images/board_slot_dark.png" },
+    { "name": "Tile_1", "pluginId": "Sprite", "texture": "images/tile_1.png" },
+    { "name": "Tile_2", "pluginId": "Sprite", "texture": "images/tile_2.png" },
+    { "name": "Tile_3", "pluginId": "Sprite", "texture": "images/tile_3.png" },
+    { "name": "Tile_4", "pluginId": "Sprite", "texture": "images/tile_4.png" },
+    { "name": "Tile_5", "pluginId": "Sprite", "texture": "images/tile_5.png" },
+    { "name": "Tile_6", "pluginId": "Sprite", "texture": "images/tile_6.png" },
+    { "name": "Tile_7", "pluginId": "Sprite", "texture": "images/tile_7_rainbow.png" },
+    { "name": "RotateButton", "pluginId": "Button", "texture": "images/icon_rotate_arrows.png" },
+    { "name": "BoosterTrash", "pluginId": "Button", "texture": "images/booster_trash.png" },
+    { "name": "BoosterHammer", "pluginId": "Button", "texture": "images/booster_hammer.png" },
+    { "name": "BoosterUndo", "pluginId": "Button", "texture": "images/booster_undo.png" }
+  ],
+  "audio": {
+    "files": ["media/audio.js"],
+    "synthesized": true
+  }
+}
+

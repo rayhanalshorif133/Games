@@ -2,9 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#1a0c05">
     <title>MAKE 7 - Mobile Puzzle Game</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="appmanifest.json">
+    <link rel="icon" type="image/png" href="icons/icon-32.png">
+    <link rel="apple-touch-icon" href="icons/icon-128.png">
 </head>
 <body>
 
@@ -35,7 +42,7 @@
                 <div class="hud-right">
                     <!-- Best Score with Trophy -->
                     <div class="stat-pill">
-                        <img src="assets/ui_v2/icon_trophy.png" class="stat-icon" alt="Trophy">
+                        <img src="images/icon_trophy.png" class="stat-icon" alt="Trophy">
                         <span id="best-val">0</span>
                     </div>
 
@@ -76,17 +83,17 @@
             <footer class="bottom-boosters">
                 <!-- 1. Trash Booster (Cost 100) -->
                 <button id="btn-booster-trash" class="booster-btn" title="Discard Current Piece (100 Coins)">
-                    <img src="assets/ui_v2/booster_trash.png" alt="Trash">
+                    <img src="images/booster_trash.png" alt="Trash">
                 </button>
 
                 <!-- 2. Hammer Booster (Cost 100) -->
                 <button id="btn-booster-hammer" class="booster-btn" title="Smash Single Tile (100 Coins)">
-                    <img src="assets/ui_v2/booster_hammer.png" alt="Hammer">
+                    <img src="images/booster_hammer.png" alt="Hammer">
                 </button>
 
                 <!-- 3. Undo Booster (Cost 100) -->
                 <button id="btn-booster-undo" class="booster-btn" title="Undo Move (100 Coins)">
-                    <img src="assets/ui_v2/booster_undo.png" alt="Undo">
+                    <img src="images/booster_undo.png" alt="Undo">
                 </button>
             </footer>
 
@@ -172,7 +179,37 @@
         </div>
     </main>
 
-    <script src="audio.js"></script>
-    <script src="game.js"></script>
+    <!-- Axios Library & Fallback -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        if (typeof window.axios === 'undefined') {
+            window.axios = {
+                post: async (url, data, config = {}) => {
+                    const res = await fetch(url, {
+                        method: 'POST',
+                        headers: config.headers || { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data),
+                        credentials: config.withCredentials ? 'include' : 'same-origin'
+                    });
+                    const resData = await res.json().catch(() => ({}));
+                    return { data: resData, status: res.status };
+                }
+            };
+        }
+    </script>
+    <!-- Send Score API -->
+    <script src="send_score_api.js"></script>
+
+    <script src="scripts/supportCheck.js"></script>
+    <script src="media/audio.js"></script>
+    <script src="c3runtime.js"></script>
+    <script src="scripts/main.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').catch(() => {});
+            });
+        }
+    </script>
 </body>
 </html>
