@@ -1,0 +1,602 @@
+/* ==========================================================================
+   MAKE 7 - Exact 1080x1920 Mobile Portrait Game Styles
+   Replicating make7 demo.mp4 with modern dark slate UI, rotatable pieces,
+   bubble merges, 7-Day reward event, and bottom boosters.
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700;800&family=Nunito:wght@700;800;900&display=swap');
+
+:root {
+    --canvas-w: 1080px;
+    --canvas-h: 1920px;
+    --bg-dark: #141721;
+    --board-slot-bg: #222634;
+    --panel-bg: #2c3244;
+    --accent-teal: #1cbfa6;
+    --accent-gold: #f2c026;
+    --font-game: 'Fredoka', 'Nunito', system-ui, -apple-system, sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: #0b0c11;
+    font-family: var(--font-game);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Master 1080x1920 Portrait Viewport Container */
+#viewport {
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    touch-action: none;
+}
+
+#canvas-container {
+    width: 1080px;
+    height: 1920px;
+    position: relative;
+    transform-origin: center center;
+    background-color: var(--bg-dark);
+    box-shadow: 0 0 60px rgba(0, 0, 0, 0.9);
+    overflow: hidden;
+}
+
+/* ========================================================
+   1080x1920 Main Screen UI Elements
+   ======================================================== */
+
+/* TOP HUD AREA (Y: 60 - 320) */
+.hud-top {
+    position: absolute;
+    top: 60px;
+    left: 50px;
+    right: 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    z-index: 100;
+}
+
+.hud-left {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+}
+
+.btn-pause-circle {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    background: #232838;
+    border: 3px solid #384157;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+    transition: transform 0.1s;
+}
+
+.btn-pause-circle:active {
+    transform: scale(0.92);
+}
+
+.pause-bar {
+    width: 12px;
+    height: 38px;
+    background: #e2e8f0;
+    border-radius: 6px;
+    margin: 0 4px;
+}
+
+/* Big Score Counter */
+.score-display-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.score-main-val {
+    font-size: 110px;
+    font-weight: 900;
+    color: #ffffff;
+    line-height: 0.95;
+    letter-spacing: -2px;
+    text-shadow: 0 4px 14px rgba(0,0,0,0.5);
+}
+
+.floating-score-container {
+    height: 40px;
+    position: relative;
+}
+
+.hud-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 16px;
+}
+
+/* Trophy Best Score & Coins Wallet */
+.stat-pill {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    color: #ffffff;
+    font-size: 38px;
+    font-weight: 800;
+}
+
+.stat-icon {
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
+}
+
+
+/* Combo Banner Notification */
+#combo-banner {
+    position: absolute;
+    top: 250px;
+    left: 50%;
+    transform: translateX(-50%) scale(0.8);
+    font-size: 64px;
+    font-weight: 900;
+    color: #1cbfa6;
+    text-shadow: 0 0 20px rgba(28, 191, 166, 0.8), 0 4px 8px rgba(0,0,0,0.9);
+    letter-spacing: 2px;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 200;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+#combo-banner.show {
+    opacity: 1;
+    transform: translateX(-50%) scale(1.15);
+}
+
+/* ========================================================
+   CENTER 19-CELL HEXAGONAL HONEYCOMB BOARD (Y: 420 - 1180)
+   ======================================================== */
+#board-wrapper {
+    position: absolute;
+    top: 400px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 860px;
+    height: 780px;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#board-canvas {
+    width: 860px;
+    height: 780px;
+    display: block;
+}
+
+/* Particle / Merge Effects Canvas (Covers entire 1080x1920) */
+#fx-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1080px;
+    height: 1920px;
+    pointer-events: none;
+    z-index: 150;
+}
+
+/* ========================================================
+   BOTTOM PIECE SPAWNER & ROTATION DOCK (Y: 1240 - 1620)
+   ======================================================== */
+#spawner-wrapper {
+    position: absolute;
+    bottom: 270px;
+    left: 0;
+    right: 0;
+    height: 360px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    pointer-events: none;
+}
+
+#spawner-container {
+    width: 440px;
+    height: 340px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: grab;
+    pointer-events: auto;
+    position: relative;
+    touch-action: none;
+    -webkit-user-drag: none;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+#spawner-container:active {
+    cursor: grabbing;
+}
+
+#spawner-canvas {
+    width: 440px;
+    height: 340px;
+    display: block;
+    filter: drop-shadow(0 12px 24px rgba(0,0,0,0.6));
+    touch-action: none;
+    pointer-events: none;
+}
+
+/* Dedicated Side Rotate Button */
+.side-rotate-btn {
+    position: absolute;
+    right: 70px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 160px;
+    height: 175px;
+    background: linear-gradient(180deg, #2b3348 0%, #1c2232 100%);
+    border: 3px solid #3d4a68;
+    border-radius: 36px;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45), inset 0 2px 0 rgba(255, 255, 255, 0.15);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    cursor: pointer;
+    pointer-events: auto;
+    transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    touch-action: manipulation;
+}
+
+.side-rotate-btn:hover {
+    border-color: var(--accent-teal);
+    background: linear-gradient(180deg, #343e58 0%, #22293d 100%);
+    box-shadow: 0 12px 28px rgba(28, 191, 166, 0.25), inset 0 2px 0 rgba(255, 255, 255, 0.2);
+}
+
+.side-rotate-btn:active {
+    transform: translateY(-50%) scale(0.92);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    border-color: var(--accent-gold);
+}
+
+.rotate-icon-circle {
+    width: 84px;
+    height: 84px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1cbfa6 0%, #149c87 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    box-shadow: 0 6px 16px rgba(28, 191, 166, 0.4);
+    transition: transform 0.25s ease;
+}
+
+.side-rotate-btn:active .rotate-icon-circle {
+    transform: rotate(60deg);
+}
+
+.rotate-label {
+    font-size: 24px;
+    font-weight: 900;
+    color: #f1f5f9;
+    letter-spacing: 1.5px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* ========================================================
+   BOTTOM BOOSTER TOOLBAR (Y: 1680 - 1860)
+   ======================================================== */
+.bottom-boosters {
+    position: absolute;
+    bottom: 60px;
+    left: 70px;
+    right: 70px;
+    height: 190px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 100;
+}
+
+.booster-btn {
+    width: 180px;
+    height: 180px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    position: relative;
+    transition: transform 0.15s;
+}
+
+.booster-btn:hover {
+    transform: translateY(-5px);
+}
+
+.booster-btn:active {
+    transform: scale(0.92);
+}
+
+.booster-btn img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* ========================================================
+   MODALS: 7-Day Event, Tutorial, Pause, Game Over
+   ======================================================== */
+.modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1080px;
+    height: 1920px;
+    background: rgba(10, 12, 18, 0.85);
+    backdrop-filter: blur(14px);
+    z-index: 500;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    animation: modalPopIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes modalPopIn {
+    from { opacity: 0; transform: scale(0.92); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+
+
+/* Big Green/Teal OK Button */
+.btn-action-teal {
+    margin-top: 50px;
+    width: 520px;
+    height: 105px;
+    border-radius: 52px;
+    background: linear-gradient(180deg, #1cbfa6, #149a85);
+    border: none;
+    font-size: 44px;
+    font-weight: 900;
+    color: #ffffff;
+    letter-spacing: 2px;
+    box-shadow: 0 10px 30px rgba(28, 191, 166, 0.45);
+    cursor: pointer;
+    transition: transform 0.15s;
+}
+
+.btn-action-teal:hover {
+    transform: scale(1.04);
+}
+
+.btn-action-teal:active {
+    transform: scale(0.96);
+}
+
+/* Pause & Game Over Card */
+.generic-modal-card {
+    width: 860px;
+    background: #1b202e;
+    border: 3px solid #363e56;
+    border-radius: 40px;
+    padding: 60px 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+}
+
+.generic-modal-title {
+    font-size: 64px;
+    font-weight: 900;
+    color: #f2c026;
+    letter-spacing: 2px;
+    margin-bottom: 24px;
+    text-shadow: 0 4px 16px rgba(242, 192, 38, 0.35);
+}
+
+.modal-stat-row {
+    font-size: 42px;
+    font-weight: 800;
+    color: #cbd5e1;
+    margin: 12px 0;
+}
+
+.modal-stat-val {
+    color: #ffffff;
+    font-weight: 900;
+    font-size: 54px;
+}
+
+.modal-btn-row {
+    display: flex;
+    gap: 24px;
+    margin-top: 45px;
+}
+
+.modal-btn-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    margin-top: 40px;
+    width: 100%;
+}
+
+.modal-btn-col .btn-action-teal {
+    margin-top: 0;
+}
+
+.btn-action-secondary {
+    width: 320px;
+    height: 96px;
+    border-radius: 48px;
+    background: #2b3348;
+    border: 2px solid #485474;
+    color: #e2e8f0;
+    font-size: 34px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform 0.15s;
+}
+
+.btn-action-secondary:hover {
+    background: #3a4562;
+    transform: scale(1.04);
+}
+
+/* Hand Tutorial Overlay */
+.tutorial-hint-banner {
+    position: absolute;
+    top: 240px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(20, 24, 35, 0.9);
+    border: 2px solid #363e56;
+    border-radius: 20px;
+    padding: 18px 40px;
+    color: #ffffff;
+    font-size: 38px;
+    font-weight: 800;
+    text-align: center;
+    z-index: 250;
+    pointer-events: none;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+}
+
+.tutorial-hint-banner span {
+    color: #1cbfa6;
+}
+
+/* ========================================================
+   SETTINGS MODAL & TOGGLE SWITCHES
+   ======================================================== */
+.settings-card {
+    width: 820px;
+    padding: 50px 45px;
+}
+
+.settings-list {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    margin: 30px 0 20px 0;
+}
+
+.settings-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #23283a;
+    border: 2px solid #363f58;
+    border-radius: 28px;
+    padding: 20px 32px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+}
+
+.settings-label-group {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+}
+
+.settings-icon-bubble {
+    width: 72px;
+    height: 72px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #1cbfa6 0%, #149c87 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(28, 191, 166, 0.35);
+}
+
+.settings-label {
+    font-size: 38px;
+    font-weight: 800;
+    color: #f1f5f9;
+    letter-spacing: 0.5px;
+}
+
+/* Custom Toggle Switch */
+.toggle-pill {
+    width: 160px;
+    height: 76px;
+    border-radius: 38px;
+    background: #333d54;
+    border: 3px solid #4a5676;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+    outline: none;
+}
+
+.toggle-pill.active {
+    background: linear-gradient(135deg, #1cbfa6 0%, #159f8a 100%);
+    border-color: #3ae2c9;
+    box-shadow: 0 0 20px rgba(28, 191, 166, 0.45);
+}
+
+.toggle-thumb {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+    transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform: translateX(0);
+}
+
+.toggle-pill.active .toggle-thumb {
+    transform: translateX(82px);
+}
+
+.toggle-label-text {
+    position: absolute;
+    font-size: 26px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    color: #cbd5e1;
+    right: 20px;
+    transition: all 0.2s;
+}
+
+.toggle-pill.active .toggle-label-text {
+    left: 20px;
+    right: auto;
+    color: #ffffff;
+}
+

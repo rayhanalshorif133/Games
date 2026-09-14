@@ -23,23 +23,14 @@
     <!-- Overlay UI Layer -->
     <div id="ui-layer">
       <!-- Top HUD Header -->
-      <div>
-        <header class="hud-header">
-          <!-- Game Branding & Level Info -->
+      <header class="hud-header">
+        <!-- Top Row: Branding & Controls -->
+        <div class="hud-top-row">
           <div class="hud-pill">
             <div class="hud-title-group">
               <span class="hud-logo-icon">🍳</span>
-              <div>
-                <div class="hud-game-title">COOK BY NUMBER</div>
-                <div id="hud-level-name" class="hud-level-badge">LEVEL 1: THE FIRST RECIPE</div>
-              </div>
+              <span class="hud-game-title">COOK BY NUMBER</span>
             </div>
-          </div>
-
-          <!-- Recipe Target Goal Box -->
-          <div class="hud-target-pill interactive" id="hud-target-pill" title="Target value required by the computer">
-            <div class="hud-target-label">COMPUTER TARGET</div>
-            <div id="hud-target-value" class="hud-target-value">3</div>
           </div>
 
           <!-- Controls & Actions -->
@@ -50,8 +41,21 @@
             <button id="btn-levels" class="btn-icon" title="Select Level" aria-label="Select Level">📑</button>
             <button id="btn-help" class="btn-icon" title="How to Play" aria-label="How to Play">❓</button>
           </div>
-        </header>
-      </div>
+        </div>
+
+        <!-- Sub Row: Level Badge & Recipe Target Pill -->
+        <div class="hud-sub-row">
+          <div class="hud-level-pill">
+            <span class="hud-level-icon">⚡</span>
+            <span id="hud-level-name" class="hud-level-badge">LEVEL 1: THE FIRST RECIPE</span>
+          </div>
+
+          <div class="hud-target-pill interactive" id="hud-target-pill" title="Target value required by the computer">
+            <div class="hud-target-label">COMPUTER TARGET</div>
+            <div id="hud-target-value" class="hud-target-value">3</div>
+          </div>
+        </div>
+      </header>
 
       <!-- Toast Notification Bar -->
       <div id="toast-notice" class="toast-notice">Notice message</div>
