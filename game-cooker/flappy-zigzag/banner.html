@@ -113,6 +113,13 @@
     const W = 1000;
     const H = 600;
 
+    const bannerImg = new Image();
+    bannerImg.src = 'banner.png';
+    bannerImg.onload = () => {
+        ctx.clearRect(0, 0, W, H);
+        ctx.drawImage(bannerImg, 0, 0, W, H);
+    };
+
     const COLORS = {
         primary: '#00f3ff',    // Neon Cyan
         secondary: '#ff007f',  // Neon Magenta
@@ -214,11 +221,13 @@
         // 7. Player Neon Ship with glowing light trail
         drawPlayerShip(500, 285);
 
-        // 8. HUD Elements based on Game UI
-        drawHUDElements();
-
-        // 9. Central Hero Title & Badges
+        // 8. Central Hero Title (Only Game Title)
         drawHeroText();
+
+        // 9. If banner.png is available, render high-res artwork directly
+        if (bannerImg.complete && bannerImg.naturalWidth !== 0) {
+            ctx.drawImage(bannerImg, 0, 0, W, H);
+        }
     }
 
     function setGlow(color, blur) {
@@ -454,40 +463,13 @@
         ctx.save();
         ctx.textAlign = 'center';
 
-        // Main Title: FLAPPY ZIGZAG
+        // Main Title: FLAPPY ZIGZAG ONLY (No extra text or subheadings)
         setGlow(COLORS.primary, 36);
-        ctx.font = '900 58px Orbitron, sans-serif';
+        ctx.font = '900 68px Orbitron, sans-serif';
         ctx.fillStyle = '#ffffff';
-        ctx.letterSpacing = '3px';
-        ctx.fillText('FLAPPY ZIGZAG', W / 2, 165);
+        ctx.letterSpacing = '4px';
+        ctx.fillText('FLAPPY ZIGZAG', W / 2, 175);
 
-        // Sub-badge: NEON ARCADE EDITION
-        setGlow(COLORS.secondary, 20);
-        ctx.font = '800 15px Orbitron, sans-serif';
-        ctx.fillStyle = COLORS.secondary;
-        ctx.fillText('⚡ NEON CYBER ARCADE • PORTRAIT HD ⚡', W / 2, 200);
-
-        // Bottom Banner Feature Pills
-        drawFeaturePill(W * 0.24, 555, '⏱️ LIVE PLAYTIME TIMER');
-        drawFeaturePill(W * 0.50, 555, '🧲 MAGNET POWER-UP');
-        drawFeaturePill(W * 0.76, 555, '💰 COIN LINE STREAKS');
-
-        ctx.restore();
-    }
-
-    function drawFeaturePill(x, y, text) {
-        ctx.save();
-        setGlow(COLORS.primary, 10);
-        ctx.fillStyle = 'rgba(13, 13, 33, 0.85)';
-        ctx.strokeStyle = 'rgba(0, 243, 255, 0.4)';
-        ctx.lineWidth = 1.2;
-        roundRect(ctx, x - 110, y - 18, 220, 36, 18, true, true);
-
-        ctx.font = '700 12px Orbitron, sans-serif';
-        ctx.fillStyle = '#ffffff';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(text, x, y + 1);
         ctx.restore();
     }
 
@@ -514,7 +496,7 @@
     // Download PNG listener
     document.getElementById('btn-download').addEventListener('click', () => {
         const link = document.createElement('a');
-        link.download = 'flappy_zigzag_banner_1000x600.png';
+        link.download = 'banner.png';
         link.href = canvas.toDataURL('image/png');
         link.click();
     });

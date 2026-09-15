@@ -17,7 +17,7 @@
 
         <!-- Heads-Up Display (HUD) -->
         <div id="hud">
-            <!-- Top-Left: Settings (⚙️), Cross (✕) & 3 Lives (❤️❤️❤️) -->
+            <!-- Top-Left: Settings (⚙️), Cross (✕), 3 Lives (❤️❤️❤️) & Coins (💰) -->
             <div id="hud-left">
                 <div class="hud-left-btns">
                     <button id="btn-settings" class="hud-btn" title="Settings" aria-label="Settings">⚙️</button>
@@ -27,6 +27,9 @@
                     <span class="life-heart" id="life-1">❤️</span>
                     <span class="life-heart" id="life-2">❤️</span>
                     <span class="life-heart" id="life-3">❤️</span>
+                </div>
+                <div id="hud-coin-badge" class="hud-coin-badge" title="Coins Collected">
+                    <span>💰</span><span id="hud-coins">0</span>
                 </div>
             </div>
 
@@ -48,6 +51,18 @@
                     </div>
                     <div id="hud-boost-badge" class="hud-status-badge boost hidden">
                         <span>🚀 BOOST!</span>
+                    </div>
+                    <div id="hud-chrono-badge" class="hud-status-badge chrono hidden">
+                        <span>⏱️ CHRONO</span><span id="hud-chrono-timer">4.0s</span>
+                    </div>
+                    <div id="hud-ghost-badge" class="hud-status-badge ghost hidden">
+                        <span>👻 PHASE</span><span id="hud-ghost-timer">3.0s</span>
+                    </div>
+                    <div id="hud-micro-badge" class="hud-status-badge micro hidden">
+                        <span>🔬 MICRO</span><span id="hud-micro-timer">6.0s</span>
+                    </div>
+                    <div id="hud-drift-badge" class="hud-status-badge drift hidden">
+                        <span>🔥 DRIFT</span><span id="hud-drift-mult">1.0x</span>
                     </div>
                 </div>
             </div>
@@ -77,22 +92,31 @@
                         <span>Flap & Switch Zigzag Direction (↖ ↔ ↗)</span>
                     </div>
                     <div class="instruction-item">
-                        <span class="key-badge">🧲 MAGNET & 🔥 2X</span>
-                        <span>Suck up all nearby coins & double your points!</span>
+                        <span class="key-badge">⏱️ CHRONO & 👻 PHASE</span>
+                        <span>Bullet time slow-mo & ghost barrier walking!</span>
                     </div>
                     <div class="instruction-item">
-                        <span class="key-badge">� BOOST & 🛡️ SHIELD</span>
-                        <span>Supersonic laser-smashing & damage absorption!</span>
+                        <span class="key-badge">💥 NOVA & 🔬 MICRO</span>
+                        <span>Screen purge explosion & quantum shrink hitbox!</span>
                     </div>
                     <div class="instruction-item">
-                        <span class="key-badge">💎 GEM & ❤️ HEAL</span>
-                        <span>Mega gems (+10 pts) and life recovery hearts!</span>
+                        <span class="key-badge">🔥 DRIFT COMBO</span>
+                        <span>Apex wall turns & hazard near-misses (up to 5x)!</span>
+                    </div>
+                    <div class="instruction-item">
+                        <span class="key-badge">🧲 2X 🛡️ BOOST 💎 GEM</span>
+                        <span>Magnetic streams, mega gems & coin streaks!</span>
                     </div>
                 </div>
 
-                <button id="btn-start-game" class="neon-btn">
-                    <span>▶ PLAY GAME</span>
-                </button>
+                <div class="start-btn-group">
+                    <button id="btn-start-game" class="neon-btn">
+                        <span>▶ PLAY GAME</span>
+                    </button>
+                    <button id="btn-open-shop" class="neon-btn secondary-btn">
+                        <span>🛒 TRAIL STORE</span>
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -219,22 +243,75 @@
                         <div id="go-best" class="stat-value">0</div>
                     </div>
                     <div class="stat-card">
+                        <div class="stat-label">COINS COLLECTED</div>
+                        <div id="go-coins" class="stat-value">💰 0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">PEAK DRIFT COMBO</div>
+                        <div id="go-drift" class="stat-value">🔥 1.0x</div>
+                    </div>
+                    <div class="stat-card">
                         <div class="stat-label">TIME SURVIVED</div>
                         <div id="go-time" class="stat-value" style="font-size:22px;">00:00.0</div>
                     </div>
                 </div>
 
-                <button id="btn-retry" class="neon-btn">
-                    <span>↺ PLAY AGAIN</span>
-                </button>
-                <button id="btn-menu-go" class="neon-btn outline-btn">
-                    <span>⌂ MAIN MENU</span>
-                </button>
+                <div class="gameover-btns">
+                    <button id="btn-retry" class="neon-btn">
+                        <span>↺ PLAY AGAIN</span>
+                    </button>
+                    <button id="btn-shop-go" class="neon-btn secondary-btn">
+                        <span>🛒 TRAIL STORE</span>
+                    </button>
+                    <button id="btn-menu-go" class="neon-btn outline-btn">
+                        <span>⌂ MAIN MENU</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Particle Trail Store Modal -->
+        <div id="store-modal" class="modal-overlay hidden">
+            <div class="modal-panel store-panel">
+                <div class="modal-header">
+                    <div class="modal-title">🎨 PARTICLE TRAIL STORE</div>
+                    <button id="btn-close-store" class="modal-close-btn" aria-label="Close Store">✕</button>
+                </div>
+
+                <div class="store-balance-banner">
+                    <span>WALLET BALANCE:</span>
+                    <strong id="store-wallet-coins">💰 0</strong>
+                </div>
+
+                <div id="store-items-container" class="store-grid">
+                    <!-- Populated dynamically by game.js -->
+                </div>
             </div>
         </div>
 
     </div>
 </div>
+
+<!-- Score API Script & Axios Support -->
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+    // Fallback in case axios CDN fails or is offline
+    if (typeof window.axios === 'undefined') {
+        window.axios = {
+            post: async (url, data, config = {}) => {
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: config.headers || { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data),
+                    credentials: config.withCredentials ? 'include' : 'same-origin'
+                });
+                const resData = await res.json().catch(() => ({}));
+                return { data: resData, status: res.status };
+            }
+        };
+    }
+</script>
+<script src="send_score_api.js"></script>
 
 <script src="scripts/audio.js"></script>
 <script src="scripts/game.js"></script>
