@@ -19,3 +19,8 @@ Requirements:
 - Typography and color palette should match the game's existing UI theme (neon glows, sleek borders, arcade dark mode).
 - Clean, centered composition with modern design elements.
 ```
+
+## Make game from a video (demo.mp4)
+```text
+Please perform a detailed analysis of the attached demo.mp4 video. Recreate identical game assets matching the visual style, art direction, and theme shown in the clip. Using these assets, build a fully functional clone of the game with a vertical screen layout (Width: 1080px, Height: 1920px). Ensure the visual effects are polished, aesthetically appealing, and modern, with ultra-smooth mechanics, responsive controls, and high-performance gameplay.
+```
