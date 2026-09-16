@@ -477,6 +477,42 @@ const SoundEngine = (function () {
         });
     }
 
+    /**
+     * Mega Coin Rush Fanfare (High-energy arpeggio with glittering harmonics)
+     */
+    function playCoinRush() {
+        if (isMuted) return;
+        const c = getContext();
+        if (!c) return;
+
+        const now = c.currentTime;
+        const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51, 1567.98, 2093.00]; // C5 to C7 rapid flourish
+        notes.forEach((freq, idx) => {
+            const osc = c.createOscillator();
+            const oscHarmonic = c.createOscillator();
+            const gain = c.createGain();
+            const t = now + idx * 0.045;
+
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, t);
+
+            oscHarmonic.type = 'sine';
+            oscHarmonic.frequency.setValueAtTime(freq * 1.5, t);
+
+            gain.gain.setValueAtTime(0.25, t);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.45);
+
+            osc.connect(gain);
+            oscHarmonic.connect(gain);
+            gain.connect(c.destination);
+
+            osc.start(t);
+            oscHarmonic.start(t);
+            osc.stop(t + 0.45);
+            oscHarmonic.stop(t + 0.45);
+        });
+    }
+
     return {
         init,
         toggleMute,
@@ -496,7 +532,8 @@ const SoundEngine = (function () {
         playPowerUp,
         playBombExplosion,
         playHurt,
-        playLifeHeart
+        playLifeHeart,
+        playCoinRush
     };
 })();
 

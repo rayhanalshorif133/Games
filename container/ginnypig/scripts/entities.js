@@ -20,10 +20,15 @@ class PlayerPiggy {
         this.prevX = startX;
         this.vx = 0;
 
-        // Catch zone bounds
-        this.catchWidth = 190;
-        this.catchHeight = 85;
-        this.slotOffset = -45;
+        // Base & Mega Scaling
+        this.baseScale = 0.78;   // Compact default size (~22% smaller)
+        this.megaScale = 1.42;   // Big size during Coin Rush!
+        this.currentScale = this.baseScale;
+
+        // Catch zone bounds (dynamically computed)
+        this.catchWidth = 190 * this.currentScale;
+        this.catchHeight = 85 * this.currentScale;
+        this.slotOffset = -45 * this.currentScale;
 
         // Visual properties
         this.tilt = 0;
@@ -42,6 +47,8 @@ class PlayerPiggy {
         // Active Power-ups
         this.magnetTimer = 0;
         this.multiplierTimer = 0;
+        this.rushTimer = 0;
+        this.rushPulse = 0;
         this.shieldPulse = 0;
     }
 
@@ -71,6 +78,11 @@ class PlayerPiggy {
 
     activateMultiplier(duration = 8.0) {
         this.multiplierTimer = Math.max(this.multiplierTimer, duration);
+    }
+
+    activateRush(duration = 15.0) {
+        this.rushTimer = Math.max(this.rushTimer, duration);
+        this.happyTimer = 1.0;
     }
 
     update(dt) {
@@ -107,6 +119,19 @@ class PlayerPiggy {
             this.multiplierTimer -= dt;
         }
 
+        // Coin Rush Timer & Smooth Scale Interpolation
+        if (this.rushTimer > 0) {
+            this.rushTimer -= dt;
+            this.rushPulse += dt * 5;
+        }
+
+        const targetBaseScale = this.rushTimer > 0 ? this.megaScale : this.baseScale;
+        this.currentScale += (targetBaseScale - this.currentScale) * Math.min(1, dt * 6.5);
+
+        this.catchWidth = 190 * this.currentScale;
+        this.catchHeight = 85 * this.currentScale;
+        this.slotOffset = -45 * this.currentScale;
+
         this.blinkTimer -= dt;
         if (this.blinkTimer <= 0) {
             this.eyeBlink = 0.15;
@@ -119,10 +144,39 @@ class PlayerPiggy {
         ctx.save();
         ctx.translate(this.x, this.y);
 
-        // 1. Magnet Power-Up Aura
+        // 1. Coin Rush Golden/Rainbow Glowing Aura
+        if (this.rushTimer > 0 || this.currentScale > this.baseScale + 0.05) {
+            ctx.save();
+            const pulse = Math.sin(this.rushPulse) * 14;
+            const auraR = (160 * this.currentScale) + 30 + pulse;
+
+            // Multi-colored radiant aura
+            const auraGrad = ctx.createRadialGradient(0, 10, auraR * 0.4, 0, 10, auraR);
+            auraGrad.addColorStop(0, 'rgba(255, 212, 59, 0.35)');
+            auraGrad.addColorStop(0.5, 'rgba(255, 146, 43, 0.22)');
+            auraGrad.addColorStop(0.8, 'rgba(240, 101, 149, 0.15)');
+            auraGrad.addColorStop(1, 'rgba(255, 212, 59, 0)');
+
+            ctx.fillStyle = auraGrad;
+            ctx.beginPath();
+            ctx.arc(0, 10, auraR, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Shimmering spinning rays
+            ctx.rotate(this.rushPulse * 0.5);
+            ctx.strokeStyle = 'rgba(255, 236, 153, 0.4)';
+            ctx.lineWidth = 3;
+            ctx.setLineDash([16, 14]);
+            ctx.beginPath();
+            ctx.arc(0, 10, auraR - 8, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        // 2. Magnet Power-Up Aura
         if (this.magnetTimer > 0) {
             ctx.save();
-            const pulseR = 190 + Math.sin(this.shieldPulse) * 12;
+            const pulseR = (190 * this.currentScale) + Math.sin(this.shieldPulse) * 12;
             ctx.strokeStyle = 'rgba(0, 242, 254, 0.75)';
             ctx.lineWidth = 4;
             ctx.setLineDash([14, 10]);
@@ -130,7 +184,7 @@ class PlayerPiggy {
             ctx.shadowColor = '#00f2fe';
             ctx.shadowBlur = 22;
             ctx.beginPath();
-            ctx.arc(0, -10, pulseR, 0, Math.PI * 2);
+            ctx.arc(0, -10 * this.currentScale, pulseR, 0, Math.PI * 2);
             ctx.stroke();
 
             ctx.fillStyle = 'rgba(0, 242, 254, 0.08)';
@@ -138,10 +192,10 @@ class PlayerPiggy {
             ctx.restore();
         }
 
-        // 2. 2X Multiplier Badge
+        // 3. 2X Multiplier Badge
         if (this.multiplierTimer > 0) {
             ctx.save();
-            ctx.translate(0, -145);
+            ctx.translate(0, -135 * this.currentScale - 20);
             ctx.fillStyle = '#ffd43b';
             ctx.shadowColor = '#ffd43b';
             ctx.shadowBlur = 15;
@@ -162,15 +216,15 @@ class PlayerPiggy {
         }
 
         ctx.rotate(this.tilt);
-        ctx.scale(this.scaleX, this.scaleY);
+        ctx.scale(this.scaleX * this.currentScale, this.scaleY * this.currentScale);
 
-        // 3. Ground Shadow
+        // 4. Ground Shadow
         ctx.fillStyle = 'rgba(0, 0, 0, 0.28)';
         ctx.beginPath();
         ctx.ellipse(0, 95, 175, 42, 0, 0, Math.PI * 2);
         ctx.fill();
 
-        // 4. Feet (Walking animated paws)
+        // 5. Feet (Walking animated paws)
         const pawOffset1 = Math.sin(this.walkCycle) * 8;
         const pawOffset2 = -pawOffset1;
 
@@ -182,7 +236,7 @@ class PlayerPiggy {
         ctx.ellipse(105, 80 + pawOffset2, 24, 18, 0, 0, Math.PI * 2);
         ctx.fill();
 
-        // 5. Ears
+        // 6. Ears
         ctx.fillStyle = this.hurtTimer > 0 ? '#495057' : '#f06595';
         ctx.beginPath();
         ctx.moveTo(-95, -55);
@@ -211,12 +265,17 @@ class PlayerPiggy {
         ctx.quadraticCurveTo(75, -90, 70, -65);
         ctx.fill();
 
-        // 6. Main Piggy Body
+        // 7. Main Piggy Body
         const bodyGrad = ctx.createRadialGradient(-35, -30, 20, 0, 0, 160);
         if (this.hurtTimer > 0) {
             bodyGrad.addColorStop(0, '#ced4da');
             bodyGrad.addColorStop(0.5, '#868e96');
             bodyGrad.addColorStop(1, '#495057');
+        } else if (this.rushTimer > 0) {
+            bodyGrad.addColorStop(0, '#fff9db');
+            bodyGrad.addColorStop(0.35, '#ffdeeb');
+            bodyGrad.addColorStop(0.75, '#fcc2d7');
+            bodyGrad.addColorStop(1, '#f06595');
         } else {
             bodyGrad.addColorStop(0, '#fff0f6');
             bodyGrad.addColorStop(0.35, '#ffdeeb');
@@ -228,21 +287,68 @@ class PlayerPiggy {
         ctx.ellipse(0, 10, 160, 115, 0, 0, Math.PI * 2);
         ctx.fill();
 
-        ctx.strokeStyle = this.hurtTimer > 0 ? '#343a40' : '#e64980';
-        ctx.lineWidth = 5;
+        ctx.strokeStyle = (this.rushTimer > 0) ? '#ffd43b' : (this.hurtTimer > 0 ? '#343a40' : '#e64980');
+        ctx.lineWidth = this.rushTimer > 0 ? 6 : 5;
         ctx.stroke();
 
-        // 7. Top Coin Slot
+        // 8. Top Coin Slot
         ctx.fillStyle = '#491217';
         ctx.beginPath();
         ctx.roundRect(-46, -92, 92, 18, 9);
         ctx.fill();
 
-        ctx.strokeStyle = this.magnetTimer > 0 ? '#00f2fe' : '#ffdeeb';
+        ctx.strokeStyle = this.magnetTimer > 0 ? '#00f2fe' : (this.rushTimer > 0 ? '#ffd43b' : '#ffdeeb');
         ctx.lineWidth = 3;
         ctx.stroke();
 
-        // 8. Piggy Snout
+        // 9. Royal Crown when in Coin Rush Mode!
+        if (this.rushTimer > 0) {
+            ctx.save();
+            ctx.translate(0, -96);
+            const crownPulse = 1 + Math.sin(this.rushPulse * 2) * 0.05;
+            ctx.scale(crownPulse, crownPulse);
+
+            // Crown Base & Points
+            const crownGrad = ctx.createLinearGradient(0, -40, 0, 0);
+            crownGrad.addColorStop(0, '#fff3bf');
+            crownGrad.addColorStop(0.4, '#ffd43b');
+            crownGrad.addColorStop(1, '#f59f00');
+            ctx.fillStyle = crownGrad;
+            ctx.shadowColor = '#ffd43b';
+            ctx.shadowBlur = 16;
+
+            ctx.beginPath();
+            ctx.moveTo(-38, 0);
+            ctx.lineTo(-44, -34);
+            ctx.lineTo(-20, -18);
+            ctx.lineTo(0, -44);
+            ctx.lineTo(20, -18);
+            ctx.lineTo(44, -34);
+            ctx.lineTo(38, 0);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+
+            // Crown Jewels (Ruby & Sapphires)
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = '#ff6b6b';
+            ctx.beginPath();
+            ctx.arc(0, -38, 4.5, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#339af0';
+            ctx.beginPath();
+            ctx.arc(-38, -28, 3.5, 0, Math.PI * 2);
+            ctx.arc(38, -28, 3.5, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        // 10. Piggy Snout
         const snoutGrad = ctx.createLinearGradient(0, -25, 0, 35);
         snoutGrad.addColorStop(0, '#ffdeeb');
         snoutGrad.addColorStop(1, '#f783ac');
@@ -260,7 +366,7 @@ class PlayerPiggy {
         ctx.ellipse(18, 20, 9, 14, 0, 0, Math.PI * 2);
         ctx.fill();
 
-        // 9. Eyes
+        // 11. Eyes
         if (this.hurtTimer > 0) {
             ctx.strokeStyle = '#212529';
             ctx.lineWidth = 5;
@@ -270,7 +376,7 @@ class PlayerPiggy {
             ctx.beginPath();
             ctx.moveTo(70, -28); ctx.lineTo(50, -16); ctx.lineTo(70, -4);
             ctx.stroke();
-        } else if (this.happyTimer > 0 || this.eyeBlink > 0) {
+        } else if (this.happyTimer > 0 || this.eyeBlink > 0 || this.rushTimer > 0) {
             ctx.strokeStyle = '#2b020d';
             ctx.lineWidth = 4.5;
             ctx.lineCap = 'round';
@@ -280,6 +386,15 @@ class PlayerPiggy {
             ctx.beginPath();
             ctx.arc(60, -18, 14, Math.PI * 1.1, Math.PI * 1.9);
             ctx.stroke();
+
+            // Extra joyful shine when in rush mode
+            if (this.rushTimer > 0) {
+                ctx.fillStyle = '#ffd43b';
+                ctx.beginPath();
+                ctx.arc(-60, -32, 4, 0, Math.PI * 2);
+                ctx.arc(60, -32, 4, 0, Math.PI * 2);
+                ctx.fill();
+            }
         } else {
             ctx.fillStyle = '#212529';
             ctx.beginPath();
@@ -296,7 +411,7 @@ class PlayerPiggy {
             ctx.fill();
         }
 
-        // 10. Rosy Cheeks
+        // 12. Rosy Cheeks
         ctx.fillStyle = 'rgba(240, 62, 62, 0.35)';
         ctx.beginPath();
         ctx.ellipse(-92, 14, 18, 12, 0, 0, Math.PI * 2);
@@ -312,7 +427,7 @@ class PlayerPiggy {
 // ==========================================
 class FallingItem {
     constructor(type, x, y, speed, hasWind = false) {
-        this.type = type; // 'coin' | 'star' | 'magnet' | 'multiplier' | 'bomb' | 'heart'
+        this.type = type; // 'coin' | 'star' | 'magnet' | 'multiplier' | 'bomb' | 'heart' | 'rush'
         this.x = x;
         this.y = y;
         this.vy = speed;
@@ -325,6 +440,7 @@ class FallingItem {
         if (type === 'bomb') this.radius = 34;
         if (type === 'heart') this.radius = 30;
         if (type === 'magnet' || type === 'multiplier') this.radius = 30;
+        if (type === 'rush') this.radius = 35;
 
         this.rotation = Math.random() * Math.PI * 2;
         this.rotSpeed = (Math.random() - 0.5) * 4;
@@ -348,15 +464,22 @@ class FallingItem {
             this.x += Math.sin(this.windPhase) * 70 * dt;
         }
 
-        // Magnet attraction (pulls coins, stars, and hearts!)
-        if (player && player.magnetTimer > 0 && (this.type === 'coin' || this.type === 'star' || this.type === 'heart')) {
-            const dx = player.x - this.x;
-            const dy = (player.y + player.slotOffset) - this.y;
-            const dist = Math.hypot(dx, dy);
-            if (dist < 650 && dist > 10) {
-                const pullStrength = 3800 * (1 - dist / 650);
-                this.x += (dx / dist) * pullStrength * dt;
-                this.y += (dy / dist) * pullStrength * dt;
+        // Magnet / Coin Rush attraction (pulls coins, stars, hearts, and power-ups!)
+        const isMagnetOn = player && player.magnetTimer > 0;
+        const isRushOn = player && player.rushTimer > 0;
+
+        if (player && (isMagnetOn || (isRushOn && (this.type === 'coin' || this.type === 'star')))) {
+            const pullEligible = this.type === 'coin' || this.type === 'star' || this.type === 'heart' || this.type === 'rush';
+            if (pullEligible) {
+                const dx = player.x - this.x;
+                const dy = (player.y + player.slotOffset) - this.y;
+                const dist = Math.hypot(dx, dy);
+                const maxRange = isRushOn ? 750 : 650;
+                if (dist < maxRange && dist > 10) {
+                    const pullStrength = (isRushOn ? 4500 : 3800) * (1 - dist / maxRange);
+                    this.x += (dx / dist) * pullStrength * dt;
+                    this.y += (dy / dist) * pullStrength * dt;
+                }
             }
         }
 
@@ -378,7 +501,7 @@ class FallingItem {
         this.trailTimer += dt;
         if (this.trailTimer > 0.035 && particleSystem) {
             this.trailTimer = 0;
-            if (this.type === 'coin' || this.type === 'star') {
+            if (this.type === 'coin' || this.type === 'star' || this.type === 'rush') {
                 particleSystem.emitCoinTrail(this.x, this.y, this.vx, this.vy);
             }
         }
@@ -411,9 +534,70 @@ class FallingItem {
             this.renderBomb(ctx, r);
         } else if (this.type === 'heart') {
             this.renderHeart(ctx, r);
+        } else if (this.type === 'rush') {
+            this.renderRush(ctx, r);
         }
 
         ctx.restore();
+    }
+
+    renderRush(ctx, r) {
+        const pulseScale = 1 + Math.sin(this.pulse * 5) * 0.12;
+        ctx.scale(pulseScale, pulseScale);
+        ctx.rotate(this.rotation * 0.5);
+
+        // Radiant rainbow/gold glow aura
+        ctx.shadowColor = '#ffd43b';
+        ctx.shadowBlur = 24;
+
+        // Outer pulsing energy ring
+        const auraGrad = ctx.createRadialGradient(0, 0, r * 0.4, 0, 0, r + 10);
+        auraGrad.addColorStop(0, 'rgba(255, 212, 59, 0.5)');
+        auraGrad.addColorStop(0.6, 'rgba(255, 107, 107, 0.3)');
+        auraGrad.addColorStop(1, 'rgba(255, 212, 59, 0)');
+        ctx.fillStyle = auraGrad;
+        ctx.beginPath();
+        ctx.arc(0, 0, r + 10, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 8-Point Diamond Star Facet Background
+        ctx.fillStyle = '#ffd43b';
+        ctx.beginPath();
+        for (let i = 0; i < 8; i++) {
+            const a = (i * Math.PI * 2) / 8;
+            const dist = (i % 2 === 0) ? r + 5 : r * 0.65;
+            const px = Math.cos(a) * dist;
+            const py = Math.sin(a) * dist;
+            if (i === 0) ctx.moveTo(px, py);
+            else ctx.lineTo(px, py);
+        }
+        ctx.closePath();
+        ctx.fill();
+
+        // White border
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 3.5;
+        ctx.stroke();
+
+        // Inner Golden Potion / Star Core
+        const coreGrad = ctx.createRadialGradient(-r * 0.25, -r * 0.25, 2, 0, 0, r);
+        coreGrad.addColorStop(0, '#fff9db');
+        coreGrad.addColorStop(0.3, '#ffd43b');
+        coreGrad.addColorStop(0.7, '#f59f00');
+        coreGrad.addColorStop(1, '#d9480f');
+        ctx.fillStyle = coreGrad;
+        ctx.beginPath();
+        ctx.arc(0, 0, r * 0.85, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.shadowBlur = 0;
+
+        // Icon inside: Lightning Bolt ⚡
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '900 30px "Outfit", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('⚡', 0, 2);
     }
 
     renderHeart(ctx, r) {

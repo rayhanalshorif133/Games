@@ -16,6 +16,8 @@ const RICOCHET_LEVELS = [
         magnetChance: 0.08,
         multiplierChance: 0.0,
         heartChance: 0.0,
+        rushChance: 0.08,
+        rushBombChance: 0.0, // 0%
         hasWind: false,
         bumpers: [],
         rotators: [],
@@ -35,6 +37,8 @@ const RICOCHET_LEVELS = [
         magnetChance: 0.08,
         multiplierChance: 0.04,
         heartChance: 0.0,
+        rushChance: 0.08,
+        rushBombChance: 0.0, // 0%
         hasWind: false,
         bumpers: [
             { x: 540, y: 920, width: 220, height: 48 }
@@ -56,6 +60,8 @@ const RICOCHET_LEVELS = [
         magnetChance: 0.08,
         multiplierChance: 0.06,
         heartChance: 0.04,
+        rushChance: 0.07,
+        rushBombChance: 0.0, // 0%
         hasWind: false,
         bumpers: [
             { x: 380, y: 780, width: 190, height: 48 },
@@ -66,7 +72,7 @@ const RICOCHET_LEVELS = [
         pegs: []
     },
 
-    // Level 4: Silver Ring - Medium-easy with radial ring bounce
+    // Level 4: Silver Ring - Medium-easy with radial ring bounce (Coin Rush: 5% bombs)
     {
         levelNumber: 4,
         name: "Silver Ring",
@@ -78,6 +84,8 @@ const RICOCHET_LEVELS = [
         magnetChance: 0.08,
         multiplierChance: 0.07,
         heartChance: 0.04,
+        rushChance: 0.07,
+        rushBombChance: 0.05, // 5%
         hasWind: false,
         bumpers: [
             { x: 720, y: 980, width: 200, height: 48 }
@@ -89,7 +97,7 @@ const RICOCHET_LEVELS = [
         pegs: []
     },
 
-    // Level 5: The Angle Paddle - Medium challenge with angled rotator
+    // Level 5: The Angle Paddle - Medium challenge with angled rotator (Coin Rush: 7% bombs)
     {
         levelNumber: 5,
         name: "The Angle Paddle",
@@ -101,6 +109,8 @@ const RICOCHET_LEVELS = [
         magnetChance: 0.08,
         multiplierChance: 0.08,
         heartChance: 0.05,
+        rushChance: 0.07,
+        rushBombChance: 0.07, // 7%
         hasWind: false,
         bumpers: [
             { x: 380, y: 820, width: 190, height: 48 }
@@ -112,7 +122,7 @@ const RICOCHET_LEVELS = [
         pegs: []
     },
 
-    // Level 6: Plinko Drop - Medium-hard musical pachinko cascade
+    // Level 6: Plinko Drop - Medium-hard musical pachinko cascade (Coin Rush: 7% bombs)
     {
         levelNumber: 6,
         name: "Plinko Drop",
@@ -124,6 +134,8 @@ const RICOCHET_LEVELS = [
         magnetChance: 0.08,
         multiplierChance: 0.09,
         heartChance: 0.05,
+        rushChance: 0.07,
+        rushBombChance: 0.07, // 7%
         hasWind: true,
         bumpers: [
             { x: 540, y: 680, width: 200, height: 48 }
@@ -141,7 +153,7 @@ const RICOCHET_LEVELS = [
         ]
     },
 
-    // Level 7: Master Deflector (Full demo setup!)
+    // Level 7: Master Deflector (Full demo setup! Coin Rush: 7% bombs)
     {
         levelNumber: 7,
         name: "Master Deflector",
@@ -153,6 +165,8 @@ const RICOCHET_LEVELS = [
         magnetChance: 0.09,
         multiplierChance: 0.09,
         heartChance: 0.06,
+        rushChance: 0.07,
+        rushBombChance: 0.07, // 7%
         hasWind: true,
         bumpers: [
             { x: 310, y: 860, width: 170, height: 48 },
@@ -168,7 +182,7 @@ const RICOCHET_LEVELS = [
         pegs: []
     },
 
-    // Level 8: Spinning Wheels - Dual spinning paddles
+    // Level 8: Spinning Wheels - Dual spinning paddles (Coin Rush: 10% bombs)
     {
         levelNumber: 8,
         name: "Spinning Wheels",
@@ -180,6 +194,8 @@ const RICOCHET_LEVELS = [
         magnetChance: 0.09,
         multiplierChance: 0.10,
         heartChance: 0.06,
+        rushChance: 0.07,
+        rushBombChance: 0.10, // 10%
         hasWind: true,
         bumpers: [
             { x: 540, y: 780, width: 200, height: 48 }
@@ -192,7 +208,7 @@ const RICOCHET_LEVELS = [
         pegs: []
     },
 
-    // Level 9: Pinball Storm - Dynamic multibumper
+    // Level 9: Pinball Storm - Dynamic multibumper (Coin Rush: 10% bombs)
     {
         levelNumber: 9,
         name: "Pinball Storm",
@@ -204,6 +220,8 @@ const RICOCHET_LEVELS = [
         magnetChance: 0.10,
         multiplierChance: 0.10,
         heartChance: 0.06,
+        rushChance: 0.07,
+        rushBombChance: 0.10, // 10%
         hasWind: true,
         bumpers: [
             { x: 540, y: 650, width: 190, height: 48 }
@@ -224,7 +242,7 @@ const RICOCHET_LEVELS = [
         ]
     },
 
-    // Level 10: Jackpot Ricochet Finale!
+    // Level 10: Jackpot Ricochet Finale! (Coin Rush: 12% bombs)
     {
         levelNumber: 10,
         name: "Jackpot Ricochet",
@@ -236,6 +254,8 @@ const RICOCHET_LEVELS = [
         magnetChance: 0.10,
         multiplierChance: 0.12,
         heartChance: 0.07,
+        rushChance: 0.08,
+        rushBombChance: 0.12, // 12%
         hasWind: true,
         bumpers: [
             { x: 300, y: 720, width: 180, height: 48 },

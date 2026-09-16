@@ -275,6 +275,11 @@ class UIManager {
         // 4. Power-Up Indicators
         // ------------------------------------------
         let badgeY = 190;
+        if (this.game.player.rushTimer > 0) {
+            const sec = Math.ceil(this.game.player.rushTimer);
+            this.renderCoinRushHUDBar(ctx, 540, badgeY, sec, this.game.player.rushTimer / 15.0);
+            badgeY += 50;
+        }
         if (this.game.player.magnetTimer > 0) {
             const sec = Math.ceil(this.game.player.magnetTimer);
             this.renderPowerUpBadge(ctx, 540, badgeY, `🧲 MAGNET ACTIVE (${sec}s)`, '#00f2fe', '#0c8599');
@@ -405,6 +410,49 @@ class UIManager {
         ctx.textBaseline = 'middle';
         ctx.fillStyle = textColor;
         ctx.fillText(text, 0, 1);
+
+        ctx.restore();
+    }
+
+    renderCoinRushHUDBar(ctx, x, y, sec, ratio) {
+        ctx.save();
+        ctx.translate(x, y);
+
+        const w = 400;
+        const h = 38;
+
+        // Glowing rainbow/golden aura
+        ctx.shadowColor = '#ffd43b';
+        ctx.shadowBlur = 18;
+
+        // Container Background
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.72)';
+        ctx.beginPath();
+        ctx.roundRect(-w / 2, -h / 2, w, h, h / 2);
+        ctx.fill();
+
+        // Animated progress fill
+        const fillW = Math.max(h, (w - 6) * Math.min(1, Math.max(0, ratio)));
+        const fillGrad = ctx.createLinearGradient(-w / 2, 0, -w / 2 + fillW, 0);
+        fillGrad.addColorStop(0, '#ffd43b');
+        fillGrad.addColorStop(0.5, '#ff922b');
+        fillGrad.addColorStop(1, '#ff6b6b');
+        ctx.fillStyle = fillGrad;
+        ctx.beginPath();
+        ctx.roundRect(-w / 2 + 3, -h / 2 + 3, fillW, h - 6, (h - 6) / 2);
+        ctx.fill();
+
+        // White border
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        ctx.shadowBlur = 0;
+        ctx.font = '900 22px "Outfit", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText(`⚡ MEGA COIN RUSH! (${sec}s) ⚡`, 0, 1);
 
         ctx.restore();
     }

@@ -167,6 +167,31 @@ class ParticleSystem {
     }
 
     /**
+     * Emit high-energy golden rainbow burst for Mega Coin Rush
+     */
+    emitCoinRushBurst(x, y) {
+        const colors = ['#ffd43b', '#ff922b', '#ff6b6b', '#cc5de8', '#339af0', '#51cf66', '#ffffff'];
+        for (let i = 0; i < 40; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const speed = 200 + Math.random() * 650;
+            this.particles.push({
+                type: 'spark',
+                x: x,
+                y: y,
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed - 80,
+                radius: 10 + Math.random() * 12,
+                rotation: Math.random() * Math.PI * 2,
+                rotSpeed: (Math.random() - 0.5) * 20,
+                maxLife: 0.7 + Math.random() * 0.4,
+                life: 0,
+                color: colors[Math.floor(Math.random() * colors.length)],
+                alpha: 1.0
+            });
+        }
+    }
+
+    /**
      * Floating "+1" score popup
      */
     addPopup(x, y, text = '+1', color = '#ffe066') {
