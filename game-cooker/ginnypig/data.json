@@ -1,15 +1,14 @@
 {
-  "name": "Coin Drop Piggy Bank",
+  "name": "Piggy Coin Rush",
   "version": "1.0.0",
   "orientation": "portrait",
   "logicalSize": {
     "width": 1080,
     "height": 1920
   },
+  "runtime": "c3",
   "scoreApi": "send_score_api.js",
   "audioEngine": "WebAudio Procedural Synthesizer",
-  "assets": {
-    "images": [],
-    "audio": []
-  }
+  "lives": 3
 }
+

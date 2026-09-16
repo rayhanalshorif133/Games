@@ -1,7 +1,7 @@
 /**
- * game.js - Piggy Bank Coin Catcher Game Loop & Manager
- * Direct player-controlled Piggy Bank, mid-air ricochet obstacles from demo.mp4,
- * falling item waves, power-ups, hazards, and score API.
+ * game.js - Piggy Bank Coin Catcher Game Loop & Linear Flow Manager
+ * Seamless linear progression, automatic obstacle spawning, gradual difficulty curve,
+ * power-ups (Magnet, 2X Multiplier, Life Heart), and 3-lives system.
  */
 
 class CoinGame {
@@ -26,21 +26,29 @@ class CoinGame {
         this.pegs = [];
 
         // Game State
-        this.state = 'PLAYING'; // 'PLAYING' | 'WIN' | 'GAMEOVER'
+        this.state = 'PLAYING'; // 'PLAYING' | 'GAMEOVER'
         this.currentLevelIndex = 0;
         this.currentLevel = null;
         this.lives = 3;
-        this.coinsCaught = 0;
+        this.coinsCaughtInLevel = 0;
+        this.totalCoinsCaught = 0;
         this.score = 0;
 
         // Spawner & Screen Shake
-        this.spawnTimer = 0;
+        this.spawnTimer = 0.5;
         this.shakeAmount = 0;
+
+        // Controls & Steering State
+        this.isHoldingLeft = false;
+        this.isHoldingRight = false;
+
+        // Level Up In-Game Floating Banner
+        this.levelUpBanner = null;
 
         // Timing
         this.lastTime = performance.now();
 
-        // Load Level 1 by default
+        // Start from Level 1
         this.loadLevel(1);
     }
 
@@ -50,13 +58,23 @@ class CoinGame {
         this.currentLevel = LEVELS[this.currentLevelIndex];
 
         this.lives = 3;
-        this.coinsCaught = 0;
+        this.coinsCaughtInLevel = 0;
+        this.totalCoinsCaught = 0;
         this.score = 0;
+        this.clicks = 0;
+        this.isHoldingLeft = false;
+        this.isHoldingRight = false;
+        this.startTime = Date.now();
+        if (typeof globalThis !== 'undefined') {
+            globalThis.gameStartTime = this.startTime;
+            globalThis.gameClickCount = 0;
+        }
         this.items = [];
         this.particles.reset();
         this.player = new PlayerPiggy(540, 1680);
-        this.spawnTimer = 0.5;
+        this.spawnTimer = 0.6;
         this.shakeAmount = 0;
+        this.levelUpBanner = null;
         this.state = 'PLAYING';
         this.ui.closeModal();
 
@@ -66,25 +84,59 @@ class CoinGame {
         this.ringBumpers = (this.currentLevel.ringBumpers || []).map(c => new StageRingBumper(c.x, c.y, c.radius));
         this.pegs = (this.currentLevel.pegs || []).map(c => new StagePeg(c.x, c.y, c.radius, c.noteIndex));
 
-        console.log(`[CoinGame] Loaded Level ${this.currentLevel.levelNumber}: ${this.currentLevel.name} (Bumpers: ${this.bumpers.length}, Rotators: ${this.rotators.length}, Rings: ${this.ringBumpers.length}, Pegs: ${this.pegs.length})`);
+        console.log(`[CoinGame] Loaded Level ${this.currentLevel.levelNumber}: ${this.currentLevel.name}`);
     }
 
     restartLevel() {
-        if (this.currentLevel) {
-            this.loadLevel(this.currentLevel.levelNumber);
+        this.loadLevel(this.currentLevel ? this.currentLevel.levelNumber : 1);
+    }
+
+    advanceLevelLinear() {
+        this.currentLevelIndex++;
+
+        // If beyond standard levels, loop templates with increased difficulty
+        if (this.currentLevelIndex < LEVELS.length) {
+            this.currentLevel = LEVELS[this.currentLevelIndex];
+        } else {
+            // Endless progression: recycle advanced stages with speed boost
+            const baseTemplate = LEVELS[5 + (this.currentLevelIndex % 5)];
+            const loopMultiplier = Math.floor(this.currentLevelIndex / LEVELS.length);
+            this.currentLevel = {
+                ...baseTemplate,
+                levelNumber: this.currentLevelIndex + 1,
+                name: `${baseTemplate.name} +${loopMultiplier}`,
+                targetCoins: baseTemplate.targetCoins + loopMultiplier * 10,
+                baseSpeed: baseTemplate.baseSpeed + loopMultiplier * 50,
+                spawnInterval: Math.max(0.38, baseTemplate.spawnInterval - loopMultiplier * 0.05)
+            };
         }
-    }
 
-    nextLevel() {
-        let nextIdx = this.currentLevelIndex + 1;
-        if (nextIdx >= LEVELS.length) nextIdx = 0;
-        this.loadLevel(LEVELS[nextIdx].levelNumber);
-    }
+        this.coinsCaughtInLevel = 0;
 
-    prevLevel() {
-        let prevIdx = this.currentLevelIndex - 1;
-        if (prevIdx < 0) prevIdx = LEVELS.length - 1;
-        this.loadLevel(LEVELS[prevIdx].levelNumber);
+        // Level Up Bonus (lowered, realistic score)
+        const bonus = 10 + this.lives * 5;
+        this.score += bonus;
+
+        // Visual and Audio Celebration (No Popup!)
+        this.particles.emitConfetti(this.width, this.height);
+        SoundEngine.playLevelWin();
+
+        // Trigger on-screen banner
+        this.levelUpBanner = {
+            timer: 2.6,
+            maxTimer: 2.6,
+            levelNumber: this.currentLevel.levelNumber,
+            name: this.currentLevel.name,
+            bonus: bonus
+        };
+
+        // Smoothly Transition Stage Obstacles
+        this.bumpers = (this.currentLevel.bumpers || []).map(c => new StageBumper(c));
+        this.rotators = (this.currentLevel.rotators || []).map(c => new StageRotator(c));
+        this.ringBumpers = (this.currentLevel.ringBumpers || []).map(c => new StageRingBumper(c.x, c.y, c.radius));
+        this.pegs = (this.currentLevel.pegs || []).map(c => new StagePeg(c.x, c.y, c.radius, c.noteIndex));
+
+        console.log(`[CoinGame] Advanced seamlessly to Level ${this.currentLevel.levelNumber}: ${this.currentLevel.name}`);
     }
 
     // ==========================================
@@ -97,21 +149,29 @@ class CoinGame {
         // Spawn X between 120 and 960
         const spawnX = 120 + Math.random() * 840;
         const spawnY = -50;
-        const speed = lvl.baseSpeed + (Math.random() - 0.5) * 50;
+        const speed = lvl.baseSpeed + (Math.random() - 0.5) * 40;
         const hasWind = lvl.hasWind;
 
-        // Determine item type
+        // Determine item type based on level's progressive probability tables
         const roll = Math.random();
         let type = 'coin';
 
-        if (roll < lvl.bombChance) {
+        const bombChance = lvl.bombChance || 0;
+        const starChance = lvl.starChance || 0.15;
+        const magnetChance = lvl.magnetChance || 0.08;
+        const multiplierChance = lvl.multiplierChance || 0.05;
+        const heartChance = (this.lives < 3) ? (lvl.heartChance || 0.05) : 0.01;
+
+        if (roll < bombChance) {
             type = 'bomb';
-        } else if (roll < (lvl.bombChance + lvl.starChance)) {
+        } else if (roll < (bombChance + starChance)) {
             type = 'star';
-        } else if (roll < (lvl.bombChance + lvl.starChance + lvl.magnetChance)) {
+        } else if (roll < (bombChance + starChance + magnetChance)) {
             type = 'magnet';
-        } else if (roll < (lvl.bombChance + lvl.starChance + lvl.magnetChance + lvl.multiplierChance)) {
+        } else if (roll < (bombChance + starChance + magnetChance + multiplierChance)) {
             type = 'multiplier';
+        } else if (roll < (bombChance + starChance + magnetChance + multiplierChance + heartChance)) {
+            type = 'heart';
         }
 
         this.items.push(new FallingItem(type, spawnX, spawnY, speed, hasWind));
@@ -122,6 +182,11 @@ class CoinGame {
     // ==========================================
     onPointerDown(px, py) {
         SoundEngine.init();
+
+        this.clicks++;
+        if (typeof globalThis !== 'undefined') {
+            globalThis.gameClickCount = this.clicks;
+        }
 
         if (this.ui.handleClick(px, py)) {
             return;
@@ -134,15 +199,22 @@ class CoinGame {
 
     onPointerMove(px, py) {
         if (this.state !== 'PLAYING') return;
+        if (this.isHoldingLeft || this.isHoldingRight) return;
         this.player.setTargetX(px);
     }
 
     onPointerUp() {
-        // Nothing on up
+        this.ui.handlePointerUp();
+        this.isHoldingLeft = false;
+        this.isHoldingRight = false;
     }
 
     moveByKeyboard(dx) {
         if (this.state !== 'PLAYING') return;
+        this.clicks++;
+        if (typeof globalThis !== 'undefined') {
+            globalThis.gameClickCount = this.clicks;
+        }
         this.ui.showTutorial = false;
         this.player.setTargetX(this.player.targetX + dx);
     }
@@ -156,6 +228,24 @@ class CoinGame {
         // Screen Shake decay
         if (this.shakeAmount > 0) {
             this.shakeAmount = Math.max(0, this.shakeAmount - dt * 45);
+        }
+
+        // Continuous button steering
+        if (this.state === 'PLAYING') {
+            if (this.isHoldingLeft) {
+                this.player.setTargetX(this.player.targetX - 1100 * dt);
+            }
+            if (this.isHoldingRight) {
+                this.player.setTargetX(this.player.targetX + 1100 * dt);
+            }
+        }
+
+        // Level Up Banner update
+        if (this.levelUpBanner) {
+            this.levelUpBanner.timer -= dt;
+            if (this.levelUpBanner.timer <= 0) {
+                this.levelUpBanner = null;
+            }
         }
 
         this.player.update(dt);
@@ -201,10 +291,8 @@ class CoinGame {
                     bumper.restitution
                 );
                 if (hit) {
-                    // Impart sideways glance velocity based on offset from bumper center
                     const offsetFraction = (item.x - bumper.x) / (bumper.width * 0.5);
                     item.vx += offsetFraction * 220;
-
                     this.particles.emitCollisionSparks(hit.hitX, hit.hitY, hit.nx, hit.ny);
                     SoundEngine.playBounce(hit.impactSpeed / 700);
                 }
@@ -266,9 +354,10 @@ class CoinGame {
                 item.isDead = true;
 
                 if (item.type === 'coin') {
-                    this.coinsCaught++;
+                    this.coinsCaughtInLevel++;
+                    this.totalCoinsCaught++;
                     const mult = this.player.multiplierTimer > 0 ? 2 : 1;
-                    const pts = 100 * mult;
+                    const pts = 1 * mult;
                     this.score += pts;
 
                     this.player.onCatchCoin(false);
@@ -276,14 +365,15 @@ class CoinGame {
                     this.particles.emitPiggyCoins(item.x, item.y);
                     this.particles.addPopup(item.x, item.y - 40, `+${pts}`, '#ffd43b');
 
-                    if (this.coinsCaught >= this.currentLevel.targetCoins) {
-                        this.triggerWin();
+                    if (this.coinsCaughtInLevel >= this.currentLevel.targetCoins) {
+                        this.advanceLevelLinear();
                         return;
                     }
                 } else if (item.type === 'star') {
-                    this.coinsCaught++;
+                    this.coinsCaughtInLevel++;
+                    this.totalCoinsCaught++;
                     const mult = this.player.multiplierTimer > 0 ? 2 : 1;
-                    const pts = 300 * mult;
+                    const pts = 3 * mult;
                     this.score += pts;
 
                     this.player.onCatchCoin(true);
@@ -291,10 +381,20 @@ class CoinGame {
                     this.particles.emitPiggyCoins(item.x, item.y);
                     this.particles.addPopup(item.x, item.y - 40, `★ +${pts}`, '#ffe066');
 
-                    if (this.coinsCaught >= this.currentLevel.targetCoins) {
-                        this.triggerWin();
+                    if (this.coinsCaughtInLevel >= this.currentLevel.targetCoins) {
+                        this.advanceLevelLinear();
                         return;
                     }
+                } else if (item.type === 'heart') {
+                    if (this.lives < 3) {
+                        this.lives++;
+                    }
+                    const pts = 2;
+                    this.score += pts;
+                    this.player.happyTimer = 0.45;
+                    SoundEngine.playLifeHeart();
+                    this.particles.emitPowerUpAura(item.x, item.y, '#ff4d6d');
+                    this.particles.addPopup(item.x, item.y - 40, this.lives === 3 ? '❤️ MAX LIFE!' : '❤️ +1 LIFE!', '#ff4d6d');
                 } else if (item.type === 'magnet') {
                     this.player.activateMagnet(6.0);
                     SoundEngine.playPowerUp();
@@ -328,58 +428,34 @@ class CoinGame {
         }
     }
 
-    triggerWin() {
-        this.state = 'WIN';
-
-        let stars = 1;
-        if (this.lives === 3) stars = 3;
-        else if (this.lives === 2) stars = 2;
-
-        const bonus = this.lives * 500;
-        this.score += bonus;
-
-        this.particles.emitConfetti(this.width, this.height);
-        SoundEngine.playLevelWin();
-
-        const resultData = {
-            score: this.score,
-            level: this.currentLevel.levelNumber,
-            coinsCaught: this.coinsCaught,
-            target: this.currentLevel.targetCoins,
-            livesLeft: this.lives,
-            status: 'win',
-            stars: stars
-        };
-
-        if (typeof SendScoreApi !== 'undefined' && SendScoreApi.sendScore) {
-            SendScoreApi.sendScore(resultData);
-        }
-
-        setTimeout(() => {
-            this.ui.openLevelComplete(resultData);
-        }, 600);
-    }
-
     triggerGameOver() {
         this.state = 'GAMEOVER';
         SoundEngine.playGameOver();
 
-        const resultData = {
-            score: this.score,
-            level: this.currentLevel.levelNumber,
-            coinsCaught: this.coinsCaught,
-            target: this.currentLevel.targetCoins,
-            livesLeft: 0,
-            status: 'gameover',
-            stars: 0
+        const finalScore = this.score;
+        const clicks = this.clicks;
+        const duration = Math.max(1, Math.round((Date.now() - this.startTime) / 1000));
+
+        if (typeof globalThis !== 'undefined') {
+            globalThis.gameDuration = duration;
+        }
+
+        const payload = {
+            score: finalScore,
+            clicks: clicks,
+            duration: duration
         };
 
-        if (typeof SendScoreApi !== 'undefined' && SendScoreApi.sendScore) {
-            SendScoreApi.sendScore(resultData);
+        console.log('[CoinGame] Game Over - payload to send_score_api:', payload);
+
+        if (typeof sendScore === 'function') {
+            sendScore(payload);
+        } else if (typeof SendScoreApi !== 'undefined' && SendScoreApi.sendScore) {
+            SendScoreApi.sendScore(payload);
         }
 
         setTimeout(() => {
-            this.ui.openGameOver(resultData);
+            this.ui.openGameOver(payload);
         }, 500);
     }
 
@@ -433,7 +509,7 @@ class CoinGame {
 
         ctx.restore();
 
-        // 6. Render UI HUD & Modals
+        // 6. Render UI HUD, Modals & Floating Banners
         this.ui.render(ctx);
     }
 
@@ -454,3 +530,4 @@ class CoinGame {
 if (typeof window !== 'undefined') {
     window.CoinGame = CoinGame;
 }
+

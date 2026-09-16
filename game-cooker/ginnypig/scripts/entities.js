@@ -312,7 +312,7 @@ class PlayerPiggy {
 // ==========================================
 class FallingItem {
     constructor(type, x, y, speed, hasWind = false) {
-        this.type = type; // 'coin' | 'star' | 'magnet' | 'multiplier' | 'bomb'
+        this.type = type; // 'coin' | 'star' | 'magnet' | 'multiplier' | 'bomb' | 'heart'
         this.x = x;
         this.y = y;
         this.vy = speed;
@@ -323,6 +323,7 @@ class FallingItem {
         this.radius = 28;
         if (type === 'star') this.radius = 32;
         if (type === 'bomb') this.radius = 34;
+        if (type === 'heart') this.radius = 30;
         if (type === 'magnet' || type === 'multiplier') this.radius = 30;
 
         this.rotation = Math.random() * Math.PI * 2;
@@ -347,8 +348,8 @@ class FallingItem {
             this.x += Math.sin(this.windPhase) * 70 * dt;
         }
 
-        // Magnet attraction
-        if (player && player.magnetTimer > 0 && (this.type === 'coin' || this.type === 'star')) {
+        // Magnet attraction (pulls coins, stars, and hearts!)
+        if (player && player.magnetTimer > 0 && (this.type === 'coin' || this.type === 'star' || this.type === 'heart')) {
             const dx = player.x - this.x;
             const dy = (player.y + player.slotOffset) - this.y;
             const dist = Math.hypot(dx, dy);
@@ -408,9 +409,50 @@ class FallingItem {
             this.renderMultiplier(ctx, r);
         } else if (this.type === 'bomb') {
             this.renderBomb(ctx, r);
+        } else if (this.type === 'heart') {
+            this.renderHeart(ctx, r);
         }
 
         ctx.restore();
+    }
+
+    renderHeart(ctx, r) {
+        const pulseScale = 1 + Math.sin(this.pulse * 5) * 0.08;
+        ctx.scale(pulseScale, pulseScale);
+
+        // Glow aura
+        ctx.shadowColor = '#ff4d6d';
+        ctx.shadowBlur = 16;
+
+        ctx.fillStyle = 'rgba(255, 77, 109, 0.2)';
+        ctx.beginPath();
+        ctx.arc(0, 0, r + 6, 0, Math.PI * 2);
+        ctx.fill();
+
+        // White border capsule
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 3.5;
+        ctx.beginPath();
+        ctx.arc(0, 0, r, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Red Heart gradient
+        const heartGrad = ctx.createLinearGradient(0, -r, 0, r);
+        heartGrad.addColorStop(0, '#ff758f');
+        heartGrad.addColorStop(0.4, '#ff4d6d');
+        heartGrad.addColorStop(1, '#c9184a');
+        ctx.fillStyle = heartGrad;
+        ctx.beginPath();
+        ctx.arc(0, 0, r - 2, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.shadowBlur = 0;
+
+        // Heart Icon in center
+        ctx.font = '28px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('❤️', 0, 2);
     }
 
     renderCoin(ctx, r) {
@@ -604,6 +646,10 @@ class StageBumper {
         this.capRadius = this.height / 2;
         this.restitution = 0.88;
 
+        // Smooth spawn entrance
+        this.spawnScale = 0;
+        this.alpha = 0;
+
         // Optional horizontal or vertical oscillation
         this.oscSpeed = config.oscSpeed || 0;
         this.oscRange = config.oscRange || 0;
@@ -614,17 +660,26 @@ class StageBumper {
     }
 
     getSegment() {
-        const halfLen = (this.width - this.height) / 2;
+        const halfLen = ((this.width * this.spawnScale) - (this.height * this.spawnScale)) / 2;
         return {
             x1: this.x - halfLen,
             y1: this.y,
             x2: this.x + halfLen,
             y2: this.y,
-            radius: this.capRadius
+            radius: this.capRadius * this.spawnScale
         };
     }
 
     update(dt) {
+        // Smooth entrance
+        if (this.spawnScale < 1) {
+            this.spawnScale += (1 - this.spawnScale) * Math.min(1, dt * 7);
+            if (this.spawnScale > 0.98) this.spawnScale = 1;
+        }
+        if (this.alpha < 1) {
+            this.alpha = Math.min(1, this.alpha + dt * 4);
+        }
+
         if (this.oscSpeed > 0 && this.oscRange > 0) {
             this.time += dt * this.oscSpeed;
             if (this.oscAxis === 'x') {
@@ -636,8 +691,11 @@ class StageBumper {
     }
 
     render(ctx) {
+        if (this.alpha <= 0) return;
         ctx.save();
         ctx.translate(this.x, this.y);
+        ctx.globalAlpha = this.alpha;
+        ctx.scale(this.spawnScale, this.spawnScale);
 
         const w = this.width;
         const h = this.height;
@@ -689,12 +747,16 @@ class StageRotator {
         this.thickness = config.thickness || 48;
         this.capRadius = this.thickness / 2;
         this.angle = config.angle || (Math.PI / 4);
-        this.spinSpeed = config.spinSpeed || 0; // if > 0, slowly spins continuously
+        this.spinSpeed = config.spinSpeed || 0;
         this.restitution = 0.92;
+
+        // Smooth spawn entrance
+        this.spawnScale = 0;
+        this.alpha = 0;
     }
 
     getSegment() {
-        const halfLen = (this.length - this.thickness) / 2;
+        const halfLen = ((this.length * this.spawnScale) - (this.thickness * this.spawnScale)) / 2;
         const cos = Math.cos(this.angle);
         const sin = Math.sin(this.angle);
         return {
@@ -702,19 +764,30 @@ class StageRotator {
             y1: this.y - sin * halfLen,
             x2: this.x + cos * halfLen,
             y2: this.y + sin * halfLen,
-            radius: this.capRadius
+            radius: this.capRadius * this.spawnScale
         };
     }
 
     update(dt) {
+        if (this.spawnScale < 1) {
+            this.spawnScale += (1 - this.spawnScale) * Math.min(1, dt * 7);
+            if (this.spawnScale > 0.98) this.spawnScale = 1;
+        }
+        if (this.alpha < 1) {
+            this.alpha = Math.min(1, this.alpha + dt * 4);
+        }
+
         if (this.spinSpeed !== 0) {
             this.angle += this.spinSpeed * dt;
         }
     }
 
     render(ctx) {
+        if (this.alpha <= 0) return;
         ctx.save();
         ctx.translate(this.x, this.y);
+        ctx.globalAlpha = this.alpha;
+        ctx.scale(this.spawnScale, this.spawnScale);
 
         // Dotted circular guide ring
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.55)';
@@ -774,6 +847,10 @@ class StageRingBumper {
         this.radius = radius;
         this.restitution = 0.95;
         this.pulse = 0;
+
+        // Smooth spawn entrance
+        this.spawnScale = 0;
+        this.alpha = 0;
     }
 
     hit() {
@@ -781,14 +858,25 @@ class StageRingBumper {
     }
 
     update(dt) {
+        if (this.spawnScale < 1) {
+            this.spawnScale += (1 - this.spawnScale) * Math.min(1, dt * 7);
+            if (this.spawnScale > 0.98) this.spawnScale = 1;
+        }
+        if (this.alpha < 1) {
+            this.alpha = Math.min(1, this.alpha + dt * 4);
+        }
+
         if (this.pulse > 0) {
             this.pulse = Math.max(0, this.pulse - dt * 4);
         }
     }
 
     render(ctx) {
+        if (this.alpha <= 0) return;
         ctx.save();
         ctx.translate(this.x, this.y);
+        ctx.globalAlpha = this.alpha;
+        ctx.scale(this.spawnScale, this.spawnScale);
 
         const r = this.radius * (1 + this.pulse * 0.08);
 
@@ -839,6 +927,10 @@ class StagePeg {
         this.noteIndex = noteIndex;
         this.restitution = 0.90;
         this.flash = 0;
+
+        // Smooth spawn entrance
+        this.spawnScale = 0;
+        this.alpha = 0;
     }
 
     hit() {
@@ -846,14 +938,25 @@ class StagePeg {
     }
 
     update(dt) {
+        if (this.spawnScale < 1) {
+            this.spawnScale += (1 - this.spawnScale) * Math.min(1, dt * 7);
+            if (this.spawnScale > 0.98) this.spawnScale = 1;
+        }
+        if (this.alpha < 1) {
+            this.alpha = Math.min(1, this.alpha + dt * 4);
+        }
+
         if (this.flash > 0) {
             this.flash = Math.max(0, this.flash - dt * 4);
         }
     }
 
     render(ctx) {
+        if (this.alpha <= 0) return;
         ctx.save();
         ctx.translate(this.x, this.y);
+        ctx.globalAlpha = this.alpha;
+        ctx.scale(this.spawnScale, this.spawnScale);
 
         const r = this.radius * (1 + this.flash * 0.25);
 

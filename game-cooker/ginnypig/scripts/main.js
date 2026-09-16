@@ -108,5 +108,5 @@ window.addEventListener('DOMContentLoaded', () => {
     // Start Game Loop
     game.startLoop();
 
-    console.log('[PiggyBank Catcher] Initialized at 1080x1920 logical resolution.');
+    console.log('[Piggy Coin Rush] Initialized at 1080x1920 logical resolution.');
 });

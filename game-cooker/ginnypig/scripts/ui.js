@@ -1,12 +1,12 @@
 /**
- * ui.js - Catcher HUD, Hearts/Lives, Progress Bar, and Modals
+ * ui.js - Catcher HUD, Hearts/Lives, Progress Bar, Floating Level Up Banners, and Game Over Modal
  */
 
 class UIManager {
     constructor(game) {
         this.game = game;
         this.buttons = [];
-        this.activeModal = null; // 'level_complete' | 'game_over' | 'level_select'
+        this.activeModal = null; // 'game_over' | 'level_select'
         this.modalData = null;
         this.showTutorial = true;
         this.initButtons();
@@ -14,14 +14,16 @@ class UIManager {
 
     initButtons() {
         this.buttons = [
-            // Top Left: Home / Levels Button
+            // Top Left: Cross / Exit Button (Redirects to '/')
             {
-                id: 'btn_home',
+                id: 'btn_exit',
                 x: 80,
                 y: 85,
                 radius: 44,
-                type: 'home',
-                action: () => this.openLevelSelect()
+                type: 'cross',
+                action: () => {
+                    window.location.href = '/';
+                }
             },
             // Top Right: Sound Toggle
             {
@@ -43,6 +45,40 @@ class UIManager {
                 radius: 44,
                 type: 'restart',
                 action: () => this.game.restartLevel()
+            },
+            // Bottom Left: Left Steering Button
+            {
+                id: 'btn_left',
+                x: 95,
+                y: 1720,
+                radius: 54,
+                type: 'arrow_left',
+                isPressed: false,
+                onDown: () => {
+                    this.game.isHoldingLeft = true;
+                    this.showTutorial = false;
+                    this.game.player.setTargetX(this.game.player.targetX - 70);
+                },
+                onUp: () => {
+                    this.game.isHoldingLeft = false;
+                }
+            },
+            // Bottom Right: Right Steering Button
+            {
+                id: 'btn_right',
+                x: 985,
+                y: 1720,
+                radius: 54,
+                type: 'arrow_right',
+                isPressed: false,
+                onDown: () => {
+                    this.game.isHoldingRight = true;
+                    this.showTutorial = false;
+                    this.game.player.setTargetX(this.game.player.targetX + 70);
+                },
+                onUp: () => {
+                    this.game.isHoldingRight = false;
+                }
             }
         ];
     }
@@ -50,11 +86,6 @@ class UIManager {
     openLevelSelect() {
         SoundEngine.playButtonClick();
         this.activeModal = 'level_select';
-    }
-
-    openLevelComplete(data) {
-        this.activeModal = 'level_complete';
-        this.modalData = data;
     }
 
     openGameOver(data) {
@@ -77,40 +108,47 @@ class UIManager {
         for (let btn of this.buttons) {
             const d = Math.hypot(px - btn.x, py - btn.y);
             if (d <= btn.radius + 15) {
-                SoundEngine.playButtonClick();
-                btn.action();
+                if (btn.onDown) {
+                    btn.isPressed = true;
+                    btn.onDown();
+                } else if (btn.action) {
+                    SoundEngine.playButtonClick();
+                    btn.action();
+                }
                 return true;
             }
         }
         return false;
     }
 
+    handlePointerUp() {
+        for (let btn of this.buttons) {
+            if (btn.isPressed) {
+                btn.isPressed = false;
+                if (btn.onUp) {
+                    btn.onUp();
+                }
+            }
+        }
+    }
+
     handleModalClick(px, py) {
-        if (this.activeModal === 'level_complete') {
-            // Next Level button
-            if (Math.abs(px - 540) < 170 && Math.abs(py - 1140) < 45) {
+        if (this.activeModal === 'game_over') {
+            // TRY AGAIN button (y around 1115)
+            if (Math.abs(px - 540) < 170 && Math.abs(py - 1115) < 40) {
                 SoundEngine.playButtonClick();
                 this.closeModal();
-                this.game.nextLevel();
+                this.game.loadLevel(1);
                 return true;
             }
-            // Replay button
-            if (Math.abs(px - 540) < 130 && Math.abs(py - 1250) < 40) {
+            // BACK TO HOME button (y around 1215)
+            if (Math.abs(px - 540) < 170 && Math.abs(py - 1215) < 40) {
                 SoundEngine.playButtonClick();
-                this.closeModal();
-                this.game.restartLevel();
-                return true;
-            }
-        } else if (this.activeModal === 'game_over') {
-            // Try Again button
-            if (Math.abs(px - 540) < 170 && Math.abs(py - 1140) < 45) {
-                SoundEngine.playButtonClick();
-                this.closeModal();
-                this.game.restartLevel();
+                window.location.href = '/';
                 return true;
             }
         } else if (this.activeModal === 'level_select') {
-            // Close
+            // Close button
             if (Math.hypot(px - 860, py - 530) < 50) {
                 SoundEngine.playButtonClick();
                 this.closeModal();
@@ -148,6 +186,8 @@ class UIManager {
 
     render(ctx) {
         this.renderHUD(ctx);
+        this.renderLevelUpBanner(ctx);
+
         if (this.activeModal) {
             this.renderModal(ctx);
         }
@@ -158,7 +198,7 @@ class UIManager {
 
         const lvl = this.game.currentLevel;
         const target = lvl ? lvl.targetCoins : 20;
-        const caught = this.game.coinsCaught;
+        const caught = this.game.coinsCaughtInLevel || 0;
         const progress = Math.min(1, caught / Math.max(1, target));
 
         // ------------------------------------------
@@ -203,7 +243,7 @@ class UIManager {
         ctx.shadowBlur = 0;
         ctx.font = '900 22px "Outfit", sans-serif';
         ctx.fillStyle = '#ffffff';
-        ctx.fillText(`COINS: ${caught} / ${target}`, 540, barY + barH / 2 + 1);
+        ctx.fillText(`STAGE GOAL: ${caught} / ${target}`, 540, barY + barH / 2 + 1);
 
         // Score below progress bar
         ctx.font = '900 32px "Outfit", sans-serif';
@@ -213,23 +253,19 @@ class UIManager {
         ctx.fillText(`SCORE: ${this.game.score.toLocaleString()}`, 540, 138);
 
         // ------------------------------------------
-        // 2. Hearts / Lives (❤️❤️❤️)
+        // 2. Hearts / Lives (❤️❤️❤️) with White Border
         // ------------------------------------------
-        const heartsY = 140;
+        const heartsY = 185;
         const heartsStartX = 870;
+        const heartsSpacing = 58;
         for (let i = 0; i < 3; i++) {
-            const hx = heartsStartX + i * 44;
+            const hx = heartsStartX + i * heartsSpacing;
             const isFull = i < this.game.lives;
-            ctx.font = '32px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.shadowBlur = 4;
-            ctx.shadowColor = '#000000';
-            ctx.fillText(isFull ? '❤️' : '🖤', hx, heartsY);
+            this.renderHeart(ctx, hx, heartsY, 48, isFull);
         }
 
         // ------------------------------------------
-        // 3. Top Buttons (Home, Sound, Restart)
+        // 3. Top Buttons (Cross, Sound, Restart)
         // ------------------------------------------
         for (let btn of this.buttons) {
             this.renderCircleButton(ctx, btn);
@@ -268,9 +304,82 @@ class UIManager {
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillStyle = '#ffffff';
-            ctx.fillText('👈 DRAG TO MOVE PIGGY 👉', 0, 2);
+            ctx.fillText('👈 SWIPE OR USE ARROWS 👉', 0, 2);
             ctx.restore();
         }
+
+        ctx.restore();
+    }
+
+    renderLevelUpBanner(ctx) {
+        const banner = this.game.levelUpBanner;
+        if (!banner) return;
+
+        const progress = banner.timer / banner.maxTimer; // 1 -> 0
+        let alpha = 1;
+        let scale = 1;
+
+        if (progress > 0.8) {
+            const t = (1 - progress) / 0.2; // 0 -> 1
+            scale = 0.5 + t * 0.55; // 0.5 -> 1.05
+            alpha = t;
+        } else if (progress < 0.25) {
+            alpha = progress / 0.25;
+            scale = 1.0 + (1 - alpha) * 0.08;
+        } else {
+            scale = 1.0 + Math.sin(progress * 14) * 0.03;
+            alpha = 1.0;
+        }
+
+        ctx.save();
+        ctx.translate(540, 520);
+        ctx.scale(scale, scale);
+        ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
+
+        // Background glow
+        ctx.shadowColor = '#ffd43b';
+        ctx.shadowBlur = 35;
+
+        // Container Pill
+        const grad = ctx.createLinearGradient(0, -90, 0, 90);
+        grad.addColorStop(0, '#fff3bf');
+        grad.addColorStop(0.3, '#ffd43b');
+        grad.addColorStop(0.7, '#f59f00');
+        grad.addColorStop(1, '#e67700');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.roundRect(-360, -90, 720, 180, 40);
+        ctx.fill();
+
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 6;
+        ctx.stroke();
+
+        ctx.shadowBlur = 0;
+
+        // Inner frame
+        ctx.strokeStyle = 'rgba(92, 16, 34, 0.35)';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.roundRect(-348, -78, 696, 156, 30);
+        ctx.stroke();
+
+        // Level Up title
+        ctx.font = '900 42px "Outfit", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = '#5c1022';
+        ctx.fillText(`🌟 LEVEL ${banner.levelNumber} UNLOCKED! 🌟`, 0, -40);
+
+        // Subtitle
+        ctx.font = '800 32px "Outfit", sans-serif';
+        ctx.fillStyle = '#2b020d';
+        ctx.fillText(`${banner.name.toUpperCase()}`, 0, 6);
+
+        // Bonus Tag
+        ctx.font = '900 26px "Outfit", sans-serif';
+        ctx.fillStyle = '#2b8a3e';
+        ctx.fillText(`+${banner.bonus} BONUS POINTS!`, 0, 50);
 
         ctx.restore();
     }
@@ -300,9 +409,98 @@ class UIManager {
         ctx.restore();
     }
 
+    renderHeart(ctx, x, y, size, isFull) {
+        ctx.save();
+        ctx.translate(x, y);
+
+        const s = size / 24;
+        ctx.scale(s, s);
+        ctx.translate(-12, -12); // Center of 24x24 bounding box
+
+        // Drop Shadow
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
+        ctx.shadowBlur = 8 / s;
+        ctx.shadowOffsetY = 2.5 / s;
+
+        // Standard Perfect SVG Heart Path
+        let path = null;
+        if (typeof Path2D !== 'undefined') {
+            if (!UIManager.heartPath) {
+                UIManager.heartPath = new Path2D(
+                    "M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+                );
+            }
+            path = UIManager.heartPath;
+        }
+
+        const drawPath = () => {
+            if (path) return;
+            ctx.beginPath();
+            ctx.moveTo(12, 21.35);
+            ctx.lineTo(10.55, 20.03);
+            ctx.bezierCurveTo(5.4, 15.36, 2, 12.28, 2, 8.5);
+            ctx.bezierCurveTo(2, 5.42, 4.42, 3, 7.5, 3);
+            ctx.bezierCurveTo(9.24, 3, 10.91, 3.81, 12, 5.09);
+            ctx.bezierCurveTo(13.09, 3.81, 14.76, 3, 16.5, 3);
+            ctx.bezierCurveTo(19.58, 3, 22, 5.42, 22, 8.5);
+            ctx.bezierCurveTo(22, 12.28, 18.6, 15.36, 13.45, 20.03);
+            ctx.closePath();
+        };
+
+        // 1. Fill (Red Gradient when Full, Dark Silhouette when Lost)
+        if (isFull) {
+            const grad = ctx.createLinearGradient(12, 3, 12, 22);
+            grad.addColorStop(0, '#ff3b69');
+            grad.addColorStop(0.4, '#e00034');
+            grad.addColorStop(1, '#9e0024');
+            ctx.fillStyle = grad;
+            if (path) {
+                ctx.fill(path);
+            } else {
+                drawPath();
+                ctx.fill();
+            }
+
+            // Specular shine highlight
+            ctx.shadowColor = 'transparent';
+            ctx.beginPath();
+            ctx.ellipse(7.8, 7.5, 2.8, 1.6, -Math.PI / 4, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+            ctx.fill();
+        } else {
+            ctx.fillStyle = 'rgba(20, 2, 8, 0.65)';
+            if (path) {
+                ctx.fill(path);
+            } else {
+                drawPath();
+                ctx.fill();
+            }
+        }
+
+        // 2. Crisp Solid White Border
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2.4;
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.35)';
+        ctx.shadowBlur = 3 / s;
+        if (path) {
+            ctx.stroke(path);
+        } else {
+            drawPath();
+            ctx.stroke();
+        }
+
+        ctx.restore();
+    }
+
     renderCircleButton(ctx, btn) {
         ctx.save();
         ctx.translate(btn.x, btn.y);
+
+        if (btn.isPressed) {
+            ctx.scale(0.92, 0.92);
+        }
 
         const r = btn.radius;
 
@@ -331,7 +529,18 @@ class UIManager {
         ctx.fillStyle = '#ffffff';
         ctx.strokeStyle = '#ffffff';
 
-        if (btn.type === 'home') {
+        if (btn.type === 'cross') {
+            ctx.lineWidth = 5;
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineCap = 'round';
+            const arm = r * 0.35;
+            ctx.beginPath();
+            ctx.moveTo(-arm, -arm);
+            ctx.lineTo(arm, arm);
+            ctx.moveTo(arm, -arm);
+            ctx.lineTo(-arm, arm);
+            ctx.stroke();
+        } else if (btn.type === 'home') {
             ctx.beginPath();
             ctx.moveTo(0, -r * 0.45);
             ctx.lineTo(-r * 0.42, -r * 0.05);
@@ -381,6 +590,22 @@ class UIManager {
                 ctx.arc(8, 0, 12, -Math.PI * 0.35, Math.PI * 0.35);
                 ctx.stroke();
             }
+        } else if (btn.type === 'arrow_left') {
+            // Left triangle arrow
+            ctx.beginPath();
+            ctx.moveTo(-r * 0.32, 0);
+            ctx.lineTo(r * 0.22, -r * 0.42);
+            ctx.lineTo(r * 0.22, r * 0.42);
+            ctx.closePath();
+            ctx.fill();
+        } else if (btn.type === 'arrow_right') {
+            // Right triangle arrow
+            ctx.beginPath();
+            ctx.moveTo(r * 0.32, 0);
+            ctx.lineTo(-r * 0.22, -r * 0.42);
+            ctx.lineTo(-r * 0.22, r * 0.42);
+            ctx.closePath();
+            ctx.fill();
         }
 
         ctx.restore();
@@ -391,9 +616,7 @@ class UIManager {
         ctx.fillStyle = 'rgba(15, 2, 8, 0.78)';
         ctx.fillRect(0, 0, 1080, 1920);
 
-        if (this.activeModal === 'level_complete') {
-            this.renderLevelCompleteModal(ctx);
-        } else if (this.activeModal === 'game_over') {
+        if (this.activeModal === 'game_over') {
             this.renderGameOverModal(ctx);
         } else if (this.activeModal === 'level_select') {
             this.renderLevelSelectModal(ctx);
@@ -402,185 +625,93 @@ class UIManager {
         ctx.restore();
     }
 
-    renderLevelCompleteModal(ctx) {
-        ctx.save();
-        ctx.translate(540, 960);
-
-        // Container
-        ctx.fillStyle = '#ffffff';
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
-        ctx.shadowBlur = 35;
-        ctx.beginPath();
-        ctx.roundRect(-380, -440, 760, 880, 48);
-        ctx.fill();
-        ctx.shadowBlur = 0;
-
-        // Header Banner
-        const headerGrad = ctx.createLinearGradient(0, -440, 0, -280);
-        headerGrad.addColorStop(0, '#ffd43b');
-        headerGrad.addColorStop(1, '#f59f00');
-        ctx.fillStyle = headerGrad;
-        ctx.beginPath();
-        ctx.roundRect(-380, -440, 760, 160, [48, 48, 0, 0]);
-        ctx.fill();
-
-        ctx.font = '900 52px "Outfit", sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillStyle = '#5c1022';
-        ctx.fillText('LEVEL COMPLETE!', 0, -360);
-
-        // Stars
-        const stars = this.modalData ? (this.modalData.stars || 3) : 3;
-        for (let i = -1; i <= 1; i++) {
-            const sx = i * 110;
-            const sy = -200 + Math.abs(i) * 20;
-            const isEarned = (i === -1 && stars >= 1) || (i === 0 && stars >= 2) || (i === 1 && stars >= 3);
-
-            ctx.save();
-            ctx.translate(sx, sy);
-            ctx.fillStyle = isEarned ? '#fcc419' : '#dee2e6';
-            ctx.strokeStyle = isEarned ? '#e67700' : '#adb5bd';
-            ctx.lineWidth = 4;
-
-            ctx.beginPath();
-            const outerR = 48;
-            const innerR = 22;
-            for (let s = 0; s < 5; s++) {
-                const a = (s * Math.PI * 2) / 5 - Math.PI / 2;
-                const ai = a + Math.PI / 5;
-                const x1 = Math.cos(a) * outerR;
-                const y1 = Math.sin(a) * outerR;
-                const x2 = Math.cos(ai) * innerR;
-                const y2 = Math.sin(ai) * innerR;
-                if (s === 0) ctx.moveTo(x1, y1);
-                else ctx.lineTo(x1, y1);
-                ctx.lineTo(x2, y2);
-            }
-            ctx.closePath();
-            ctx.fill();
-            ctx.stroke();
-            ctx.restore();
-        }
-
-        const score = this.modalData ? this.modalData.score : 0;
-        const target = this.modalData ? this.modalData.target : 20;
-        const livesLeft = this.modalData ? this.modalData.livesLeft : 3;
-
-        ctx.font = '700 32px "Outfit", sans-serif';
-        ctx.fillStyle = '#868e96';
-        ctx.fillText('TOTAL SCORE', 0, -80);
-
-        ctx.font = '900 68px "Outfit", sans-serif';
-        ctx.fillStyle = '#212529';
-        ctx.fillText(score.toLocaleString(), 0, -25);
-
-        ctx.font = '600 28px "Outfit", sans-serif';
-        ctx.fillStyle = '#495057';
-        ctx.fillText(`Target Caught: ${target} / ${target} Coins`, 0, 50);
-        ctx.fillText(`Lives Remaining: ${'❤️'.repeat(livesLeft)}`, 0, 95);
-
-        ctx.font = '500 22px "Outfit", sans-serif';
-        ctx.fillStyle = '#2f9e44';
-        ctx.fillText('✓ Score transmitted via sendscoreapi.js', 0, 140);
-
-        // NEXT LEVEL Button
-        ctx.translate(0, 180);
-        const btnGrad = ctx.createLinearGradient(0, -40, 0, 40);
-        btnGrad.addColorStop(0, '#51cf66');
-        btnGrad.addColorStop(1, '#2b8a3e');
-        ctx.fillStyle = btnGrad;
-        ctx.beginPath();
-        ctx.roundRect(-170, -40, 340, 80, 40);
-        ctx.fill();
-
-        ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 4;
-        ctx.stroke();
-
-        ctx.font = '900 38px "Outfit", sans-serif';
-        ctx.fillStyle = '#ffffff';
-        ctx.fillText('NEXT LEVEL ➔', 0, 2);
-
-        // REPLAY Button
-        ctx.translate(0, 110);
-        ctx.fillStyle = '#e9ecef';
-        ctx.beginPath();
-        ctx.roundRect(-130, -32, 260, 64, 32);
-        ctx.fill();
-
-        ctx.font = '800 30px "Outfit", sans-serif';
-        ctx.fillStyle = '#495057';
-        ctx.fillText('REPLAY ↻', 0, 2);
-
-        ctx.restore();
-    }
-
     renderGameOverModal(ctx) {
         ctx.save();
         ctx.translate(540, 960);
 
-        // Container
+        // Container Box
         ctx.fillStyle = '#ffffff';
         ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
         ctx.shadowBlur = 35;
         ctx.beginPath();
-        ctx.roundRect(-380, -400, 760, 800, 48);
+        ctx.roundRect(-380, -420, 760, 840, 48);
         ctx.fill();
         ctx.shadowBlur = 0;
 
-        // Header
-        const headerGrad = ctx.createLinearGradient(0, -400, 0, -250);
+        // Header Banner
+        const headerGrad = ctx.createLinearGradient(0, -420, 0, -270);
         headerGrad.addColorStop(0, '#ff6b6b');
         headerGrad.addColorStop(1, '#c92a2a');
         ctx.fillStyle = headerGrad;
         ctx.beginPath();
-        ctx.roundRect(-380, -400, 760, 150, [48, 48, 0, 0]);
+        ctx.roundRect(-380, -420, 760, 150, [48, 48, 0, 0]);
         ctx.fill();
 
         ctx.font = '900 52px "Outfit", sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillStyle = '#ffffff';
-        ctx.fillText('GAME OVER', 0, -325);
+        ctx.fillText('GAME OVER', 0, -345);
 
         ctx.font = '900 70px sans-serif';
-        ctx.fillText('🐷💔💣', 0, -180);
+        ctx.fillText('🐷💔💣', 0, -210);
 
         ctx.font = '700 36px "Outfit", sans-serif';
         ctx.fillStyle = '#343a40';
-        ctx.fillText('Out of Lives!', 0, -90);
+        ctx.fillText('Out of Lives!', 0, -120);
 
         const score = this.modalData ? this.modalData.score : 0;
-        const caught = this.modalData ? this.modalData.coinsCaught : 0;
-        const target = this.modalData ? this.modalData.target : 20;
+        const clicks = this.modalData ? (this.modalData.clicks || 0) : 0;
+        const duration = this.modalData ? (this.modalData.duration || 0) : 0;
+
+        ctx.font = '900 56px "Outfit", sans-serif';
+        ctx.fillStyle = '#d9480f';
+        ctx.fillText(`FINAL SCORE: ${score.toLocaleString()}`, 0, -45);
 
         ctx.font = '600 30px "Outfit", sans-serif';
         ctx.fillStyle = '#868e96';
-        ctx.fillText(`Coins Caught: ${caught} / ${target}`, 0, -30);
-        ctx.fillText(`Final Score: ${score}`, 0, 20);
+        ctx.fillText(`Total Clicks: ${clicks}`, 0, 15);
+        ctx.fillText(`Duration: ${duration}s`, 0, 60);
 
-        ctx.font = '500 22px "Outfit", sans-serif';
-        ctx.fillStyle = '#868e96';
-        ctx.fillText('✓ Game Over score reported to sendscoreapi.js', 0, 80);
-
-        // TRY AGAIN Button
-        ctx.translate(0, 180);
-        const btnGrad = ctx.createLinearGradient(0, -40, 0, 40);
-        btnGrad.addColorStop(0, '#339af0');
-        btnGrad.addColorStop(1, '#1864ab');
-        ctx.fillStyle = btnGrad;
+        // 1. TRY AGAIN Button (y: 155)
+        ctx.save();
+        ctx.translate(0, 155);
+        const btnGrad1 = ctx.createLinearGradient(0, -36, 0, 36);
+        btnGrad1.addColorStop(0, '#339af0');
+        btnGrad1.addColorStop(1, '#1864ab');
+        ctx.fillStyle = btnGrad1;
         ctx.beginPath();
-        ctx.roundRect(-170, -40, 340, 80, 40);
+        ctx.roundRect(-170, -36, 340, 72, 36);
         ctx.fill();
 
         ctx.strokeStyle = '#ffffff';
         ctx.lineWidth = 4;
         ctx.stroke();
 
-        ctx.font = '900 38px "Outfit", sans-serif';
+        ctx.font = '900 36px "Outfit", sans-serif';
         ctx.fillStyle = '#ffffff';
         ctx.fillText('TRY AGAIN ↻', 0, 2);
+        ctx.restore();
+
+        // 2. BACK TO HOME Button (y: 255) - Same pill design
+        ctx.save();
+        ctx.translate(0, 255);
+        const btnGrad2 = ctx.createLinearGradient(0, -36, 0, 36);
+        btnGrad2.addColorStop(0, '#ffd43b');
+        btnGrad2.addColorStop(1, '#e67700');
+        ctx.fillStyle = btnGrad2;
+        ctx.beginPath();
+        ctx.roundRect(-170, -36, 340, 72, 36);
+        ctx.fill();
+
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 4;
+        ctx.stroke();
+
+        ctx.font = '900 34px "Outfit", sans-serif';
+        ctx.fillStyle = '#5c1022';
+        ctx.fillText('BACK TO HOME 🏠', 0, 2);
+        ctx.restore();
 
         ctx.restore();
     }
@@ -601,7 +732,7 @@ class UIManager {
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillStyle = '#212529';
-        ctx.fillText('SELECT LEVEL', 0, -410);
+        ctx.fillText('SELECT START LEVEL', 0, -410);
 
         // Close button
         ctx.fillStyle = '#f1f3f5';
@@ -661,3 +792,4 @@ class UIManager {
 if (typeof window !== 'undefined') {
     window.UIManager = UIManager;
 }
+

@@ -1,20 +1,21 @@
 /**
- * levels.js - 10-Level Progressive Difficulty with Dynamic Ricochet Obstacles
- * From Level 1 (wide open sky) to Level 7 (full demo.mp4 maze) to Level 10 (kinetic pinball finale).
+ * levels.js - Progressive Difficulty Curve & Linear Obstacle Evolution
+ * Smoothly scales from Level 1 (0% bombs, gentle speed) to advanced pinball challenges.
  */
 
 const RICOCHET_LEVELS = [
-    // Level 1: Sunny Meadow - Zero obstacles, gentle start!
+    // Level 1: Sunny Meadow - Zero bombs, gentle speed, pure warm-up fun!
     {
         levelNumber: 1,
         name: "Sunny Meadow",
         targetCoins: 15,
-        baseSpeed: 380,
+        baseSpeed: 350,
         spawnInterval: 1.15,
         bombChance: 0.0,
-        starChance: 0.12,
-        magnetChance: 0.0,
+        starChance: 0.15,
+        magnetChance: 0.08,
         multiplierChance: 0.0,
+        heartChance: 0.0,
         hasWind: false,
         bumpers: [],
         rotators: [],
@@ -22,17 +23,18 @@ const RICOCHET_LEVELS = [
         pegs: []
     },
 
-    // Level 2: First Bounce - 1 Center Slider
+    // Level 2: First Bounce - 0% bombs, 1 Center Slider introduces ricochet
     {
         levelNumber: 2,
         name: "First Bounce",
         targetCoins: 20,
-        baseSpeed: 420,
-        spawnInterval: 1.0,
+        baseSpeed: 400,
+        spawnInterval: 1.05,
         bombChance: 0.0,
         starChance: 0.16,
-        magnetChance: 0.05,
-        multiplierChance: 0.0,
+        magnetChance: 0.08,
+        multiplierChance: 0.04,
+        heartChance: 0.0,
         hasWind: false,
         bumpers: [
             { x: 540, y: 920, width: 220, height: 48 }
@@ -42,17 +44,18 @@ const RICOCHET_LEVELS = [
         pegs: []
     },
 
-    // Level 3: Twin Sliders - Zig-zag deflections
+    // Level 3: Twin Sliders - Very gentle bombs (5%), dual deflections & 2X multiplier
     {
         levelNumber: 3,
         name: "Twin Sliders",
         targetCoins: 25,
-        baseSpeed: 480,
-        spawnInterval: 0.88,
-        bombChance: 0.06,
+        baseSpeed: 450,
+        spawnInterval: 0.95,
+        bombChance: 0.05,
         starChance: 0.18,
         magnetChance: 0.08,
-        multiplierChance: 0.05,
+        multiplierChance: 0.06,
+        heartChance: 0.04,
         hasWind: false,
         bumpers: [
             { x: 380, y: 780, width: 190, height: 48 },
@@ -63,17 +66,18 @@ const RICOCHET_LEVELS = [
         pegs: []
     },
 
-    // Level 4: Silver Ring - High-velocity radial rebounds
+    // Level 4: Silver Ring - Medium-easy with radial ring bounce
     {
         levelNumber: 4,
         name: "Silver Ring",
         targetCoins: 30,
-        baseSpeed: 540,
-        spawnInterval: 0.80,
-        bombChance: 0.11,
+        baseSpeed: 510,
+        spawnInterval: 0.86,
+        bombChance: 0.09,
         starChance: 0.18,
         magnetChance: 0.08,
-        multiplierChance: 0.06,
+        multiplierChance: 0.07,
+        heartChance: 0.04,
         hasWind: false,
         bumpers: [
             { x: 720, y: 980, width: 200, height: 48 }
@@ -85,17 +89,18 @@ const RICOCHET_LEVELS = [
         pegs: []
     },
 
-    // Level 5: The Angle Paddle - Rotator deflection
+    // Level 5: The Angle Paddle - Medium challenge with angled rotator
     {
         levelNumber: 5,
         name: "The Angle Paddle",
         targetCoins: 35,
-        baseSpeed: 600,
-        spawnInterval: 0.74,
-        bombChance: 0.15,
+        baseSpeed: 570,
+        spawnInterval: 0.78,
+        bombChance: 0.13,
         starChance: 0.20,
         magnetChance: 0.08,
         multiplierChance: 0.08,
+        heartChance: 0.05,
         hasWind: false,
         bumpers: [
             { x: 380, y: 820, width: 190, height: 48 }
@@ -107,17 +112,18 @@ const RICOCHET_LEVELS = [
         pegs: []
     },
 
-    // Level 6: Plinko Drop - Musical pachinko cascade
+    // Level 6: Plinko Drop - Medium-hard musical pachinko cascade
     {
         levelNumber: 6,
         name: "Plinko Drop",
         targetCoins: 40,
-        baseSpeed: 660,
-        spawnInterval: 0.68,
-        bombChance: 0.18,
+        baseSpeed: 630,
+        spawnInterval: 0.72,
+        bombChance: 0.16,
         starChance: 0.20,
         magnetChance: 0.08,
         multiplierChance: 0.09,
+        heartChance: 0.05,
         hasWind: true,
         bumpers: [
             { x: 540, y: 680, width: 200, height: 48 }
@@ -135,48 +141,45 @@ const RICOCHET_LEVELS = [
         ]
     },
 
-    // ==========================================
-    // LEVEL 7: MASTER DEFLECTOR (Exact demo.mp4 setup!)
-    // ==========================================
+    // Level 7: Master Deflector (Full demo setup!)
     {
         levelNumber: 7,
-        name: "Master Deflector (Demo)",
+        name: "Master Deflector",
         targetCoins: 45,
-        baseSpeed: 720,
-        spawnInterval: 0.62,
-        bombChance: 0.22,
+        baseSpeed: 700,
+        spawnInterval: 0.65,
+        bombChance: 0.20,
         starChance: 0.22,
         magnetChance: 0.09,
         multiplierChance: 0.09,
+        heartChance: 0.06,
         hasWind: true,
-        // 3 Vertical Sliders from demo video
         bumpers: [
             { x: 310, y: 860, width: 170, height: 48 },
             { x: 525, y: 1040, width: 170, height: 48 },
             { x: 740, y: 1200, width: 170, height: 48 }
         ],
-        // 1 Rotator at bottom right
         rotators: [
             { x: 865, y: 1360, length: 180, thickness: 48, angle: Math.PI / 4, spinSpeed: 0 }
         ],
-        // 1 Silver Ring Bumper at left
         ringBumpers: [
             { x: 120, y: 760, radius: 70 }
         ],
         pegs: []
     },
 
-    // Level 8: Spinning Wheels - Rotating paddles
+    // Level 8: Spinning Wheels - Dual spinning paddles
     {
         levelNumber: 8,
         name: "Spinning Wheels",
         targetCoins: 50,
-        baseSpeed: 780,
-        spawnInterval: 0.56,
-        bombChance: 0.25,
+        baseSpeed: 760,
+        spawnInterval: 0.58,
+        bombChance: 0.23,
         starChance: 0.22,
         magnetChance: 0.09,
         multiplierChance: 0.10,
+        heartChance: 0.06,
         hasWind: true,
         bumpers: [
             { x: 540, y: 780, width: 200, height: 48 }
@@ -189,17 +192,18 @@ const RICOCHET_LEVELS = [
         pegs: []
     },
 
-    // Level 9: Pinball Storm - Bumpers, rotators and pegs
+    // Level 9: Pinball Storm - Dynamic multibumper
     {
         levelNumber: 9,
         name: "Pinball Storm",
-        targetCoins: 60,
-        baseSpeed: 840,
-        spawnInterval: 0.50,
-        bombChance: 0.28,
+        targetCoins: 55,
+        baseSpeed: 820,
+        spawnInterval: 0.52,
+        bombChance: 0.26,
         starChance: 0.24,
         magnetChance: 0.10,
         multiplierChance: 0.10,
+        heartChance: 0.06,
         hasWind: true,
         bumpers: [
             { x: 540, y: 650, width: 190, height: 48 }
@@ -224,13 +228,14 @@ const RICOCHET_LEVELS = [
     {
         levelNumber: 10,
         name: "Jackpot Ricochet",
-        targetCoins: 75,
-        baseSpeed: 900,
-        spawnInterval: 0.44,
-        bombChance: 0.30,
+        targetCoins: 60,
+        baseSpeed: 880,
+        spawnInterval: 0.46,
+        bombChance: 0.28,
         starChance: 0.25,
         magnetChance: 0.10,
         multiplierChance: 0.12,
+        heartChance: 0.07,
         hasWind: true,
         bumpers: [
             { x: 300, y: 720, width: 180, height: 48 },

@@ -449,6 +449,34 @@ const SoundEngine = (function () {
         osc.stop(now + 0.06);
     }
 
+    /**
+     * Life Heart Pickup Chime (Warm healing major chord)
+     */
+    function playLifeHeart() {
+        if (isMuted) return;
+        const c = getContext();
+        if (!c) return;
+
+        const now = c.currentTime;
+        const notes = [523.25, 659.25, 783.99, 1046.50, 1318.5]; // C5, E5, G5, C6, E6
+        notes.forEach((freq, idx) => {
+            const osc = c.createOscillator();
+            const gain = c.createGain();
+            const t = now + idx * 0.05;
+
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, t);
+            gain.gain.setValueAtTime(0.22, t);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+
+            osc.connect(gain);
+            gain.connect(c.destination);
+
+            osc.start(t);
+            osc.stop(t + 0.35);
+        });
+    }
+
     return {
         init,
         toggleMute,
@@ -467,7 +495,8 @@ const SoundEngine = (function () {
         playStarChime,
         playPowerUp,
         playBombExplosion,
-        playHurt
+        playHurt,
+        playLifeHeart
     };
 })();
 

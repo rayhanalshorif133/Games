@@ -1,0 +1,39 @@
+{
+  "project": {
+    "name": "Piggy Coin Rush",
+    "version": "1.0.0",
+    "uniqueId": "piggy-coin-rush",
+    "viewportWidth": 1080,
+    "viewportHeight": 1920,
+    "viewportFit": "cover",
+    "fullscreenMode": "letterbox-scale",
+    "orientations": "portrait",
+    "useLoaderLayout": false
+  },
+  "runtime": "c3",
+  "files": {
+    "scripts": [
+      "send_score_api.js",
+      "scripts/supportcheck.js",
+      "scripts/audio.js",
+      "scripts/particles.js",
+      "scripts/physics.js",
+      "scripts/entities.js",
+      "scripts/levels.js",
+      "scripts/ui.js",
+      "scripts/c3runtime.js",
+      "scripts/game.js",
+      "scripts/main.js"
+    ],
+    "icons": [
+      "icons/icon-16.png",
+      "icons/icon-32.png",
+      "icons/icon-64.png",
+      "icons/icon-128.png",
+      "icons/icon-256.png",
+      "icons/icon-512.png",
+      "icons/loading-logo.png"
+    ]
+  }
+}
+

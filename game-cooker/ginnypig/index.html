@@ -2,32 +2,45 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <title>Piggy Coin Rush</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Coin Drop - Piggy Bank Physics</title>
     
-    <!-- Mobile Web App Optimization -->
+    <!-- Construct 3 Manifests & PWA Meta -->
+    <link rel="manifest" href="appmanifest.json">
+    <link rel="apple-touch-icon" sizes="128x128" href="icons/icon-128.png">
+    <link rel="apple-touch-icon" sizes="256x256" href="icons/icon-256.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="icons/icon-512.png">
+    <link rel="icon" type="image/png" href="icons/icon-32.png">
+
+    <!-- Mobile Optimization -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#e41355">
-    <meta name="description" content="Coin Drop Piggy Bank Physics Puzzle Game - 1080x1920 Mobile Responsive">
+    <meta name="description" content="Piggy Coin Rush - Physics Coin Catcher Arcade Game">
 
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="gameContainer">
-        <canvas id="gameCanvas" width="1080" height="1920"></canvas>
+    <div id="c3container">
+        <div id="gameContainer">
+            <canvas id="gameCanvas" width="1080" height="1920"></canvas>
+        </div>
     </div>
 
-    <!-- Construct 3 Architecture Modular Scripts -->
-    <script src="sendscoreapi.js"></script>
+    <!-- Construct 3 Architecture Runtime Scripts -->
+    <script src="send_score_api.js"></script>
+    <script src="c3runtime.js"></script>
+    <script src="scripts/supportcheck.js"></script>
     <script src="scripts/audio.js"></script>
     <script src="scripts/particles.js"></script>
     <script src="scripts/physics.js"></script>
     <script src="scripts/entities.js"></script>
     <script src="scripts/levels.js"></script>
     <script src="scripts/ui.js"></script>
+    <script src="scripts/c3runtime.js"></script>
     <script src="scripts/game.js"></script>
     <script src="scripts/main.js"></script>
+    <script src="scripts/register-sw.js"></script>
 </body>
 </html>
