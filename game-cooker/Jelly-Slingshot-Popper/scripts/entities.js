@@ -12,16 +12,112 @@ class Ball {
         this.gravity = 820;
         this.hasPenalized = false;
         this.passedDangerLine = false;
+
+        // Super Power Ball properties
+        this.isSuperBall = (color === 'rainbow');
+        this.maxPierces = 5;
+        this.pierceCount = 0;
+        this.trail = [];
+        this.glowAngle = 0;
     }
 
     update(dt) {
         this.vy += this.gravity * dt;
         this.x += this.vx * dt;
         this.y += this.vy * dt;
+
+        if (this.isSuperBall) {
+            this.glowAngle += dt * 8;
+            this.trail.unshift({ x: this.x, y: this.y, alpha: 1.0, r: this.radius * 0.85 });
+            if (this.trail.length > 12) this.trail.pop();
+            for (let t of this.trail) {
+                t.alpha -= dt * 3.5;
+            }
+        }
     }
 
     draw(ctx, ballImages = {}) {
         ctx.save();
+
+        if (this.isSuperBall || this.color === 'rainbow') {
+            // Draw sparkling motion trail
+            for (let i = 0; i < this.trail.length; i++) {
+                const t = this.trail[i];
+                if (t.alpha > 0) {
+                    ctx.save();
+                    ctx.globalAlpha = Math.max(0, t.alpha * 0.55);
+                    const trailColors = ['#ff3366', '#ffea00', '#00e676', '#00e5ff', '#d500f9'];
+                    ctx.fillStyle = trailColors[i % trailColors.length];
+                    ctx.beginPath();
+                    ctx.arc(t.x, t.y, Math.max(2, t.r * (1 - i / this.trail.length)), 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                }
+            }
+
+            // Outer Pulsing Aura Ring
+            const pulse = Math.sin(performance.now() * 0.008) * 6;
+            const auraR = this.radius + 12 + pulse;
+            const auraGrad = ctx.createRadialGradient(this.x, this.y, this.radius * 0.4, this.x, this.y, auraR);
+            auraGrad.addColorStop(0, 'rgba(255, 220, 0, 0.75)');
+            auraGrad.addColorStop(0.5, 'rgba(255, 50, 150, 0.45)');
+            auraGrad.addColorStop(1, 'rgba(0, 230, 255, 0)');
+            ctx.fillStyle = auraGrad;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, auraR, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Rotating Electric Orbit Sparkles
+            for (let i = 0; i < 4; i++) {
+                const ang = this.glowAngle + i * (Math.PI / 2);
+                const ox = this.x + Math.cos(ang) * (this.radius + 8);
+                const oy = this.y + Math.sin(ang) * (this.radius + 8);
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(ox, oy, 5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Dark Outline
+            ctx.fillStyle = '#201025';
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Prismatic Rainbow Sphere Gradient
+            const grad = ctx.createRadialGradient(
+                this.x - this.radius * 0.35, this.y - this.radius * 0.35, this.radius * 0.08,
+                this.x, this.y, this.radius - 2
+            );
+            grad.addColorStop(0, '#ffffff');
+            grad.addColorStop(0.2, '#fff176');
+            grad.addColorStop(0.45, '#ff4081');
+            grad.addColorStop(0.75, '#7c4dff');
+            grad.addColorStop(1, '#00b0ff');
+
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius - 2, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Bright Specular Glint
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.beginPath();
+            ctx.arc(this.x - this.radius * 0.35, this.y - this.radius * 0.35, this.radius * 0.28, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Center Power Star / Lightning Glyph & Remaining Charges Badge
+            const remaining = Math.max(0, this.maxPierces - this.pierceCount);
+            ctx.fillStyle = '#ffffff';
+            ctx.font = "900 24px 'Fredoka', 'Nunito', sans-serif";
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(`⚡${remaining}`, this.x, this.y + 1);
+
+            ctx.restore();
+            return;
+        }
+
         const img = ballImages[this.color];
         const size = this.radius * 2;
 
@@ -86,6 +182,7 @@ class JellyMonster {
         this.shape = shape; // 'square' or 'pill'
         this.isAlive = true;
         this.isDormant = false;
+        this.hasPowerUp = false;
 
         // Eye properties
         this.eyeRadius = Math.min(w, h) * 0.28;
@@ -221,6 +318,21 @@ class JellyMonster {
         // Corner radius
         const cornerR = this.shape === 'pill' ? 44 : 38;
 
+        // Glowing Power-up Aura
+        if (this.hasPowerUp) {
+            const auraPulse = Math.sin(performance.now() * 0.008 + this.wobblePhase) * 6;
+            ctx.fillStyle = 'rgba(255, 215, 0, 0.38)';
+            ctx.beginPath();
+            ctx.roundRect(this.x - 8 - auraPulse, this.y - 8 - auraPulse, this.w + 16 + auraPulse * 2, this.h + 16 + auraPulse * 2, cornerR + 8);
+            ctx.fill();
+
+            ctx.strokeStyle = 'rgba(255, 255, 120, 0.85)';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.roundRect(this.x - 4 - auraPulse * 0.5, this.y - 4 - auraPulse * 0.5, this.w + 8 + auraPulse, this.h + 8 + auraPulse, cornerR + 4);
+            ctx.stroke();
+        }
+
         if (sprite && sprite.complete && sprite.naturalWidth > 0) {
             ctx.drawImage(sprite, this.x, this.y, this.w, this.h);
         } else {
@@ -230,6 +342,42 @@ class JellyMonster {
 
         // Draw Eye & Moving Pupil
         this.drawEye(ctx, pupilImg);
+
+        // Draw Glowing Power-Up Badge in upper-right corner
+        if (this.hasPowerUp) {
+            const badgeX = this.x + this.w - 18;
+            const badgeY = this.y + 18;
+            const badgeR = 20;
+            const badgePulse = Math.sin(performance.now() * 0.01 + this.wobblePhase) * 2.5;
+
+            // Shadow
+            ctx.fillStyle = 'rgba(20, 10, 5, 0.45)';
+            ctx.beginPath();
+            ctx.arc(badgeX + 2, badgeY + 3, badgeR + badgePulse, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Gradient fill
+            const bgGrad = ctx.createLinearGradient(badgeX - badgeR, badgeY - badgeR, badgeX + badgeR, badgeY + badgeR);
+            bgGrad.addColorStop(0, '#fff44f');
+            bgGrad.addColorStop(0.5, '#ff9900');
+            bgGrad.addColorStop(1, '#e000ff');
+            ctx.fillStyle = bgGrad;
+            ctx.beginPath();
+            ctx.arc(badgeX, badgeY, badgeR + badgePulse, 0, Math.PI * 2);
+            ctx.fill();
+
+            // White border
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // Lightning glyph
+            ctx.font = `bold ${Math.round(20 + badgePulse)}px sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillStyle = '#ffffff';
+            ctx.fillText('⚡', badgeX, badgeY + 1);
+        }
 
         ctx.restore();
     }

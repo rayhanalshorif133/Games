@@ -119,16 +119,37 @@ class Game {
         this.loadedBall = new window.Ball(this.slingshot.rest.x, this.slingshot.rest.y, ballColor);
     }
 
+    loadSuperBall() {
+        this.loadedBall = new window.Ball(this.slingshot.rest.x, this.slingshot.rest.y, 'rainbow');
+        this.loadedBall.isSuperBall = true;
+        this.loadedBall.maxPierces = 5;
+        this.loadedBall.pierceCount = 0;
+
+        // Magical rainbow spark explosion around slingshot
+        const rainbowColors = ['#ff0055', '#ffaa00', '#00ff66', '#00ccff', '#cc00ff'];
+        for (let i = 0; i < 32; i++) {
+            this.particles.push(new window.Particle(this.slingshot.rest.x, this.slingshot.rest.y, rainbowColors[i % rainbowColors.length]));
+        }
+
+        window.sounds.playPowerUp();
+        this.triggerScreenShake(12, 0.25);
+        this.floatingTexts.push(new window.FloatingText(540, 1420, '⚡ 5-BLOCK SUPER BALL READY! ⚡', '#ffd700'));
+    }
+
     switchBallColor(newColor) {
         this.colorSwitcher.setColor(newColor);
         if (this.loadedBall) {
-            this.loadedBall.color = newColor;
+            if (!this.loadedBall.isSuperBall) {
+                this.loadedBall.color = newColor;
+            }
         } else {
             this.loadBall(newColor);
         }
         window.sounds.init();
         window.sounds.playBounce(1200);
-        this.floatingTexts.push(new window.FloatingText(540, 1680, newColor.toUpperCase() + ' BALL!', '#ffffff'));
+        if (!this.loadedBall || !this.loadedBall.isSuperBall) {
+            this.floatingTexts.push(new window.FloatingText(540, 1680, newColor.toUpperCase() + ' BALL!', '#ffffff'));
+        }
     }
 
     triggerScreenShake(intensity = 15, duration = 0.3) {
@@ -225,6 +246,13 @@ class Game {
                 if (launch) {
                     // Fire the ball!
                     const firedBall = new window.Ball(launch.x, launch.y, this.loadedBall.color, launch.vx, launch.vy);
+                    if (this.loadedBall.isSuperBall) {
+                        firedBall.isSuperBall = true;
+                        firedBall.color = 'rainbow';
+                        firedBall.maxPierces = this.loadedBall.maxPierces || 5;
+                        firedBall.pierceCount = 0;
+                        window.sounds.playPowerUp();
+                    }
                     this.activeBalls.push(firedBall);
                     this.loadedBall = null;
 
@@ -414,27 +442,29 @@ class Game {
             // Check if returning ball crossed below danger line: lose 1 life and destroy ball!
             if (ball.passedDangerLine && ball.y >= this.dangerLineY && ball.vy > 0) {
                 ball.isAlive = false;
-                this.lives--;
-                this.combo = 0;
-                this.triggerScreenShake(14, 0.3);
-                window.sounds.playMiss();
+                if (!ball.isSuperBall || ball.pierceCount === 0) {
+                    this.lives--;
+                    this.combo = 0;
+                    this.triggerScreenShake(14, 0.3);
+                    window.sounds.playMiss();
 
-                // Spawn miss particles at danger line
-                for (let p = 0; p < 24; p++) {
-                    this.particles.push(new window.Particle(ball.x, this.dangerLineY, '#ff3344'));
-                }
+                    // Spawn miss particles at danger line
+                    for (let p = 0; p < 24; p++) {
+                        this.particles.push(new window.Particle(ball.x, this.dangerLineY, '#ff3344'));
+                    }
 
-                // Floating penalty text
-                this.floatingTexts.push(new window.FloatingText(
-                    Math.min(900, Math.max(180, ball.x)),
-                    this.dangerLineY + 50,
-                    'MISS! -1 ❤️',
-                    '#ff3344'
-                ));
+                    // Floating penalty text
+                    this.floatingTexts.push(new window.FloatingText(
+                        Math.min(900, Math.max(180, ball.x)),
+                        this.dangerLineY + 50,
+                        'MISS! -1 ❤️',
+                        '#ff3344'
+                    ));
 
-                if (this.lives <= 0) {
-                    this.triggerGameOver('OUT OF LIVES!');
-                    return;
+                    if (this.lives <= 0) {
+                        this.triggerGameOver('OUT OF LIVES!');
+                        return;
+                    }
                 }
             }
 
@@ -447,7 +477,58 @@ class Game {
                 if (!jelly.isAlive) continue;
 
                 if (window.Physics.checkBallJelly(ball, jelly)) {
-                    if (ball.color === jelly.color) {
+                    if (ball.isSuperBall) {
+                        // SUPER POWER BALL PIERCE: Destroys ANY block regardless of color!
+                        jelly.isAlive = false;
+                        ball.pierceCount++;
+                        this.combo++;
+                        const points = 25 + ball.pierceCount * 10;
+                        this.score += points;
+
+                        // Push remaining blocks UPWARDS
+                        const pushBack = 55;
+                        this.jellies.forEach(otherJelly => {
+                            if (otherJelly.isAlive) {
+                                otherJelly.y -= pushBack;
+                                otherJelly.targetY -= pushBack;
+                                otherJelly.triggerHitReaction();
+                            }
+                        });
+
+                        // Sound & Shockwave particles
+                        window.sounds.playPop(ball.pierceCount + 2);
+                        window.sounds.playPowerUp();
+
+                        const rainbowColors = ['#ff3366', '#ffea00', '#00e676', '#00e5ff', '#d500f9'];
+                        for (let p = 0; p < 30; p++) {
+                            this.particles.push(new window.Particle(ball.x, ball.y, rainbowColors[p % rainbowColors.length]));
+                            this.particles.push(new window.Particle(jelly.x + jelly.w / 2, jelly.y + jelly.h / 2, rainbowColors[p % rainbowColors.length]));
+                        }
+
+                        // Floating text
+                        const remaining = Math.max(0, ball.maxPierces - ball.pierceCount);
+                        const pierceText = remaining > 0 ? `⚡ SUPER POP! (${remaining} left)` : `⚡ FINAL BURST! +50`;
+                        this.floatingTexts.push(new window.FloatingText(jelly.x + jelly.w / 2, jelly.y, pierceText, '#ffd700'));
+
+                        // If popped block was also a power-up block, queue another super ball
+                        if (jelly.hasPowerUp) {
+                            this.loadSuperBall();
+                        }
+
+                        // If 5 pierces completed, explode super ball
+                        if (ball.pierceCount >= ball.maxPierces) {
+                            ball.isAlive = false;
+                            this.score += 50;
+                            window.sounds.playWin();
+                            this.triggerScreenShake(18, 0.4);
+                            this.floatingTexts.push(new window.FloatingText(540, 680, `🌟 5-BLOCK PIERCE COMPLETE! +50 PTS 🌟`, '#ffd700'));
+                            for (let c = 0; c < 45; c++) {
+                                this.particles.push(new window.Particle(ball.x, ball.y, rainbowColors[c % rainbowColors.length]));
+                            }
+                            break;
+                        }
+
+                    } else if (ball.color === jelly.color) {
                         // COLOR MATCH POP: Destroy BOTH block and ball!
                         jelly.isAlive = false;
                         ball.isAlive = false;
@@ -484,6 +565,12 @@ class Game {
                         // Floating score
                         const comboText = this.combo > 1 ? `+${points} (x${this.combo}) ⬆️` : `+${points} ⬆️`;
                         this.floatingTexts.push(new window.FloatingText(jelly.x + jelly.w / 2, jelly.y, comboText, particleColor));
+
+                        // Power-Up Drop Check!
+                        if (jelly.hasPowerUp) {
+                            this.loadSuperBall();
+                            this.floatingTexts.push(new window.FloatingText(540, 760, '⚡ 5-BLOCK SUPER POWER BALL! ⚡', '#ffd700'));
+                        }
 
                         // 3-Streak Combo Bonus!
                         if (this.combo === 3 || (this.combo > 3 && this.combo % 3 === 0)) {
@@ -623,12 +710,19 @@ class Game {
         // 5. Draw Aim Trajectory Preview
         if (this.slingshot.isDragging && this.loadedBall) {
             const trajectory = this.slingshot.getTrajectory(this.loadedBall.color);
+            const isSuper = this.loadedBall.isSuperBall;
             ctx.save();
             trajectory.forEach((pt, idx) => {
                 if (idx % 2 === 0) {
-                    ctx.fillStyle = `rgba(255, 255, 255, ${pt.alpha * 0.85})`;
+                    if (isSuper) {
+                        const rainbowCols = ['#ff3366', '#ffea00', '#00e676', '#00e5ff', '#d500f9'];
+                        ctx.fillStyle = rainbowCols[idx % rainbowCols.length];
+                        ctx.globalAlpha = Math.max(0.2, pt.alpha * 0.95);
+                    } else {
+                        ctx.fillStyle = `rgba(255, 255, 255, ${pt.alpha * 0.85})`;
+                    }
                     ctx.beginPath();
-                    ctx.arc(pt.x, pt.y, Math.max(3, 10 - idx * 0.22), 0, Math.PI * 2);
+                    ctx.arc(pt.x, pt.y, Math.max(3, (isSuper ? 13 : 10) - idx * 0.22), 0, Math.PI * 2);
                     ctx.fill();
                 }
             });

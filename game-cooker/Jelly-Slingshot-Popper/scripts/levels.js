@@ -14,7 +14,22 @@ class PatternSpawner {
         ];
 
         const generator = patterns[patternIndex % patterns.length];
-        return generator.call(this, startY, patternIndex);
+        const jellies = generator.call(this, startY, patternIndex);
+
+        // Assign power-up ability to 1-2 blocks in the wave (~18-25% chance)
+        if (jellies.length > 0) {
+            const powerUpCount = Math.max(1, Math.min(2, Math.floor(jellies.length * 0.2)));
+            const indices = [];
+            while (indices.length < powerUpCount && indices.length < jellies.length) {
+                const randIdx = Math.floor(Math.random() * jellies.length);
+                if (!indices.includes(randIdx)) {
+                    indices.push(randIdx);
+                    jellies[randIdx].hasPowerUp = true;
+                }
+            }
+        }
+
+        return jellies;
     }
 
     // 1. Rainbow Rows: 2 structured rows of distinct matching colors

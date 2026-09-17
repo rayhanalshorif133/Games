@@ -158,6 +158,28 @@ class SoundManager {
         });
     }
 
+    playPowerUp() {
+        if (this.muted || !this.ctx) return;
+        const now = this.ctx.currentTime;
+        const chords = [440, 554.37, 659.25, 880, 1108.73]; // A major rising shimmer
+        chords.forEach((freq, idx) => {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            const time = now + idx * 0.06;
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, time);
+            osc.frequency.exponentialRampToValueAtTime(freq * 1.5, time + 0.28);
+
+            gain.gain.setValueAtTime(0.28, time);
+            gain.gain.exponentialRampToValueAtTime(0.001, time + 0.3);
+
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(time);
+            osc.stop(time + 0.3);
+        });
+    }
+
     playBandRebound() {
         if (this.muted || !this.ctx) return;
         const now = this.ctx.currentTime;
