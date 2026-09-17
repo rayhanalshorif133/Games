@@ -36,7 +36,7 @@ class CoinGame {
 
         // Spawner & Screen Shake
         this.spawnTimer = 0.5;
-        this.rushSpawnTimer = 10.0;
+        this.rushSpawnTimer = 20.0 + Math.random() * 15.0; // Between 20s and 35s
         this.shakeAmount = 0;
 
         // Controls & Steering State
@@ -74,7 +74,7 @@ class CoinGame {
         this.particles.reset();
         this.player = new PlayerPiggy(540, 1680);
         this.spawnTimer = 0.6;
-        this.rushSpawnTimer = 10.0;
+        this.rushSpawnTimer = 20.0 + Math.random() * 15.0; // Next rush in 20s - 35s
         this.shakeAmount = 0;
         this.levelUpBanner = null;
         this.state = 'PLAYING';
@@ -141,16 +141,7 @@ class CoinGame {
         console.log(`[CoinGame] Advanced seamlessly to Level ${this.currentLevel.levelNumber}: ${this.currentLevel.name}`);
     }
 
-    /**
-     * Progressive Black Bomb hazard scaling during Coin Rush:
-     * - Level 1 to 3: 0%
-     * - Level 4: 5% (0.05)
-     * - Level 5 to 7: 7% (0.07)
-     * - Level 8 to 9: 10% (0.10)
-     * - Level 10 to 11: 12% (0.12)
-     * - Level 12 to 15: 15% (0.15)
-     * - Level 16+: 20% (0.20 fixed cap)
-     */
+   
     getRushBombChance() {
         const lvl = this.currentLevel;
         const lvlNum = lvl ? lvl.levelNumber : 1;
@@ -159,8 +150,7 @@ class CoinGame {
         if (lvlNum >= 10) return 0.12; // 10 level e 12%
         if (lvlNum >= 8)  return 0.10; // 8 level e 10%
         if (lvlNum >= 5)  return 0.07; // 5 level e 7%
-        if (lvlNum >= 4)  return 0.05; // 4 level e 5%
-        return 0.0;                    // 1-3 level e 0%
+        return 0.05;                   // 1-4 level e 5% must
     }
 
     // ==========================================
@@ -178,7 +168,7 @@ class CoinGame {
         const hasWind = lvl.hasWind;
 
         if (isRush) {
-            // Progressive Black Bomb hazard scaling during Coin Rush
+            // Progressive Black Bomb hazard scaling during Coin Rush (5% minimum for all levels!)
             const rushBombChance = this.getRushBombChance();
             const roll = Math.random();
 
@@ -195,7 +185,7 @@ class CoinGame {
             return;
         }
 
-        // Determine item type based on level's progressive probability tables
+        // Standard drop selection (rush item is spawned exclusively via the controlled 20-35s timer)
         const roll = Math.random();
         let type = 'coin';
 
@@ -204,7 +194,6 @@ class CoinGame {
         const magnetChance = lvl.magnetChance || 0.08;
         const multiplierChance = lvl.multiplierChance || 0.05;
         const heartChance = (this.lives < 3) ? (lvl.heartChance || 0.05) : 0.01;
-        const rushChance = lvl.rushChance || 0.07;
 
         if (roll < bombChance) {
             type = 'bomb';
@@ -216,8 +205,6 @@ class CoinGame {
             type = 'multiplier';
         } else if (roll < (bombChance + starChance + magnetChance + multiplierChance + heartChance)) {
             type = 'heart';
-        } else if (roll < (bombChance + starChance + magnetChance + multiplierChance + heartChance + rushChance)) {
-            type = 'rush';
         }
 
         this.items.push(new FallingItem(type, spawnX, spawnY, speed, hasWind));
@@ -305,21 +292,24 @@ class CoinGame {
 
         if (this.state !== 'PLAYING') return;
 
+        // Controlled Rush power-up spawner (every 20s to 35s)
+        // Strictly blocked if Coin Rush is active or if a rush item is already falling on screen
+        const hasRushOnScreen = this.items.some(it => it.type === 'rush');
+        const isRushActive = this.player.rushTimer > 0;
+
+        if (!isRushActive && !hasRushOnScreen) {
+            this.rushSpawnTimer -= dt;
+            if (this.rushSpawnTimer <= 0) {
+                this.rushSpawnTimer = 20.0 + Math.random() * 15.0; // Reset for next cycle (20-35s)
+                this.items.push(new FallingItem('rush', 160 + Math.random() * 760, -50, this.currentLevel.baseSpeed * 0.85, false));
+            }
+        }
+
         // Item Spawning (Fast shower during Coin Rush!)
         this.spawnTimer -= dt;
         if (this.spawnTimer <= 0) {
-            const isRush = this.player.rushTimer > 0;
-            this.spawnTimer = isRush ? 0.18 : this.currentLevel.spawnInterval;
+            this.spawnTimer = isRushActive ? 0.18 : this.currentLevel.spawnInterval;
             this.spawnItem();
-        }
-
-        // Periodic guaranteed Rush power-up spawner (spawns periodically so player gets power-ups regularly)
-        if (this.player.rushTimer <= 0) {
-            this.rushSpawnTimer -= dt;
-            if (this.rushSpawnTimer <= 0) {
-                this.rushSpawnTimer = 22.0 + Math.random() * 8.0;
-                this.items.push(new FallingItem('rush', 160 + Math.random() * 760, -50, this.currentLevel.baseSpeed * 0.85, false));
-            }
         }
 
         // Catch zone bounds
@@ -463,6 +453,7 @@ class CoinGame {
                     this.particles.addPopup(item.x, item.y - 40, '⚡ 2X SCORE!', '#51cf66');
                 } else if (item.type === 'rush') {
                     this.player.activateRush(15.0);
+                    this.rushSpawnTimer = 20.0 + Math.random() * 15.0; // Reset 20-35s timer for next rush
                     SoundEngine.playCoinRush();
                     this.particles.emitCoinRushBurst(item.x, item.y);
                     this.particles.addPopup(item.x, item.y - 50, '⚡ MEGA COIN RUSH! (15s) ⚡', '#ffd43b');
@@ -470,16 +461,6 @@ class CoinGame {
                     const mult = this.player.multiplierTimer > 0 ? 2 : 1;
                     const pts = 10 * mult;
                     this.score += pts;
-
-                    // Clear any bombs currently on stage for safe levels (< 4)
-                    if (this.currentLevel.levelNumber < 4) {
-                        for (let other of this.items) {
-                            if (other.type === 'bomb') {
-                                other.isDead = true;
-                                this.particles.emitPowerUpAura(other.x, other.y, '#ffd43b');
-                            }
-                        }
-                    }
                 } else if (item.type === 'bomb') {
                     this.lives = Math.max(0, this.lives - 1);
                     this.shakeAmount = 30;

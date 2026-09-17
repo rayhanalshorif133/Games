@@ -1,10 +1,10 @@
 /**
  * levels.js - Progressive Difficulty Curve & Linear Obstacle Evolution
- * Smoothly scales from Level 1 (0% bombs, gentle speed) to advanced pinball challenges.
+ * Smoothly scales from Level 1 (5% rush bombs, gentle speed) to advanced pinball challenges.
  */
 
 const RICOCHET_LEVELS = [
-    // Level 1: Sunny Meadow - Zero bombs, gentle speed, pure warm-up fun!
+    // Level 1: Sunny Meadow - 0% regular bombs, 5% rush bombs, gentle speed
     {
         levelNumber: 1,
         name: "Sunny Meadow",
@@ -16,8 +16,7 @@ const RICOCHET_LEVELS = [
         magnetChance: 0.08,
         multiplierChance: 0.0,
         heartChance: 0.0,
-        rushChance: 0.08,
-        rushBombChance: 0.0, // 0%
+        rushBombChance: 0.05, // 5% minimum
         hasWind: false,
         bumpers: [],
         rotators: [],
@@ -25,7 +24,7 @@ const RICOCHET_LEVELS = [
         pegs: []
     },
 
-    // Level 2: First Bounce - 0% bombs, 1 Center Slider introduces ricochet
+    // Level 2: First Bounce - 0% regular bombs, 5% rush bombs, 1 Center Slider
     {
         levelNumber: 2,
         name: "First Bounce",
@@ -37,8 +36,7 @@ const RICOCHET_LEVELS = [
         magnetChance: 0.08,
         multiplierChance: 0.04,
         heartChance: 0.0,
-        rushChance: 0.08,
-        rushBombChance: 0.0, // 0%
+        rushBombChance: 0.05, // 5% minimum
         hasWind: false,
         bumpers: [
             { x: 540, y: 920, width: 220, height: 48 }
@@ -48,7 +46,7 @@ const RICOCHET_LEVELS = [
         pegs: []
     },
 
-    // Level 3: Twin Sliders - Very gentle bombs (5%), dual deflections & 2X multiplier
+    // Level 3: Twin Sliders - 5% regular bombs, 5% rush bombs, dual deflections & 2X multiplier
     {
         levelNumber: 3,
         name: "Twin Sliders",
@@ -60,8 +58,7 @@ const RICOCHET_LEVELS = [
         magnetChance: 0.08,
         multiplierChance: 0.06,
         heartChance: 0.04,
-        rushChance: 0.07,
-        rushBombChance: 0.0, // 0%
+        rushBombChance: 0.05, // 5% minimum
         hasWind: false,
         bumpers: [
             { x: 380, y: 780, width: 190, height: 48 },
@@ -84,7 +81,6 @@ const RICOCHET_LEVELS = [
         magnetChance: 0.08,
         multiplierChance: 0.07,
         heartChance: 0.04,
-        rushChance: 0.07,
         rushBombChance: 0.05, // 5%
         hasWind: false,
         bumpers: [
@@ -109,7 +105,6 @@ const RICOCHET_LEVELS = [
         magnetChance: 0.08,
         multiplierChance: 0.08,
         heartChance: 0.05,
-        rushChance: 0.07,
         rushBombChance: 0.07, // 7%
         hasWind: false,
         bumpers: [
@@ -134,7 +129,6 @@ const RICOCHET_LEVELS = [
         magnetChance: 0.08,
         multiplierChance: 0.09,
         heartChance: 0.05,
-        rushChance: 0.07,
         rushBombChance: 0.07, // 7%
         hasWind: true,
         bumpers: [
@@ -165,7 +159,6 @@ const RICOCHET_LEVELS = [
         magnetChance: 0.09,
         multiplierChance: 0.09,
         heartChance: 0.06,
-        rushChance: 0.07,
         rushBombChance: 0.07, // 7%
         hasWind: true,
         bumpers: [
@@ -194,7 +187,6 @@ const RICOCHET_LEVELS = [
         magnetChance: 0.09,
         multiplierChance: 0.10,
         heartChance: 0.06,
-        rushChance: 0.07,
         rushBombChance: 0.10, // 10%
         hasWind: true,
         bumpers: [
@@ -220,7 +212,6 @@ const RICOCHET_LEVELS = [
         magnetChance: 0.10,
         multiplierChance: 0.10,
         heartChance: 0.06,
-        rushChance: 0.07,
         rushBombChance: 0.10, // 10%
         hasWind: true,
         bumpers: [
@@ -254,7 +245,6 @@ const RICOCHET_LEVELS = [
         magnetChance: 0.10,
         multiplierChance: 0.12,
         heartChance: 0.07,
-        rushChance: 0.08,
         rushBombChance: 0.12, // 12%
         hasWind: true,
         bumpers: [

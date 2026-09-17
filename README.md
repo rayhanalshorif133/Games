@@ -12,12 +12,7 @@ Integrate the existing `send_score_api.js` script into this game adhering to the
 ## 2. 🎨 Game Banner Creation Prompts
 
 ```text
-Create a modern, eye-catching game banner using HTML and CSS (or Canvas) based on this game's UI.
-Requirements:
-- Exact dimensions: Width: 1000px, Height: 600px.
-- The banner must contain ONLY the game title. No extra text or subheadings.
-- Typography and color palette should match the game's existing UI theme (neon glows, sleek borders, arcade dark mode).
-- Clean, centered composition with modern design elements.
+Ey game er ui er upore based kore ekta banner image baniye daw banner e sudu game title tay thkabe ar kono text thkabe na banner size: h: 600 and w: 1000
 ```
 
 ## Make game from a video (demo.mp4)

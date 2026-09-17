@@ -9,40 +9,61 @@ class UIManager {
         this.activeModal = null; // 'game_over' | 'level_select'
         this.modalData = null;
         this.showTutorial = true;
+        this.showControls = true;
+        try {
+            const saved = localStorage.getItem('piggy_show_controls');
+            if (saved !== null) {
+                this.showControls = saved === 'true';
+            }
+        } catch (e) {}
         this.initButtons();
     }
 
     initButtons() {
+        // Uniform radius for all top HUD action buttons
+        const HUD_BTN_RADIUS = 42;
+
         this.buttons = [
-            // Top Left: Cross / Exit Button (Redirects to '/')
+            // Top Left 1: Cross / Exit Button (Redirects to '/')
             {
                 id: 'btn_exit',
                 x: 80,
                 y: 85,
-                radius: 44,
+                radius: HUD_BTN_RADIUS,
                 type: 'cross',
                 action: () => {
                     window.location.href = '/';
                 }
             },
-            // Top Right: Sound Toggle
+            // Top Left 2: Toggle Touch Steering Buttons Show/Hide
+            {
+                id: 'btn_toggle_controls',
+                x: 185,
+                y: 85,
+                radius: HUD_BTN_RADIUS,
+                type: 'toggle_controls',
+                action: () => {
+                    this.toggleControls();
+                }
+            },
+            // Top Right 1: Sound Toggle
             {
                 id: 'btn_sound',
-                x: 880,
+                x: 895,
                 y: 85,
-                radius: 38,
+                radius: HUD_BTN_RADIUS,
                 type: 'sound',
                 action: () => {
                     SoundEngine.toggleMute();
                     SoundEngine.playButtonClick();
                 }
             },
-            // Top Right: Restart Button
+            // Top Right 2: Restart Button
             {
                 id: 'btn_restart',
-                x: 990,
+                x: 1000,
                 y: 85,
-                radius: 44,
+                radius: HUD_BTN_RADIUS,
                 type: 'restart',
                 action: () => this.game.restartLevel()
             },
@@ -83,6 +104,33 @@ class UIManager {
         ];
     }
 
+    toggleControls() {
+        this.showControls = !this.showControls;
+        if (!this.showControls) {
+            this.game.isHoldingLeft = false;
+            this.game.isHoldingRight = false;
+            const bLeft = this.buttons.find(b => b.id === 'btn_left');
+            const bRight = this.buttons.find(b => b.id === 'btn_right');
+            if (bLeft) bLeft.isPressed = false;
+            if (bRight) bRight.isPressed = false;
+        }
+        try {
+            localStorage.setItem('piggy_show_controls', this.showControls.toString());
+        } catch (e) {}
+
+        const toggleBtn = this.buttons.find(b => b.id === 'btn_toggle_controls');
+        const bx = toggleBtn ? toggleBtn.x : 185;
+        const by = toggleBtn ? toggleBtn.y : 85;
+        if (this.game && this.game.particles) {
+            this.game.particles.addPopup(
+                bx,
+                by + 65,
+                this.showControls ? 'BUTTONS: ON' : 'BUTTONS: OFF',
+                this.showControls ? '#51cf66' : '#ff6b6b'
+            );
+        }
+    }
+
     openLevelSelect() {
         SoundEngine.playButtonClick();
         this.activeModal = 'level_select';
@@ -106,6 +154,10 @@ class UIManager {
         }
 
         for (let btn of this.buttons) {
+            if (!this.showControls && (btn.id === 'btn_left' || btn.id === 'btn_right')) {
+                continue;
+            }
+
             const d = Math.hypot(px - btn.x, py - btn.y);
             if (d <= btn.radius + 15) {
                 if (btn.onDown) {
@@ -265,9 +317,12 @@ class UIManager {
         }
 
         // ------------------------------------------
-        // 3. Top Buttons (Cross, Sound, Restart)
+        // 3. Top Buttons & Steering Controls
         // ------------------------------------------
         for (let btn of this.buttons) {
+            if (!this.showControls && (btn.id === 'btn_left' || btn.id === 'btn_right')) {
+                continue;
+            }
             this.renderCircleButton(ctx, btn);
         }
 
@@ -309,7 +364,7 @@ class UIManager {
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillStyle = '#ffffff';
-            ctx.fillText('👈 SWIPE OR USE ARROWS 👉', 0, 2);
+            ctx.fillText(this.showControls ? '👈 SWIPE OR USE ARROWS 👉' : '👈 SWIPE / DRAG TO MOVE 👉', 0, 2);
             ctx.restore();
         }
 
@@ -615,27 +670,30 @@ class UIManager {
             ctx.fill();
         } else if (btn.type === 'sound') {
             const muted = SoundEngine.isAudioMuted();
+            const s = r / 42;
             ctx.beginPath();
-            ctx.moveTo(-10, -8);
-            ctx.lineTo(-2, -8);
-            ctx.lineTo(10, -16);
-            ctx.lineTo(10, 16);
-            ctx.lineTo(-2, 8);
-            ctx.lineTo(-10, 8);
+            ctx.moveTo(-11 * s, -9 * s);
+            ctx.lineTo(-3 * s, -9 * s);
+            ctx.lineTo(11 * s, -17 * s);
+            ctx.lineTo(11 * s, 17 * s);
+            ctx.lineTo(-3 * s, 9 * s);
+            ctx.lineTo(-11 * s, 9 * s);
             ctx.closePath();
             ctx.fill();
 
             if (muted) {
                 ctx.strokeStyle = '#ff6b6b';
-                ctx.lineWidth = 4;
+                ctx.lineWidth = 4 * s;
+                ctx.lineCap = 'round';
                 ctx.beginPath();
-                ctx.moveTo(-14, -14);
-                ctx.lineTo(16, 16);
+                ctx.moveTo(-15 * s, -15 * s);
+                ctx.lineTo(15 * s, 15 * s);
                 ctx.stroke();
             } else {
-                ctx.lineWidth = 3;
+                ctx.lineWidth = 3.5 * s;
+                ctx.lineCap = 'round';
                 ctx.beginPath();
-                ctx.arc(8, 0, 12, -Math.PI * 0.35, Math.PI * 0.35);
+                ctx.arc(8 * s, 0, 13 * s, -Math.PI * 0.35, Math.PI * 0.35);
                 ctx.stroke();
             }
         } else if (btn.type === 'arrow_left') {
@@ -654,6 +712,44 @@ class UIManager {
             ctx.lineTo(-r * 0.22, r * 0.42);
             ctx.closePath();
             ctx.fill();
+        } else if (btn.type === 'toggle_controls') {
+            const isVisible = this.showControls;
+            const s = r / 42;
+
+            // Left triangle arrow ◄
+            ctx.beginPath();
+            ctx.moveTo(-14 * s, 0);
+            ctx.lineTo(-4 * s, -10 * s);
+            ctx.lineTo(-4 * s, 10 * s);
+            ctx.closePath();
+            ctx.fill();
+
+            // Right triangle arrow ►
+            ctx.beginPath();
+            ctx.moveTo(14 * s, 0);
+            ctx.lineTo(4 * s, -10 * s);
+            ctx.lineTo(4 * s, 10 * s);
+            ctx.closePath();
+            ctx.fill();
+
+            // Center connector line
+            ctx.lineWidth = 3.5 * s;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(-3 * s, 0);
+            ctx.lineTo(3 * s, 0);
+            ctx.stroke();
+
+            // Red diagonal slash if hidden
+            if (!isVisible) {
+                ctx.strokeStyle = '#ff6b6b';
+                ctx.lineWidth = 4 * s;
+                ctx.lineCap = 'round';
+                ctx.beginPath();
+                ctx.moveTo(-15 * s, -15 * s);
+                ctx.lineTo(15 * s, 15 * s);
+                ctx.stroke();
+            }
         }
 
         ctx.restore();
@@ -729,7 +825,7 @@ class UIManager {
         btnGrad1.addColorStop(1, '#1864ab');
         ctx.fillStyle = btnGrad1;
         ctx.beginPath();
-        ctx.roundRect(-170, -36, 340, 72, 36);
+        ctx.roundRect(-190, -36, 380, 72, 36);
         ctx.fill();
 
         ctx.strokeStyle = '#ffffff';
@@ -749,7 +845,7 @@ class UIManager {
         btnGrad2.addColorStop(1, '#e67700');
         ctx.fillStyle = btnGrad2;
         ctx.beginPath();
-        ctx.roundRect(-170, -36, 340, 72, 36);
+        ctx.roundRect(-190, -36, 380, 72, 36);
         ctx.fill();
 
         ctx.strokeStyle = '#ffffff';
