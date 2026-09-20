@@ -26,8 +26,8 @@ class Game {
         // Game State
         this.score = 0;
         this.displayScore = 0;
-        this.lives = 5;
-        this.maxLives = 5;
+        this.lives = 3;
+        this.maxLives = 3;
         this.patternIndex = 0;
         this.dangerLineY = 1380; // Danger line above slingshot
         this.gameOverReason = '';
@@ -46,6 +46,14 @@ class Game {
         this.rushTimer = 0;
         this.rushCooldown = 0;
         this.isRushing = false;
+        this.hasSentScore = false;
+        this.totalClicks = 0;
+        this.gameStartTime = Date.now();
+        if (typeof globalThis !== 'undefined') {
+            globalThis.gameClickCount = 0;
+            globalThis.gameStartTime = this.gameStartTime;
+            globalThis.gameDuration = 0;
+        }
         this.gameState = 'PLAYING'; // PLAYING, GAME_OVER, PAUSED
 
         // Bindings & Setup
@@ -100,6 +108,14 @@ class Game {
         this.rushTimer = 0;
         this.rushCooldown = 0;
         this.isRushing = false;
+        this.hasSentScore = false;
+        this.totalClicks = 0;
+        this.gameStartTime = Date.now();
+        if (typeof globalThis !== 'undefined') {
+            globalThis.gameClickCount = 0;
+            globalThis.gameStartTime = this.gameStartTime;
+            globalThis.gameDuration = 0;
+        }
         this.gameOverReason = '';
         this.gameState = 'PLAYING';
 
@@ -163,6 +179,26 @@ class Game {
         this.gameOverReason = reason;
         window.sounds.playGameOver();
         this.triggerScreenShake(24, 0.5);
+
+        // Send final score precisely once per game over event
+        if (!this.hasSentScore) {
+            this.hasSentScore = true;
+            const finalScore = Number(this.score) || 0;
+            const durationSec = Math.max(1, Math.round((Date.now() - this.gameStartTime) / 1000));
+            if (typeof globalThis !== 'undefined') {
+                globalThis.gameClickCount = this.totalClicks;
+                globalThis.gameDuration = durationSec;
+            }
+            const extraData = {
+                clicks: this.totalClicks,
+                duration: durationSec
+            };
+            if (typeof window !== 'undefined' && typeof window.sendScore === 'function') {
+                window.sendScore(finalScore, extraData);
+            } else if (typeof sendScore === 'function') {
+                sendScore(finalScore, extraData);
+            }
+        }
     }
 
     setupInputs() {
@@ -186,13 +222,43 @@ class Game {
             window.sounds.init();
             touchStartPos = { x: coords.x, y: coords.y };
 
-            // Retry click on Game Over
+            // Track player click count
+            this.totalClicks++;
+            if (typeof globalThis !== 'undefined') {
+                globalThis.gameClickCount = this.totalClicks;
+            }
+
+            // 1. Cross / Exit button click on top-left of HUD -> redirect to "/"
+            if (coords.x >= 35 && coords.x <= 135 && coords.y >= 35 && coords.y <= 135) {
+                window.location.href = '/';
+                return;
+            }
+
+            // 2. Button clicks on Game Over Modal
             if (this.gameState === 'GAME_OVER') {
-                const mx = (this.width - 740) / 2;
-                const my = (this.height - 640) / 2;
-                if (coords.x >= mx + 100 && coords.x <= mx + 640 &&
-                    coords.y >= my + 440 && coords.y <= my + 560) {
+                const mw = 760;
+                const mh = 760;
+                const mx = (this.width - mw) / 2;
+                const my = (this.height - mh) / 2;
+                const btnW = mw - 160;
+                const btnX = mx + 80;
+
+                // Check RETRY click
+                const retryY = my + 380;
+                const retryH = 95;
+                if (coords.x >= btnX && coords.x <= btnX + btnW &&
+                    coords.y >= retryY && coords.y <= retryY + retryH) {
                     this.startNewGame();
+                    return;
+                }
+
+                // Check BACK TO HOME click
+                const homeY = my + 505;
+                const homeH = 95;
+                if (coords.x >= btnX && coords.x <= btnX + btnW &&
+                    coords.y >= homeY && coords.y <= homeY + homeH) {
+                    window.location.href = '/';
+                    return;
                 }
                 return;
             }
@@ -229,6 +295,23 @@ class Game {
             if (this.slingshot.isDragging) {
                 this.slingshot.updateDrag(coords.x, coords.y);
             }
+
+            // Update mouse cursor styling when hovering over interactive buttons
+            const onCross = (coords.x >= 35 && coords.x <= 135 && coords.y >= 35 && coords.y <= 135);
+            let onGameOverBtn = false;
+            if (this.gameState === 'GAME_OVER') {
+                const mw = 760;
+                const mh = 760;
+                const mx = (this.width - mw) / 2;
+                const my = (this.height - mh) / 2;
+                const btnW = mw - 160;
+                const btnX = mx + 80;
+                if (coords.x >= btnX && coords.x <= btnX + btnW &&
+                    coords.y >= my + 380 && coords.y <= my + 600) {
+                    onGameOverBtn = true;
+                }
+            }
+            this.canvas.style.cursor = (onCross || onGameOverBtn) ? 'pointer' : 'default';
         };
 
         const handleEnd = (e) => {
@@ -251,6 +334,10 @@ class Game {
                         firedBall.color = 'rainbow';
                         firedBall.maxPierces = this.loadedBall.maxPierces || 5;
                         firedBall.pierceCount = 0;
+                        firedBall.gravity = 200;
+                        if (Math.abs(firedBall.vy) < 1400) {
+                            firedBall.vy = -1600;
+                        }
                         window.sounds.playPowerUp();
                     }
                     this.activeBalls.push(firedBall);
@@ -273,6 +360,10 @@ class Game {
             }
             touchStartPos = null;
         };
+
+        this.handleStart = handleStart;
+        this.handleMove = handleMove;
+        this.handleEnd = handleEnd;
 
         // Mouse Listeners
         window.addEventListener('mousedown', (e) => {
@@ -337,6 +428,9 @@ class Game {
 
         // Survival Time & Gradual Speed Acceleration
         this.gameTime += dt;
+        if (typeof globalThis !== 'undefined') {
+            globalThis.gameDuration = Math.max(1, Math.round((Date.now() - this.gameStartTime) / 1000));
+        }
 
         // Update Speed Surge Timers
         if (this.rushCooldown > 0) {
@@ -394,10 +488,45 @@ class Game {
             lowestBlockY = Math.max(lowestBlockY, jelly.y + jelly.h);
             highestBlockY = Math.min(highestBlockY, jelly.y);
 
-            // Danger line breach check: Game Over!
+            // Danger line breach check: each breaching jelly costs 1 life!
             if (jelly.y + jelly.h >= this.dangerLineY) {
-                this.triggerGameOver('BLOCKS BREACHED THE DANGER LINE!');
-                return;
+                jelly.isAlive = false;
+                this.lives--;
+                this.combo = 0;
+                window.sounds.playMiss();
+                this.triggerScreenShake(18, 0.4);
+
+                // Miss / Danger breach floating text
+                this.floatingTexts.push(new window.FloatingText(
+                    Math.min(900, Math.max(180, jelly.x + jelly.w / 2)),
+                    this.dangerLineY - 30,
+                    'DANGER HIT! -1 ❤️',
+                    '#ff3344'
+                ));
+
+                // Danger impact particle burst
+                for (let p = 0; p < 25; p++) {
+                    this.particles.push(new window.Particle(
+                        jelly.x + jelly.w / 2,
+                        this.dangerLineY,
+                        '#ff2244'
+                    ));
+                }
+
+                // Push remaining blocks up slightly so adjacent blocks don't instantly breach in the same frame
+                this.jellies.forEach(other => {
+                    if (other.isAlive) {
+                        other.y -= 50;
+                        other.targetY -= 50;
+                        other.triggerHitReaction();
+                    }
+                });
+
+                // When 3 lives are lost (lives reach 0), Game Over!
+                if (this.lives <= 0) {
+                    this.triggerGameOver('OUT OF LIVES!');
+                    return;
+                }
             }
         }
 
@@ -478,6 +607,14 @@ class Game {
 
                 if (window.Physics.checkBallJelly(ball, jelly)) {
                     if (ball.isSuperBall) {
+                        // Ensure ball continues driving forward with powerful momentum
+                        const curSpeed = Math.hypot(ball.vx, ball.vy);
+                        if (curSpeed < 1400) {
+                            const boost = 1500 / (curSpeed || 1);
+                            ball.vx *= boost;
+                            ball.vy *= boost;
+                        }
+
                         // SUPER POWER BALL PIERCE: Destroys ANY block regardless of color!
                         jelly.isAlive = false;
                         ball.pierceCount++;
@@ -485,12 +622,9 @@ class Game {
                         const points = 25 + ball.pierceCount * 10;
                         this.score += points;
 
-                        // Push remaining blocks UPWARDS
-                        const pushBack = 55;
+                        // Visual wobble hit reaction on alive blocks
                         this.jellies.forEach(otherJelly => {
                             if (otherJelly.isAlive) {
-                                otherJelly.y -= pushBack;
-                                otherJelly.targetY -= pushBack;
                                 otherJelly.triggerHitReaction();
                             }
                         });
@@ -525,6 +659,16 @@ class Game {
                             for (let c = 0; c < 45; c++) {
                                 this.particles.push(new window.Particle(ball.x, ball.y, rainbowColors[c % rainbowColors.length]));
                             }
+
+                            // Push remaining blocks UPWARDS after the full 5-block pierce is complete!
+                            const pushBack = 65;
+                            this.jellies.forEach(otherJelly => {
+                                if (otherJelly.isAlive) {
+                                    otherJelly.y -= pushBack;
+                                    otherJelly.targetY -= pushBack;
+                                    otherJelly.triggerHitReaction();
+                                }
+                            });
                             break;
                         }
 
@@ -838,13 +982,50 @@ class Game {
         ctx.roundRect(32, 24, w - 64, 34, 17);
         ctx.fill();
 
-        // Score Text ("Score : 0")
+        // 1. Cross / Exit Button on Header Left (Redirects to "/")
+        const crossX = 85;
+        const crossY = 18 + h / 2;
+        const crossR = 36;
+
+        // Drop shadow for cross button
+        ctx.fillStyle = 'rgba(40, 20, 0, 0.35)';
+        ctx.beginPath();
+        ctx.arc(crossX, crossY + 3, crossR, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Glossy circular button
+        const crossGrad = ctx.createLinearGradient(0, crossY - crossR, 0, crossY + crossR);
+        crossGrad.addColorStop(0, '#ff4757');
+        crossGrad.addColorStop(1, '#c2185b');
+        ctx.fillStyle = crossGrad;
+        ctx.beginPath();
+        ctx.arc(crossX, crossY, crossR, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = '#5a092b';
+        ctx.lineWidth = 4;
+        ctx.stroke();
+
+        // Highlight glint on button
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+        ctx.beginPath();
+        ctx.ellipse(crossX, crossY - 14, 20, 8, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // White '✕' symbol
+        ctx.fillStyle = '#ffffff';
+        ctx.font = "900 42px 'Fredoka', 'Nunito', sans-serif";
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('✕', crossX, crossY + 1);
+
+        // 2. Score Text ("Score : X") in Center
         ctx.save();
-        ctx.font = "900 60px 'Fredoka', 'Nunito', 'Arial Rounded MT Bold', sans-serif";
+        ctx.font = "900 58px 'Fredoka', 'Nunito', 'Arial Rounded MT Bold', sans-serif";
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
 
-        const textX = w / 2 - 50;
+        const textX = w / 2 - 20;
         const textY = 18 + h / 2 + 2;
         const scoreStr = `Score : ${this.displayScore}`;
 
@@ -856,13 +1037,13 @@ class Game {
         ctx.fillStyle = '#ffffff';
         ctx.fillText(scoreStr, textX, textY);
 
-        // Lives Hearts on Header Right (5 hearts)
-        const heartsX = w - 150;
+        // 3. Lives Hearts on Header Right (3 larger hearts)
+        const heartsX = w - 165;
         const heartsY = 18 + h / 2 + 2;
         for (let i = 0; i < this.maxLives; i++) {
-            const hx = heartsX + (i - 2) * 34;
+            const hx = heartsX + (i - 1) * 62;
             const hasHeart = (i < this.lives);
-            ctx.font = '28px sans-serif';
+            ctx.font = "46px 'Segoe UI Emoji', 'Apple Color Emoji', sans-serif";
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(hasHeart ? '❤️' : '🖤', hx, heartsY);
@@ -876,9 +1057,9 @@ class Game {
         ctx.fillStyle = 'rgba(20, 10, 15, 0.85)';
         ctx.fillRect(0, 0, this.width, this.height);
 
-        // Modal Box
+        // Modal Box (extended to 760px to fit both Retry & Home buttons cleanly)
         const mw = 760;
-        const mh = 660;
+        const mh = 760;
         const mx = (this.width - mw) / 2;
         const my = (this.height - mh) / 2;
 
@@ -896,17 +1077,17 @@ class Game {
         ctx.font = "900 70px 'Fredoka', sans-serif";
         ctx.fillStyle = '#d9142e';
         ctx.textAlign = 'center';
-        ctx.fillText('💀 GAME OVER', this.width / 2, my + 130);
+        ctx.fillText('💀 GAME OVER', this.width / 2, my + 115);
 
         // Reason subtitle
         ctx.font = "700 32px 'Fredoka', sans-serif";
         ctx.fillStyle = '#555555';
-        ctx.fillText(this.gameOverReason || 'TRY AGAIN!', this.width / 2, my + 210);
+        ctx.fillText(this.gameOverReason || 'TRY AGAIN!', this.width / 2, my + 185);
 
         // Final Score Banner
         ctx.fillStyle = '#fff4d6';
         ctx.beginPath();
-        ctx.roundRect(mx + 80, my + 260, mw - 160, 120, 20);
+        ctx.roundRect(mx + 80, my + 230, mw - 160, 115, 20);
         ctx.fill();
         ctx.strokeStyle = '#ffaa00';
         ctx.lineWidth = 4;
@@ -914,21 +1095,22 @@ class Game {
 
         ctx.font = "900 48px 'Fredoka', sans-serif";
         ctx.fillStyle = '#4c2608';
-        ctx.fillText(`Final Score: ${this.score}`, this.width / 2, my + 332);
+        ctx.fillText(`Final Score: ${this.score}`, this.width / 2, my + 295);
 
-        // Large RETRY Button
-        const btnY = my + 440;
-        const btnH = 110;
-        const btnW = mw - 200;
-        const btnX = mx + 100;
+        // Button dimensions
+        const btnW = mw - 160;
+        const btnH = 95;
+        const btnX = mx + 80;
 
-        const btnGrad = ctx.createLinearGradient(0, btnY, 0, btnY + btnH);
-        btnGrad.addColorStop(0, '#ffbb00');
-        btnGrad.addColorStop(1, '#ff6600');
+        // 1. RETRY Button
+        const retryY = my + 380;
+        const retryGrad = ctx.createLinearGradient(0, retryY, 0, retryY + btnH);
+        retryGrad.addColorStop(0, '#ffbb00');
+        retryGrad.addColorStop(1, '#ff6600');
 
-        ctx.fillStyle = btnGrad;
+        ctx.fillStyle = retryGrad;
         ctx.beginPath();
-        ctx.roundRect(btnX, btnY, btnW, btnH, 32);
+        ctx.roundRect(btnX, retryY, btnW, btnH, 28);
         ctx.fill();
 
         ctx.strokeStyle = '#381c00';
@@ -936,8 +1118,27 @@ class Game {
         ctx.stroke();
 
         ctx.fillStyle = '#ffffff';
-        ctx.font = "900 52px 'Fredoka', sans-serif";
-        ctx.fillText('🔄 RETRY', this.width / 2, btnY + 70);
+        ctx.font = "900 46px 'Fredoka', sans-serif";
+        ctx.fillText('🔄 RETRY', this.width / 2, retryY + 58);
+
+        // 2. BACK TO HOME Button (Redirects to "/")
+        const homeY = my + 505;
+        const homeGrad = ctx.createLinearGradient(0, homeY, 0, homeY + btnH);
+        homeGrad.addColorStop(0, '#3a86ff');
+        homeGrad.addColorStop(1, '#1d3557');
+
+        ctx.fillStyle = homeGrad;
+        ctx.beginPath();
+        ctx.roundRect(btnX, homeY, btnW, btnH, 28);
+        ctx.fill();
+
+        ctx.strokeStyle = '#0d1b2a';
+        ctx.lineWidth = 6;
+        ctx.stroke();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = "900 46px 'Fredoka', sans-serif";
+        ctx.fillText('🏠 BACK TO HOME', this.width / 2, homeY + 58);
 
         ctx.restore();
     }

@@ -322,6 +322,11 @@ class Physics {
         const distSq = dx * dx + dy * dy;
 
         if (distSq < ball.radius * ball.radius) {
+            if (ball.isSuperBall) {
+                // Super power ball pierces straight through blocks without bouncing back
+                return true;
+            }
+
             const dist = Math.sqrt(distSq) || 1;
             const nx = dx / dist;
             const ny = dy / dist;

@@ -15,6 +15,7 @@ class Ball {
 
         // Super Power Ball properties
         this.isSuperBall = (color === 'rainbow');
+        this.gravity = this.isSuperBall ? 200 : 820;
         this.maxPierces = 5;
         this.pierceCount = 0;
         this.trail = [];

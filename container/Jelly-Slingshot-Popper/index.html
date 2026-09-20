@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#ff6b81">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Jelly Slingshot Popper</title>
+    <link rel="manifest" href="appmanifest.json">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-viewport">
+        <!-- 1080x1920 Game Canvas -->
+        <canvas id="gameCanvas" width="1080" height="1920"></canvas>
+
+        <div class="desktop-hint">Drag Slingshot to Aim & Release to Fire</div>
+    </div>
+
+    <!-- API & Helper Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        if (typeof window.axios === 'undefined') {
+            window.axios = {
+                post: async (url, data, config) => {
+                    return fetch(url, {
+                        method: 'POST',
+                        headers: config?.headers || { 'Content-Type': 'application/json' },
+                        credentials: config?.withCredentials ? 'include' : 'same-origin',
+                        body: JSON.stringify(data)
+                    }).then(async res => ({ data: await res.json().catch(() => ({})) }));
+                }
+            };
+        }
+    </script>
+    <script src="send_score_api.js"></script>
+
+    <!-- Construct 3 Style Modular Game Scripts -->
+    <script src="scripts/audio.js"></script>
+    <script src="scripts/physics.js"></script>
+    <script src="scripts/entities.js"></script>
+    <script src="scripts/levels.js"></script>
+    <script src="scripts/game.js"></script>
+
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js').catch((err) => {
+                    console.warn('Service worker registration failed:', err);
+                });
+            });
+        }
+    </script>
+</body>
+</html>
+
