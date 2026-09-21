@@ -1,0 +1,44 @@
+{
+  "name": "ConnectDots",
+  "version": "1.0.0.0",
+  "author": "Antigravity",
+  "firstLayout": "GameLayout",
+  "useLoaderLayout": false,
+  "viewportWidth": 1080,
+  "viewportHeight": 1920,
+  "pixelRounding": false,
+  "sampling": "bilinear",
+  "downscaling": "high-quality",
+  "orientation": "portrait",
+  "fullscreenMode": "letterbox-scale",
+  "animations": {
+    "items": []
+  },
+  "layouts": [
+    {
+      "name": "GameLayout",
+      "width": 1080,
+      "height": 1920
+    }
+  ],
+  "objectTypes": [
+    { "name": "Dot_Blue", "plugin-id": "Sprite", "image": "images/dot_blue.png" },
+    { "name": "Dot_Purple", "plugin-id": "Sprite", "image": "images/dot_purple.png" },
+    { "name": "Dot_Red", "plugin-id": "Sprite", "image": "images/dot_red.png" },
+    { "name": "Dot_Yellow", "plugin-id": "Sprite", "image": "images/dot_yellow.png" },
+    { "name": "Dot_Highlight", "plugin-id": "Sprite", "image": "images/dot_highlight.png" },
+    { "name": "Icon_Moves", "plugin-id": "Sprite", "image": "images/icon_moves.png" },
+    { "name": "Icon_Trophy", "plugin-id": "Sprite", "image": "images/icon_trophy.png" },
+    { "name": "Icon_Coin", "plugin-id": "Sprite", "image": "images/icon_coin.png" },
+    { "name": "Icon_Check", "plugin-id": "Sprite", "image": "images/icon_check.png" },
+    { "name": "Icon_Pause", "plugin-id": "Sprite", "image": "images/icon_pause.png" },
+    { "name": "Icon_SoundOn", "plugin-id": "Sprite", "image": "images/icon_sound_on.png" },
+    { "name": "Icon_SoundOff", "plugin-id": "Sprite", "image": "images/icon_sound_off.png" },
+    { "name": "Icon_Play", "plugin-id": "Sprite", "image": "images/icon_play.png" },
+    { "name": "Icon_Close", "plugin-id": "Sprite", "image": "images/icon_close.png" },
+    { "name": "Icon_Video", "plugin-id": "Sprite", "image": "images/icon_video.png" },
+    { "name": "Star_Filled", "plugin-id": "Sprite", "image": "images/star_filled.png" },
+    { "name": "Star_Empty", "plugin-id": "Sprite", "image": "images/star_empty.png" }
+  ]
+}
+

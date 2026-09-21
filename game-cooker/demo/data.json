@@ -1,0 +1,55 @@
+{
+  "project": {
+    "name": "Connect Dots Puzzle",
+    "version": "1.0.0.0",
+    "author": "Antigravity",
+    "viewport": {
+      "width": 1080,
+      "height": 1920
+    }
+  },
+  "colors": {
+    "blue": { "primary": "#6EA8FE", "light": "#A6CBFF", "dark": "#3D7DE0", "glow": "rgba(110, 168, 254, 0.6)", "bgHighlight": "rgba(110, 168, 254, 0.3)" },
+    "purple": { "primary": "#9D5DE5", "light": "#C18FFF", "dark": "#7A35C5", "glow": "rgba(157, 93, 229, 0.6)", "bgHighlight": "rgba(157, 93, 229, 0.3)" },
+    "red": { "primary": "#EE5965", "light": "#FF8A93", "dark": "#C83845", "glow": "rgba(238, 89, 101, 0.6)", "bgHighlight": "rgba(238, 89, 101, 0.3)" },
+    "yellow": { "primary": "#F8CF47", "light": "#FEE77E", "dark": "#D8A618", "glow": "rgba(248, 207, 71, 0.6)", "bgHighlight": "rgba(248, 207, 71, 0.3)" }
+  },
+  "levels": [
+    {
+      "levelNumber": 1,
+      "title": "Level 01",
+      "moves": 15,
+      "objectives": { "blue": 10, "red": 10, "purple": 0, "yellow": 0 },
+      "starThresholds": [30, 60, 90]
+    },
+    {
+      "levelNumber": 2,
+      "title": "Level 02",
+      "moves": 20,
+      "objectives": { "blue": 15, "purple": 15, "red": 0, "yellow": 15 },
+      "starThresholds": [45, 90, 130]
+    },
+    {
+      "levelNumber": 3,
+      "title": "Level 03",
+      "moves": 25,
+      "objectives": { "blue": 0, "purple": 20, "red": 20, "yellow": 20 },
+      "starThresholds": [60, 120, 180]
+    },
+    {
+      "levelNumber": 4,
+      "title": "Level 04",
+      "moves": 30,
+      "objectives": { "blue": 25, "purple": 25, "red": 25, "yellow": 25 },
+      "starThresholds": [75, 150, 220]
+    },
+    {
+      "levelNumber": 5,
+      "title": "Level 05",
+      "moves": 28,
+      "objectives": { "blue": 30, "purple": 30, "red": 30, "yellow": 30 },
+      "starThresholds": [90, 180, 260]
+    }
+  ]
+}
+
