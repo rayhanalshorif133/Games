@@ -17,5 +17,5 @@ Ey game er ui er upore based kore ekta banner image baniye daw banner e sudu gam
 
 ## Make game from a video (demo.mp4)
 ```text
-Please perform a detailed analysis of the attached demo.mp4 video. Recreate identical game assets matching the visual style, art direction, and theme shown in the clip. Using these assets, build a fully functional clone of the game with a vertical screen layout (Width: 1080px, Height: 1920px). Ensure the visual effects are polished, aesthetically appealing, and modern, with ultra-smooth mechanics, responsive controls, and high-performance gameplay.
+demo.mp4 full game er video analaysis koro , assets banaw, consturct 3 er build file structure follow kore sundor ekta game baniye daw amk and layout size h: 1920 and w: 1080
 ```
