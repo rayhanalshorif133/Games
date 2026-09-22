@@ -9,8 +9,10 @@ class Board {
     this.path = [];
     this.isSquareMode = false;
     this.activeColor = null;
-    this.nextDotId = 1;
-    this.allColors = ['blue', 'purple', 'red', 'yellow'];
+    // 5-Color Palette
+    this.allColors = ['red', 'yellow', 'green', 'orange', 'purple'];
+    // 4 Active colors currently spawning
+    this.activeColors = ['red', 'yellow', 'green', 'orange'];
 
     this.gridLeft = 108;
     this.gridTop = 500;
@@ -27,7 +29,13 @@ class Board {
     this.gridTop = 500;
   }
 
-  initBoard() {
+  initBoard(initialColors) {
+    if (Array.isArray(initialColors) && initialColors.length > 0) {
+      this.activeColors = [...initialColors];
+    } else {
+      this.activeColors = ['red', 'yellow', 'green', 'orange'];
+    }
+
     this.grid = [];
     this.path = [];
     this.isSquareMode = false;
@@ -56,9 +64,22 @@ class Board {
     }
   }
 
-  getRandomColor() {
-    const idx = Math.floor(Math.random() * this.allColors.length);
-    return this.allColors[idx];
+  getRandomColor(allowMixed = true) {
+    if (allowMixed && Math.random() < 0.12) {
+      return 'mixed';
+    }
+    const pool = this.activeColors.length > 0 ? this.activeColors : this.allColors;
+    const idx = Math.floor(Math.random() * pool.length);
+    return pool[idx];
+  }
+
+  replaceActiveColor(oldColor, newColor) {
+    const idx = this.activeColors.indexOf(oldColor);
+    if (idx !== -1) {
+      this.activeColors[idx] = newColor;
+    } else {
+      this.activeColors.push(newColor);
+    }
   }
 
   getCellCenter(row, col) {
@@ -93,19 +114,30 @@ class Board {
     if (!tile || tile.isClearing) return false;
 
     this.path = [pos];
-    this.activeColor = tile.color;
+    this.activeColor = tile.color === 'mixed' ? null : tile.color;
     this.isSquareMode = false;
     return true;
   }
 
   addCellToPath(pos) {
-    if (!this.activeColor || this.path.length === 0) {
+    if (this.path.length === 0) {
       return { changed: false, added: false, squareFormed: false, backtrack: false };
     }
 
     const tile = this.grid[pos.row]?.[pos.col];
-    if (!tile || tile.color !== this.activeColor || tile.isClearing) {
+    if (!tile || tile.isClearing) {
       return { changed: false, added: false, squareFormed: false, backtrack: false };
+    }
+
+    // Determine / match color with wildcard support
+    if (!this.activeColor) {
+      if (tile.color !== 'mixed') {
+        this.activeColor = tile.color;
+      }
+    } else {
+      if (tile.color !== this.activeColor && tile.color !== 'mixed') {
+        return { changed: false, added: false, squareFormed: false, backtrack: false };
+      }
     }
 
     const lastPos = this.path[this.path.length - 1];
@@ -120,6 +152,9 @@ class Board {
       if (prevPos.row === pos.row && prevPos.col === pos.col) {
         this.path.pop();
         this.isSquareMode = this.checkIfPathHasCycle();
+        if (this.path.every(p => this.grid[p.row]?.[p.col]?.color === 'mixed')) {
+          this.activeColor = null;
+        }
         return { changed: true, added: false, squareFormed: false, backtrack: true };
       }
     }
@@ -154,23 +189,25 @@ class Board {
   }
 
   endPath() {
-    if (this.path.length < 2 || !this.activeColor) {
+    if (this.path.length < 2) {
       this.path = [];
       this.isSquareMode = false;
       this.activeColor = null;
-      return { clearedTiles: [], isSquare: false, color: null };
+      return { clearedTiles: [], isSquare: false, color: null, mixedCount: 0 };
     }
 
-    const clearedColor = this.activeColor;
+    const clearedColor = this.activeColor || 'mixed';
     const isSquare = this.isSquareMode;
     const clearedTiles = [];
+    let mixedCount = 0;
 
     if (isSquare) {
       for (let r = 0; r < this.rows; r++) {
         for (let c = 0; c < this.cols; c++) {
           const t = this.grid[r][c];
-          if (t && t.color === clearedColor && !t.isClearing) {
+          if (t && (t.color === clearedColor || t.color === 'mixed') && !t.isClearing) {
             t.isClearing = true;
+            if (t.color === 'mixed') mixedCount++;
             clearedTiles.push(t);
           }
         }
@@ -184,6 +221,7 @@ class Board {
           const t = this.grid[p.row][p.col];
           if (t && !t.isClearing) {
             t.isClearing = true;
+            if (t.color === 'mixed') mixedCount++;
             clearedTiles.push(t);
           }
         }
@@ -194,7 +232,21 @@ class Board {
     this.isSquareMode = false;
     this.activeColor = null;
 
-    return { clearedTiles, isSquare, color: clearedColor };
+    return { clearedTiles, isSquare, color: clearedColor, mixedCount };
+  }
+
+  clearAllOfColor(color) {
+    const cleared = [];
+    for (let r = 0; r < this.rows; r++) {
+      for (let c = 0; c < this.cols; c++) {
+        const t = this.grid[r][c];
+        if (t && t.color === color && !t.isClearing) {
+          t.isClearing = true;
+          cleared.push(t);
+        }
+      }
+    }
+    return cleared;
   }
 
   dropAndRefill() {

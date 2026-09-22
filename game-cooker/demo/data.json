@@ -9,47 +9,11 @@
     }
   },
   "colors": {
-    "blue": { "primary": "#6EA8FE", "light": "#A6CBFF", "dark": "#3D7DE0", "glow": "rgba(110, 168, 254, 0.6)", "bgHighlight": "rgba(110, 168, 254, 0.3)" },
-    "purple": { "primary": "#9D5DE5", "light": "#C18FFF", "dark": "#7A35C5", "glow": "rgba(157, 93, 229, 0.6)", "bgHighlight": "rgba(157, 93, 229, 0.3)" },
-    "red": { "primary": "#EE5965", "light": "#FF8A93", "dark": "#C83845", "glow": "rgba(238, 89, 101, 0.6)", "bgHighlight": "rgba(238, 89, 101, 0.3)" },
-    "yellow": { "primary": "#F8CF47", "light": "#FEE77E", "dark": "#D8A618", "glow": "rgba(248, 207, 71, 0.6)", "bgHighlight": "rgba(248, 207, 71, 0.3)" }
-  },
-  "levels": [
-    {
-      "levelNumber": 1,
-      "title": "Level 01",
-      "moves": 15,
-      "objectives": { "blue": 10, "red": 10, "purple": 0, "yellow": 0 },
-      "starThresholds": [30, 60, 90]
-    },
-    {
-      "levelNumber": 2,
-      "title": "Level 02",
-      "moves": 20,
-      "objectives": { "blue": 15, "purple": 15, "red": 0, "yellow": 15 },
-      "starThresholds": [45, 90, 130]
-    },
-    {
-      "levelNumber": 3,
-      "title": "Level 03",
-      "moves": 25,
-      "objectives": { "blue": 0, "purple": 20, "red": 20, "yellow": 20 },
-      "starThresholds": [60, 120, 180]
-    },
-    {
-      "levelNumber": 4,
-      "title": "Level 04",
-      "moves": 30,
-      "objectives": { "blue": 25, "purple": 25, "red": 25, "yellow": 25 },
-      "starThresholds": [75, 150, 220]
-    },
-    {
-      "levelNumber": 5,
-      "title": "Level 05",
-      "moves": 28,
-      "objectives": { "blue": 30, "purple": 30, "red": 30, "yellow": 30 },
-      "starThresholds": [90, 180, 260]
-    }
-  ]
+    "red": { "name": "Red", "primary": "#EB5757", "light": "#F18585", "dark": "#C92B2B", "glow": "rgba(235, 87, 87, 0.6)", "bgHighlight": "rgba(235, 87, 87, 0.32)" },
+    "yellow": { "name": "Yellow", "primary": "#F2C94C", "light": "#F6D97B", "dark": "#CAA020", "glow": "rgba(242, 201, 76, 0.6)", "bgHighlight": "rgba(242, 201, 76, 0.32)" },
+    "green": { "name": "Green", "primary": "#27AE60", "light": "#58D68D", "dark": "#1E8449", "glow": "rgba(39, 174, 96, 0.6)", "bgHighlight": "rgba(39, 174, 96, 0.32)" },
+    "orange": { "name": "Orange", "primary": "#F2994A", "light": "#F6B579", "dark": "#C86E1D", "glow": "rgba(242, 153, 74, 0.6)", "bgHighlight": "rgba(242, 153, 74, 0.32)" },
+    "purple": { "name": "Purple", "primary": "#9B51E0", "light": "#BA80EC", "dark": "#752BBA", "glow": "rgba(155, 81, 224, 0.6)", "bgHighlight": "rgba(155, 81, 224, 0.32)" },
+    "mixed": { "name": "Wildcard", "primary": "#F2C94C", "light": "#FFFFFF", "dark": "#9B51E0", "glow": "rgba(242, 201, 76, 0.8)", "bgHighlight": "rgba(242, 201, 76, 0.4)" }
+  }
 }
-

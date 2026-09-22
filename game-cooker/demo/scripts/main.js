@@ -1,4 +1,14 @@
 /**
+ * =========================================================
+ * GLOBAL GAME CONFIGURATION
+ * =========================================================
+ * Change this value to adjust the game timer duration (in seconds).
+ * Default: 300 seconds (5 minutes).
+ * Modifying this variable will update the timer for game levels.
+ */
+window.GAME_TIMER_SECONDS = 300;
+
+/**
  * Construct 3 Main Controller & Canvas Renderer
  */
 class GameApp {
@@ -22,14 +32,14 @@ class GameApp {
     } catch (e) {
       console.warn('Fallback data loading', e);
       this.data = {
-        levels: [
-          { levelNumber: 4, title: 'Level 04', moves: 30, objectives: { blue: 25, purple: 25, red: 25, yellow: 25 }, starThresholds: [75, 150, 220] }
-        ],
         colors: {
-          blue: { primary: '#6EA8FE', light: '#A6CBFF', dark: '#3D7DE0', glow: 'rgba(110, 168, 254, 0.6)', bgHighlight: 'rgba(110, 168, 254, 0.32)' },
-          purple: { primary: '#9D5DE5', light: '#C18FFF', dark: '#7A35C5', glow: 'rgba(157, 93, 229, 0.6)', bgHighlight: 'rgba(157, 93, 229, 0.32)' },
-          red: { primary: '#EE5965', light: '#FF8A93', dark: '#C83845', glow: 'rgba(238, 89, 101, 0.6)', bgHighlight: 'rgba(238, 89, 101, 0.32)' },
-          yellow: { primary: '#F8CF47', light: '#FEE77E', dark: '#D8A618', glow: 'rgba(248, 207, 71, 0.6)', bgHighlight: 'rgba(248, 207, 71, 0.32)' }
+          red: { name: 'Red', primary: '#EB5757', light: '#F18585', dark: '#C92B2B', glow: 'rgba(235, 87, 87, 0.6)', bgHighlight: 'rgba(235, 87, 87, 0.32)' },
+          yellow: { name: 'Yellow', primary: '#F2C94C', light: '#F6D97B', dark: '#CAA020', glow: 'rgba(242, 201, 76, 0.6)', bgHighlight: 'rgba(242, 201, 76, 0.32)' },
+          green: { name: 'Green', primary: '#27AE60', light: '#58D68D', dark: '#1E8449', glow: 'rgba(39, 174, 96, 0.6)', bgHighlight: 'rgba(39, 174, 96, 0.32)' },
+          orange: { name: 'Orange', primary: '#F2994A', light: '#F6B579', dark: '#C86E1D', glow: 'rgba(242, 153, 74, 0.6)', bgHighlight: 'rgba(242, 153, 74, 0.32)' },
+          indigo: { name: 'Indigo', primary: '#6C5CE7', light: '#968BED', dark: '#4834D4', glow: 'rgba(108, 92, 231, 0.6)', bgHighlight: 'rgba(108, 92, 231, 0.32)' },
+          purple: { name: 'Purple', primary: '#9B51E0', light: '#BA80EC', dark: '#752BBA', glow: 'rgba(155, 81, 224, 0.6)', bgHighlight: 'rgba(155, 81, 224, 0.32)' },
+          mixed: { name: 'Rainbow Star', primary: '#F2C94C', light: '#FFFFFF', dark: '#9B51E0', glow: 'rgba(242, 201, 76, 0.8)', bgHighlight: 'rgba(242, 201, 76, 0.4)' }
         }
       };
     }
@@ -38,8 +48,9 @@ class GameApp {
     await this.preloadImages();
 
     // 3. Initialize core systems
-    this.gameState = new GameState(this.data.levels, 3); // Level 4
+    this.gameState = new GameState();
     this.board = new Board();
+    this.board.initBoard(this.gameState.activeColors);
     this.audioEngine = new AudioEngine();
     this.physics = new Physics();
     this.particleSystem = new ParticleSystem();
@@ -48,7 +59,7 @@ class GameApp {
     this.initCanvasAndInput();
     this.initScaling();
 
-    this.gameState.loadLevel(this.gameState.currentLevelIndex);
+    this.gameState.startPlaying();
     this.isLoaded = true;
 
     requestAnimationFrame(this.gameLoop.bind(this));
@@ -56,7 +67,8 @@ class GameApp {
 
   preloadImages() {
     const imageFiles = [
-      'dot_blue', 'dot_purple', 'dot_red', 'dot_yellow', 'dot_highlight',
+      'dot_red', 'dot_yellow', 'dot_green', 'dot_orange', 'dot_purple',
+      'dot_mixed', 'mixed_box', 'dot_highlight',
       'icon_moves', 'icon_trophy', 'icon_coin', 'icon_check', 'icon_pause',
       'icon_sound_on', 'icon_sound_off', 'icon_play', 'icon_close', 'icon_video',
       'star_filled', 'star_empty', 'btn_green'
@@ -85,8 +97,7 @@ class GameApp {
       this.appEl,
       this.gameState,
       this.audioEngine,
-      this.restartCurrentLevel.bind(this),
-      this.advanceNextLevel.bind(this)
+      this.restartGame.bind(this)
     );
   }
 
@@ -102,7 +113,8 @@ class GameApp {
       this.gameState,
       this.audioEngine,
       this.particleSystem,
-      this.data.colors
+      this.data.colors,
+      this.uiManager
     );
   }
 
@@ -126,16 +138,14 @@ class GameApp {
     updateScale();
   }
 
-  restartCurrentLevel() {
-    this.board.initBoard();
+  restartGame() {
+    this.gameState.restartGame();
+    this.board.initBoard(this.gameState.activeColors);
     this.particleSystem.clear();
-    this.gameState.restartLevel();
   }
 
-  advanceNextLevel() {
-    this.board.initBoard();
-    this.particleSystem.clear();
-    this.gameState.nextLevel();
+  restartCurrentLevel() {
+    this.restartGame();
   }
 
   gameLoop(time) {
@@ -143,6 +153,14 @@ class GameApp {
 
     const dt = Math.min((time - this.lastTime) / 1000, 0.1);
     this.lastTime = time;
+
+    if (this.gameState.status === 'playing') {
+      this.gameState.updateTimer(dt);
+    }
+
+    if (this.uiManager) {
+      this.uiManager.updateTimer(this.gameState.timeRemaining);
+    }
 
     this.physics.update(this.board, dt);
     this.particleSystem.update(dt);
@@ -274,7 +292,9 @@ class GameApp {
         if (!tile || tile.alpha <= 0.01) continue;
 
         let scale = tile.scale;
-        if (board.isSquareMode && tile.color === board.activeColor && !tile.isClearing) {
+        if (tile.color === 'mixed' && !tile.isClearing) {
+          scale *= 1 + Math.sin(now * 0.007 + (r * 2 + c)) * 0.06;
+        } else if (board.isSquareMode && tile.color === board.activeColor && !tile.isClearing) {
           scale *= 1 + Math.sin(now * 0.01 + (r + c) * 0.3) * 0.08;
         }
 
@@ -283,11 +303,11 @@ class GameApp {
         ctx.scale(scale, scale);
         ctx.globalAlpha = tile.alpha;
 
-        const sprite = this.images[`dot_${tile.color}`];
+        const sprite = this.images[`dot_${tile.color}`] || (tile.color === 'mixed' ? this.images['mixed_box'] : null);
         if (sprite) {
           ctx.drawImage(sprite, -dotSize / 2, -dotSize / 2, dotSize, dotSize);
         } else {
-          const theme = colors[tile.color] || { primary: '#6EA8FE' };
+          const theme = colors[tile.color] || { primary: '#F2C94C' };
           ctx.fillStyle = theme.primary;
           this.drawRoundedRect(ctx, -dotSize / 2, -dotSize / 2, dotSize, dotSize, 26);
           ctx.fill();

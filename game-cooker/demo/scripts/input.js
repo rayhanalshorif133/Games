@@ -2,13 +2,14 @@
  * Construct 3 Input Handler
  */
 class InputHandler {
-  constructor(canvas, board, gameState, audioEngine, particleSystem, colorsConfig) {
+  constructor(canvas, board, gameState, audioEngine, particleSystem, colorsConfig, uiManager = null) {
     this.canvas = canvas;
     this.board = board;
     this.gameState = gameState;
     this.audioEngine = audioEngine;
     this.particleSystem = particleSystem;
     this.colorsConfig = colorsConfig;
+    this.uiManager = uiManager;
 
     this.isDragging = false;
     this.dragPos = null;
@@ -97,40 +98,95 @@ class InputHandler {
     }
 
     const pathLength = this.board.path.length;
-    const { clearedTiles, isSquare, color } = this.board.endPath();
+    const { clearedTiles, isSquare, color, mixedCount } = this.board.endPath();
 
     if (clearedTiles.length > 0 && color) {
-      this.gameState.decrementMoves();
-
       const baseScore = clearedTiles.length * 10;
       const bonusScore = isSquare ? 50 : Math.max(0, (pathLength - 2) * 5);
-      this.gameState.addScore(baseScore + bonusScore);
+      const mixedBonus = (mixedCount || 0) * 100;
+      this.gameState.addScore(baseScore + bonusScore + mixedBonus);
 
-      this.gameState.updateObjectives({ [color]: clearedTiles.length });
+      if (mixedBonus > 0) {
+        this.audioEngine.playCoin();
+        this.particleSystem.emitFloatingText(540, 560, `+${mixedBonus} WILDCARD BONUS!`, '#F2C94C');
+      }
 
       const theme = this.colorsConfig[color] || { primary: '#6EA8FE' };
 
       if (isSquare) {
         this.audioEngine.playSquareBurst();
-        for (const t of clearedTiles) {
-          this.particleSystem.emitDotBurst(t.x, t.y, theme.primary, 12);
-        }
       } else {
         this.audioEngine.playPop(1.0);
-        for (const t of clearedTiles) {
-          this.particleSystem.emitDotBurst(t.x, t.y, theme.primary, 8);
+      }
+
+      // 1. Emit local dot bursts & Flying orbs heading to matching target slot in footer
+      clearedTiles.forEach((t, idx) => {
+        this.particleSystem.emitDotBurst(t.x, t.y, theme.primary, isSquare ? 12 : 8);
+
+        const orbColor = t.color === 'mixed' ? color : t.color;
+        const targetPos = this.uiManager
+          ? this.uiManager.getColorSlotCanvasPos(orbColor)
+          : { x: 540, y: 1835 };
+
+        this.particleSystem.emitFlyingOrb(
+          t.x,
+          t.y,
+          targetPos.x,
+          targetPos.y,
+          theme.primary,
+          () => {
+            if (this.uiManager) {
+              this.uiManager.pulseColorSlot(orbColor);
+            }
+          },
+          idx * 0.035
+        );
+      });
+
+      // 2. Check color box counter & bonus wipe
+      const targetResult = this.gameState.updateColorTarget(color, clearedTiles.length);
+      if (targetResult.completed) {
+        this.audioEngine.playVictoryFanfare();
+        
+        // Trigger 100% full glass exit and new glass entry
+        if (this.uiManager) {
+          this.uiManager.animateGlassCompletion(targetResult.oldColor, targetResult.newColor);
         }
+
+        // Update board's active spawning pool with the new color
+        this.board.replaceActiveColor(targetResult.oldColor, targetResult.newColor);
+
+        const newTheme = this.colorsConfig[targetResult.newColor] || theme;
+        this.particleSystem.emitFloatingText(540, 440, `+${targetResult.bonusPoints} BONUS!`, theme.primary);
+        this.particleSystem.emitFloatingText(540, 495, `NEW: ${targetResult.newColorName.toUpperCase()}`, newTheme.primary);
+
+        // Vanish all remaining dots of the completed color across the entire board
+        const extraCleared = this.board.clearAllOfColor(targetResult.oldColor);
+        const oldTargetPos = this.uiManager
+          ? this.uiManager.getColorSlotCanvasPos(targetResult.oldColor)
+          : { x: 540, y: 1835 };
+
+        extraCleared.forEach((t, idx) => {
+          this.particleSystem.emitDotBurst(t.x, t.y, theme.primary, 14);
+          this.particleSystem.emitFlyingOrb(
+            t.x,
+            t.y,
+            oldTargetPos.x,
+            oldTargetPos.y,
+            theme.primary,
+            () => {
+              if (this.uiManager) {
+                this.uiManager.pulseColorSlot(targetResult.oldColor);
+              }
+            },
+            idx * 0.025
+          );
+        });
       }
 
       setTimeout(() => {
         this.board.dropAndRefill();
         this.audioEngine.playLandingThud();
-
-        const isGameOver = this.gameState.checkWinCondition();
-        if (isGameOver && this.gameState.status === 'won') {
-          this.audioEngine.playVictoryFanfare();
-          this.particleSystem.emitConfettiCannon();
-        }
 
         if (this.onActionComplete) {
           this.onActionComplete();

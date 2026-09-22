@@ -1,43 +1,39 @@
 /**
- * Construct 3 Game State Manager
+ * Construct 3 Game State Manager (6-Color Palette Rotation)
  */
 class GameState {
-  constructor(levelsData, initialLevelIndex = 3) {
-    this.levelsData = levelsData || [];
-    this.currentLevelIndex = initialLevelIndex;
-    this.currentLevel = this.levelsData[this.currentLevelIndex] || this.levelsData[0];
-    this.movesRemaining = 0;
+  constructor() {
     this.score = 0;
-    this.levelScore = 0;
+    this.highScore = parseInt(localStorage.getItem('dots_high_score') || '0', 10);
     this.coins = 150;
-    this.objectives = { blue: 0, purple: 0, red: 0, yellow: 0 };
-    this.initialObjectives = { blue: 0, purple: 0, red: 0, yellow: 0 };
-    this.status = 'start_modal';
-    this.starsEarned = 0;
-    this.lastGainedCoins = 27;
-    this.lastGainedScore = 94;
-    this.isVideoRewardClaimed = false;
+    this.status = 'playing';
+    this.lossReason = null;
+    this.timerDuration = (typeof window !== 'undefined' && typeof window.GAME_TIMER_SECONDS === 'number') 
+      ? window.GAME_TIMER_SECONDS 
+      : 300;
+    this.timeRemaining = this.timerDuration;
+    this.targetQuota = 15;
+
+    // 5-Color Palette (Red, Yellow, Green, Orange, Purple)
+    this.colorPalette = ['red', 'yellow', 'green', 'orange', 'purple'];
+    this.paletteNames = {
+      red: 'Red',
+      yellow: 'Yellow',
+      green: 'Green',
+      orange: 'Orange',
+      purple: 'Purple'
+    };
+
+    // Active 4 colors
+    this.activeColors = ['red', 'yellow', 'green', 'orange'];
+    this.colorTargets = {
+      red: this.targetQuota,
+      yellow: this.targetQuota,
+      green: this.targetQuota,
+      orange: this.targetQuota
+    };
+
     this.onStateChanged = null;
-
-    this.loadLevel(this.currentLevelIndex);
-  }
-
-  loadLevel(index) {
-    if (index >= this.levelsData.length) {
-      index = 0;
-    }
-    this.currentLevelIndex = index;
-    this.currentLevel = this.levelsData[index];
-    this.movesRemaining = this.currentLevel.moves;
-    this.levelScore = 0;
-    this.starsEarned = 0;
-    this.isVideoRewardClaimed = false;
-
-    this.objectives = { ...this.currentLevel.objectives };
-    this.initialObjectives = { ...this.currentLevel.objectives };
-    this.status = 'start_modal';
-
-    this.notify();
   }
 
   startPlaying() {
@@ -59,93 +55,106 @@ class GameState {
     }
   }
 
-  restartLevel() {
-    this.loadLevel(this.currentLevelIndex);
+  restartGame() {
+    this.score = 0;
+    this.timerDuration = (typeof window !== 'undefined' && typeof window.GAME_TIMER_SECONDS === 'number') 
+      ? window.GAME_TIMER_SECONDS 
+      : 300;
+    this.timeRemaining = this.timerDuration;
+    this.activeColors = ['red', 'yellow', 'green', 'orange'];
+    this.colorTargets = {
+      red: this.targetQuota,
+      yellow: this.targetQuota,
+      green: this.targetQuota,
+      orange: this.targetQuota
+    };
+    this.status = 'playing';
+    this.lossReason = null;
+    this.notify();
   }
 
-  nextLevel() {
-    this.loadLevel((this.currentLevelIndex + 1) % this.levelsData.length);
+  restartLevel() {
+    this.restartGame();
+  }
+
+  loadLevel() {
+    this.restartGame();
   }
 
   addScore(points) {
     this.score += points;
-    this.levelScore += points;
-    this.notify();
-  }
-
-  decrementMoves() {
-    if (this.movesRemaining > 0) {
-      this.movesRemaining--;
-      this.notify();
-      return true;
+    if (this.score > this.highScore) {
+      this.highScore = this.score;
+      try {
+        localStorage.setItem('dots_high_score', this.highScore.toString());
+      } catch (e) {}
     }
-    return false;
-  }
-
-  addExtraMoves(count = 5) {
-    this.movesRemaining += count;
-    this.status = 'playing';
     this.notify();
   }
 
-  updateObjectives(clearedMap) {
-    let anyChanged = false;
-    for (const color in clearedMap) {
-      const count = clearedMap[color] || 0;
-      if (count > 0 && this.objectives[color] > 0) {
-        this.objectives[color] = Math.max(0, this.objectives[color] - count);
-        anyChanged = true;
+  getNextAvailableColor(excludeColor) {
+    const available = this.colorPalette.filter(
+      (c) => !this.activeColors.includes(c) && c !== excludeColor
+    );
+    if (available.length > 0) {
+      const idx = Math.floor(Math.random() * available.length);
+      return available[idx];
+    }
+    const anyOther = this.colorPalette.filter((c) => c !== excludeColor);
+    return anyOther[Math.floor(Math.random() * anyOther.length)] || this.colorPalette[0];
+  }
+
+  updateColorTarget(color, count) {
+    if (typeof this.colorTargets[color] !== 'number') {
+      return { completed: false };
+    }
+
+    this.colorTargets[color] = Math.max(0, this.colorTargets[color] - count);
+    
+    if (this.colorTargets[color] <= 0) {
+      const bonusPoints = 200;
+      this.addScore(bonusPoints);
+
+      // Rotate to a new color from the palette
+      const newColor = this.getNextAvailableColor(color);
+      const oldColorIdx = this.activeColors.indexOf(color);
+      if (oldColorIdx !== -1) {
+        this.activeColors[oldColorIdx] = newColor;
       }
-    }
-    if (anyChanged) {
+      delete this.colorTargets[color];
+      this.colorTargets[newColor] = this.targetQuota;
+
       this.notify();
+      return { 
+        completed: true, 
+        bonusPoints, 
+        oldColor: color, 
+        newColor: newColor,
+        newColorName: this.paletteNames[newColor] || newColor
+      };
     }
+
+    this.notify();
+    return { completed: false };
   }
 
-  checkWinCondition() {
-    const allDone = Object.values(this.objectives).every((req) => req <= 0);
-    if (allDone) {
-      this.calculateStarsAndRewards();
-      this.status = 'won';
-      this.notify();
-      return true;
-    }
+  updateTimer(dt) {
+    if (this.status !== 'playing') return;
 
-    if (this.movesRemaining <= 0) {
+    this.timeRemaining = Math.max(0, this.timeRemaining - dt);
+    if (this.timeRemaining <= 0) {
+      this.timeRemaining = 0;
       this.status = 'lost';
+      this.lossReason = 'timeout';
       this.notify();
-      return false;
     }
-
-    return false;
   }
 
-  calculateStarsAndRewards() {
-    const [t1, t2, t3] = this.currentLevel.starThresholds;
-    if (this.levelScore >= t3) {
-      this.starsEarned = 3;
-    } else if (this.levelScore >= t2) {
-      this.starsEarned = 2;
-    } else {
-      this.starsEarned = 1;
-    }
-
-    const baseCoins = 20 + this.currentLevel.levelNumber * 2;
-    const bonusCoins = this.movesRemaining * 3;
-    this.lastGainedCoins = baseCoins + bonusCoins;
-    this.lastGainedScore = this.levelScore > 0 ? this.levelScore : 94;
-    this.coins += this.lastGainedCoins;
-  }
-
-  claimDoubleVideoReward() {
-    if (!this.isVideoRewardClaimed) {
-      this.isVideoRewardClaimed = true;
-      this.coins += this.lastGainedCoins;
-      this.lastGainedCoins *= 2;
-      this.notify();
-      return this.lastGainedCoins;
-    }
-    return this.lastGainedCoins;
+  addExtraTime(seconds = 60) {
+    this.timeRemaining += seconds;
+    this.status = 'playing';
+    this.lossReason = null;
+    this.notify();
   }
 
   notify() {
@@ -156,4 +165,3 @@ class GameState {
 }
 
 window.GameState = GameState;
-
