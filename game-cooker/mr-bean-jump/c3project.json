@@ -1,0 +1,39 @@
+{
+  "projectSettings": {
+    "name": "MrBeanJump",
+    "version": "1.0.0.0",
+    "author": "Antigravity Game Cooker",
+    "description": "Mr. Bean Jump - Stack Jump Arcade Game in 1080x1920 layout",
+    "viewportWidth": 1080,
+    "viewportHeight": 1920,
+    "viewportFit": "cover",
+    "fullscreenMode": "letterbox-scale",
+    "orientations": "portrait",
+    "sampling": "bilinear",
+    "framerateMode": "vsync",
+    "pixelRounding": true
+  },
+  "layouts": [
+    {
+      "name": "GameLayout",
+      "width": 1080,
+      "height": 1920,
+      "layers": [
+        { "name": "Background", "parallaxX": 0.2, "parallaxY": 0.2 },
+        { "name": "Game", "parallaxX": 1.0, "parallaxY": 1.0 },
+        { "name": "HUD", "parallaxX": 0.0, "parallaxY": 0.0 }
+      ]
+    }
+  ],
+  "objectTypes": [
+    { "name": "MrBean", "plugin-id": "Sprite", "animations": ["idle", "jump1", "jump2", "jump3", "fall"] },
+    { "name": "Crate", "plugin-id": "Sprite", "animations": ["wood", "gold"] },
+    { "name": "Cloud", "plugin-id": "Sprite" },
+    { "name": "Bush", "plugin-id": "Sprite" },
+    { "name": "ParticleDust", "plugin-id": "Particles" },
+    { "name": "ParticleSparkle", "plugin-id": "Particles" },
+    { "name": "ScoreText", "plugin-id": "Text" },
+    { "name": "AudioEngine", "plugin-id": "Audio" }
+  ]
+}
+

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Mr. Bean Jump - 1080x1920 Arcade Stack Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <!-- Main HTML5 Canvas (Internal 1080 x 1920) -->
+        <canvas id="gameCanvas" width="1080" height="1920"></canvas>
+
+        <!-- Top Right Control Buttons -->
+        <div class="top-controls">
+            <button id="sound-btn" class="icon-btn" title="Toggle Sound">🔊</button>
+            <button id="pause-btn" class="icon-btn" title="Pause Game">⏸️</button>
+        </div>
+
+        <!-- Start Menu Overlay -->
+        <div id="menu-overlay" class="overlay" style="display: flex;">
+            <div class="card">
+                <div class="hero-preview"></div>
+                <h1>MR. BEAN JUMP</h1>
+                <p>Time your jumps perfectly and stack the crates as high as possible!</p>
+                <button id="start-btn" class="btn-primary">TAP TO PLAY</button>
+                <div class="instruction-text">Tap Screen or Press [SPACE] to Jump</div>
+            </div>
+        </div>
+
+        <!-- Game Over Overlay -->
+        <div id="gameover-overlay" class="overlay">
+            <div class="card">
+                <h2>GAME OVER!</h2>
+                <div class="score-board">
+                    <div class="score-item">
+                        <span class="score-label">Score</span>
+                        <span id="final-score-val" class="score-val">0</span>
+                    </div>
+                    <div class="score-item">
+                        <span class="score-label">Best</span>
+                        <span id="best-score-val" class="score-val highlight">0</span>
+                    </div>
+                </div>
+                <button id="restart-btn" class="btn-primary">PLAY AGAIN</button>
+                <div class="instruction-text">Tap or Press [SPACE] to Restart</div>
+            </div>
+        </div>
+
+        <!-- Pause Overlay -->
+        <div id="pause-overlay" class="overlay">
+            <div class="card">
+                <h1>PAUSED</h1>
+                <p>Take a breath! Mr. Bean is waiting on top of the crates.</p>
+                <button class="btn-primary" onclick="window.Game?.togglePause()">RESUME</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio and Game Logic Scripts -->
+    <script src="scripts/audio.js"></script>
+    <script src="scripts/game.js"></script>
+</body>
+</html>
+
