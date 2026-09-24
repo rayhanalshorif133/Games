@@ -1,6 +1,7 @@
 /**
  * Player Car Entity & Controller
- * Implements smooth vehicle dynamics, tilt rotation, steering, nitro boost, and fuel consumption.
+ * Implements smooth vehicle dynamics, progressive speed acceleration, steering,
+ * nitro inventory boost system, fuel consumption, and dramatic crash explosions with airborne flying physics.
  */
 
 class Player {
@@ -18,6 +19,11 @@ class Player {
         this.vx = 0;
         this.targetX = 540;
         this.speed = 0;          // Current road scrolling speed (pixels / frame)
+        this.baseMinSpeed = 6;
+        this.baseNormalSpeed = 16;
+        this.baseTopSpeed = 26;
+        this.baseNitroSpeed = 38;
+
         this.minSpeed = 6;
         this.normalSpeed = 16;
         this.topSpeed = 26;
@@ -30,10 +36,11 @@ class Player {
         this.maxFuel = 100;
         this.fuelBurnRate = 0.045; // Depletes over ~35-40 seconds if no fuel picked up
 
-        this.nitro = 100;
-        this.maxNitro = 100;
-        this.isNitroActive = false;
+        // Nitro Count System (Starts with 1 default nitro charge)
+        this.nitroCount = 1;
+        this.nitroDuration = 180; // 3 seconds boost at 60fps
         this.nitroTimer = 0;
+        this.isNitroActive = false;
 
         this.hasShield = false;
         this.shieldTimer = 0;
@@ -45,48 +52,77 @@ class Player {
         this.spinAngle = 0;
         this.spinTimer = 0;
 
+        // Crash and Airborne Physics
+        this.isAirborne = false;
+        this.airborneTimer = 0;
+        this.airborneDuration = 60;
+        this.flyVx = 0;
+        this.flyVy = 0;
+        this.altitude = 0;
+        this.gravity = 0.85;
+        this.tumbleAngle = 0;
+        this.spinSpeed = 0;
+        this.crashReason = '';
+
         this.isAlive = true;
         this.distance = 0;
         this.score = 0;
         this.coins = 0;
     }
 
+    canUseNitro() {
+        return this.nitroCount > 0 && !this.isNitroActive && this.isAlive && !this.isAirborne;
+    }
+
     activateNitro() {
-        if (this.nitro >= 25 && !this.isNitroActive && this.isAlive) {
+        if (this.canUseNitro()) {
+            this.nitroCount--;
             this.isNitroActive = true;
-            this.nitroTimer = 180; // 3 seconds at 60fps
+            this.nitroTimer = this.nitroDuration;
             window.soundManager.playNitro();
+            this.game.particles.addScorePopup(this.x, this.y - 60, "⚡ NITRO BOOST!", "#00f0ff");
+        } else if (this.nitroCount <= 0 && this.isAlive && !this.isAirborne) {
+            this.game.particles.addScorePopup(this.x, this.y - 60, "NO NITRO BOTTLES!", "#ef476f");
         }
+    }
+
+    addNitro(amount = 1) {
+        this.nitroCount += amount;
+        this.score += 2; // +2 for pickup
+        window.soundManager.playFuel();
+        this.game.particles.addScorePopup(this.x, this.y - 60, `⚡ +2 NITRO! (x${this.nitroCount})`, "#00f0ff");
     }
 
     addFuel(amount = 35) {
         this.fuel = MathUtils.clamp(this.fuel + amount, 0, this.maxFuel);
+        this.score += 2; // +2 for pickup
         window.soundManager.playFuel();
-        this.game.particles.addScorePopup(this.x, this.y - 60, "+FUEL", "#ffaa00");
+        this.game.particles.addScorePopup(this.x, this.y - 60, "+2 FUEL", "#ffaa00");
     }
 
     addCoins(amount = 1) {
         this.coins += amount;
-        this.score += 50 * amount;
-        this.nitro = MathUtils.clamp(this.nitro + 10, 0, this.maxNitro);
+        this.score += 2 * amount; // +2 for pickup
         window.soundManager.playCoin();
-        this.game.particles.addScorePopup(this.x, this.y - 60, "+50", "#ffd166");
+        this.game.particles.addScorePopup(this.x, this.y - 60, "+2", "#ffd166");
     }
 
     addShield(duration = 600) {
         this.hasShield = true;
         this.shieldTimer = duration;
-        this.game.particles.addScorePopup(this.x, this.y - 60, "SHIELD!", "#48cae4");
+        this.score += 2; // +2 for pickup
+        this.game.particles.addScorePopup(this.x, this.y - 60, "+2 SHIELD!", "#48cae4");
     }
 
     addMagnet(duration = 500) {
         this.hasMagnet = true;
         this.magnetTimer = duration;
-        this.game.particles.addScorePopup(this.x, this.y - 60, "MAGNET!", "#f72585");
+        this.score += 2; // +2 for pickup
+        this.game.particles.addScorePopup(this.x, this.y - 60, "+2 MAGNET!", "#f72585");
     }
 
     triggerOilSpin() {
-        if (this.isSpinning) return;
+        if (this.isSpinning || !this.isAlive) return;
         this.isSpinning = true;
         this.spinTimer = 50;
         window.soundManager.playSkid();
@@ -94,7 +130,48 @@ class Player {
     }
 
     update(input, dt = 1) {
+        // Airborne Flying Car Crash Sequence
+        if (this.isAirborne) {
+            this.airborneTimer++;
+            this.x += this.flyVx;
+            this.flyVy += this.gravity;
+            this.y += this.flyVy;
+            this.altitude = Math.max(0, this.altitude - this.flyVy * 0.9);
+            this.tumbleAngle += this.spinSpeed;
+
+            // Trail thick fiery smoke puffs
+            if (this.airborneTimer % 2 === 0) {
+                this.game.particles.particles.push({
+                    type: 'smoke',
+                    x: this.x + MathUtils.randRange(-15, 15),
+                    y: this.y + MathUtils.randRange(-15, 15),
+                    vx: MathUtils.randRange(-2, 2),
+                    vy: MathUtils.randRange(1, 4),
+                    radius: MathUtils.randRange(18, 30),
+                    maxRadius: 70,
+                    alpha: 0.9,
+                    decay: 0.02,
+                    color: MathUtils.randChoice(['#ff5400', '#2b2d42', '#ffbd00', '#1a1a24'])
+                });
+            }
+
+            if (this.airborneTimer >= this.airborneDuration) {
+                this.isAirborne = false;
+                this.game.particles.addCarExplosion(this.x, this.y);
+                this.game.screenShake = 25;
+                this.game.onGameOver(this.crashReason);
+            }
+            return;
+        }
+
         if (!this.isAlive) return;
+
+        // Progressive speed scaling over distance (car speed dhire dhire barte thakbe)
+        const speedProgression = Math.min(14, (this.distance / 350) * 0.7);
+        this.normalSpeed = this.baseNormalSpeed + speedProgression;
+        this.topSpeed = this.baseTopSpeed + speedProgression;
+        this.nitroSpeed = this.baseNitroSpeed + speedProgression * 1.15;
+        this.minSpeed = this.baseMinSpeed + speedProgression * 0.35;
 
         // Speed management
         let targetSpeed = this.normalSpeed;
@@ -102,13 +179,11 @@ class Player {
         if (this.isNitroActive) {
             targetSpeed = this.nitroSpeed;
             this.nitroTimer--;
-            this.nitro = Math.max(0, this.nitro - 0.55);
-            if (this.nitroTimer <= 0 || this.nitro <= 0) {
+            if (this.nitroTimer <= 0) {
                 this.isNitroActive = false;
             }
         } else if (input.up) {
             targetSpeed = this.topSpeed;
-            this.nitro = MathUtils.clamp(this.nitro + 0.05, 0, this.maxNitro);
         } else if (input.down) {
             targetSpeed = this.minSpeed;
             // Spawn brake skid marks
@@ -124,7 +199,7 @@ class Player {
         // Accelerate / Decelerate smoothly
         this.speed = MathUtils.lerp(this.speed, targetSpeed, 0.08);
         this.distance += this.speed * 0.15;
-        this.score += Math.floor(this.speed * 0.1);
+        // Automatic score removed: score is only awarded for overtaking, blasting, and pickups!
 
         // Sound engine update
         const speedRatio = (this.speed - this.minSpeed) / (this.nitroSpeed - this.minSpeed);
@@ -180,13 +255,12 @@ class Player {
         const targetTilt = (this.vx / steerSpeed) * 0.14;
         this.angle = MathUtils.lerp(this.angle, targetTilt, this.tiltSmooth);
 
-        // Road Boundaries (between x=300 and x=780)
+        // Road Boundaries (between x=330 and x=750)
         const roadMinX = 330;
         const roadMaxX = 750;
         if (this.x < roadMinX) {
             this.x = roadMinX;
             this.vx = 0;
-            // Offroad drag
             this.speed = Math.max(this.minSpeed, this.speed * 0.95);
         }
         if (this.x > roadMaxX) {
@@ -220,12 +294,60 @@ class Player {
         this.speed = 0;
         window.soundManager.stopEngine();
         window.soundManager.playCrash();
-        this.game.particles.addSparks(this.x, this.y, 40);
-        this.game.onGameOver(reason);
+
+        // 1. Massive Explosion shockwave & sparks & shrapnel!
+        this.game.particles.addCarExplosion(this.x, this.y);
+        this.game.screenShake = 45;
+
+        // 2. Launch car into airborne flying arc ("car ure chole jacche")
+        this.isAirborne = true;
+        this.airborneTimer = 0;
+        this.airborneDuration = 60;
+        this.flyVx = (Math.random() - 0.5) * 16;
+        this.flyVy = -26; // High launch upwards!
+        this.altitude = 0;
+        this.gravity = 0.85;
+        this.tumbleAngle = this.angle;
+        this.spinSpeed = (Math.random() > 0.5 ? 1 : -1) * (0.2 + Math.random() * 0.15);
+        this.crashReason = reason;
     }
 
     draw(ctx) {
         ctx.save();
+
+        if (this.isAirborne) {
+            // 1. Ground shadow far below
+            const shadowScale = Math.max(0.4, 1.0 - (this.altitude * 0.003));
+            ctx.fillStyle = 'rgba(20, 25, 15, 0.45)';
+            ctx.beginPath();
+            ctx.ellipse(this.x, this.y + this.altitude + 50, this.w * 0.45 * shadowScale, this.h * 0.25 * shadowScale, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 2. Flying Car Chassis scaling up (closer to camera)
+            const scale = 1.0 + Math.min(0.8, this.altitude * 0.004);
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.tumbleAngle);
+            ctx.scale(scale, scale);
+
+            const sprite = this.game.assets.images["car_red.png"];
+            if (sprite) {
+                ctx.drawImage(sprite, -this.w / 2, -this.h / 2, this.w, this.h);
+            }
+
+            // Fiery radial glow around burning airborne wreck
+            const fireGrad = ctx.createRadialGradient(0, 0, 10, 0, 0, this.h * 0.6);
+            fireGrad.addColorStop(0, 'rgba(255, 200, 0, 0.6)');
+            fireGrad.addColorStop(0.5, 'rgba(255, 70, 0, 0.4)');
+            fireGrad.addColorStop(1, 'rgba(255, 0, 0, 0.0)');
+            ctx.fillStyle = fireGrad;
+            ctx.beginPath();
+            ctx.arc(0, 0, this.h * 0.6, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+            return;
+        }
+
         ctx.translate(this.x, this.y);
         ctx.rotate(this.angle + (this.isSpinning ? this.spinAngle : 0));
 

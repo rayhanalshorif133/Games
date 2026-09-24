@@ -1,13 +1,15 @@
 /**
  * UI & HUD Manager - Faithful replication of demo.png
  * Renders Header Bar with Score, Distance/Best, Fuel & Nitro meters, Golden Star Coin counter,
- * Speedometer Badge (MPH), and realistic Metallic 3D Brake & Nitro touch buttons.
+ * Speedometer Badge (MPH), interactive Metallic 3D Brake & Nitro touch buttons with availability states,
+ * Game Over popup with "TRY AGAIN" and "BACK TO HOME" navigation,
+ * and Pause popup with "RESUME", "RESTART", "BACK TO HOME", and top-right close cross.
  */
 
 class UIManager {
     constructor(game) {
         this.game = game;
-        this.highScore = parseInt(localStorage.getItem('lltt_highscore') || '1020', 10);
+        this.highScore = parseInt(localStorage.getItem('lltt_highscore') || '25', 10);
         
         // Touch Hitboxes aligned precisely with visual positions
         this.touchControls = {
@@ -17,11 +19,23 @@ class UIManager {
             nitroGauge: { x: 980, y: 68, w: 160, h: 80 },
             brakeBtn: { x: 185, y: 1710, r: 135, w: 270, h: 270 },
             boostBtn: { x: 895, y: 1710, r: 135, w: 270, h: 270 },
-            speedBadge: { x: 540, y: 1865, w: 190, h: 110 }
+            speedBadge: { x: 540, y: 1865, w: 190, h: 110 },
+            gameOverCloseBtn: { x: 860, y: 620, r: 34 },
+            gameOverPlayAgainBtn: { x: 540, y: 1120, w: 480, h: 96 },
+            gameOverHomeBtn: { x: 540, y: 1245, w: 480, h: 96 },
+            pauseCloseBtn: { x: 830, y: 635, r: 32 },
+            pauseResumeBtn: { x: 540, y: 790, w: 480, h: 86 },
+            pauseRestartBtn: { x: 540, y: 900, w: 480, h: 86 },
+            pauseHomeBtn: { x: 540, y: 1010, w: 480, h: 86 }
         };
 
         this.isBrakePressed = false;
         this.isNitroPressed = false;
+        this.coinBump = 1.0;
+    }
+
+    triggerCoinBump() {
+        this.coinBump = 1.5;
     }
 
     saveHighScore(score) {
@@ -93,13 +107,18 @@ class UIManager {
         ctx.fill();
         ctx.restore();
 
-        // --- COIN COUNTER (Left-Center) ---
+        // --- COIN COUNTER (Left-Center with dynamic spring bounce) ---
+        this.coinBump = MathUtils.lerp(this.coinBump, 1.0, 0.12);
         const coinImg = this.game.assets.images['hud_coin.png'];
         if (coinImg) {
-            ctx.drawImage(coinImg, 150, pb.y - 28, 56, 56);
+            ctx.save();
+            ctx.translate(178, pb.y);
+            ctx.scale(this.coinBump, this.coinBump);
+            ctx.drawImage(coinImg, -28, -28, 56, 56);
+            ctx.restore();
         }
 
-        ctx.fillStyle = '#3e3428';
+        ctx.fillStyle = this.coinBump > 1.1 ? '#e76f51' : '#3e3428';
         ctx.font = '900 42px "Segoe UI", Arial, sans-serif';
         ctx.textAlign = 'left';
         ctx.textBaseline = 'middle';
@@ -156,18 +175,17 @@ class UIManager {
             ctx.drawImage(fuelIcon, 755, 78, 28, 28);
         }
         ctx.font = '900 24px "Segoe UI", Arial, sans-serif';
-        ctx.fillStyle = '#483e33';
+        ctx.fillStyle = fuelRatio < 0.25 ? '#ef476f' : '#483e33';
         ctx.textAlign = 'left';
         ctx.fillText(`${Math.round(fuelRatio * 100)}%`, 792, 100);
 
         // --- NITRO GAUGE (Far-Right) ---
-        const nitroRatio = MathUtils.clamp(p.nitro / p.maxNitro, 0, 1);
         const nitroCenterX = 980;
 
         ctx.font = '900 24px "Segoe UI", Arial, sans-serif';
-        ctx.fillStyle = '#483e33';
+        ctx.fillStyle = p.isNitroActive ? '#00b4d8' : '#483e33';
         ctx.textAlign = 'center';
-        ctx.fillText('NITRO', nitroCenterX, 36);
+        ctx.fillText(p.isNitroActive ? '🔥 BOOSTING' : `NITRO (×${p.nitroCount})`, nitroCenterX, 36);
 
         // Nitro Capsule Track
         const nbx = 905, nby = 46, nbw = 150, nbh = 22, nbr = 11;
@@ -179,7 +197,14 @@ class UIManager {
         ctx.lineWidth = 1.5;
         ctx.stroke();
 
-        // Nitro Fill Gradient (Teal to Cyan Mint)
+        // Nitro Fill: If active, shows countdown bar. If not active, shows full bar if nitroCount > 0
+        let nitroRatio = 0;
+        if (p.isNitroActive) {
+            nitroRatio = MathUtils.clamp(p.nitroTimer / p.nitroDuration, 0, 1);
+        } else if (p.nitroCount > 0) {
+            nitroRatio = 1.0;
+        }
+
         if (nitroRatio > 0.02) {
             ctx.save();
             ctx.beginPath();
@@ -187,22 +212,37 @@ class UIManager {
             ctx.clip();
 
             const nGrad = ctx.createLinearGradient(nbx, 0, nbx + nbw, 0);
-            nGrad.addColorStop(0, '#36a6b8');
-            nGrad.addColorStop(1, '#8de0db');
+            if (p.isNitroActive) {
+                nGrad.addColorStop(0, '#00b4d8');
+                nGrad.addColorStop(1, '#90e0ef');
+            } else {
+                nGrad.addColorStop(0, '#36a6b8');
+                nGrad.addColorStop(1, '#8de0db');
+            }
             ctx.fillStyle = nGrad;
             ctx.fillRect(nbx + 2, nby + 2, (nbw - 4) * nitroRatio, nbh - 4);
             ctx.restore();
         }
 
-        // Nitro Icon & Percentage
+        // Nitro Icon & Percentage / Count
         const nitroIcon = this.game.assets.images['hud_nitro_icon.png'];
         if (nitroIcon) {
-            ctx.drawImage(nitroIcon, 928, 78, 28, 28);
+            ctx.drawImage(nitroIcon, 924, 78, 28, 28);
         }
         ctx.font = '900 24px "Segoe UI", Arial, sans-serif';
-        ctx.fillStyle = '#483e33';
-        ctx.textAlign = 'left';
-        ctx.fillText(`${Math.round(nitroRatio * 100)}%`, 964, 100);
+        if (p.isNitroActive) {
+            ctx.fillStyle = '#00b4d8';
+            ctx.textAlign = 'left';
+            ctx.fillText(`${Math.ceil((p.nitroTimer / p.nitroDuration) * 100)}%`, 958, 100);
+        } else if (p.nitroCount > 0) {
+            ctx.fillStyle = '#1b7a63';
+            ctx.textAlign = 'left';
+            ctx.fillText(`× ${p.nitroCount} READY`, 958, 100);
+        } else {
+            ctx.fillStyle = '#ef476f';
+            ctx.textAlign = 'left';
+            ctx.fillText(`× 0 (EMPTY)`, 958, 100);
+        }
     }
 
     drawSpeedometer(ctx, p) {
@@ -217,7 +257,7 @@ class UIManager {
         ctx.fill();
 
         // Speed Number
-        ctx.fillStyle = '#fbf2d8';
+        ctx.fillStyle = p.isNitroActive ? '#00f0ff' : '#fbf2d8';
         ctx.font = '900 66px "Segoe UI", Arial, sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'alphabetic';
@@ -246,7 +286,7 @@ class UIManager {
 
         // Active depression overlay
         if (isBraking) {
-            ctx.fillStyle = 'rgba(255, 60, 60, 0.2)';
+            ctx.fillStyle = 'rgba(255, 60, 60, 0.22)';
             ctx.beginPath();
             ctx.arc(0, 0, btn.r * 0.95, 0, Math.PI * 2);
             ctx.fill();
@@ -257,28 +297,157 @@ class UIManager {
 
     drawNitroButton(ctx, p) {
         const btn = this.touchControls.boostBtn;
-        const isNitro = p.isNitroActive || this.game.input.nitro || this.isNitroPressed;
-        const scale = isNitro ? 0.94 : 1.0;
+        const isBoosting = p.isNitroActive;
+        const hasNitro = p.nitroCount > 0;
+        const isPress = this.isNitroPressed || this.game.input.nitro;
+        const scale = (isBoosting || isPress) ? 0.94 : 1.0;
         const sprite = this.game.assets.images['btn_nitro.png'];
 
         ctx.save();
         ctx.translate(btn.x, btn.y);
         ctx.scale(scale, scale);
 
-        if (sprite) {
-            ctx.drawImage(sprite, -btn.w / 2, -btn.h / 2, btn.w, btn.h);
-        }
+        if (!hasNitro && !isBoosting) {
+            // NITRO EMPTY STATE (x0)
+            ctx.globalAlpha = 0.42;
+            if (sprite) {
+                ctx.drawImage(sprite, -btn.w / 2, -btn.h / 2, btn.w, btn.h);
+            }
+            ctx.globalAlpha = 1.0;
 
-        // Active cyan boost glow
-        if (isNitro) {
-            ctx.strokeStyle = 'rgba(0, 240, 255, 0.75)';
-            ctx.lineWidth = 5;
+            // Dark empty mask
+            ctx.fillStyle = 'rgba(15, 20, 25, 0.45)';
+            ctx.beginPath();
+            ctx.arc(0, 0, btn.r * 0.95, 0, Math.PI * 2);
+            ctx.fill();
+
+            // "EMPTY (x0)" Badge Pill
+            ctx.fillStyle = 'rgba(239, 71, 111, 0.88)';
+            ctx.beginPath();
+            ctx.roundRect(-65, btn.r * 0.42, 130, 32, 16);
+            ctx.fill();
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.font = '900 18px "Segoe UI", Arial, sans-serif';
+            ctx.fillStyle = '#ffffff';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText("EMPTY (x0)", 0, btn.r * 0.42 + 16);
+
+            // Counter Badge on Top-Right (0)
+            ctx.fillStyle = '#495057';
+            ctx.beginPath();
+            ctx.arc(btn.r * 0.65, -btn.r * 0.65, 30, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+
+            ctx.font = '900 22px "Segoe UI", Arial, sans-serif';
+            ctx.fillStyle = '#adb5bd';
+            ctx.fillText("0", btn.r * 0.65, -btn.r * 0.65 + 1);
+
+        } else if (isBoosting) {
+            // NITRO BOOSTING ACTIVE STATE
+            if (sprite) {
+                ctx.drawImage(sprite, -btn.w / 2, -btn.h / 2, btn.w, btn.h);
+            }
+
+            // Outer Boost Aura
+            ctx.strokeStyle = 'rgba(0, 240, 255, 0.9)';
+            ctx.lineWidth = 7;
             ctx.shadowColor = '#00f0ff';
-            ctx.shadowBlur = 20;
+            ctx.shadowBlur = 28;
             ctx.beginPath();
             ctx.arc(0, 0, btn.r * 0.98, 0, Math.PI * 2);
             ctx.stroke();
             ctx.shadowBlur = 0;
+
+            // Spinning Dash Arc
+            const spin = Date.now() * 0.009;
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 5;
+            ctx.beginPath();
+            ctx.arc(0, 0, btn.r * 1.05, spin, spin + Math.PI * 1.3);
+            ctx.stroke();
+
+            // "BOOST!" Badge Pill
+            ctx.fillStyle = '#00b4d8';
+            ctx.beginPath();
+            ctx.roundRect(-68, btn.r * 0.42, 136, 32, 16);
+            ctx.fill();
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.font = '900 18px "Segoe UI", Arial, sans-serif';
+            ctx.fillStyle = '#ffffff';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText("⚡ BOOST!", 0, btn.r * 0.42 + 16);
+
+            // Counter Badge on Top-Right
+            ctx.fillStyle = '#00b4d8';
+            ctx.beginPath();
+            ctx.arc(btn.r * 0.65, -btn.r * 0.65, 30, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+
+            ctx.font = '900 22px "Segoe UI", Arial, sans-serif';
+            ctx.fillStyle = '#ffffff';
+            ctx.fillText(`x${p.nitroCount}`, btn.r * 0.65, -btn.r * 0.65 + 1);
+
+        } else {
+            // NITRO READY STATE
+            if (sprite) {
+                ctx.drawImage(sprite, -btn.w / 2, -btn.h / 2, btn.w, btn.h);
+            }
+
+            // Gentle pulsating ready ring
+            const pulse = 1.0 + Math.sin(Date.now() * 0.006) * 0.03;
+            ctx.strokeStyle = 'rgba(0, 212, 255, 0.65)';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.arc(0, 0, btn.r * 0.98 * pulse, 0, Math.PI * 2);
+            ctx.stroke();
+
+            // "READY" Badge Pill
+            ctx.fillStyle = 'rgba(6, 214, 160, 0.9)';
+            ctx.beginPath();
+            ctx.roundRect(-68, btn.r * 0.42, 136, 32, 16);
+            ctx.fill();
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.font = '900 18px "Segoe UI", Arial, sans-serif';
+            ctx.fillStyle = '#112211';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(`⚡ READY (x${p.nitroCount})`, 0, btn.r * 0.42 + 16);
+
+            // Glowing Counter Badge on Top-Right (x1, x2, x3...)
+            const badgeGrad = ctx.createRadialGradient(btn.r * 0.65 - 4, -btn.r * 0.65 - 4, 2, btn.r * 0.65, -btn.r * 0.65, 30);
+            badgeGrad.addColorStop(0, '#00f0ff');
+            badgeGrad.addColorStop(1, '#0077b6');
+            ctx.fillStyle = badgeGrad;
+            ctx.shadowColor = '#00f0ff';
+            ctx.shadowBlur = 12;
+            ctx.beginPath();
+            ctx.arc(btn.r * 0.65, -btn.r * 0.65, 30, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+
+            ctx.font = '900 22px "Segoe UI", Arial, sans-serif';
+            ctx.fillStyle = '#ffffff';
+            ctx.fillText(`x${p.nitroCount}`, btn.r * 0.65, -btn.r * 0.65 + 1);
         }
 
         ctx.restore();
@@ -332,7 +501,7 @@ class UIManager {
         ctx.fillText("🕹️ Steer: Left / Right, Drag Screen, or Tap Lane", cx, cy + 640);
         ctx.fillText("🛑 Brake: BRAKE Button or Down Arrow / S", cx, cy + 685);
         ctx.fillText("⚡ Nitro: NITRO Button or Spacebar / W", cx, cy + 730);
-        ctx.fillText("⛽ Collect Fuel Cans & Stars to survive!", cx, cy + 775);
+        ctx.fillText("⛽ Collect Fuel Cans, Nitro & Stars to survive!", cx, cy + 775);
 
         // Pulsing Start CTA Button
         const pulse = 1.0 + Math.sin(Date.now() * 0.006) * 0.05;
@@ -350,79 +519,112 @@ class UIManager {
 
         ctx.font = '900 40px "Segoe UI", Arial, sans-serif';
         ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText("START ENGINE", 0, 0);
+        ctx.fillText("TAP TO START", 0, 0);
         ctx.restore();
-
-        // High score banner
-        ctx.font = 'bold 26px "Segoe UI", Arial, sans-serif';
-        ctx.fillStyle = '#ffd166';
-        ctx.fillText(`🏆 ALL TIME BEST: ${this.highScore}m`, cx, cy + 1040);
 
         ctx.restore();
     }
 
     drawGameOverScreen(ctx, reason) {
         ctx.save();
-        ctx.fillStyle = 'rgba(20, 20, 25, 0.88)';
+        const p = this.game.player;
+        this.saveHighScore(p.score);
+
+        // Backdrop Overlay
+        ctx.fillStyle = 'rgba(15, 20, 15, 0.85)';
         ctx.fillRect(0, 0, 1080, 1920);
 
         const cx = 540;
-        const cy = 680;
-        const p = this.game.player;
+        const cy = 940;
 
-        this.saveHighScore(Math.floor(p.distance));
+        // Modal Frame
+        ctx.fillStyle = 'rgba(28, 35, 25, 0.96)';
+        ctx.beginPath();
+        ctx.roundRect(cx - 360, cy - 360, 720, 760, 32);
+        ctx.fill();
+        ctx.strokeStyle = '#d7b365';
+        ctx.lineWidth = 4;
+        ctx.stroke();
 
-        // Header
-        ctx.font = '900 76px "Impact", "Arial Black", sans-serif';
+        // Inner Border
+        ctx.strokeStyle = 'rgba(215, 179, 101, 0.35)';
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(cx - 348, cy - 348, 696, 736);
+
+        // Title
+        ctx.font = '900 68px "Impact", "Arial Black", sans-serif';
         ctx.fillStyle = '#ef476f';
         ctx.textAlign = 'center';
-        ctx.fillText("GAME OVER", cx, cy - 200);
+        ctx.fillText("GAME OVER", cx, cy - 250);
 
-        ctx.font = 'bold 34px "Segoe UI", Arial, sans-serif';
-        ctx.fillStyle = '#fcf1b6';
-        ctx.fillText(reason, cx, cy - 130);
+        ctx.font = 'bold 32px "Segoe UI", Arial, sans-serif';
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText(reason || "VEHICLE CRASHED!", cx, cy - 190);
 
-        // Summary Card
-        ctx.fillStyle = 'rgba(30, 35, 30, 0.92)';
+        // Results Card
+        ctx.fillStyle = 'rgba(15, 20, 15, 0.8)';
         ctx.beginPath();
-        ctx.roundRect(cx - 360, cy - 80, 720, 420, 28);
+        ctx.roundRect(cx - 310, cy - 150, 620, 280, 20);
         ctx.fill();
         ctx.strokeStyle = '#d7b365';
         ctx.lineWidth = 3;
         ctx.stroke();
 
+        // Cross (✕) Close Button (Top-Right of popup)
+        const cb = this.touchControls.gameOverCloseBtn;
+        ctx.save();
+        ctx.fillStyle = '#4a2028';
+        ctx.beginPath();
+        ctx.arc(cb.x, cb.y, cb.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#ef476f';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        // Draw ✕ symbol
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 4;
+        ctx.lineCap = 'round';
+        const cr = 11;
+        ctx.beginPath();
+        ctx.moveTo(cb.x - cr, cb.y - cr);
+        ctx.lineTo(cb.x + cr, cb.y + cr);
+        ctx.moveTo(cb.x + cr, cb.y - cr);
+        ctx.lineTo(cb.x - cr, cb.y + cr);
+        ctx.stroke();
+        ctx.restore();
+
         ctx.font = 'bold 30px "Segoe UI", Arial, sans-serif';
         ctx.fillStyle = '#b9a731';
-        ctx.fillText("FINAL RESULTS", cx, cy - 20);
+        ctx.fillText("FINAL RESULTS", cx, cy - 90);
 
         ctx.textAlign = 'left';
-        ctx.font = 'bold 36px "Segoe UI", Arial, sans-serif';
+        ctx.font = 'bold 32px "Segoe UI", Arial, sans-serif';
         ctx.fillStyle = '#ffffff';
-        ctx.fillText("Total Score:", cx - 280, cy + 60);
-        ctx.fillText("Distance Traveled:", cx - 280, cy + 130);
-        ctx.fillText("Stars Collected:", cx - 280, cy + 200);
-        ctx.fillText("Best Record:", cx - 280, cy + 270);
+        ctx.fillText("Total Score:", cx - 270, cy - 30);
+        ctx.fillText("Distance Traveled:", cx - 270, cy + 30);
+        ctx.fillText("Stars Collected:", cx - 270, cy + 90);
 
         ctx.textAlign = 'right';
         ctx.fillStyle = '#ffd166';
-        ctx.fillText(`${p.score}`, cx + 280, cy + 60);
+        ctx.fillText(`${p.score}`, cx + 270, cy - 30);
         ctx.fillStyle = '#06d6a0';
-        ctx.fillText(`${Math.floor(p.distance)} m`, cx + 280, cy + 130);
+        ctx.fillText(`${Math.floor(p.distance)} m`, cx + 270, cy + 30);
         ctx.fillStyle = '#ffbe0b';
-        ctx.fillText(`⭐ ${p.coins}`, cx + 280, cy + 200);
-        ctx.fillStyle = '#00f0ff';
-        ctx.fillText(`${this.highScore} m`, cx + 280, cy + 270);
+        ctx.fillText(`⭐ ${p.coins}`, cx + 270, cy + 90);
 
-        // Play Again Button
-        const pulse = 1.0 + Math.sin(Date.now() * 0.006) * 0.05;
+        // 1. Try Again Button
+        const pb = this.touchControls.gameOverPlayAgainBtn;
+        const pulse = 1.0 + Math.sin(Date.now() * 0.006) * 0.04;
         ctx.save();
-        ctx.translate(cx, cy + 440);
+        ctx.translate(pb.x, pb.y);
         ctx.scale(pulse, pulse);
 
         ctx.fillStyle = '#06d6a0';
         ctx.beginPath();
-        ctx.roundRect(-240, -50, 480, 100, 30);
+        ctx.roundRect(-pb.w / 2, -pb.h / 2, pb.w, pb.h, 28);
         ctx.fill();
         ctx.strokeStyle = '#ffffff';
         ctx.lineWidth = 4;
@@ -430,9 +632,29 @@ class UIManager {
 
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.font = '900 42px "Segoe UI", Arial, sans-serif';
+        ctx.font = '900 40px "Segoe UI", Arial, sans-serif';
         ctx.fillStyle = '#112211';
-        ctx.fillText("PLAY AGAIN", 0, 0);
+        ctx.fillText("🔄 TRY AGAIN", 0, 0);
+        ctx.restore();
+
+        // 2. Back to Home Button
+        const hb = this.touchControls.gameOverHomeBtn;
+        ctx.save();
+        ctx.translate(hb.x, hb.y);
+
+        ctx.fillStyle = '#3a506b';
+        ctx.beginPath();
+        ctx.roundRect(-hb.w / 2, -hb.h / 2, hb.w, hb.h, 28);
+        ctx.fill();
+        ctx.strokeStyle = '#d7b365';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.font = '900 36px "Segoe UI", Arial, sans-serif';
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText("🏠 BACK TO HOME", 0, 0);
         ctx.restore();
 
         ctx.restore();
@@ -440,34 +662,114 @@ class UIManager {
 
     drawPauseScreen(ctx) {
         ctx.save();
-        ctx.fillStyle = 'rgba(20, 25, 20, 0.85)';
+        // 1. Dark Backdrop Overlay
+        ctx.fillStyle = 'rgba(15, 20, 15, 0.85)';
         ctx.fillRect(0, 0, 1080, 1920);
 
         const cx = 540;
-        const cy = 860;
+        const cy = 900;
+        const cardW = 680;
+        const cardH = 580;
 
-        ctx.font = '900 72px "Impact", "Arial Black", sans-serif';
-        ctx.fillStyle = '#fcf1b6';
-        ctx.textAlign = 'center';
-        ctx.fillText("PAUSED", cx, cy - 120);
-
-        // Resume Button
-        ctx.fillStyle = '#06d6a0';
+        // 2. Modal Card Background
+        ctx.fillStyle = 'rgba(28, 35, 25, 0.96)';
         ctx.beginPath();
-        ctx.roundRect(cx - 220, cy - 20, 440, 90, 24);
+        ctx.roundRect(cx - cardW / 2, cy - cardH / 2, cardW, cardH, 32);
         ctx.fill();
-        ctx.font = '900 38px "Segoe UI", Arial, sans-serif';
-        ctx.fillStyle = '#112211';
-        ctx.textBaseline = 'middle';
-        ctx.fillText("RESUME", cx, cy + 25);
 
-        // Restart Button
+        ctx.strokeStyle = '#d7b365';
+        ctx.lineWidth = 4;
+        ctx.stroke();
+
+        // Inner decorative border
+        ctx.strokeStyle = 'rgba(215, 179, 101, 0.35)';
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(cx - cardW / 2 + 12, cy - cardH / 2 + 12, cardW - 24, cardH - 24);
+
+        // 3. Top-Right "✕" Cross Button
+        const cb = this.touchControls.pauseCloseBtn;
+        ctx.save();
         ctx.fillStyle = '#ef476f';
         ctx.beginPath();
-        ctx.roundRect(cx - 220, cy + 100, 440, 90, 24);
+        ctx.arc(cb.x, cb.y, cb.r, 0, Math.PI * 2);
         ctx.fill();
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(cb.x - 11, cb.y - 11);
+        ctx.lineTo(cb.x + 11, cb.y + 11);
+        ctx.moveTo(cb.x + 11, cb.y - 11);
+        ctx.lineTo(cb.x - 11, cb.y + 11);
+        ctx.stroke();
+        ctx.restore();
+
+        // 4. Modal Header "GAME PAUSED"
+        ctx.font = '900 60px "Impact", "Arial Black", sans-serif';
+        ctx.fillStyle = '#fcf1b6';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText("GAME PAUSED", cx, cy - 190);
+
+        // 5. RESUME Button
+        const rb = this.touchControls.pauseResumeBtn;
+        ctx.save();
+        ctx.translate(rb.x, rb.y);
+        ctx.fillStyle = '#06d6a0';
+        ctx.beginPath();
+        ctx.roundRect(-rb.w / 2, -rb.h / 2, rb.w, rb.h, 28);
+        ctx.fill();
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.font = '900 38px "Segoe UI", Arial, sans-serif';
+        ctx.fillStyle = '#112211';
+        ctx.fillText("▶️ RESUME", 0, 0);
+        ctx.restore();
+
+        // 6. RESTART Button
+        const rsb = this.touchControls.pauseRestartBtn;
+        ctx.save();
+        ctx.translate(rsb.x, rsb.y);
+        ctx.fillStyle = '#f3c460';
+        ctx.beginPath();
+        ctx.roundRect(-rsb.w / 2, -rsb.h / 2, rsb.w, rsb.h, 28);
+        ctx.fill();
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.font = '900 38px "Segoe UI", Arial, sans-serif';
+        ctx.fillStyle = '#3a2e10';
+        ctx.fillText("🔄 RESTART", 0, 0);
+        ctx.restore();
+
+        // 7. BACK TO HOME Button
+        const hb = this.touchControls.pauseHomeBtn;
+        ctx.save();
+        ctx.translate(hb.x, hb.y);
+        ctx.fillStyle = '#3a506b';
+        ctx.beginPath();
+        ctx.roundRect(-hb.w / 2, -hb.h / 2, hb.w, hb.h, 28);
+        ctx.fill();
+        ctx.strokeStyle = '#d7b365';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.font = '900 36px "Segoe UI", Arial, sans-serif';
         ctx.fillStyle = '#ffffff';
-        ctx.fillText("RESTART", cx, cy + 145);
+        ctx.fillText("🏠 BACK TO HOME", 0, 0);
+        ctx.restore();
 
         ctx.restore();
     }

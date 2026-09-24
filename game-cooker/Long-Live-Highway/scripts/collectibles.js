@@ -34,10 +34,10 @@ class CollectiblesManager {
         const laneX = MathUtils.randChoice(this.lanes);
         const roll = Math.random();
 
-        if (roll < 0.45) {
+        if (roll < 0.38) {
             // Coins trail
             this.spawnCoinTrail(laneX, Math.floor(MathUtils.randRange(3, 6)));
-        } else if (roll < 0.70) {
+        } else if (roll < 0.62) {
             // Fuel canister (vital!)
             this.items.push({
                 type: 'fuel',
@@ -49,7 +49,7 @@ class CollectiblesManager {
                 bobOffset: Math.random()
             });
         } else if (roll < 0.82) {
-            // Nitro bottle
+            // Nitro bottle (Spawns on road for player to collect!)
             this.items.push({
                 type: 'nitro',
                 sprite: 'pickup_nitro.png',
@@ -59,7 +59,7 @@ class CollectiblesManager {
                 y: -100,
                 bobOffset: Math.random()
             });
-        } else if (roll < 0.90) {
+        } else if (roll < 0.92) {
             // Shield
             this.items.push({
                 type: 'shield',
@@ -86,7 +86,7 @@ class CollectiblesManager {
 
     update(playerSpeed) {
         this.spawnTimer++;
-        if (this.spawnTimer > 110) {
+        if (this.spawnTimer > 100) {
             this.spawnTimer = 0;
             this.spawnRandomItem();
         }
@@ -118,7 +118,12 @@ class CollectiblesManager {
 
                 if (MathUtils.checkAABB(pBounds, itemBounds)) {
                     if (item.type === 'coin') {
-                        p.addCoins(1);
+                        const coinX = item.x;
+                        const coinY = item.y;
+                        this.game.particles.addFlyingCoin(coinX, coinY, 180, 68, () => {
+                            p.addCoins(1);
+                            if (this.game.ui) this.game.ui.triggerCoinBump();
+                        });
                         this.items.splice(i, 1);
                         continue;
                     } else if (item.type === 'fuel') {
@@ -126,9 +131,7 @@ class CollectiblesManager {
                         this.items.splice(i, 1);
                         continue;
                     } else if (item.type === 'nitro') {
-                        p.nitro = p.maxNitro;
-                        this.game.particles.addScorePopup(item.x, item.y, "NITRO MAX!", "#00f0ff");
-                        window.soundManager.playFuel();
+                        p.addNitro(1);
                         this.items.splice(i, 1);
                         continue;
                     } else if (item.type === 'shield') {

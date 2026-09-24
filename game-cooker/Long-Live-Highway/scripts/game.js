@@ -135,12 +135,56 @@ class Game {
                 return;
             }
             if (this.state === 'GAMEOVER') {
-                if (pos.y > 950 && pos.y < 1250) this.startGame();
+                const tc = this.ui.touchControls;
+                // Check Cross Button (redirect to "/")
+                if (MathUtils.dist(pos.x, pos.y, tc.gameOverCloseBtn.x, tc.gameOverCloseBtn.y) <= tc.gameOverCloseBtn.r + 15) {
+                    window.location.href = '/';
+                    return;
+                }
+                // Check Back to Home Button (redirect to "/")
+                const hb = tc.gameOverHomeBtn;
+                if (pos.x >= hb.x - hb.w / 2 && pos.x <= hb.x + hb.w / 2 &&
+                    pos.y >= hb.y - hb.h / 2 && pos.y <= hb.y + hb.h / 2) {
+                    window.location.href = '/';
+                    return;
+                }
+                // Check Try Again Button
+                const pb = tc.gameOverPlayAgainBtn;
+                if (pos.x >= pb.x - pb.w / 2 && pos.x <= pb.x + pb.w / 2 &&
+                    pos.y >= pb.y - pb.h / 2 && pos.y <= pb.y + pb.h / 2) {
+                    this.startGame();
+                    return;
+                }
                 return;
             }
             if (this.state === 'PAUSED') {
-                if (pos.y > 800 && pos.y < 920) this.togglePause();
-                else if (pos.y > 920 && pos.y < 1040) this.startGame();
+                const tc = this.ui.touchControls;
+                // 1. Check Cross Button (redirect to "/")
+                if (tc.pauseCloseBtn && MathUtils.dist(pos.x, pos.y, tc.pauseCloseBtn.x, tc.pauseCloseBtn.y) <= tc.pauseCloseBtn.r + 15) {
+                    window.location.href = '/';
+                    return;
+                }
+                // 2. Check Back to Home Button (redirect to "/")
+                const hb = tc.pauseHomeBtn;
+                if (hb && pos.x >= hb.x - hb.w / 2 && pos.x <= hb.x + hb.w / 2 &&
+                    pos.y >= hb.y - hb.h / 2 && pos.y <= hb.y + hb.h / 2) {
+                    window.location.href = '/';
+                    return;
+                }
+                // 3. Check Resume Button
+                const rb = tc.pauseResumeBtn;
+                if (rb && pos.x >= rb.x - rb.w / 2 && pos.x <= rb.x + rb.w / 2 &&
+                    pos.y >= rb.y - rb.h / 2 && pos.y <= rb.y + rb.h / 2) {
+                    this.togglePause();
+                    return;
+                }
+                // 4. Check Restart Button
+                const rsb = tc.pauseRestartBtn;
+                if (rsb && pos.x >= rsb.x - rsb.w / 2 && pos.x <= rsb.x + rsb.w / 2 &&
+                    pos.y >= rsb.y - rsb.h / 2 && pos.y <= rsb.y + rsb.h / 2) {
+                    this.startGame();
+                    return;
+                }
                 return;
             }
 
@@ -185,12 +229,56 @@ class Game {
                 return;
             }
             if (this.state === 'GAMEOVER') {
-                if (pos.y > 950 && pos.y < 1250) this.startGame();
+                const tc = this.ui.touchControls;
+                // Check Cross Button (redirect to "/")
+                if (MathUtils.dist(pos.x, pos.y, tc.gameOverCloseBtn.x, tc.gameOverCloseBtn.y) <= tc.gameOverCloseBtn.r + 15) {
+                    window.location.href = '/';
+                    return;
+                }
+                // Check Back to Home Button (redirect to "/")
+                const hb = tc.gameOverHomeBtn;
+                if (pos.x >= hb.x - hb.w / 2 && pos.x <= hb.x + hb.w / 2 &&
+                    pos.y >= hb.y - hb.h / 2 && pos.y <= hb.y + hb.h / 2) {
+                    window.location.href = '/';
+                    return;
+                }
+                // Check Try Again Button
+                const pb = tc.gameOverPlayAgainBtn;
+                if (pos.x >= pb.x - pb.w / 2 && pos.x <= pb.x + pb.w / 2 &&
+                    pos.y >= pb.y - pb.h / 2 && pos.y <= pb.y + pb.h / 2) {
+                    this.startGame();
+                    return;
+                }
                 return;
             }
             if (this.state === 'PAUSED') {
-                if (pos.y > 800 && pos.y < 920) this.togglePause();
-                else if (pos.y > 920 && pos.y < 1040) this.startGame();
+                const tc = this.ui.touchControls;
+                // 1. Check Cross Button (redirect to "/")
+                if (tc.pauseCloseBtn && MathUtils.dist(pos.x, pos.y, tc.pauseCloseBtn.x, tc.pauseCloseBtn.y) <= tc.pauseCloseBtn.r + 15) {
+                    window.location.href = '/';
+                    return;
+                }
+                // 2. Check Back to Home Button (redirect to "/")
+                const hb = tc.pauseHomeBtn;
+                if (hb && pos.x >= hb.x - hb.w / 2 && pos.x <= hb.x + hb.w / 2 &&
+                    pos.y >= hb.y - hb.h / 2 && pos.y <= hb.y + hb.h / 2) {
+                    window.location.href = '/';
+                    return;
+                }
+                // 3. Check Resume Button
+                const rb = tc.pauseResumeBtn;
+                if (rb && pos.x >= rb.x - rb.w / 2 && pos.x <= rb.x + rb.w / 2 &&
+                    pos.y >= rb.y - rb.h / 2 && pos.y <= rb.y + rb.h / 2) {
+                    this.togglePause();
+                    return;
+                }
+                // 4. Check Restart Button
+                const rsb = tc.pauseRestartBtn;
+                if (rsb && pos.x >= rsb.x - rsb.w / 2 && pos.x <= rsb.x + rsb.w / 2 &&
+                    pos.y >= rsb.y - rsb.h / 2 && pos.y <= rsb.y + rsb.h / 2) {
+                    this.startGame();
+                    return;
+                }
                 return;
             }
 
@@ -374,3 +462,4 @@ class Game {
 }
 
 window.Game = Game;
+
