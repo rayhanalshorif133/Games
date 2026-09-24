@@ -1,7 +1,7 @@
 /**
  * Collectibles & Road Hazards Manager
  * Handles spawning and collecting Fuel canisters, Coins, Nitro boosts, Shields, and Oil slicks,
- * as well as treacherous Broken Road sections with burning fire pits and narrow detour lanes.
+ * as well as treacherous Broken Road sections with burning fire pits, and Ground-Level Railway Crossings with Passing Trains!
  */
 
 class CollectiblesManager {
@@ -9,16 +9,22 @@ class CollectiblesManager {
         this.game = game;
         this.items = [];
         this.brokenRoads = [];
+        this.railCrossings = [];
         this.spawnTimer = 0;
         this.roadHazardTimer = 0;
+        this.railCrossingTimer = 0;
         this.lanes = [390, 490, 590, 690];
     }
 
     reset() {
         this.items = [];
         this.brokenRoads = [];
+        this.railCrossings = [];
         this.spawnTimer = 0;
         this.roadHazardTimer = 0;
+        this.railCrossingTimer = 0;
+        // Spawn immediate road-level railway crossing with train on road ahead!
+        this.spawnRailCrossing(-620);
     }
 
     spawnCoinTrail(laneX, count = 4) {
@@ -113,11 +119,59 @@ class CollectiblesManager {
             warned: false
         });
 
+        // Spawn advance roadside warning signboard on the grass shoulder ahead of the hazard
+        if (this.game.scenery) {
+            this.game.scenery.spawnRoadSign(isLeft ? 'road_damage_left' : 'road_damage_right', -hazardH - 450);
+        }
+
         // Add warning popup
         this.game.particles.addScorePopup(540, 300, isLeft ? "⚠️ DANGER: LEFT ROAD ON FIRE! KEEP RIGHT ➡️" : "⚠️ DANGER: RIGHT ROAD ON FIRE! KEEP LEFT ⬅️", "#ff5400");
     }
 
+    spawnRailCrossing(yPos = -350) {
+        const isRight = Math.random() < 0.5;
+        const trainSpeed = (isRight ? 26 : -26);
+        const carCount = 6;
+        const carW = 160;
+        const carH = 64;
+        const cars = [];
+        const colors = ['#d90429', '#0077b6', '#2a9d8f', '#e76f51', '#f4a261', '#457b9d'];
+
+        for (let i = 0; i < carCount; i++) {
+            cars.push({
+                isLoco: i === 0,
+                color: i === 0 ? '#ffb703' : MathUtils.randChoice(colors),
+                w: carW,
+                h: carH,
+                label: i === 0 ? 'LOCO' : MathUtils.randChoice(['MAERSK', 'CARGO', 'FREIGHT', 'OIL', 'STEEL'])
+            });
+        }
+
+        this.railCrossings.push({
+            y: yPos,
+            h: 150,
+            train: {
+                isMovingRight: isRight,
+                x: isRight ? -550 : 1550,
+                vx: trainSpeed,
+                cars: cars,
+                carW: carW,
+                totalW: carCount * (carW + 10),
+                isBlasted: false
+            },
+            lightTimer: 0,
+            warned: false
+        });
+
+        // Spawn advance roadside railway warning signboard
+        if (this.game.scenery) {
+            this.game.scenery.spawnRoadSign('railway_ahead', yPos - 500);
+        }
+    }
+
     update(playerSpeed) {
+        const pDist = this.game.player.distance;
+
         // 1. Spawning pickups
         this.spawnTimer++;
         if (this.spawnTimer > 100) {
@@ -125,8 +179,7 @@ class CollectiblesManager {
             this.spawnRandomItem();
         }
 
-        // 2. Spawning Broken Road Burning Hazards (Starts after 220m distance, becomes progressively more challenging)
-        const pDist = this.game.player.distance;
+        // 2. Spawning Broken Road Burning Hazards (Starts after 220m distance)
         if (pDist >= 220) {
             this.roadHazardTimer++;
             const hazardInterval = Math.max(500, 1200 - Math.floor(pDist / 2.5));
@@ -136,10 +189,18 @@ class CollectiblesManager {
             }
         }
 
+        // 3. Spawning Road-Level Railway Crossings with Trains (Spawns frequently every ~6-8 seconds!)
+        this.railCrossingTimer++;
+        const crossingInterval = Math.max(320, 520 - Math.floor(pDist / 4));
+        if (this.railCrossingTimer > crossingInterval) {
+            this.railCrossingTimer = 0;
+            this.spawnRailCrossing(-350);
+        }
+
         const p = this.game.player;
         const pBounds = p.getBounds();
 
-        // 3. Update Broken Road Hazards
+        // 4. Update Broken Road Hazards
         for (let k = this.brokenRoads.length - 1; k >= 0; k--) {
             const br = this.brokenRoads[k];
             br.y += playerSpeed;
@@ -209,7 +270,95 @@ class CollectiblesManager {
             }
         }
 
-        // 4. Update Collectibles
+        // 5. Update Road Railway Level Crossings
+        for (let r = this.railCrossings.length - 1; r >= 0; r--) {
+            const rc = this.railCrossings[r];
+            rc.y += playerSpeed;
+            rc.train.x += rc.train.vx;
+
+            if (rc.y > -250 && rc.y < 2000) {
+                rc.lightTimer++;
+                // Ring crossing bell alarm
+                if (rc.lightTimer % 18 === 0) {
+                    window.soundManager.playCrossingBell();
+                }
+
+                if (!rc.warned) {
+                    rc.warned = true;
+                    this.game.particles.addScorePopup(540, 280, "🚨 RAILROAD CROSSING! TRAIN PASSING! 🚨", "#ff0055");
+                    this.game.screenShake = 10;
+                    window.soundManager.playTrainHorn();
+                }
+
+                // Locomotive diesel smoke
+                if (rc.lightTimer % 4 === 0 && !rc.train.isBlasted) {
+                    const locoX = rc.train.isMovingRight ? rc.train.x + 80 : rc.train.x + rc.train.totalW - 80;
+                    if (locoX > 200 && locoX < 880) {
+                        this.game.particles.particles.push({
+                            type: 'smoke',
+                            x: locoX,
+                            y: rc.y + 40,
+                            vx: MathUtils.randRange(-1, 1),
+                            vy: MathUtils.randRange(-3, -1),
+                            radius: 20,
+                            maxRadius: 60,
+                            alpha: 0.75,
+                            decay: 0.03,
+                            color: '#2b2d42'
+                        });
+                    }
+                }
+            }
+
+            // Check collision with player car
+            if (p.isAlive && !p.isAirborne && !rc.train.isBlasted) {
+                const trainLeft = rc.train.x;
+                const trainRight = rc.train.x + rc.train.totalW;
+
+                // Check if train is currently occupying the highway road area
+                if (trainRight > 280 && trainLeft < 800) {
+                    const trainBounds = {
+                        x: Math.max(280, trainLeft),
+                        y: rc.y + 42,
+                        w: Math.min(800, trainRight) - Math.max(280, trainLeft),
+                        h: 66
+                    };
+
+                    if (MathUtils.checkAABB(pBounds, trainBounds)) {
+                        if (p.isNitroActive) {
+                            // --- NITRO TRAIN RAM BLAST (+20 SCORE) ---
+                            this.game.particles.addNitroRamBlast(p.x, p.y);
+                            this.game.particles.addCarExplosion(p.x, p.y);
+                            rc.train.isBlasted = true;
+                            p.score += 20;
+                            this.game.particles.addScorePopup(p.x, p.y - 60, "💥 +20 TRAIN DESTROYED!", "#00f0ff");
+                            this.game.screenShake = 45;
+                            window.soundManager.playNitroSmash();
+                        } else if (p.hasShield) {
+                            // --- SHIELD DEFLECTION BLAST (+10 SCORE) ---
+                            this.game.particles.addShieldDeflectBlast(p.x, p.y);
+                            p.hasShield = false;
+                            p.score += 10;
+                            rc.train.isBlasted = true;
+                            this.game.particles.addScorePopup(p.x, p.y - 60, "🛡️ +10 TRAIN SMASHED!", "#48cae4");
+                            this.game.screenShake = 25;
+                            window.soundManager.playShieldShatter();
+                        } else {
+                            // Regular crash into passing train!
+                            p.die("SMASHED BY PASSING TRAIN!");
+                            return;
+                        }
+                    }
+                }
+            }
+
+            // Remove offscreen
+            if (rc.y > 2200) {
+                this.railCrossings.splice(r, 1);
+            }
+        }
+
+        // 6. Update Collectibles
         for (let i = this.items.length - 1; i >= 0; i--) {
             const item = this.items[i];
             item.y += playerSpeed;
@@ -255,7 +404,9 @@ class CollectiblesManager {
                         this.items.splice(i, 1);
                         continue;
                     } else if (item.type === 'oil') {
-                        p.triggerOilSpin();
+                        if (!p.hasShield && !p.isNitroActive) {
+                            p.triggerOilSpin();
+                        }
                         this.items.splice(i, 1);
                         continue;
                     }
@@ -263,29 +414,29 @@ class CollectiblesManager {
             }
 
             // Remove offscreen
-            if (item.y > 2050) {
+            if (item.y > 2100) {
                 this.items.splice(i, 1);
             }
         }
     }
 
     draw(ctx) {
-        // 1. Draw Broken Road Sections & Burning Fire Pits (Drawn under cars and pickups)
+        // 1. Draw Broken Road Burning Fire Hazards
         for (const br of this.brokenRoads) {
             ctx.save();
             ctx.translate(br.x, br.y);
 
-            // A. Dark Charred Pit Base
-            ctx.fillStyle = '#1b140e';
+            // A. Dark Charred Asphalt Base
+            ctx.fillStyle = '#1c1917';
             ctx.fillRect(0, 0, br.w, br.h);
 
-            // B. Jagged Broken Asphalt Edges
-            ctx.fillStyle = '#3a2e1d';
+            // B. Jagged Broken Road Asphalt Borders
+            ctx.fillStyle = '#44403c';
             ctx.beginPath();
             ctx.moveTo(0, 0);
-            for (let py = 0; py <= br.h; py += 40) {
-                const jx = Math.sin(py * 0.08) * 18 + 12;
-                ctx.lineTo(jx, py);
+            for (let y = 0; y <= br.h; y += 40) {
+                const offset = Math.sin(y * 0.08) * 18 + Math.cos(y * 0.15) * 8;
+                ctx.lineTo(offset + 14, y);
             }
             ctx.lineTo(0, br.h);
             ctx.closePath();
@@ -293,9 +444,9 @@ class CollectiblesManager {
 
             ctx.beginPath();
             ctx.moveTo(br.w, 0);
-            for (let py = 0; py <= br.h; py += 40) {
-                const jx = br.w - (Math.cos(py * 0.08) * 18 + 12);
-                ctx.lineTo(jx, py);
+            for (let y = 0; y <= br.h; y += 40) {
+                const offset = Math.cos(y * 0.08) * 18 + Math.sin(y * 0.15) * 8;
+                ctx.lineTo(br.w - offset - 14, y);
             }
             ctx.lineTo(br.w, br.h);
             ctx.closePath();
@@ -327,13 +478,12 @@ class CollectiblesManager {
                 ctx.fill();
             }
 
-            // E. Danger Warning Construction Stripes at Top & Bottom Entrances
+            // E. Danger Warning Construction Stripes
             const drawBarrier = (by) => {
                 ctx.save();
                 ctx.fillStyle = '#222222';
                 ctx.fillRect(0, by, br.w, 36);
 
-                // Diagonal warning stripes
                 ctx.save();
                 ctx.beginPath();
                 ctx.rect(0, by, br.w, 36);
@@ -350,7 +500,6 @@ class CollectiblesManager {
                 }
                 ctx.restore();
 
-                // Blinking amber warning hazard lights on posts
                 const blink = Math.sin(Date.now() * 0.01) > 0;
                 ctx.fillStyle = blink ? '#ffbe0b' : '#725200';
                 ctx.shadowColor = blink ? '#ffbe0b' : 'transparent';
@@ -383,12 +532,169 @@ class CollectiblesManager {
             ctx.restore();
         }
 
-        // 2. Draw Pickups & Items
+        // 2. Draw Ground-Level Railway Level Crossings with Passing Trains
+        for (const rc of this.railCrossings) {
+            ctx.save();
+            ctx.translate(0, rc.y);
+
+            // A. Road Pavement Markings: Large Yellow "X" & "R R" ahead of crossing
+            ctx.fillStyle = 'rgba(255, 209, 102, 0.75)';
+            ctx.font = '900 44px "Impact", Arial, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText("❌ R   R ❌", 540, -40);
+            ctx.fillText("❌ R   R ❌", 540, 180);
+
+            // B. Dark Asphalt Railway Bed Embedded in Road
+            ctx.fillStyle = '#26282a';
+            ctx.fillRect(250, 25, 580, 95);
+
+            // C. Wooden Sleepers / Ties Across Road
+            ctx.fillStyle = '#4a3f35';
+            for (let sx = 250; sx < 830; sx += 24) {
+                ctx.fillRect(sx, 30, 14, 85);
+            }
+
+            // D. Dual Steel Rail Tracks Across Highway
+            const drawGroundRail = (gy) => {
+                ctx.fillStyle = '#78909c';
+                ctx.fillRect(240, gy, 600, 8);
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(240, gy + 1, 600, 2.5);
+                ctx.fillStyle = '#1c2327';
+                ctx.fillRect(240, gy + 7, 600, 2);
+            };
+
+            drawGroundRail(48);
+            drawGroundRail(68);
+            drawGroundRail(88);
+
+            // E. Flashing Railroad Crossing Signal Masts (Left & Right Shoulders)
+            const drawSignalMast = (mx) => {
+                // Mast post
+                ctx.fillStyle = '#6c757d';
+                ctx.fillRect(mx - 4, -15, 8, 140);
+
+                // Crossbuck ❌ "RAILROAD CROSSING"
+                ctx.save();
+                ctx.translate(mx, 5);
+                ctx.fillStyle = '#f8f9fa';
+                ctx.strokeStyle = '#212529';
+                ctx.lineWidth = 2;
+
+                ctx.save();
+                ctx.rotate(Math.PI / 4);
+                ctx.fillRect(-24, -5, 48, 10);
+                ctx.strokeRect(-24, -5, 48, 10);
+                ctx.restore();
+
+                ctx.save();
+                ctx.rotate(-Math.PI / 4);
+                ctx.fillRect(-24, -5, 48, 10);
+                ctx.strokeRect(-24, -5, 48, 10);
+                ctx.restore();
+
+                // Alternating Flashing Red LED Lights (🔴 🔴)
+                const isLeftLight = Math.sin(rc.lightTimer * 0.25) > 0;
+                ctx.fillStyle = isLeftLight ? '#ff0033' : '#590d18';
+                ctx.shadowColor = isLeftLight ? '#ff0033' : 'transparent';
+                ctx.shadowBlur = isLeftLight ? 18 : 0;
+                ctx.beginPath();
+                ctx.arc(-16, 22, 9, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = !isLeftLight ? '#ff0033' : '#590d18';
+                ctx.shadowColor = !isLeftLight ? '#ff0033' : 'transparent';
+                ctx.shadowBlur = !isLeftLight ? 18 : 0;
+                ctx.beginPath();
+                ctx.arc(16, 22, 9, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+
+                ctx.restore();
+
+                // Red & White Striped Lowered Barrier Gate
+                ctx.fillStyle = '#ff0033';
+                const gateW = 85;
+                const gateX = mx > 540 ? mx - gateW : mx;
+                ctx.fillRect(gateX, 60, gateW, 8);
+                ctx.fillStyle = '#ffffff';
+                for (let gx = gateX; gx < gateX + gateW; gx += 18) {
+                    ctx.fillRect(gx, 60, 9, 8);
+                }
+            };
+
+            drawSignalMast(245);
+            drawSignalMast(835);
+
+            // F. Render Passing Train Across the Road
+            if (!rc.train.isBlasted) {
+                const t = rc.train;
+                for (let cIdx = 0; cIdx < t.cars.length; cIdx++) {
+                    const car = t.cars[cIdx];
+                    const carX = t.x + (cIdx * (t.carW + 10));
+
+                    if (carX + t.carW < -100 || carX > 1180) continue;
+
+                    ctx.save();
+                    ctx.translate(carX, 42);
+
+                    // Train Car Body
+                    ctx.fillStyle = car.color;
+                    ctx.beginPath();
+                    ctx.roundRect(0, 0, car.w, car.h, 6);
+                    ctx.fill();
+                    ctx.strokeStyle = '#111210';
+                    ctx.lineWidth = 2.5;
+                    ctx.stroke();
+
+                    // Container Corrugated Ridges
+                    ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+                    ctx.lineWidth = 2;
+                    for (let rx = 10; rx < car.w - 10; rx += 14) {
+                        ctx.beginPath();
+                        ctx.moveTo(rx, 4);
+                        ctx.lineTo(rx, car.h - 4);
+                        ctx.stroke();
+                    }
+
+                    // Cargo Label
+                    ctx.font = '900 16px "Arial Black", Impact, sans-serif';
+                    ctx.fillStyle = '#ffffff';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(car.label, car.w / 2, car.h / 2);
+
+                    // Locomotive Front Details
+                    if (car.isLoco) {
+                        const hlx = t.isMovingRight ? car.w - 6 : 6;
+                        ctx.fillStyle = '#fffffa';
+                        ctx.shadowColor = '#ffff55';
+                        ctx.shadowBlur = 20;
+                        ctx.beginPath();
+                        ctx.arc(hlx, car.h / 2, 9, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.shadowBlur = 0;
+                    }
+
+                    ctx.restore();
+                }
+            } else {
+                // Blasted Train Fiery Aftermath
+                ctx.fillStyle = 'rgba(255, 60, 0, 0.6)';
+                ctx.beginPath();
+                ctx.arc(540, 70, 70, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            ctx.restore();
+        }
+
+        // 3. Draw Pickups & Items
         const time = Date.now() * 0.005;
 
         for (const item of this.items) {
             ctx.save();
-            // Gentle hovering bob for pickups
             const bobY = item.type !== 'oil' ? Math.sin(time + item.bobOffset * 5) * 6 : 0;
             ctx.translate(item.x, item.y + bobY);
 
@@ -403,4 +709,3 @@ class CollectiblesManager {
 }
 
 window.CollectiblesManager = CollectiblesManager;
-

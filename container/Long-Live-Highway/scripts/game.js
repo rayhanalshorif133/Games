@@ -477,30 +477,39 @@ class Game {
         // 1. Draw Terrain & Highway Road
         this.scenery.drawTerrain(this.ctx);
 
-        // 2. Draw Skid marks on road
+        // 2. Draw Overbridge Shadows on Road Underneath
+        this.scenery.drawBridgeShadows(this.ctx);
+
+        // 3. Draw Skid marks on road
         this.particles.drawSkids(this.ctx);
 
-        // 3. Draw Collectibles & Hazards
+        // 4. Draw Collectibles & Hazards
         this.collectibles.draw(this.ctx);
 
-        // 4. Draw Traffic Vehicles
+        // 5. Draw Traffic Vehicles
         this.traffic.draw(this.ctx);
 
-        // 5. Draw Player Car
+        // 6. Draw Player Car
         this.player.draw(this.ctx);
 
-        // 6. Draw Particles & Dust
+        // 7. Draw Particles & Dust
         this.particles.drawParticles(this.ctx);
 
-        // 7. Draw Birds flying in sky
+        // 8. Draw Birds flying in sky
         this.scenery.drawBirds(this.ctx);
 
-        // 8. Speed Lines when in Nitro mode
+        // 9. Draw Roadside Warning Signboards ("Road Damage Ahead", "Railway Station", "Military Zone")
+        this.scenery.drawRoadSigns(this.ctx);
+
+        // 10. Draw Overpasses & Passing High-Speed Trains (Overhead layer above highway!)
+        this.scenery.drawOverpasses(this.ctx);
+
+        // 11. Speed Lines when in Nitro mode
         if (this.player.isNitroActive) {
             this.drawSpeedLines();
         }
 
-        // 9. UI & HUD Overlay
+        // 12. UI & HUD Overlay
         if (this.state === 'PLAYING') {
             this.ui.drawHUD(this.ctx);
         } else if (this.state === 'START') {

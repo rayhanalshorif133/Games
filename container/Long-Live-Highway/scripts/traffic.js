@@ -53,7 +53,62 @@ class TrafficManager {
             this.spawnTank(laneX, idx * 30);
         });
 
+        if (this.game.scenery) {
+            this.game.scenery.spawnRoadSign('military_zone', -450);
+        }
+
         this.game.particles.addScorePopup(540, 260, "🚨 WARNING: ARMORED TANK CONVOY! 🚨", "#ff5400");
+    }
+
+    spawnBrakePunishVehicles() {
+        if (!this.game.player.isAlive || this.game.player.isAirborne) return;
+
+        // Don't spam if there are already oncoming vehicles on screen
+        const existingOncoming = this.vehicles.filter(v => v.isOncoming);
+        if (existingOncoming.length >= 2) return;
+
+        // Choose 1 or 2 oncoming speeders rushing down towards player
+        const count = Math.random() < 0.6 ? 1 : 2;
+        const playerLane = this.lanes.reduce((prev, curr) => 
+            Math.abs(curr - this.game.player.x) < Math.abs(prev - this.game.player.x) ? curr : prev
+        );
+
+        let chosenLanes = [playerLane];
+        if (count === 2) {
+            const otherLanes = this.lanes.filter(l => l !== playerLane);
+            chosenLanes.push(MathUtils.randChoice(otherLanes));
+        }
+
+        const sprites = ['car_yellow.png', 'car_red.png', 'car_blue.png', 'car_police.png'];
+        let spawnedAny = false;
+
+        chosenLanes.forEach((laneX, idx) => {
+            const tooClose = this.vehicles.some(v => Math.abs(v.x - laneX) < 80 && v.y < 220 && v.y > -350);
+            if (!tooClose) {
+                spawnedAny = true;
+                this.vehicles.push({
+                    id: 'oncoming',
+                    sprite: MathUtils.randChoice(sprites),
+                    w: 95,
+                    h: 180,
+                    x: laneX,
+                    y: -240 - (idx * 150),
+                    targetX: laneX,
+                    baseSpeed: -16, // High negative speed = speeds DOWN rapidly towards the player!
+                    passScore: 2,
+                    angle: Math.PI, // Facing downward towards the player
+                    isOncoming: true,
+                    headlightTimer: 0,
+                    passed: false
+                });
+            }
+        });
+
+        if (spawnedAny) {
+            window.soundManager.playHorn();
+            this.game.particles.addScorePopup(this.game.player.x, 260, "⚠️ ONCOMING TRAFFIC! DODGE!", "#ff0055");
+            this.game.screenShake = 12;
+        }
     }
 
     spawnVehicle() {
@@ -176,6 +231,9 @@ class TrafficManager {
                 if (v.id === 'tank') {
                     pts = 5;
                     label = "🛡️ +5 TANK";
+                } else if (v.isOncoming) {
+                    pts = 2;
+                    label = "⚡ +2 DODGED!";
                 } else if (v.id === 'truck') {
                     pts = 3;
                     label = "+3 TRUCK";
@@ -341,6 +399,20 @@ class TrafficManager {
                     ctx.shadowBlur = 24;
                     ctx.beginPath();
                     ctx.arc(0, -10, 15, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                }
+
+                // Oncoming Speeders Flashing Headlights Beam
+                if (v.isOncoming) {
+                    v.headlightTimer = (v.headlightTimer || 0) + 1;
+                    const flash = Math.sin(v.headlightTimer * 0.35) > 0;
+                    ctx.fillStyle = flash ? 'rgba(255, 255, 220, 0.95)' : 'rgba(255, 210, 80, 0.7)';
+                    ctx.shadowColor = '#ffff99';
+                    ctx.shadowBlur = 20;
+                    ctx.beginPath();
+                    ctx.arc(-26, -70, 10, 0, Math.PI * 2);
+                    ctx.arc(26, -70, 10, 0, Math.PI * 2);
                     ctx.fill();
                     ctx.shadowBlur = 0;
                 }

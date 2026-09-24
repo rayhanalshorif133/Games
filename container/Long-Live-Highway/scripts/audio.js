@@ -330,6 +330,104 @@ class SoundManager {
         osc.start(now);
         osc.stop(now + 0.12);
     }
+
+    playHorn() {
+        if (this.muted || !this.ctx) return;
+        this.resume();
+        const now = this.ctx.currentTime;
+        const osc1 = this.ctx.createOscillator();
+        const osc2 = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc1.type = 'sawtooth';
+        osc1.frequency.setValueAtTime(415, now);
+        osc2.type = 'sawtooth';
+        osc2.frequency.setValueAtTime(466, now);
+
+        gain.gain.setValueAtTime(0.18, now);
+        gain.gain.setValueAtTime(0.18, now + 0.28);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.38);
+
+        osc1.connect(gain);
+        osc2.connect(gain);
+        gain.connect(this.masterGain);
+
+        osc1.start(now);
+        osc2.start(now);
+        osc1.stop(now + 0.38);
+        osc2.stop(now + 0.38);
+    }
+
+    playTrainHorn() {
+        if (this.muted || !this.ctx) return;
+        this.resume();
+        const now = this.ctx.currentTime;
+        const chords = [311.13, 370.00, 466.16, 622.25]; // D# chord locomotive air horn
+        
+        chords.forEach((freq) => {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(freq, now);
+            osc.frequency.linearRampToValueAtTime(freq * 0.98, now + 1.2);
+
+            gain.gain.setValueAtTime(0.08, now);
+            gain.gain.setValueAtTime(0.12, now + 0.15);
+            gain.gain.setValueAtTime(0.12, now + 0.85);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 1.4);
+
+            osc.connect(gain);
+            gain.connect(this.masterGain);
+
+            osc.start(now);
+            osc.stop(now + 1.4);
+        });
+    }
+
+    playTrainRumble() {
+        if (this.muted || !this.ctx) return;
+        this.resume();
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const filter = this.ctx.createBiquadFilter();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(55, now);
+        osc.frequency.linearRampToValueAtTime(65, now + 0.4);
+        osc.frequency.linearRampToValueAtTime(50, now + 0.8);
+
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(140, now);
+
+        gain.gain.setValueAtTime(0.14, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.9);
+
+        osc.start(now);
+        osc.stop(now + 0.9);
+    }
+
+    playCrossingBell() {
+        if (this.muted || !this.ctx) return;
+        this.resume();
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(1200, now);
+        osc.frequency.exponentialRampToValueAtTime(750, now + 0.16);
+
+        gain.gain.setValueAtTime(0.18, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+
+        osc.connect(gain);
+        gain.connect(this.masterGain);
+
+        osc.start(now);
+        osc.stop(now + 0.18);
+    }
 }
 
 window.soundManager = new SoundManager();
