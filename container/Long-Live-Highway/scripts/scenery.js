@@ -1,8 +1,8 @@
 /**
- * Roadside Scenery, Parallax Environment, Overhead Bridges, High-Speed Trains & Roadside Warning Signboards
- * Generates continuous parallax terrain, houses, villas, crops, tree groves, bird flocks,
- * Roadside Warning Signboards ("Road Damage Ahead", "Railway Station Ahead", "Military Zone"),
- * and Highway Overpasses & Railway Bridges with High-Speed Bullet Trains!
+ * Roadside Scenery, Parallax Environment, Scenic Rivers, Overhead Bridges & High-Speed Trains
+ * Generates continuous parallax terrain, terracotta estates, blue villas, sparkling roadside rivers with boats & docks,
+ * crop fields, tree groves, bird flocks, Roadside Warning Signboards,
+ * and well-spaced Highway Overpasses & Railway Bridges with High-Speed Bullet Trains!
  */
 
 class SceneryManager {
@@ -13,6 +13,7 @@ class SceneryManager {
         this.overpasses = [];
         this.roadSigns = [];
         this.roadScrollY = 0;
+        this.totalDistanceScrolled = 0;
         this.roadWidth = 520;
         this.roadLeft = (1080 - this.roadWidth) / 2; // 280
         this.roadRight = this.roadLeft + this.roadWidth; // 800
@@ -21,7 +22,7 @@ class SceneryManager {
         this.rightSpawnY = -200;
         this.birdSpawnTimer = 0;
         this.overpassTimer = 0;
-        this.overpassInterval = 420; // Spawns an overbridge frequently every ~7 seconds
+        this.overpassInterval = 2600; // Well spaced out (~40-55 seconds)
 
         this.initInitialScenery();
     }
@@ -31,11 +32,22 @@ class SceneryManager {
         this.birds = [];
         this.overpasses = [];
         this.roadSigns = [];
+        this.roadScrollY = 0;
+        this.totalDistanceScrolled = 0;
         this.leftSpawnY = -200;
         this.rightSpawnY = -200;
         this.birdSpawnTimer = 0;
         this.overpassTimer = 0;
+        this.overpassInterval = 2600;
         this.initInitialScenery();
+    }
+
+    getRoadOffset(screenY) {
+        return 0; // Classic straight highway
+    }
+
+    getRoadTangent(screenY) {
+        return 0; // Straight alignment
     }
 
     initInitialScenery() {
@@ -46,20 +58,13 @@ class SceneryManager {
         }
         // Add initial birds
         this.spawnBirdFlock(800, 600);
-
-        // Spawn immediate overpasses and advance warning signs
-        this.spawnOverpass(-220);
-        this.spawnRoadSign('train_station', 100);
-        this.spawnOverpass(-1050);
-        this.spawnRoadSign('road_damage_right', -400);
-        this.spawnRoadSign('railway_ahead', -750);
     }
 
     spawnSceneryBlock(side, yPos) {
         const isLeft = side === 'left';
         const roll = Math.random();
 
-        if (roll < 0.32) {
+        if (roll < 0.22) {
             // Terracotta House
             this.sceneryItems.push({
                 type: 'house_terracotta',
@@ -70,7 +75,7 @@ class SceneryManager {
                 h: 240,
                 side: side
             });
-        } else if (roll < 0.58) {
+        } else if (roll < 0.42) {
             // Blue Hip Roof House
             this.sceneryItems.push({
                 type: 'house_blue',
@@ -80,6 +85,23 @@ class SceneryManager {
                 w: 230,
                 h: 230,
                 side: side
+            });
+        } else if (roll < 0.64) {
+            // Scenic Blue River / Waterway with Boats & Docks on roadside!
+            this.sceneryItems.push({
+                type: 'river',
+                x: isLeft ? 130 : 950,
+                y: yPos,
+                w: 250,
+                h: 360,
+                side: side,
+                boatOffset: Math.random() * 50,
+                hasDock: Math.random() < 0.55,
+                hasBoat: Math.random() < 0.65,
+                lilyPads: [
+                    { x: MathUtils.randRange(-60, 60), y: MathUtils.randRange(-80, 80) },
+                    { x: MathUtils.randRange(-60, 60), y: MathUtils.randRange(-80, 80) }
+                ]
             });
         } else if (roll < 0.82) {
             // Striped Farmland Crops
@@ -161,9 +183,9 @@ class SceneryManager {
     spawnOverpass(yPos = -380) {
         const roll = Math.random();
         let type = 'railway_bullet';
-        if (roll < 0.50) {
+        if (roll < 0.55) {
             type = 'railway_bullet'; // High-Speed Aerodynamic Bullet Train
-        } else if (roll < 0.80) {
+        } else if (roll < 0.85) {
             type = 'railway_freight'; // Heavy Cargo Freight Train
         } else {
             type = 'highway_overpass'; // Vehicular Overpass with Highway Route Signs
@@ -230,8 +252,11 @@ class SceneryManager {
     }
 
     update(playerSpeed) {
-        // Road texture scrolling offset
+        const pDist = this.game.player.distance;
+
+        // Road texture scrolling offset & total distance tracking for road curvature
         this.roadScrollY = (this.roadScrollY + playerSpeed) % 480;
+        this.totalDistanceScrolled += playerSpeed;
 
         // 1. Update Scenery items
         for (let i = this.sceneryItems.length - 1; i >= 0; i--) {
@@ -293,12 +318,14 @@ class SceneryManager {
             }
         }
 
-        // 4. Update Overhead Bridges & Passing Trains
-        this.overpassTimer++;
-        if (this.overpassTimer > this.overpassInterval) {
-            this.overpassTimer = 0;
-            this.spawnOverpass(-380);
-            this.overpassInterval = Math.floor(MathUtils.randRange(320, 480));
+        // 4. Update Overhead Bridges & Passing Trains (Starts after 650m distance, well spaced out!)
+        if (pDist >= 650) {
+            this.overpassTimer++;
+            if (this.overpassTimer > this.overpassInterval) {
+                this.overpassTimer = 0;
+                this.spawnOverpass(-380);
+                this.overpassInterval = Math.floor(MathUtils.randRange(2400, 3400)); // ~40-55 seconds apart
+            }
         }
 
         for (let j = this.overpasses.length - 1; j >= 0; j--) {
@@ -350,7 +377,7 @@ class SceneryManager {
         ctx.fillStyle = '#898630';
         ctx.fillRect(0, 0, 1080, 1920);
 
-        // 2. Draw Side Scenery (Under road / beside road)
+        // 2. Draw Side Scenery (Under road / beside road: Houses, Rivers, Crops, Trees)
         for (const item of this.sceneryItems) {
             if (item.type === 'stamp_text') {
                 ctx.save();
@@ -361,6 +388,122 @@ class SceneryManager {
                 ctx.letterSpacing = '3px';
                 ctx.fillText("LONG LIVE", 0, -25);
                 ctx.fillText("THE TRUE", 0, 25);
+                ctx.restore();
+                continue;
+            }
+
+            if (item.type === 'river') {
+                ctx.save();
+                ctx.translate(item.x, item.y);
+                const rw = item.w;
+                const rh = item.h;
+
+                // 1. Sandy Riverbank Shore
+                ctx.fillStyle = '#c59b6d';
+                ctx.beginPath();
+                ctx.roundRect(-rw / 2 - 12, -rh / 2, rw + 24, rh, 20);
+                ctx.fill();
+
+                // 2. Deep Sparkling Blue River Water
+                const waterGrad = ctx.createLinearGradient(-rw / 2, 0, rw / 2, 0);
+                waterGrad.addColorStop(0, '#0077b6');
+                waterGrad.addColorStop(0.5, '#0096c7');
+                waterGrad.addColorStop(1, '#023e8a');
+                ctx.fillStyle = waterGrad;
+                ctx.beginPath();
+                ctx.roundRect(-rw / 2, -rh / 2, rw, rh, 16);
+                ctx.fill();
+
+                // 3. Flowing Animated Water Ripples
+                const wTime = Date.now() * 0.003;
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
+                ctx.lineWidth = 2.5;
+                for (let ry = -rh / 2 + 35; ry < rh / 2; ry += 55) {
+                    const waveOff = Math.sin(ry * 0.1 + wTime + item.boatOffset) * 18;
+                    ctx.beginPath();
+                    ctx.moveTo(-rw / 2 + 25 + waveOff, ry);
+                    ctx.quadraticCurveTo(waveOff, ry - 10, rw / 2 - 25 + waveOff, ry);
+                    ctx.stroke();
+                }
+
+                // 4. Green Lilypads with Lotus Flowers
+                if (item.lilyPads) {
+                    for (const lp of item.lilyPads) {
+                        ctx.fillStyle = '#38b000';
+                        ctx.beginPath();
+                        ctx.arc(lp.x, lp.y, 12, 0, Math.PI * 1.8);
+                        ctx.lineTo(lp.x, lp.y);
+                        ctx.fill();
+
+                        ctx.fillStyle = '#ff70a6';
+                        ctx.beginPath();
+                        ctx.arc(lp.x + 2, lp.y - 2, 4, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+
+                // 5. Wooden Fishing Dock / Pier
+                if (item.hasDock) {
+                    const isDockLeft = item.side === 'left';
+                    const dx = isDockLeft ? rw / 2 - 60 : -rw / 2;
+                    ctx.fillStyle = '#6f4e37';
+                    ctx.fillRect(dx, -25, 60, 50);
+                    ctx.strokeStyle = '#3e2723';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(dx, -25, 60, 50);
+
+                    for (let px = dx + 10; px < dx + 60; px += 12) {
+                        ctx.beginPath();
+                        ctx.moveTo(px, -25);
+                        ctx.lineTo(px, 25);
+                        ctx.stroke();
+                    }
+
+                    ctx.fillStyle = '#3e2723';
+                    ctx.fillRect(dx + 48, -27, 8, 12);
+                    ctx.fillRect(dx + 48, 15, 8, 12);
+                }
+
+                // 6. Little Wooden Sailboat / Canoe
+                if (item.hasBoat) {
+                    const boatSway = Math.sin(wTime * 2 + item.boatOffset) * 6;
+                    const bx = item.side === 'left' ? -20 : 20;
+                    const by = boatSway;
+
+                    ctx.save();
+                    ctx.translate(bx, by);
+
+                    // Wooden Boat Hull
+                    ctx.fillStyle = '#8b5a2b';
+                    ctx.beginPath();
+                    ctx.moveTo(-28, 0);
+                    ctx.quadraticCurveTo(0, 14, 28, 0);
+                    ctx.quadraticCurveTo(0, -14, -28, 0);
+                    ctx.fill();
+                    ctx.strokeStyle = '#4a2c11';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+
+                    // White Sail
+                    ctx.fillStyle = '#ffffff';
+                    ctx.beginPath();
+                    ctx.moveTo(0, -2);
+                    ctx.lineTo(14, -18);
+                    ctx.lineTo(0, -18);
+                    ctx.closePath();
+                    ctx.fill();
+
+                    // Mast
+                    ctx.strokeStyle = '#4a2c11';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(0, 4);
+                    ctx.lineTo(0, -20);
+                    ctx.stroke();
+
+                    ctx.restore();
+                }
+
                 ctx.restore();
                 continue;
             }
@@ -455,7 +598,6 @@ class SceneryManager {
 
             // Signboard Content & Graphics
             if (s.type === 'road_damage_left' || s.type === 'road_damage_right') {
-                // High-visibility Construction Orange/Yellow
                 const bg = ctx.createLinearGradient(0, 0, 0, sh);
                 bg.addColorStop(0, '#ff7b00');
                 bg.addColorStop(1, '#e85d04');
@@ -467,7 +609,6 @@ class SceneryManager {
                 ctx.lineWidth = 3;
                 ctx.stroke();
 
-                // Flashing Amber Warning Strobes
                 const flash = Math.sin(s.lightTimer * 0.25) > 0;
                 ctx.fillStyle = flash ? '#ffea00' : '#705300';
                 ctx.shadowColor = flash ? '#ffea00' : 'transparent';
@@ -478,7 +619,6 @@ class SceneryManager {
                 ctx.fill();
                 ctx.shadowBlur = 0;
 
-                // Sign Text
                 ctx.fillStyle = '#000000';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
@@ -495,7 +635,6 @@ class SceneryManager {
                 ctx.fillText(detourText, 0, 94);
 
             } else if (s.type === 'railway_ahead' || s.type === 'train_station') {
-                // Diamond Railroad Yellow
                 const bg = ctx.createLinearGradient(0, 0, 0, sh);
                 bg.addColorStop(0, '#ffd166');
                 bg.addColorStop(1, '#ffb703');
@@ -507,7 +646,6 @@ class SceneryManager {
                 ctx.lineWidth = 3;
                 ctx.stroke();
 
-                // Flashing Red Alert Light
                 const flash = Math.sin(s.lightTimer * 0.3) > 0;
                 ctx.fillStyle = flash ? '#ff0033' : '#590d18';
                 ctx.shadowColor = flash ? '#ff0033' : 'transparent';
@@ -532,7 +670,6 @@ class SceneryManager {
                 ctx.fillText("BE PREPARED TO STOP", 0, 94);
 
             } else if (s.type === 'military_zone') {
-                // Red & White Tactical Hazard Sign
                 const bg = ctx.createLinearGradient(0, 0, 0, sh);
                 bg.addColorStop(0, '#d90429');
                 bg.addColorStop(1, '#9b2226');
@@ -544,7 +681,6 @@ class SceneryManager {
                 ctx.lineWidth = 3;
                 ctx.stroke();
 
-                // Flashing Siren
                 const flash = Math.sin(s.lightTimer * 0.35) > 0;
                 ctx.fillStyle = flash ? '#00f0ff' : '#0077b6';
                 ctx.shadowColor = flash ? '#00f0ff' : 'transparent';
@@ -569,7 +705,6 @@ class SceneryManager {
                 ctx.fillText("ARMORED ZONE", 0, 94);
 
             } else {
-                // Green Highway Route Information Sign
                 const bg = ctx.createLinearGradient(0, 0, 0, sh);
                 bg.addColorStop(0, '#065f46');
                 bg.addColorStop(1, '#044e3a');

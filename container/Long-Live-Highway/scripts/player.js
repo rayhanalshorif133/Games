@@ -278,7 +278,7 @@ class Player {
         const targetTilt = (this.vx / steerSpeed) * 0.14;
         this.angle = MathUtils.lerp(this.angle, targetTilt, this.tiltSmooth);
 
-        // Road Boundaries (between x=330 and x=750)
+        // Road Boundaries (between left curb and right curb)
         const roadMinX = 330;
         const roadMaxX = 750;
         if (this.x < roadMinX) {

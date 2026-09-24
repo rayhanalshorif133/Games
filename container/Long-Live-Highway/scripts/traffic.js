@@ -22,15 +22,16 @@ class TrafficManager {
         this.convoyTimer = 0;
     }
 
-    spawnTank(laneX, yOffset = 0) {
+    spawnTank(laneX = 540, yOffset = 0) {
         const distanceBonus = Math.min(6, (this.game.player.distance / 600) * 0.3);
+
         this.vehicles.push({
             id: 'tank',
             sprite: null, // Procedurally drawn high-detail military tank
-            w: 125,
-            h: 240,
+            w: 100,       // Proportionately balanced tank dimensions
+            h: 190,
             x: laneX,
-            y: -280 - yOffset,
+            y: -240 - yOffset,
             targetX: laneX,
             baseSpeed: 5.5 + distanceBonus,
             passScore: 5,
@@ -42,11 +43,11 @@ class TrafficManager {
     }
 
     spawnTankConvoy() {
-        // Spawns 2 tanks side by side across 2 lanes, leaving 1 narrow lane open
+        // Spawns 2 tanks side by side across 2 lanes, leaving 1 lane open
         const pattern = MathUtils.randChoice([
-            [410, 540], // Lane 1 & 2 blocked, Lane 3 open
-            [540, 670], // Lane 2 & 3 blocked, Lane 1 open
-            [410, 670]  // Lane 1 & 3 blocked, middle Lane 2 open
+            [410, 540], // Left & Center blocked, Right open
+            [540, 670], // Center & Right blocked, Left open
+            [410, 670]  // Left & Right blocked, Center open
         ]);
 
         pattern.forEach((laneX, idx) => {
@@ -84,6 +85,7 @@ class TrafficManager {
 
         chosenLanes.forEach((laneX, idx) => {
             const tooClose = this.vehicles.some(v => Math.abs(v.x - laneX) < 80 && v.y < 220 && v.y > -350);
+
             if (!tooClose) {
                 spawnedAny = true;
                 this.vehicles.push({
@@ -194,7 +196,7 @@ class TrafficManager {
                     v.x = MathUtils.lerp(v.x, v.targetX, 0.05);
                     v.angle = MathUtils.lerp(v.angle, (v.targetX - v.x) * 0.005, 0.1);
                 } else {
-                    v.angle = MathUtils.lerp(v.angle, 0, 0.1);
+                    v.angle = MathUtils.lerp(v.angle, (v.isOncoming ? Math.PI : 0), 0.1);
                 }
             } else {
                 v.treadOffset = (v.treadOffset + 4) % 24;
@@ -202,12 +204,12 @@ class TrafficManager {
                 if (Math.random() < 0.35 && v.y > -100 && v.y < 2000) {
                     this.game.particles.particles.push({
                         type: 'smoke',
-                        x: v.x + MathUtils.randChoice([-35, 35]),
-                        y: v.y + 110,
+                        x: v.x + MathUtils.randChoice([-30, 30]),
+                        y: v.y + 95,
                         vx: MathUtils.randRange(-1, 1),
                         vy: MathUtils.randRange(2, 5),
-                        radius: MathUtils.randRange(14, 24),
-                        maxRadius: 55,
+                        radius: MathUtils.randRange(12, 22),
+                        maxRadius: 50,
                         alpha: 0.7,
                         decay: 0.03,
                         color: '#2b2d42'
@@ -461,43 +463,60 @@ class TrafficManager {
     }
 
     drawTank(ctx, v) {
-        const w = v.w;
-        const h = v.h;
+        const w = v.w || 100;
+        const h = v.h || 190;
 
-        // 1. Heavy Drop Shadow
-        ctx.fillStyle = 'rgba(15, 20, 10, 0.5)';
+        // 1. Realistic Soft Ground Shadow (Offset slightly in sun angle)
+        ctx.fillStyle = 'rgba(12, 16, 12, 0.42)';
         ctx.beginPath();
-        ctx.roundRect(-w / 2 - 8, -h / 2 - 6, w + 16, h + 12, 16);
+        ctx.roundRect(-w / 2 + 3, -h / 2 + 10, w - 6, h - 8, 14);
+        ctx.fill();
+
+        // Deep contact shadows directly under caterpillar tracks
+        const trackW = 23;
+        ctx.fillStyle = 'rgba(8, 10, 8, 0.55)';
+        ctx.beginPath();
+        ctx.roundRect(-w / 2 + 1, -h / 2 + 8, trackW - 2, h - 12, 8);
+        ctx.roundRect(w / 2 - trackW + 1, -h / 2 + 8, trackW - 2, h - 12, 8);
         ctx.fill();
 
         // 2. Caterpillar Tracks (Left & Right)
-        const trackW = 28;
         const drawTrack = (tx) => {
-            // Track rubber/steel base
-            ctx.fillStyle = '#1e201c';
+            // Track rubber/steel base band
+            ctx.fillStyle = '#21241f';
             ctx.beginPath();
-            ctx.roundRect(tx, -h / 2, trackW, h, 12);
+            ctx.roundRect(tx, -h / 2 + 4, trackW, h - 8, 8);
             ctx.fill();
-            ctx.strokeStyle = '#3a3d36';
-            ctx.lineWidth = 2.5;
+            ctx.strokeStyle = '#3d4038';
+            ctx.lineWidth = 2;
             ctx.stroke();
 
-            // Tread segments (animated scrolling)
-            ctx.fillStyle = '#111210';
-            for (let ty = -h / 2 + 8; ty < h / 2 - 8; ty += 18) {
+            // Animated Tread Cleats & Links
+            ctx.fillStyle = '#141512';
+            for (let ty = -h / 2 + 10; ty < h / 2 - 10; ty += 14) {
                 const offY = (ty + (v.treadOffset || 0)) % (h - 24) - h / 2 + 12;
-                ctx.fillRect(tx + 2, offY, trackW - 4, 6);
+                ctx.fillRect(tx + 2, offY, trackW - 4, 5);
             }
 
-            // Road Wheels & Rollers
-            for (let wy = -h / 2 + 25; wy <= h / 2 - 25; wy += 38) {
-                ctx.fillStyle = '#3a3d36';
+            // Road Wheels (5 per track) with Hub Caps and Rim Highlights
+            const wheelRadius = 7.5;
+            for (let wy = -h / 2 + 20; wy <= h / 2 - 20; wy += 32) {
+                // Wheel Rim
+                ctx.fillStyle = '#4a4e44';
                 ctx.beginPath();
-                ctx.arc(tx + trackW / 2, wy, 9, 0, Math.PI * 2);
+                ctx.arc(tx + trackW / 2, wy, wheelRadius, 0, Math.PI * 2);
                 ctx.fill();
-                ctx.fillStyle = '#111210';
+
+                // Steel Inner Hub
+                ctx.fillStyle = '#1a1d17';
                 ctx.beginPath();
-                ctx.arc(tx + trackW / 2, wy, 4, 0, Math.PI * 2);
+                ctx.arc(tx + trackW / 2, wy, 3.5, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Center Bolt Dot
+                ctx.fillStyle = '#8f9485';
+                ctx.beginPath();
+                ctx.arc(tx + trackW / 2, wy, 1.2, 0, Math.PI * 2);
                 ctx.fill();
             }
         };
@@ -505,44 +524,44 @@ class TrafficManager {
         drawTrack(-w / 2);
         drawTrack(w / 2 - trackW);
 
-        // 3. Armored Tank Chassis (Military Camo Green)
-        const hullW = w - trackW * 2 + 10;
-        ctx.fillStyle = '#3e5229'; // Base olive camo
+        // 3. Armored Tank Chassis Hull (Military Olive Camo)
+        const hullW = w - trackW * 2 + 8; // 62px
+        ctx.fillStyle = '#41522d';
         ctx.beginPath();
-        ctx.roundRect(-hullW / 2, -h / 2 + 12, hullW, h - 24, 14);
+        ctx.roundRect(-hullW / 2, -h / 2 + 14, hullW, h - 28, 10);
         ctx.fill();
         ctx.strokeStyle = '#283618';
-        ctx.lineWidth = 3;
+        ctx.lineWidth = 2.5;
         ctx.stroke();
 
-        // Camouflage patches on hull
-        ctx.fillStyle = '#283618';
+        // Camouflage Pattern Patches
+        ctx.fillStyle = '#2b3818';
         ctx.beginPath();
-        ctx.roundRect(-hullW / 2 + 6, -h / 2 + 30, hullW * 0.5, 50, 10);
-        ctx.roundRect(0, 20, hullW * 0.45, 60, 10);
+        ctx.roundRect(-hullW / 2 + 4, -h / 2 + 26, hullW * 0.55, 38, 8);
+        ctx.roundRect(0, 15, hullW * 0.48, 45, 8);
         ctx.fill();
 
-        ctx.fillStyle = '#4f6935';
+        ctx.fillStyle = '#526938';
         ctx.beginPath();
-        ctx.roundRect(-hullW / 2 + 15, -h / 2 + 90, hullW * 0.6, 40, 8);
+        ctx.roundRect(-hullW / 2 + 10, -h / 2 + 75, hullW * 0.6, 32, 6);
         ctx.fill();
 
-        // Armor Plates & Rivet Bolts
-        ctx.fillStyle = '#1a2310';
-        for (let bx = -hullW / 2 + 4; bx <= hullW / 2 - 4; bx += 14) {
-            ctx.fillRect(bx, -h / 2 + 16, 2, 4);
-            ctx.fillRect(bx, h / 2 - 20, 2, 4);
+        // Front Glacis Plate & Rivets
+        ctx.fillStyle = '#1f2912';
+        for (let bx = -hullW / 2 + 6; bx <= hullW / 2 - 6; bx += 12) {
+            ctx.fillRect(bx, -h / 2 + 18, 2, 3);
+            ctx.fillRect(bx, h / 2 - 20, 2, 3);
         }
 
-        // Rear Exhaust Grilles
-        ctx.fillStyle = '#1e1e1e';
-        ctx.fillRect(-hullW / 2 + 8, h / 2 - 32, 18, 12);
-        ctx.fillRect(hullW / 2 - 26, h / 2 - 32, 18, 12);
+        // Rear Engine Exhaust Louvers
+        ctx.fillStyle = '#191c16';
+        ctx.fillRect(-hullW / 2 + 6, h / 2 - 24, 15, 9);
+        ctx.fillRect(hullW / 2 - 21, h / 2 - 24, 15, 9);
 
-        // 4. Main 120mm Cannon Barrel (Points forward)
+        // 4. Main 120mm Cannon Barrel
         ctx.fillStyle = '#283618';
         ctx.beginPath();
-        ctx.roundRect(-7, -h / 2 - 50, 14, 85, 4);
+        ctx.roundRect(-6, -h / 2 - 42, 12, 70, 3);
         ctx.fill();
         ctx.strokeStyle = '#1a2310';
         ctx.lineWidth = 2;
@@ -550,34 +569,34 @@ class TrafficManager {
 
         // Cannon Muzzle Brake
         ctx.fillStyle = '#1b2614';
-        ctx.fillRect(-11, -h / 2 - 58, 22, 14);
-        ctx.fillRect(-8, -h / 2 - 62, 16, 6);
+        ctx.fillRect(-9, -h / 2 - 48, 18, 10);
+        ctx.fillRect(-7, -h / 2 - 52, 14, 5);
 
         // 5. Rotating Center Armor Turret
         ctx.save();
         ctx.rotate(v.turretAngle || 0);
 
-        // Turret shadow & base
-        ctx.fillStyle = '#314220';
+        // Turret Cast Armor Body
+        ctx.fillStyle = '#364724';
         ctx.beginPath();
-        ctx.ellipse(0, 0, hullW * 0.42, 48, 0, 0, Math.PI * 2);
+        ctx.ellipse(0, 0, hullW * 0.44, 38, 0, 0, Math.PI * 2);
         ctx.fill();
-        ctx.strokeStyle = '#1b2614';
-        ctx.lineWidth = 3;
+        ctx.strokeStyle = '#1d2713';
+        ctx.lineWidth = 2.5;
         ctx.stroke();
 
         // Commander Cupola Hatch
-        ctx.fillStyle = '#222e16';
+        ctx.fillStyle = '#232f17';
         ctx.beginPath();
-        ctx.arc(-10, -12, 12, 0, Math.PI * 2);
+        ctx.arc(-8, -10, 9, 0, Math.PI * 2);
         ctx.fill();
 
         // White Military Tactical Star Insignia on Turret
         ctx.fillStyle = '#ffffff';
-        ctx.font = '900 18px Arial';
+        ctx.font = '900 15px Arial';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText("★", 12, 12);
+        ctx.fillText("★", 10, 10);
 
         ctx.restore();
     }

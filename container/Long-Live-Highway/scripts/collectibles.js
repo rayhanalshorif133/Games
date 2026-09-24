@@ -23,8 +23,6 @@ class CollectiblesManager {
         this.spawnTimer = 0;
         this.roadHazardTimer = 0;
         this.railCrossingTimer = 0;
-        // Spawn immediate road-level railway crossing with train on road ahead!
-        this.spawnRailCrossing(-620);
     }
 
     spawnCoinTrail(laneX, count = 4) {
@@ -97,9 +95,6 @@ class CollectiblesManager {
 
     spawnBrokenRoadHazard() {
         const isLeft = Math.random() > 0.5;
-        // Highway road goes from x=280 to x=800 (total width 520)
-        // Left broken zone: x=280, w=270 (player must drive in right lane x=550 to 750)
-        // Right broken zone: x=530, w=270 (player must drive in left lane x=330 to 530)
         const hazardX = isLeft ? 280 : 530;
         const hazardW = 270;
         const hazardH = Math.floor(MathUtils.randRange(650, 900));
@@ -189,12 +184,14 @@ class CollectiblesManager {
             }
         }
 
-        // 3. Spawning Road-Level Railway Crossings with Trains (Spawns frequently every ~6-8 seconds!)
-        this.railCrossingTimer++;
-        const crossingInterval = Math.max(320, 520 - Math.floor(pDist / 4));
-        if (this.railCrossingTimer > crossingInterval) {
-            this.railCrossingTimer = 0;
-            this.spawnRailCrossing(-350);
+        // 3. Spawning Road-Level Railway Crossings with Trains (Starts after 900m distance, well-spaced!)
+        if (pDist >= 900) {
+            this.railCrossingTimer++;
+            const crossingInterval = Math.max(2600, 3800 - Math.floor(pDist / 2));
+            if (this.railCrossingTimer > crossingInterval) {
+                this.railCrossingTimer = 0;
+                this.spawnRailCrossing(-350);
+            }
         }
 
         const p = this.game.player;
@@ -205,6 +202,7 @@ class CollectiblesManager {
             const br = this.brokenRoads[k];
             br.y += playerSpeed;
             br.flameTimer++;
+            br.x = br.side === 'left' ? 280 : 530;
 
             // Emit roaring fire flame tongues & sparks
             if (br.y > -500 && br.y < 2100) {
@@ -276,6 +274,9 @@ class CollectiblesManager {
             rc.y += playerSpeed;
             rc.train.x += rc.train.vx;
 
+            const rLeft = 280;
+            const rRight = 800;
+
             if (rc.y > -250 && rc.y < 2000) {
                 rc.lightTimer++;
                 // Ring crossing bell alarm
@@ -293,7 +294,7 @@ class CollectiblesManager {
                 // Locomotive diesel smoke
                 if (rc.lightTimer % 4 === 0 && !rc.train.isBlasted) {
                     const locoX = rc.train.isMovingRight ? rc.train.x + 80 : rc.train.x + rc.train.totalW - 80;
-                    if (locoX > 200 && locoX < 880) {
+                    if (locoX > rLeft - 80 && locoX < rRight + 80) {
                         this.game.particles.particles.push({
                             type: 'smoke',
                             x: locoX,
@@ -316,11 +317,11 @@ class CollectiblesManager {
                 const trainRight = rc.train.x + rc.train.totalW;
 
                 // Check if train is currently occupying the highway road area
-                if (trainRight > 280 && trainLeft < 800) {
+                if (trainRight > rLeft && trainLeft < rRight) {
                     const trainBounds = {
-                        x: Math.max(280, trainLeft),
+                        x: Math.max(rLeft, trainLeft),
                         y: rc.y + 42,
-                        w: Math.min(800, trainRight) - Math.max(280, trainLeft),
+                        w: Math.min(rRight, trainRight) - Math.max(rLeft, trainLeft),
                         h: 66
                     };
 
