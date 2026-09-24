@@ -37,6 +37,10 @@ class Game {
         // Camera Shake
         this.screenShake = 0;
 
+        // Score reporting flag
+        this.scoreSent = false;
+        this.gameOverClosed = false;
+
         this.initInputListeners();
     }
 
@@ -136,22 +140,49 @@ class Game {
             }
             if (this.state === 'GAMEOVER') {
                 const tc = this.ui.touchControls;
-                // Check Cross Button (redirect to "/")
-                if (MathUtils.dist(pos.x, pos.y, tc.gameOverCloseBtn.x, tc.gameOverCloseBtn.y) <= tc.gameOverCloseBtn.r + 15) {
-                    window.location.href = '/';
+                // Check Cross Button (dismiss / close popup)
+                if (!this.gameOverClosed && MathUtils.dist(pos.x, pos.y, tc.gameOverCloseBtn.x, tc.gameOverCloseBtn.y) <= tc.gameOverCloseBtn.r + 15) {
+                    this.gameOverClosed = true;
                     return;
                 }
-                // Check Back to Home Button (redirect to "/")
-                const hb = tc.gameOverHomeBtn;
-                if (pos.x >= hb.x - hb.w / 2 && pos.x <= hb.x + hb.w / 2 &&
-                    pos.y >= hb.y - hb.h / 2 && pos.y <= hb.y + hb.h / 2) {
-                    window.location.href = '/';
-                    return;
-                }
-                // Check Try Again Button
-                const pb = tc.gameOverPlayAgainBtn;
-                if (pos.x >= pb.x - pb.w / 2 && pos.x <= pb.x + pb.w / 2 &&
-                    pos.y >= pb.y - pb.h / 2 && pos.y <= pb.y + pb.h / 2) {
+                if (!this.gameOverClosed) {
+                    // Check Revive Button (starts at 5 coins, increases by +5 each time: 5 -> 10 -> 15 -> 20...)
+                    const rb = tc.gameOverReviveBtn;
+                    if (rb && pos.x >= rb.x - rb.w / 2 && pos.x <= rb.x + rb.w / 2 &&
+                        pos.y >= rb.y - rb.h / 2 && pos.y <= rb.y + rb.h / 2) {
+                        const reviveCost = this.player.getReviveCost ? this.player.getReviveCost() : 5;
+                        if (this.player.coins >= reviveCost) {
+                            this.player.coins -= reviveCost;
+                            this.player.revive();
+                            // Clear immediate traffic & road hazard directly around player
+                            this.traffic.vehicles = this.traffic.vehicles.filter(v => v.y < this.player.y - 500 || v.y > this.player.y + 300);
+                            this.collectibles.brokenRoads = this.collectibles.brokenRoads.filter(br => br.y < this.player.y - 600 || br.y > this.player.y + 400);
+                            this.state = 'PLAYING';
+                            this.scoreSent = false;
+                            this.gameOverClosed = false;
+                            this.ui.triggerCoinBump();
+                            return;
+                        } else {
+                            this.particles.addScorePopup(540, 940, `NEED ${reviveCost} ⭐ TO REVIVE!`, "#ef476f");
+                            return;
+                        }
+                    }
+                    // Check Back to Home Button (redirect to "/")
+                    const hb = tc.gameOverHomeBtn;
+                    if (pos.x >= hb.x - hb.w / 2 && pos.x <= hb.x + hb.w / 2 &&
+                        pos.y >= hb.y - hb.h / 2 && pos.y <= hb.y + hb.h / 2) {
+                        window.location.href = '/';
+                        return;
+                    }
+                    // Check Try Again Button
+                    const pb = tc.gameOverPlayAgainBtn;
+                    if (pos.x >= pb.x - pb.w / 2 && pos.x <= pb.x + pb.w / 2 &&
+                        pos.y >= pb.y - pb.h / 2 && pos.y <= pb.y + pb.h / 2) {
+                        this.startGame();
+                        return;
+                    }
+                } else {
+                    // If popup was closed, tap anywhere on screen restarts game
                     this.startGame();
                     return;
                 }
@@ -159,9 +190,9 @@ class Game {
             }
             if (this.state === 'PAUSED') {
                 const tc = this.ui.touchControls;
-                // 1. Check Cross Button (redirect to "/")
+                // 1. Check Cross Button (dismiss pause popup / resume game)
                 if (tc.pauseCloseBtn && MathUtils.dist(pos.x, pos.y, tc.pauseCloseBtn.x, tc.pauseCloseBtn.y) <= tc.pauseCloseBtn.r + 15) {
-                    window.location.href = '/';
+                    this.togglePause();
                     return;
                 }
                 // 2. Check Back to Home Button (redirect to "/")
@@ -230,22 +261,49 @@ class Game {
             }
             if (this.state === 'GAMEOVER') {
                 const tc = this.ui.touchControls;
-                // Check Cross Button (redirect to "/")
-                if (MathUtils.dist(pos.x, pos.y, tc.gameOverCloseBtn.x, tc.gameOverCloseBtn.y) <= tc.gameOverCloseBtn.r + 15) {
-                    window.location.href = '/';
+                // Check Cross Button (dismiss / close popup)
+                if (!this.gameOverClosed && MathUtils.dist(pos.x, pos.y, tc.gameOverCloseBtn.x, tc.gameOverCloseBtn.y) <= tc.gameOverCloseBtn.r + 15) {
+                    this.gameOverClosed = true;
                     return;
                 }
-                // Check Back to Home Button (redirect to "/")
-                const hb = tc.gameOverHomeBtn;
-                if (pos.x >= hb.x - hb.w / 2 && pos.x <= hb.x + hb.w / 2 &&
-                    pos.y >= hb.y - hb.h / 2 && pos.y <= hb.y + hb.h / 2) {
-                    window.location.href = '/';
-                    return;
-                }
-                // Check Try Again Button
-                const pb = tc.gameOverPlayAgainBtn;
-                if (pos.x >= pb.x - pb.w / 2 && pos.x <= pb.x + pb.w / 2 &&
-                    pos.y >= pb.y - pb.h / 2 && pos.y <= pb.y + pb.h / 2) {
+                if (!this.gameOverClosed) {
+                    // Check Revive Button (starts at 5 coins, increases by +5 each time: 5 -> 10 -> 15 -> 20...)
+                    const rb = tc.gameOverReviveBtn;
+                    if (rb && pos.x >= rb.x - rb.w / 2 && pos.x <= rb.x + rb.w / 2 &&
+                        pos.y >= rb.y - rb.h / 2 && pos.y <= rb.y + rb.h / 2) {
+                        const reviveCost = this.player.getReviveCost ? this.player.getReviveCost() : 5;
+                        if (this.player.coins >= reviveCost) {
+                            this.player.coins -= reviveCost;
+                            this.player.revive();
+                            // Clear immediate traffic & road hazard directly around player
+                            this.traffic.vehicles = this.traffic.vehicles.filter(v => v.y < this.player.y - 500 || v.y > this.player.y + 300);
+                            this.collectibles.brokenRoads = this.collectibles.brokenRoads.filter(br => br.y < this.player.y - 600 || br.y > this.player.y + 400);
+                            this.state = 'PLAYING';
+                            this.scoreSent = false;
+                            this.gameOverClosed = false;
+                            this.ui.triggerCoinBump();
+                            return;
+                        } else {
+                            this.particles.addScorePopup(540, 940, `NEED ${reviveCost} ⭐ TO REVIVE!`, "#ef476f");
+                            return;
+                        }
+                    }
+                    // Check Back to Home Button (redirect to "/")
+                    const hb = tc.gameOverHomeBtn;
+                    if (pos.x >= hb.x - hb.w / 2 && pos.x <= hb.x + hb.w / 2 &&
+                        pos.y >= hb.y - hb.h / 2 && pos.y <= hb.y + hb.h / 2) {
+                        window.location.href = '/';
+                        return;
+                    }
+                    // Check Try Again Button
+                    const pb = tc.gameOverPlayAgainBtn;
+                    if (pos.x >= pb.x - pb.w / 2 && pos.x <= pb.x + pb.w / 2 &&
+                        pos.y >= pb.y - pb.h / 2 && pos.y <= pb.y + pb.h / 2) {
+                        this.startGame();
+                        return;
+                    }
+                } else {
+                    // If popup was closed, click anywhere on screen restarts game
                     this.startGame();
                     return;
                 }
@@ -253,9 +311,9 @@ class Game {
             }
             if (this.state === 'PAUSED') {
                 const tc = this.ui.touchControls;
-                // 1. Check Cross Button (redirect to "/")
+                // 1. Check Cross Button (dismiss pause popup / resume game)
                 if (tc.pauseCloseBtn && MathUtils.dist(pos.x, pos.y, tc.pauseCloseBtn.x, tc.pauseCloseBtn.y) <= tc.pauseCloseBtn.r + 15) {
-                    window.location.href = '/';
+                    this.togglePause();
                     return;
                 }
                 // 2. Check Back to Home Button (redirect to "/")
@@ -334,6 +392,8 @@ class Game {
 
     startGame() {
         this.state = 'PLAYING';
+        this.scoreSent = false;
+        this.gameOverClosed = false;
         this.player.reset();
         this.traffic.reset();
         this.collectibles.reset();
@@ -355,7 +415,19 @@ class Game {
     onGameOver(reason) {
         this.state = 'GAMEOVER';
         this.gameOverReason = reason;
+        this.gameOverClosed = false;
         this.screenShake = 25;
+
+        // Send score via send_score_api.js precisely once per game over event
+        if (!this.scoreSent) {
+            this.scoreSent = true;
+            const finalScore = Number(this.player.score) || 0;
+            if (typeof window !== 'undefined' && typeof window.sendScore === 'function') {
+                window.sendScore(finalScore);
+            } else if (typeof sendScore === 'function') {
+                sendScore(finalScore);
+            }
+        }
     }
 
     update(dt = 1) {
@@ -435,7 +507,9 @@ class Game {
             this.ui.drawStartScreen(this.ctx);
         } else if (this.state === 'GAMEOVER') {
             this.ui.drawHUD(this.ctx);
-            this.ui.drawGameOverScreen(this.ctx, this.gameOverReason);
+            if (!this.gameOverClosed) {
+                this.ui.drawGameOverScreen(this.ctx, this.gameOverReason);
+            }
         } else if (this.state === 'PAUSED') {
             this.ui.drawHUD(this.ctx);
             this.ui.drawPauseScreen(this.ctx);

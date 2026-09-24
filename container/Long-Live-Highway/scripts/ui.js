@@ -20,9 +20,10 @@ class UIManager {
             brakeBtn: { x: 185, y: 1710, r: 135, w: 270, h: 270 },
             boostBtn: { x: 895, y: 1710, r: 135, w: 270, h: 270 },
             speedBadge: { x: 540, y: 1865, w: 190, h: 110 },
-            gameOverCloseBtn: { x: 860, y: 620, r: 34 },
-            gameOverPlayAgainBtn: { x: 540, y: 1120, w: 480, h: 96 },
-            gameOverHomeBtn: { x: 540, y: 1245, w: 480, h: 96 },
+            gameOverCloseBtn: { x: 860, y: 580, r: 34 },
+            gameOverReviveBtn: { x: 540, y: 1040, w: 480, h: 84 },
+            gameOverPlayAgainBtn: { x: 540, y: 1140, w: 480, h: 84 },
+            gameOverHomeBtn: { x: 540, y: 1240, w: 480, h: 84 },
             pauseCloseBtn: { x: 830, y: 635, r: 32 },
             pauseResumeBtn: { x: 540, y: 790, w: 480, h: 86 },
             pauseRestartBtn: { x: 540, y: 900, w: 480, h: 86 },
@@ -542,7 +543,7 @@ class UIManager {
         // Modal Frame
         ctx.fillStyle = 'rgba(28, 35, 25, 0.96)';
         ctx.beginPath();
-        ctx.roundRect(cx - 360, cy - 360, 720, 760, 32);
+        ctx.roundRect(cx - 360, cy - 400, 720, 830, 32);
         ctx.fill();
         ctx.strokeStyle = '#d7b365';
         ctx.lineWidth = 4;
@@ -551,22 +552,22 @@ class UIManager {
         // Inner Border
         ctx.strokeStyle = 'rgba(215, 179, 101, 0.35)';
         ctx.lineWidth = 1.5;
-        ctx.strokeRect(cx - 348, cy - 348, 696, 736);
+        ctx.strokeRect(cx - 348, cy - 388, 696, 806);
 
         // Title
-        ctx.font = '900 68px "Impact", "Arial Black", sans-serif';
+        ctx.font = '900 66px "Impact", "Arial Black", sans-serif';
         ctx.fillStyle = '#ef476f';
         ctx.textAlign = 'center';
-        ctx.fillText("GAME OVER", cx, cy - 250);
+        ctx.fillText("GAME OVER", cx, cy - 300);
 
-        ctx.font = 'bold 32px "Segoe UI", Arial, sans-serif';
+        ctx.font = 'bold 30px "Segoe UI", Arial, sans-serif';
         ctx.fillStyle = '#ffffff';
-        ctx.fillText(reason || "VEHICLE CRASHED!", cx, cy - 190);
+        ctx.fillText(reason || "VEHICLE CRASHED!", cx, cy - 245);
 
         // Results Card
         ctx.fillStyle = 'rgba(15, 20, 15, 0.8)';
         ctx.beginPath();
-        ctx.roundRect(cx - 310, cy - 150, 620, 280, 20);
+        ctx.roundRect(cx - 310, cy - 215, 620, 230, 20);
         ctx.fill();
         ctx.strokeStyle = '#d7b365';
         ctx.lineWidth = 3;
@@ -596,63 +597,108 @@ class UIManager {
         ctx.stroke();
         ctx.restore();
 
-        ctx.font = 'bold 30px "Segoe UI", Arial, sans-serif';
+        ctx.font = 'bold 28px "Segoe UI", Arial, sans-serif';
         ctx.fillStyle = '#b9a731';
-        ctx.fillText("FINAL RESULTS", cx, cy - 90);
+        ctx.fillText("FINAL RESULTS", cx, cy - 165);
 
         ctx.textAlign = 'left';
-        ctx.font = 'bold 32px "Segoe UI", Arial, sans-serif';
+        ctx.font = 'bold 30px "Segoe UI", Arial, sans-serif';
         ctx.fillStyle = '#ffffff';
-        ctx.fillText("Total Score:", cx - 270, cy - 30);
-        ctx.fillText("Distance Traveled:", cx - 270, cy + 30);
-        ctx.fillText("Stars Collected:", cx - 270, cy + 90);
+        ctx.fillText("Total Score:", cx - 270, cy - 115);
+        ctx.fillText("Distance Traveled:", cx - 270, cy - 65);
+        ctx.fillText("Stars Collected:", cx - 270, cy - 15);
 
         ctx.textAlign = 'right';
         ctx.fillStyle = '#ffd166';
-        ctx.fillText(`${p.score}`, cx + 270, cy - 30);
+        ctx.fillText(`${p.score}`, cx + 270, cy - 115);
         ctx.fillStyle = '#06d6a0';
-        ctx.fillText(`${Math.floor(p.distance)} m`, cx + 270, cy + 30);
+        ctx.fillText(`${Math.floor(p.distance)} m`, cx + 270, cy - 65);
         ctx.fillStyle = '#ffbe0b';
-        ctx.fillText(`⭐ ${p.coins}`, cx + 270, cy + 90);
+        ctx.fillText(`⭐ ${p.coins}`, cx + 270, cy - 15);
 
-        // 1. Try Again Button
+        // 1. REVIVE WITH COINS BUTTON
+        const rb = this.touchControls.gameOverReviveBtn;
+        const canRevive = p.coins >= 5;
+        const pulseRevive = canRevive ? (1.0 + Math.sin(Date.now() * 0.008) * 0.04) : 1.0;
+
+        ctx.save();
+        ctx.translate(rb.x, rb.y);
+        ctx.scale(pulseRevive, pulseRevive);
+
+        if (canRevive) {
+            // Active Golden Glowing Button
+            const revGrad = ctx.createLinearGradient(-rb.w / 2, 0, rb.w / 2, 0);
+            revGrad.addColorStop(0, '#ffbe0b');
+            revGrad.addColorStop(1, '#fb5607');
+            ctx.fillStyle = revGrad;
+            ctx.beginPath();
+            ctx.roundRect(-rb.w / 2, -rb.h / 2, rb.w, rb.h, 26);
+            ctx.fill();
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 3.5;
+            ctx.stroke();
+
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.font = '900 36px "Segoe UI", Arial, sans-serif';
+            ctx.fillStyle = '#1b1b1e';
+            ctx.fillText("⚡ REVIVE (5 ⭐)", 0, 0);
+        } else {
+            // Disabled Button (Not enough coins)
+            ctx.fillStyle = 'rgba(45, 55, 45, 0.7)';
+            ctx.beginPath();
+            ctx.roundRect(-rb.w / 2, -rb.h / 2, rb.w, rb.h, 26);
+            ctx.fill();
+            ctx.strokeStyle = '#556b2f';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.font = '900 30px "Segoe UI", Arial, sans-serif';
+            ctx.fillStyle = '#8d99ae';
+            ctx.fillText(`🔒 NEED 5 ⭐ TO REVIVE (${p.coins}/5)`, 0, 0);
+        }
+        ctx.restore();
+
+        // 2. Try Again Button
         const pb = this.touchControls.gameOverPlayAgainBtn;
-        const pulse = 1.0 + Math.sin(Date.now() * 0.006) * 0.04;
+        const pulse = 1.0 + Math.sin(Date.now() * 0.006) * 0.03;
         ctx.save();
         ctx.translate(pb.x, pb.y);
         ctx.scale(pulse, pulse);
 
         ctx.fillStyle = '#06d6a0';
         ctx.beginPath();
-        ctx.roundRect(-pb.w / 2, -pb.h / 2, pb.w, pb.h, 28);
+        ctx.roundRect(-pb.w / 2, -pb.h / 2, pb.w, pb.h, 26);
         ctx.fill();
         ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 4;
+        ctx.lineWidth = 3.5;
         ctx.stroke();
 
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.font = '900 40px "Segoe UI", Arial, sans-serif';
+        ctx.font = '900 36px "Segoe UI", Arial, sans-serif';
         ctx.fillStyle = '#112211';
         ctx.fillText("🔄 TRY AGAIN", 0, 0);
         ctx.restore();
 
-        // 2. Back to Home Button
+        // 3. Back to Home Button
         const hb = this.touchControls.gameOverHomeBtn;
         ctx.save();
         ctx.translate(hb.x, hb.y);
 
         ctx.fillStyle = '#3a506b';
         ctx.beginPath();
-        ctx.roundRect(-hb.w / 2, -hb.h / 2, hb.w, hb.h, 28);
+        ctx.roundRect(-hb.w / 2, -hb.h / 2, hb.w, hb.h, 26);
         ctx.fill();
         ctx.strokeStyle = '#d7b365';
-        ctx.lineWidth = 3;
+        ctx.lineWidth = 2.5;
         ctx.stroke();
 
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.font = '900 36px "Segoe UI", Arial, sans-serif';
+        ctx.font = '900 34px "Segoe UI", Arial, sans-serif';
         ctx.fillStyle = '#ffffff';
         ctx.fillText("🏠 BACK TO HOME", 0, 0);
         ctx.restore();

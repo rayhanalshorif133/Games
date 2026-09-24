@@ -80,6 +80,53 @@ class ParticleSystem {
         }
     }
 
+    addFireFlame(x, y, size = 18) {
+        // Flame tongue puff
+        this.particles.push({
+            type: 'flame',
+            x: x + MathUtils.randRange(-8, 8),
+            y: y + MathUtils.randRange(-4, 4),
+            vx: MathUtils.randRange(-0.8, 0.8),
+            vy: MathUtils.randRange(-4.5, -2.0),
+            radius: size,
+            maxRadius: size * 1.8,
+            alpha: 0.95,
+            decay: MathUtils.randRange(0.025, 0.045),
+            color: MathUtils.randChoice(['#ffbe0b', '#fb5607', '#ff0055', '#ff9e00', '#ffffff'])
+        });
+
+        // Occasional floating ember spark
+        if (Math.random() < 0.4) {
+            this.particles.push({
+                type: 'spark',
+                x: x + MathUtils.randRange(-12, 12),
+                y: y,
+                vx: MathUtils.randRange(-1.5, 1.5),
+                vy: MathUtils.randRange(-5, -2),
+                radius: MathUtils.randRange(3, 7),
+                alpha: 1.0,
+                decay: 0.03,
+                color: MathUtils.randChoice(['#ffd166', '#ff5400', '#ffffff'])
+            });
+        }
+    }
+
+    addFireEmbers(x, y, count = 5) {
+        for (let i = 0; i < count; i++) {
+            this.particles.push({
+                type: 'spark',
+                x: x + MathUtils.randRange(-15, 15),
+                y: y + MathUtils.randRange(-10, 10),
+                vx: MathUtils.randRange(-2, 2),
+                vy: MathUtils.randRange(-6, -1),
+                radius: MathUtils.randRange(3, 8),
+                alpha: 1.0,
+                decay: 0.025,
+                color: MathUtils.randChoice(['#ff5400', '#ffbe0b', '#fb5607', '#fff'])
+            });
+        }
+    }
+
     addCarExplosion(x, y) {
         // Shockwave rings
         this.explosions.push({

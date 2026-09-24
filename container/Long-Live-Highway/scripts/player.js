@@ -70,6 +70,29 @@ class Player {
         this.coins = 0;
     }
 
+    revive() {
+        this.isAlive = true;
+        this.isAirborne = false;
+        this.airborneTimer = 0;
+        this.flyVx = 0;
+        this.flyVy = 0;
+        this.altitude = 0;
+        this.tumbleAngle = 0;
+        this.angle = 0;
+        this.vx = 0;
+        this.x = 540;
+        this.y = 1450;
+        this.targetX = 540;
+        this.speed = this.normalSpeed;
+        this.isSpinning = false;
+        this.spinAngle = 0;
+        this.fuel = this.maxFuel;
+        this.addShield(400); // 6.5 seconds of invincible shield!
+        this.game.particles.addCarExplosion(this.x, this.y);
+        this.game.particles.addScorePopup(this.x, this.y - 70, "⚡ REVIVED! (SHIELD ACTIVE) ⚡", "#00f0ff");
+        window.soundManager.startEngine();
+    }
+
     canUseNitro() {
         return this.nitroCount > 0 && !this.isNitroActive && this.isAlive && !this.isAirborne;
     }
