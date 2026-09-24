@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Long Live The True - Highway</title>
+    <link rel="manifest" href="appmanifest.json">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="icons/icon-128.png">
+</head>
+<body>
+    <div id="game-container">
+        <!-- Canvas with layout resolution 1080 x 1920 -->
+        <canvas id="c3canvas" width="1080" height="1920"></canvas>
+
+        <!-- Construct 3 Preloader -->
+        <div id="loading-screen">
+            <div class="loader-title">LONG LIVE THE TRUE</div>
+            <div class="progress-container">
+                <div id="loading-progress"></div>
+            </div>
+            <div id="loading-text">Loading Assets...</div>
+        </div>
+    </div>
+
+    <!-- Game Scripts Architecture -->
+    <script src="scripts/audio.js"></script>
+    <script src="scripts/math.js"></script>
+    <script src="scripts/particles.js"></script>
+    <script src="scripts/player.js"></script>
+    <script src="scripts/traffic.js"></script>
+    <script src="scripts/collectibles.js"></script>
+    <script src="scripts/scenery.js"></script>
+    <script src="scripts/ui.js"></script>
+    <script src="scripts/game.js"></script>
+    <script src="c3runtime.js"></script>
+    <script src="scripts/main.js"></script>
+</body>
+</html>

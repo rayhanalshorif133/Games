@@ -1,0 +1,27 @@
+{
+  "name": "Long Live The True",
+  "short_name": "RoadOdyssey",
+  "description": "Retro stylized top-down highway driving game with 1080x1920 layout.",
+  "start_url": "index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#898630",
+  "theme_color": "#d7b365",
+  "icons": [
+    {
+      "src": "icons/icon-128.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-256.png",
+      "sizes": "256x256",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

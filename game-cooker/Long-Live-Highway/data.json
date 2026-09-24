@@ -1,0 +1,40 @@
+{
+  "project": {
+    "name": "Long Live The True - Highway Odyssey",
+    "version": "1.0.0.0",
+    "description": "Retro stylized top-down highway driving game inspired by demo.gif with responsive portrait 1080x1920 layout.",
+    "author": "Antigravity Construct3 Builder",
+    "layout": {
+      "name": "GameLayout",
+      "width": 1080,
+      "height": 1920,
+      "unboundedScrolling": true,
+      "viewportWidth": 1080,
+      "viewportHeight": 1920,
+      "orientation": "portrait",
+      "sampling": "bilinear",
+      "fullscreenMode": "letterbox scale"
+    },
+    "objectTypes": [
+      { "name": "PlayerCar", "plugin-id": "Sprite", "asset": "images/car_red.png", "width": 100, "height": 190 },
+      { "name": "TrafficBlue", "plugin-id": "Sprite", "asset": "images/car_blue.png", "width": 95, "height": 180 },
+      { "name": "TrafficYellow", "plugin-id": "Sprite", "asset": "images/car_yellow.png", "width": 95, "height": 180 },
+      { "name": "TrafficTruck", "plugin-id": "Sprite", "asset": "images/car_truck.png", "width": 115, "height": 300 },
+      { "name": "TrafficPolice", "plugin-id": "Sprite", "asset": "images/car_police.png", "width": 95, "height": 180 },
+      { "name": "HouseTerracotta", "plugin-id": "Sprite", "asset": "images/house_terracotta.png", "width": 360, "height": 320 },
+      { "name": "HouseBlue", "plugin-id": "Sprite", "asset": "images/house_blue.png", "width": 280, "height": 280 },
+      { "name": "CropsField", "plugin-id": "Sprite", "asset": "images/crops_field.png", "width": 340, "height": 480 },
+      { "name": "TreeLarge", "plugin-id": "Sprite", "asset": "images/tree_large.png", "width": 220, "height": 220 },
+      { "name": "TreeMedium", "plugin-id": "Sprite", "asset": "images/tree_medium.png", "width": 140, "height": 140 },
+      { "name": "Bird", "plugin-id": "Sprite", "frames": ["images/bird_f1.png", "images/bird_f2.png", "images/bird_f3.png"], "width": 70, "height": 60 },
+      { "name": "PickupFuel", "plugin-id": "Sprite", "asset": "images/pickup_fuel.png", "width": 70, "height": 70 },
+      { "name": "PickupCoin", "plugin-id": "Sprite", "asset": "images/pickup_coin.png", "width": 70, "height": 70 },
+      { "name": "PickupNitro", "plugin-id": "Sprite", "asset": "images/pickup_nitro.png", "width": 70, "height": 70 },
+      { "name": "PickupShield", "plugin-id": "Sprite", "asset": "images/pickup_shield.png", "width": 70, "height": 70 },
+      { "name": "HazardOil", "plugin-id": "Sprite", "asset": "images/hazard_oil.png", "width": 90, "height": 70 },
+      { "name": "Audio", "plugin-id": "Audio", "driver": "WebAudioAPI" },
+      { "name": "Touch", "plugin-id": "Touch" },
+      { "name": "Keyboard", "plugin-id": "Keyboard" }
+    ]
+  }
+}
