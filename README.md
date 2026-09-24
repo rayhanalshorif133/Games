@@ -1,4 +1,4 @@
-## 1. 📊 Score API Integration Prompts
+## 📊 Score API Integration Prompts
 
 ```text
 Integrate the existing `send_score_api.js` script into this game adhering to these strict rules:
@@ -9,7 +9,12 @@ Integrate the existing `send_score_api.js` script into this game adhering to the
 5. Ensure the score is sent only once per game over event.
 ```
 
-## 2. 🎨 Game Banner Creation Prompts
+## Redirect to Home
+```text
+game over hole popup e je try again button ache setar niche back to home name e ekta button add koro and setay click korle "/" e redirect koraw same ase right side e cross button e click korleo "/" ey URL e redirect koraw
+```
+
+## 🎨 Game Banner Creation Prompts
 
 ```text
 Ey game er ui er upore based kore ekta banner image baniye daw banner e sudu game title tay thkabe ar kono text thkabe na banner size: h: 600 and w: 1000
