@@ -261,6 +261,39 @@ class TrafficManager {
                 };
 
                 if (MathUtils.checkAABB(pBounds, vBounds)) {
+                    const p = this.game.player;
+
+                    // --- JUMP STOMP / CRUSH MECHANIC ---
+                    // When player jumps and lands on top of a traffic vehicle, the vehicle is crushed & destroyed!
+                    if (p.isJumping) {
+                        const isTank = v.id === 'tank';
+                        const pts = isTank ? 20 : 10;
+                        const label = isTank ? "💥 +20 TANK CRUSHED!" : "🚗💥 +10 CAR CRUSHED!";
+
+                        p.score += pts;
+                        p.jumpCarClearCount++;
+                        this.game.particles.addCarExplosion(v.x, v.y);
+                        this.game.particles.addJumpLaunchBlast(v.x, v.y);
+                        this.game.particles.addScorePopup(v.x, v.y - 50, label, '#ffd166');
+                        this.game.screenShake = isTank ? 35 : 25;
+                        window.soundManager.playNitroSmash();
+
+                        // Satisfying rebound bounce off the crushed car roof
+                        p.jumpVy = Math.max(16, p.jumpVy + 12);
+                        p.jumpAltitude = Math.max(30, p.jumpAltitude);
+
+                        // Catapult crushed wreckage away
+                        this.catapultWreckage(v, {
+                            vx: (v.x - p.x) * 0.35 + MathUtils.randRange(-15, 15),
+                            vy: 10,
+                            spin: MathUtils.randRange(-0.45, 0.45),
+                            type: 'jump_stomp'
+                        });
+
+                        this.vehicles.splice(i, 1);
+                        continue;
+                    }
+
                     if (this.game.player.isNitroActive) {
                         // --- 1. NITRO RAM EXPLOSION BLAST (+15 for tank, +5 for cars) ---
                         const isTank = v.id === 'tank';

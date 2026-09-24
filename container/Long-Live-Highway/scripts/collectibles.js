@@ -10,9 +10,11 @@ class CollectiblesManager {
         this.items = [];
         this.brokenRoads = [];
         this.railCrossings = [];
+        this.jumpRamps = [];
         this.spawnTimer = 0;
         this.roadHazardTimer = 0;
         this.railCrossingTimer = 0;
+        this.jumpRampTimer = 0;
         this.lanes = [390, 490, 590, 690];
     }
 
@@ -20,9 +22,26 @@ class CollectiblesManager {
         this.items = [];
         this.brokenRoads = [];
         this.railCrossings = [];
+        this.jumpRamps = [];
         this.spawnTimer = 0;
         this.roadHazardTimer = 0;
         this.railCrossingTimer = 0;
+        this.jumpRampTimer = 0;
+    }
+
+    spawnJumpRamp(yPos = -200) {
+        const laneX = MathUtils.randChoice(this.lanes);
+        const rampW = 96;
+        const rampH = 125;
+
+        this.jumpRamps.push({
+            x: laneX,
+            y: yPos,
+            w: rampW,
+            h: rampH,
+            glowTimer: 0,
+            triggered: false
+        });
     }
 
     spawnCoinTrail(laneX, count = 4) {
@@ -194,10 +213,18 @@ class CollectiblesManager {
             }
         }
 
+        // 4. Spawning Road Stunt Jump Ramps
+        this.jumpRampTimer++;
+        const jumpRampInterval = Math.max(300, 480 - Math.floor(pDist / 8));
+        if (this.jumpRampTimer > jumpRampInterval) {
+            this.jumpRampTimer = 0;
+            this.spawnJumpRamp(-200);
+        }
+
         const p = this.game.player;
         const pBounds = p.getBounds();
 
-        // 4. Update Broken Road Hazards
+        // 5. Update Broken Road Hazards
         for (let k = this.brokenRoads.length - 1; k >= 0; k--) {
             const br = this.brokenRoads[k];
             br.y += playerSpeed;
@@ -240,6 +267,17 @@ class CollectiblesManager {
                 };
 
                 if (MathUtils.checkAABB(pBounds, brBounds)) {
+                    // Check if player jumped over the fire pit
+                    if (p.isJumping && p.jumpAltitude > 22) {
+                        if (!br.jumpCleared) {
+                            br.jumpCleared = true;
+                            p.score += 4;
+                            this.game.particles.addScorePopup(p.x, p.y - 50, "🔥 +4 FIRE JUMPED OVER!", "#00f0ff");
+                            window.soundManager.playWhoosh();
+                        }
+                        continue;
+                    }
+
                     if (p.isNitroActive) {
                         // Nitro blazes straight through the fire with bonus score!
                         if (br.flameTimer % 10 === 0) {
@@ -268,7 +306,7 @@ class CollectiblesManager {
             }
         }
 
-        // 5. Update Road Railway Level Crossings
+        // 6. Update Road Railway Level Crossings
         for (let r = this.railCrossings.length - 1; r >= 0; r--) {
             const rc = this.railCrossings[r];
             rc.y += playerSpeed;
@@ -326,6 +364,18 @@ class CollectiblesManager {
                     };
 
                     if (MathUtils.checkAABB(pBounds, trainBounds)) {
+                        // Check if player is flying over the train
+                        if (p.isJumping && p.jumpAltitude > 32) {
+                            if (!rc.train.jumpCleared) {
+                                rc.train.jumpCleared = true;
+                                p.score += 15;
+                                this.game.particles.addScorePopup(p.x, p.y - 60, "✈️ +15 TRAIN JUMP OVER!", "#ffd166");
+                                this.game.screenShake = 14;
+                                window.soundManager.playWhoosh();
+                            }
+                            continue;
+                        }
+
                         if (p.isNitroActive) {
                             // --- NITRO TRAIN RAM BLAST (+20 SCORE) ---
                             this.game.particles.addNitroRamBlast(p.x, p.y);
@@ -359,7 +409,36 @@ class CollectiblesManager {
             }
         }
 
-        // 6. Update Collectibles
+        // 7. Update Stunt Jump Ramps
+        for (let jr = this.jumpRamps.length - 1; jr >= 0; jr--) {
+            const ramp = this.jumpRamps[jr];
+            ramp.y += playerSpeed;
+            ramp.glowTimer++;
+
+            if (p.isAlive && !p.isAirborne && !p.isJumping) {
+                const rampBounds = {
+                    x: ramp.x - ramp.w * 0.45,
+                    y: ramp.y - ramp.h * 0.45,
+                    w: ramp.w * 0.9,
+                    h: ramp.h * 0.9
+                };
+
+                if (MathUtils.checkAABB(pBounds, rampBounds)) {
+                    ramp.triggered = true;
+                    p.jump(25, 3); // High stunt jump!
+                    this.game.particles.addJumpLaunchBlast(ramp.x, ramp.y);
+                    this.game.screenShake = 12;
+                    p.score += 5;
+                    this.game.particles.addScorePopup(p.x, p.y - 70, "🚀 MEGA JUMP! +5", "#00f0ff");
+                }
+            }
+
+            if (ramp.y > 2200) {
+                this.jumpRamps.splice(jr, 1);
+            }
+        }
+
+        // 8. Update Collectibles
         for (let i = this.items.length - 1; i >= 0; i--) {
             const item = this.items[i];
             item.y += playerSpeed;
@@ -422,6 +501,108 @@ class CollectiblesManager {
     }
 
     draw(ctx) {
+        // 0. Draw Stunt Jump Ramps (Embedded on Highway Road Surface)
+        for (const ramp of this.jumpRamps) {
+            if (ramp.y < -200 || ramp.y > 2100) continue;
+
+            ctx.save();
+            ctx.translate(ramp.x, ramp.y);
+
+            const rw = ramp.w;
+            const rh = ramp.h;
+
+            // A. Incline Ground Contact Drop Shadow
+            ctx.fillStyle = 'rgba(15, 20, 15, 0.42)';
+            ctx.beginPath();
+            ctx.roundRect(-rw / 2 - 8, -rh / 2 - 6, rw + 16, rh + 24, 10);
+            ctx.fill();
+
+            // B. Metallic Stunt Ramp Incline Base Plate
+            const rampGrad = ctx.createLinearGradient(0, rh / 2, 0, -rh / 2);
+            rampGrad.addColorStop(0, '#1e293b'); // Bottom entry edge flush with road
+            rampGrad.addColorStop(0.4, '#334155');
+            rampGrad.addColorStop(0.85, '#475569');
+            rampGrad.addColorStop(1, '#0f172a'); // Elevated launch lip
+            ctx.fillStyle = rampGrad;
+            ctx.beginPath();
+            ctx.roundRect(-rw / 2, -rh / 2, rw, rh, 8);
+            ctx.fill();
+            ctx.strokeStyle = '#64748b';
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+
+            // C. Hazard Warning Striped Left & Right Side Flanks (Yellow/Black Chevrons)
+            const flankW = 10;
+            const drawHazardFlank = (fx) => {
+                ctx.save();
+                ctx.beginPath();
+                ctx.rect(fx, -rh / 2, flankW, rh);
+                ctx.clip();
+                ctx.fillStyle = '#ffd166';
+                ctx.fillRect(fx, -rh / 2, flankW, rh);
+                ctx.fillStyle = '#111210';
+                for (let sy = -rh / 2 - 20; sy < rh / 2 + 20; sy += 18) {
+                    ctx.beginPath();
+                    ctx.moveTo(fx, sy);
+                    ctx.lineTo(fx + flankW, sy + 10);
+                    ctx.lineTo(fx + flankW, sy + 18);
+                    ctx.lineTo(fx, sy + 8);
+                    ctx.fill();
+                }
+                ctx.restore();
+            };
+            drawHazardFlank(-rw / 2);
+            drawHazardFlank(rw / 2 - flankW);
+
+            // D. Animated Glowing Directional Chevron Launch Arrows (▲ ▲ ▲)
+            const pulse = (Math.sin(ramp.glowTimer * 0.15) + 1) * 0.5;
+            const arrowPhase = (ramp.glowTimer * 2.5) % 36;
+            
+            for (let ay = rh / 2 - 22; ay > -rh / 2 + 20; ay -= 30) {
+                const effectiveY = ay - arrowPhase;
+                if (effectiveY < -rh / 2 + 10 || effectiveY > rh / 2 - 12) continue;
+
+                ctx.save();
+                ctx.translate(0, effectiveY);
+                ctx.fillStyle = `rgba(0, 240, 255, ${0.6 + pulse * 0.4})`;
+                ctx.shadowColor = '#00f0ff';
+                ctx.shadowBlur = 12 * (0.8 + pulse * 0.4);
+
+                ctx.beginPath();
+                ctx.moveTo(0, -10);
+                ctx.lineTo(24, 6);
+                ctx.lineTo(16, 8);
+                ctx.lineTo(0, -2);
+                ctx.lineTo(-16, 8);
+                ctx.lineTo(-24, 6);
+                ctx.closePath();
+                ctx.fill();
+                ctx.restore();
+            }
+
+            // E. Bold "JUMP" Text on Ramp Face
+            ctx.save();
+            ctx.font = '900 22px "Impact", "Arial Black", sans-serif';
+            ctx.fillStyle = '#ffffff';
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 3;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.strokeText("JUMP", 0, rh / 2 - 16);
+            ctx.fillText("JUMP", 0, rh / 2 - 16);
+            ctx.restore();
+
+            // F. High-Energy Launch Lip LED Neon Crest Bar
+            const lipGlow = Math.sin(ramp.glowTimer * 0.25) > 0;
+            ctx.fillStyle = lipGlow ? '#00f0ff' : '#0077b6';
+            ctx.shadowColor = lipGlow ? '#00f0ff' : 'transparent';
+            ctx.shadowBlur = lipGlow ? 20 : 0;
+            ctx.fillRect(-rw / 2 + 2, -rh / 2 - 4, rw - 4, 7);
+            ctx.shadowBlur = 0;
+
+            ctx.restore();
+        }
+
         // 1. Draw Broken Road Burning Fire Hazards
         for (const br of this.brokenRoads) {
             ctx.save();

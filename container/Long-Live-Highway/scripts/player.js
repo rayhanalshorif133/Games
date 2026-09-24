@@ -64,6 +64,14 @@ class Player {
         this.spinSpeed = 0;
         this.crashReason = '';
 
+        // Controlled Stunt Jump Physics
+        this.isJumping = false;
+        this.jumpAltitude = 0;
+        this.jumpVy = 0;
+        this.jumpGravity = 0.62;
+        this.jumpAirTime = 0;
+        this.jumpCarClearCount = 0;
+
         this.isAlive = true;
         this.distance = 0;
         this.score = 0;
@@ -73,6 +81,11 @@ class Player {
     revive() {
         this.isAlive = true;
         this.isAirborne = false;
+        this.isJumping = false;
+        this.jumpAltitude = 0;
+        this.jumpVy = 0;
+        this.jumpAirTime = 0;
+        this.jumpCarClearCount = 0;
         this.airborneTimer = 0;
         this.flyVx = 0;
         this.flyVy = 0;
@@ -107,6 +120,18 @@ class Player {
         } else if (this.nitroCount <= 0 && this.isAlive && !this.isAirborne) {
             this.game.particles.addScorePopup(this.x, this.y - 60, "NO NITRO BOTTLES!", "#ef476f");
         }
+    }
+
+    jump(initialVy = 25, boostSpeed = 2) {
+        if (!this.isAlive || this.isAirborne || this.isJumping) return;
+        this.isJumping = true;
+        this.jumpAltitude = 6;
+        this.jumpVy = initialVy;
+        this.jumpCarClearCount = 0;
+        this.jumpAirTime = 0;
+        this.speed = Math.min(this.nitroSpeed, this.speed + boostSpeed);
+        this.game.particles.addJumpLaunchBlast(this.x, this.y);
+        window.soundManager.playJump();
     }
 
     addNitro(amount = 1) {
@@ -146,6 +171,7 @@ class Player {
 
     triggerOilSpin() {
         if (this.isSpinning || !this.isAlive) return;
+        if (this.isJumping && this.jumpAltitude > 20) return; // Jumped over oil!
         this.isSpinning = true;
         this.spinTimer = 50;
         window.soundManager.playSkid();
@@ -188,6 +214,33 @@ class Player {
         }
 
         if (!this.isAlive) return;
+
+        // Controlled Stunt Jump Airborne Physics
+        if (this.isJumping) {
+            this.jumpAirTime++;
+            this.jumpAltitude += this.jumpVy;
+            this.jumpVy -= this.jumpGravity;
+
+            // Stream high-speed aerodynamic air streaks
+            if (this.jumpAirTime % 2 === 0) {
+                this.game.particles.addAirStreak(this.x, this.y - this.jumpAltitude + 40);
+            }
+
+            // Landing on Road Surface
+            if (this.jumpAltitude <= 0) {
+                this.jumpAltitude = 0;
+                this.isJumping = false;
+                this.game.particles.addLandingDust(this.x, this.y);
+                window.soundManager.playLanding();
+                this.game.screenShake = 8;
+
+                if (this.jumpCarClearCount > 0) {
+                    const bonus = this.jumpCarClearCount * 5;
+                    this.score += bonus;
+                    this.game.particles.addScorePopup(this.x, this.y - 70, `🛩️ ${this.jumpCarClearCount} CARS CLEARED! +${bonus}`, '#ffd166');
+                }
+            }
+        }
 
         // Progressive speed scaling over distance (car speed dhire dhire barte thakbe)
         const speedProgression = Math.min(14, (this.distance / 350) * 0.7);
@@ -314,6 +367,8 @@ class Player {
     die(reason = "CRASH!") {
         if (!this.isAlive) return;
         this.isAlive = false;
+        this.isJumping = false;
+        this.jumpAltitude = 0;
         this.speed = 0;
         window.soundManager.stopEngine();
         window.soundManager.playCrash();
@@ -366,6 +421,54 @@ class Player {
             ctx.beginPath();
             ctx.arc(0, 0, this.h * 0.6, 0, Math.PI * 2);
             ctx.fill();
+
+            ctx.restore();
+            return;
+        }
+
+        if (this.isJumping) {
+            // 1. Dynamic Ground Contact Shadow on road surface
+            const shadowScale = Math.max(0.5, 1.0 - (this.jumpAltitude * 0.0025));
+            const shadowAlpha = Math.max(0.12, 0.42 - (this.jumpAltitude * 0.0018));
+            ctx.fillStyle = `rgba(15, 20, 15, ${shadowAlpha})`;
+            ctx.beginPath();
+            ctx.ellipse(this.x, this.y + 20, this.w * 0.46 * shadowScale, this.h * 0.28 * shadowScale, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 2. Elevated Airborne Car Chassis with perspective scaling and aerodynamic pitch tilt
+            const jumpScale = 1.0 + Math.min(0.3, this.jumpAltitude * 0.0018);
+            const pitchTilt = MathUtils.clamp(-this.jumpVy * 0.007, -0.12, 0.12);
+
+            ctx.translate(this.x, this.y - this.jumpAltitude);
+            ctx.rotate(this.angle + pitchTilt + (this.isSpinning ? this.spinAngle : 0));
+            ctx.scale(jumpScale, jumpScale);
+
+            // Draw Car Sprite
+            const sprite = this.game.assets.images["car_red.png"];
+            if (sprite) {
+                ctx.drawImage(sprite, -this.w / 2, -this.h / 2, this.w, this.h);
+            }
+
+            // Draw Shield Aura if active
+            if (this.hasShield) {
+                ctx.strokeStyle = '#00f0ff';
+                ctx.lineWidth = 6;
+                ctx.shadowColor = '#00f0ff';
+                ctx.shadowBlur = 18;
+                ctx.beginPath();
+                ctx.arc(0, 0, this.h * 0.58, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+            }
+
+            // Draw Magnet Glow if active
+            if (this.hasMagnet) {
+                ctx.strokeStyle = '#f72585';
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                ctx.arc(0, 0, this.h * 0.52, 0, Math.PI * 2);
+                ctx.stroke();
+            }
 
             ctx.restore();
             return;

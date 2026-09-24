@@ -313,6 +313,100 @@ class ParticleSystem {
         }
     }
 
+    addJumpLaunchBlast(x, y) {
+        // Stunt Launch shockwave
+        this.explosions.push({
+            x: x,
+            y: y,
+            radius: 12,
+            maxRadius: 160,
+            alpha: 1.0,
+            color: 'rgba(0, 240, 255, 0.4)',
+            strokeColor: '#00f0ff',
+            lineWidth: 16
+        });
+
+        // Launch booster sparks and kinetic thrust
+        for (let i = 0; i < 24; i++) {
+            const angle = MathUtils.randRange(-Math.PI * 0.85, -Math.PI * 0.15); // Upward angle arc
+            const spd = MathUtils.randRange(8, 22);
+            this.particles.push({
+                type: 'spark',
+                x: x + MathUtils.randRange(-25, 25),
+                y: y + MathUtils.randRange(-10, 10),
+                vx: Math.cos(angle) * spd,
+                vy: Math.sin(angle) * spd,
+                radius: MathUtils.randRange(4, 9),
+                alpha: 1.0,
+                decay: MathUtils.randRange(0.03, 0.06),
+                color: MathUtils.randChoice(['#00f0ff', '#ffd166', '#ffffff', '#70e000'])
+            });
+        }
+
+        // Launch dust puffs
+        for (let i = 0; i < 14; i++) {
+            this.particles.push({
+                type: 'smoke',
+                x: x + MathUtils.randRange(-30, 30),
+                y: y + MathUtils.randRange(-10, 15),
+                vx: MathUtils.randRange(-3, 3),
+                vy: MathUtils.randRange(1, 5),
+                radius: MathUtils.randRange(14, 24),
+                maxRadius: 55,
+                alpha: 0.7,
+                decay: 0.03,
+                color: MathUtils.randChoice(['#e9d37c', '#fcf1b6', '#ffffff'])
+            });
+        }
+    }
+
+    addLandingDust(x, y) {
+        // Dual landing puffs for left and right wheels
+        const sides = [-35, 35];
+        sides.forEach((offsetX) => {
+            for (let i = 0; i < 8; i++) {
+                this.particles.push({
+                    type: 'smoke',
+                    x: x + offsetX + MathUtils.randRange(-8, 8),
+                    y: y + 40 + MathUtils.randRange(-5, 5),
+                    vx: (offsetX > 0 ? 1 : -1) * MathUtils.randRange(2, 6) + MathUtils.randRange(-1, 1),
+                    vy: MathUtils.randRange(-2, 2),
+                    radius: MathUtils.randRange(12, 22),
+                    maxRadius: 48,
+                    alpha: 0.75,
+                    decay: 0.04,
+                    color: MathUtils.randChoice(['#e9d37c', '#fcf1b6', '#d7b365', '#ffffff'])
+                });
+            }
+        });
+
+        // Quick mini landing ring
+        this.explosions.push({
+            x: x,
+            y: y + 30,
+            radius: 8,
+            maxRadius: 90,
+            alpha: 0.8,
+            color: 'rgba(252, 241, 182, 0.3)',
+            strokeColor: '#d7b365',
+            lineWidth: 8
+        });
+    }
+
+    addAirStreak(x, y) {
+        this.particles.push({
+            type: 'spark',
+            x: x + MathUtils.randRange(-20, 20),
+            y: y + MathUtils.randRange(-5, 5),
+            vx: MathUtils.randRange(-0.8, 0.8),
+            vy: MathUtils.randRange(4, 10),
+            radius: MathUtils.randRange(3, 6),
+            alpha: 0.8,
+            decay: 0.06,
+            color: MathUtils.randChoice(['#ffffff', '#00f0ff', '#e0fbfc'])
+        });
+    }
+
     addFlyingCoin(startX, startY, targetX = 180, targetY = 68, onArrival = null) {
         const cpX = startX + (targetX - startX) * 0.25 - 80;
         const cpY = Math.min(startY, targetY) - 120;

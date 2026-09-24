@@ -74,9 +74,20 @@ class Game {
             if (e.code === 'ArrowRight' || e.code === 'KeyD') this.input.right = true;
             if (e.code === 'ArrowUp' || e.code === 'KeyW') this.input.up = true;
             if (e.code === 'ArrowDown' || e.code === 'KeyS') this.input.down = true;
-            if (e.code === 'Space') {
+            if (e.code === 'KeyJ' || e.code === 'KeyK') {
+                this.player.jump(24, 2);
+            }
+            if (e.code === 'KeyN' || e.code === 'ShiftLeft' || e.code === 'ShiftRight') {
                 this.input.nitro = true;
                 this.player.activateNitro();
+            }
+            if (e.code === 'Space') {
+                if (this.player.canUseNitro()) {
+                    this.input.nitro = true;
+                    this.player.activateNitro();
+                } else {
+                    this.player.jump(24, 2);
+                }
             }
         });
 
@@ -85,7 +96,7 @@ class Game {
             if (e.code === 'ArrowRight' || e.code === 'KeyD') this.input.right = false;
             if (e.code === 'ArrowUp' || e.code === 'KeyW') this.input.up = false;
             if (e.code === 'ArrowDown' || e.code === 'KeyS') this.input.down = false;
-            if (e.code === 'Space') this.input.nitro = false;
+            if (e.code === 'Space' || e.code === 'KeyN' || e.code === 'ShiftLeft' || e.code === 'ShiftRight') this.input.nitro = false;
         });
 
         // Multi-Touch & Mouse Pointer Handling
@@ -495,10 +506,7 @@ class Game {
         // 7. Draw Particles & Dust
         this.particles.drawParticles(this.ctx);
 
-        // 8. Draw Birds flying in sky
-        this.scenery.drawBirds(this.ctx);
-
-        // 9. Draw Roadside Warning Signboards ("Road Damage Ahead", "Railway Station", "Military Zone")
+        // 8. Draw Roadside Warning Signboards ("Road Damage Ahead", "Railway Station", "Military Zone")
         this.scenery.drawRoadSigns(this.ctx);
 
         // 10. Draw Overpasses & Passing High-Speed Trains (Overhead layer above highway!)

@@ -9,7 +9,6 @@ class SceneryManager {
     constructor(game) {
         this.game = game;
         this.sceneryItems = [];
-        this.birds = [];
         this.overpasses = [];
         this.roadSigns = [];
         this.roadScrollY = 0;
@@ -20,7 +19,6 @@ class SceneryManager {
 
         this.leftSpawnY = -200;
         this.rightSpawnY = -200;
-        this.birdSpawnTimer = 0;
         this.overpassTimer = 0;
         this.overpassInterval = 2600; // Well spaced out (~40-55 seconds)
 
@@ -29,14 +27,12 @@ class SceneryManager {
 
     reset() {
         this.sceneryItems = [];
-        this.birds = [];
         this.overpasses = [];
         this.roadSigns = [];
         this.roadScrollY = 0;
         this.totalDistanceScrolled = 0;
         this.leftSpawnY = -200;
         this.rightSpawnY = -200;
-        this.birdSpawnTimer = 0;
         this.overpassTimer = 0;
         this.overpassInterval = 2600;
         this.initInitialScenery();
@@ -56,8 +52,6 @@ class SceneryManager {
             this.spawnSceneryBlock('left', y);
             this.spawnSceneryBlock('right', y);
         }
-        // Add initial birds
-        this.spawnBirdFlock(800, 600);
     }
 
     spawnSceneryBlock(side, yPos) {
@@ -143,25 +137,6 @@ class SceneryManager {
                 x: 940,
                 y: yPos + 200,
                 side: 'right'
-            });
-        }
-    }
-
-    spawnBirdFlock(startX = 900, startY = -100) {
-        const count = Math.floor(MathUtils.randRange(2, 5));
-        const baseSpeedX = MathUtils.randRange(-1.5, -0.5);
-        const baseSpeedY = MathUtils.randRange(1.8, 3.2);
-
-        for (let i = 0; i < count; i++) {
-            this.birds.push({
-                x: startX + (i * 45) + MathUtils.randRange(-15, 15),
-                y: startY + (i * 35) + MathUtils.randRange(-10, 10),
-                vx: baseSpeedX + MathUtils.randRange(-0.2, 0.2),
-                vy: baseSpeedY + MathUtils.randRange(-0.2, 0.2),
-                frame: Math.floor(Math.random() * 3),
-                animTimer: Math.floor(Math.random() * 10),
-                w: 60,
-                h: 50
             });
         }
     }
@@ -283,31 +258,7 @@ class SceneryManager {
             this.spawnSceneryBlock('right', highestRightY - 360);
         }
 
-        // 2. Bird spawning & animation
-        this.birdSpawnTimer++;
-        if (this.birdSpawnTimer > 240) {
-            this.birdSpawnTimer = 0;
-            this.spawnBirdFlock(MathUtils.randRange(400, 1000), -120);
-            if (Math.random() < 0.5) window.soundManager.playChirp();
-        }
-
-        for (let i = this.birds.length - 1; i >= 0; i--) {
-            const b = this.birds[i];
-            b.x += b.vx;
-            b.y += b.vy + (playerSpeed * 0.45);
-
-            b.animTimer++;
-            if (b.animTimer > 8) {
-                b.animTimer = 0;
-                b.frame = (b.frame + 1) % 3;
-            }
-
-            if (b.y > 2100 || b.x < -100 || b.x > 1200) {
-                this.birds.splice(i, 1);
-            }
-        }
-
-        // 3. Update Roadside Warning Signboards
+        // 2. Update Roadside Warning Signboards
         for (let s = this.roadSigns.length - 1; s >= 0; s--) {
             const sign = this.roadSigns[s];
             sign.y += playerSpeed;
@@ -557,17 +508,7 @@ class SceneryManager {
     }
 
     drawBirds(ctx) {
-        const frames = ['bird_f1.png', 'bird_f2.png', 'bird_f3.png'];
-
-        for (const b of this.birds) {
-            const spriteName = frames[b.frame];
-            const sprite = this.game.assets.images[spriteName];
-            if (sprite) {
-                ctx.save();
-                ctx.drawImage(sprite, b.x - b.w / 2, b.y - b.h / 2, b.w, b.h);
-                ctx.restore();
-            }
-        }
+        // Birds removed
     }
 
     drawRoadSigns(ctx) {
