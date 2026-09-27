@@ -59,6 +59,9 @@ class GameApp {
     this.initCanvasAndInput();
     this.initScaling();
 
+    globalThis.gameStartTime = Date.now();
+    globalThis.gameClickCount = 0;
+
     this.gameState.startPlaying();
     this.isLoaded = true;
 
@@ -139,6 +142,11 @@ class GameApp {
   }
 
   restartGame() {
+    globalThis.gameStartTime = Date.now();
+    globalThis.gameClickCount = 0;
+    if (this.uiManager) {
+      this.uiManager.scoreSent = false;
+    }
     this.gameState.restartGame();
     this.board.initBoard(this.gameState.activeColors);
     this.particleSystem.clear();

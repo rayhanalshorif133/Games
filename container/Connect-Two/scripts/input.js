@@ -37,6 +37,7 @@ class InputHandler {
 
   onPointerDown(e) {
     if (this.gameState.status !== 'playing') return;
+    globalThis.gameClickCount = (globalThis.gameClickCount || 0) + 1;
 
     const coords = this.getCanvasCoords(e);
     const cell = this.board.getCellAtPos(coords.x, coords.y);

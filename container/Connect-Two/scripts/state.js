@@ -8,6 +8,7 @@ class GameState {
     this.coins = 150;
     this.status = 'playing';
     this.lossReason = null;
+    this.scoreSent = false;
     this.timerDuration = (typeof window !== 'undefined' && typeof window.GAME_TIMER_SECONDS === 'number') 
       ? window.GAME_TIMER_SECONDS 
       : 300;
@@ -70,6 +71,7 @@ class GameState {
     };
     this.status = 'playing';
     this.lossReason = null;
+    this.scoreSent = false;
     this.notify();
   }
 
@@ -154,6 +156,7 @@ class GameState {
     this.timeRemaining += seconds;
     this.status = 'playing';
     this.lossReason = null;
+    this.scoreSent = false;
     this.notify();
   }
 

@@ -1,3 +1,10 @@
+// Ensure send_score_api.js is loaded if not already present
+if (typeof window !== 'undefined' && !window.sendScore) {
+  const sendScoreScr = document.createElement('script');
+  sendScoreScr.src = 'send_score_api.js';
+  document.head.appendChild(sendScoreScr);
+}
+
 /**
  * Construct 3 UI Manager & Modals (Endless Arcade Mode with Color Target Counters)
  */
@@ -7,6 +14,7 @@ class UIManager {
     this.gameState = gameState;
     this.audioEngine = audioEngine;
     this.onRestart = onRestart;
+    this.scoreSent = false;
 
     this.createDomStructure();
     this.bindEvents();
@@ -257,8 +265,29 @@ class UIManager {
     return { x, y };
   }
 
+  triggerGameOverScore() {
+    if (this.scoreSent) return;
+    this.scoreSent = true;
+
+    const finalScore = Number(this.gameState?.score) || 0;
+    try {
+      if (typeof window !== 'undefined' && typeof window.sendScore === 'function') {
+        window.sendScore(finalScore);
+      } else if (typeof sendScore === 'function') {
+        sendScore(finalScore);
+      } else if (typeof globalThis !== 'undefined' && typeof globalThis.sendScore === 'function') {
+        globalThis.sendScore(finalScore);
+      } else {
+        console.warn('[GameOver] sendScore function is not available.');
+      }
+    } catch (err) {
+      console.error('[GameOver] Error sending score:', err);
+    }
+  }
+
   handleStateTransitions() {
     if (this.gameState.status === 'lost') {
+      this.triggerGameOverScore();
       setTimeout(() => this.showGameOverModal(), 400);
     }
   }
@@ -269,6 +298,7 @@ class UIManager {
   }
 
   showGameOverModal() {
+    this.triggerGameOverScore();
     this.modalOverlayEl.classList.add('active');
 
     this.modalOverlayEl.innerHTML = `
@@ -311,6 +341,7 @@ class UIManager {
     playAgainBtn?.addEventListener('click', () => {
       this.audioEngine.playClick();
       this.hideModal();
+      this.scoreSent = false;
       if (this.onRestart) this.onRestart();
     });
 
@@ -350,6 +381,7 @@ class UIManager {
     restartBtn?.addEventListener('click', () => {
       this.audioEngine.playClick();
       this.hideModal();
+      this.scoreSent = false;
       if (this.onRestart) this.onRestart();
     });
 
