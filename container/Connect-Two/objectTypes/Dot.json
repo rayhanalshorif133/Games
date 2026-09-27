@@ -1,0 +1,12 @@
+{
+  "name": "Dot",
+  "plugin-id": "Sprite",
+  "sid": 1001,
+  "isGlobal": false,
+  "instanceVariables": [
+    { "name": "color", "type": "string", "initialValue": "red" },
+    { "name": "row", "type": "number", "initialValue": 0 },
+    { "name": "col", "type": "number", "initialValue": 0 }
+  ],
+  "behaviorTypes": []
+}

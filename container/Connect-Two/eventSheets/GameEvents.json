@@ -1,0 +1,9 @@
+{
+  "name": "GameEvents",
+  "events": [
+    {
+      "eventType": "comment",
+      "text": "Core game mechanics handled via Construct 3 modular scripts in scripts/"
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "name": "HUD",
+  "plugin-id": "Sprite",
+  "sid": 1002,
+  "isGlobal": true,
+  "instanceVariables": [],
+  "behaviorTypes": []
+}

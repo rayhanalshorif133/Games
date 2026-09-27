@@ -1,0 +1,126 @@
+{
+  "name": "Connect The Dots",
+  "version": "1.0.0.0",
+  "author": "Antigravity",
+  "uniqueId": "com.gamecooker.connecttwo",
+  "c3version": 380,
+  "viewportWidth": 1080,
+  "viewportHeight": 1920,
+  "fullscreenMode": "letterbox-scale",
+  "orientations": "portrait",
+  "pixelRounding": false,
+  "sampling": "bilinear",
+  "downscaling": "high-quality",
+  "firstLayout": "GameLayout",
+  "useLoaderLayout": false,
+  "loaderStyle": "progress-bar-logo",
+  "themeColor": "#27AE60",
+  "properties": {
+    "viewportWidth": 1080,
+    "viewportHeight": 1920,
+    "canvasWidth": 1080,
+    "canvasHeight": 1920
+  },
+  "layouts": [
+    "GameLayout"
+  ],
+  "eventSheets": [
+    "GameEvents"
+  ],
+  "scripts": [
+    {
+      "name": "supportcheck.js",
+      "path": "scripts/supportcheck.js",
+      "purpose": "device-capability"
+    },
+    {
+      "name": "audio.js",
+      "path": "scripts/audio.js",
+      "purpose": "audio-synthesis"
+    },
+    {
+      "name": "particles.js",
+      "path": "scripts/particles.js",
+      "purpose": "visual-effects"
+    },
+    {
+      "name": "physics.js",
+      "path": "scripts/physics.js",
+      "purpose": "drop-physics"
+    },
+    {
+      "name": "state.js",
+      "path": "scripts/state.js",
+      "purpose": "game-state"
+    },
+    {
+      "name": "board.js",
+      "path": "scripts/board.js",
+      "purpose": "board-mechanics"
+    },
+    {
+      "name": "ui.js",
+      "path": "scripts/ui.js",
+      "purpose": "ui-controller"
+    },
+    {
+      "name": "input.js",
+      "path": "scripts/input.js",
+      "purpose": "input-handler"
+    },
+    {
+      "name": "main.js",
+      "path": "scripts/main.js",
+      "purpose": "main-entry"
+    },
+    {
+      "name": "register-sw.js",
+      "path": "scripts/register-sw.js",
+      "purpose": "service-worker"
+    }
+  ],
+  "objectTypes": [
+    "Dot_Red",
+    "Dot_Yellow",
+    "Dot_Green",
+    "Dot_Orange",
+    "Dot_Purple",
+    "Dot_Mixed",
+    "HUD"
+  ],
+  "families": [],
+  "images": [
+    "images/dot_red.png",
+    "images/dot_yellow.png",
+    "images/dot_green.png",
+    "images/dot_orange.png",
+    "images/dot_purple.png",
+    "images/dot_mixed.png",
+    "images/mixed_box.png",
+    "images/dot_highlight.png",
+    "images/icon_moves.png",
+    "images/icon_trophy.png",
+    "images/icon_coin.png",
+    "images/icon_check.png",
+    "images/icon_pause.png",
+    "images/icon_sound_on.png",
+    "images/icon_sound_off.png",
+    "images/icon_play.png",
+    "images/icon_close.png",
+    "images/icon_video.png",
+    "images/star_filled.png",
+    "images/star_empty.png",
+    "images/btn_green.png"
+  ],
+  "icons": [
+    "icons/icon-16.png",
+    "icons/icon-32.png",
+    "icons/icon-64.png",
+    "icons/icon-128.png",
+    "icons/icon-256.png",
+    "icons/icon-512.png",
+    "icons/loading-logo.png"
+  ],
+  "sounds": [],
+  "music": []
+}

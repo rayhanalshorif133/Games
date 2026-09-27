@@ -1,0 +1,39 @@
+{
+  "project": {
+    "name": "Connect The Dots",
+    "version": "1.0.0.0",
+    "uniqueId": "connect-two-c3",
+    "viewportWidth": 1080,
+    "viewportHeight": 1920,
+    "viewportFit": "cover",
+    "fullscreenMode": "letterbox-scale",
+    "orientations": "portrait",
+    "useLoaderLayout": false
+  },
+  "runtime": "c3",
+  "files": {
+    "scripts": [
+      "send_score_api.js",
+      "c3runtime.js",
+      "scripts/supportcheck.js",
+      "scripts/audio.js",
+      "scripts/particles.js",
+      "scripts/physics.js",
+      "scripts/state.js",
+      "scripts/board.js",
+      "scripts/ui.js",
+      "scripts/input.js",
+      "scripts/main.js",
+      "scripts/register-sw.js"
+    ],
+    "icons": [
+      "icons/icon-16.png",
+      "icons/icon-32.png",
+      "icons/icon-64.png",
+      "icons/icon-128.png",
+      "icons/icon-256.png",
+      "icons/icon-512.png",
+      "icons/loading-logo.png"
+    ]
+  }
+}
