@@ -1,0 +1,97 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: #2b2260;
+  touch-action: none;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#canvas-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  background: radial-gradient(circle at center, #3c2f82 0%, #221a4f 100%);
+}
+
+#c3canvas {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  max-width: calc(100vh * (1080 / 1920));
+  max-height: calc(100vw * (1920 / 1080));
+  aspect-ratio: 1080 / 1920;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  image-rendering: pixelated;
+  image-rendering: auto;
+  cursor: grab;
+}
+
+#c3canvas:active {
+  cursor: grabbing;
+}
+
+/* Construct 3 Loading Screen */
+#loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #463a9c;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  transition: opacity 0.4s ease-out;
+  pointer-events: none;
+}
+
+#loading-overlay.hidden {
+  opacity: 0;
+}
+
+.spinner {
+  width: 70px;
+  height: 70px;
+  border: 7px solid rgba(255, 255, 255, 0.2);
+  border-top-color: #fcd32a;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 24px;
+}
+
+.loading-text {
+  color: #ffffff;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+

@@ -1,0 +1,88 @@
+{
+  "project": {
+    "name": "Swipy Basketball",
+    "version": "1.0.0.0",
+    "description": "Fast-paced arcade swipy basketball game with combos, moving hoops, and revive rewards",
+    "author": "GameCooker",
+    "uniqueId": "swipy-basketball-c3-build",
+    "firstLayout": "Game",
+    "viewportWidth": 1080,
+    "viewportHeight": 1920,
+    "viewportScale": "letterbox-scale",
+    "orientation": "portrait",
+    "useLoaderLayout": false,
+    "fullscreenMode": "letterbox-scale",
+    "pixelRounding": false,
+    "sampling": "linear",
+    "framerateMode": "vsync",
+    "downscalingQuality": "high",
+    "flowDirection": "ltr"
+  },
+  "layouts": [
+    {
+      "name": "Game",
+      "width": 1080,
+      "height": 1920,
+      "unboundedScrolling": false,
+      "layers": [
+        { "name": "Background", "parallaxX": 1, "parallaxY": 1, "opacity": 1, "transparent": false, "visible": true },
+        { "name": "SpeedLines", "parallaxX": 1, "parallaxY": 1, "opacity": 1, "transparent": true, "visible": true },
+        { "name": "HoopBack", "parallaxX": 1, "parallaxY": 1, "opacity": 1, "transparent": true, "visible": true },
+        { "name": "NetBack", "parallaxX": 1, "parallaxY": 1, "opacity": 1, "transparent": true, "visible": true },
+        { "name": "GameObjects", "parallaxX": 1, "parallaxY": 1, "opacity": 1, "transparent": true, "visible": true },
+        { "name": "NetFront", "parallaxX": 1, "parallaxY": 1, "opacity": 1, "transparent": true, "visible": true },
+        { "name": "RimFront", "parallaxX": 1, "parallaxY": 1, "opacity": 1, "transparent": true, "visible": true },
+        { "name": "Court", "parallaxX": 1, "parallaxY": 1, "opacity": 1, "transparent": true, "visible": true },
+        { "name": "UI", "parallaxX": 1, "parallaxY": 1, "opacity": 1, "transparent": true, "visible": true },
+        { "name": "Popups", "parallaxX": 1, "parallaxY": 1, "opacity": 1, "transparent": true, "visible": true },
+        { "name": "Overlay", "parallaxX": 1, "parallaxY": 1, "opacity": 1, "transparent": true, "visible": true }
+      ]
+    }
+  ],
+  "objectTypes": [
+    { "name": "Background", "pluginId": "Sprite", "asset": "images/background.png" },
+    { "name": "Court", "pluginId": "Sprite", "asset": "images/court.png" },
+    { "name": "Backboard", "pluginId": "Sprite", "asset": "images/backboard.png" },
+    { "name": "Rim", "pluginId": "Sprite", "asset": "images/rim.png" },
+    { "name": "Net", "pluginId": "Sprite", "asset": "images/net.png" },
+    { "name": "NetSwish", "pluginId": "Sprite", "asset": "images/net_swish.png" },
+    { "name": "Basketball", "pluginId": "Sprite", "asset": "images/ball.png" },
+    { "name": "BasketballFire", "pluginId": "Sprite", "asset": "images/ball_fire.png" },
+    { "name": "RingGlow", "pluginId": "Sprite", "asset": "images/ring_glow.png" },
+    { "name": "Star", "pluginId": "Sprite", "asset": "images/star.png" },
+    { "name": "StarIcon", "pluginId": "Sprite", "asset": "images/star_icon.png" },
+    { "name": "PopupKeepItUp", "pluginId": "Sprite", "asset": "images/popup_keepitup.png" },
+    { "name": "PopupMiss", "pluginId": "Sprite", "asset": "images/popup_miss.png" },
+    { "name": "PopupSwish", "pluginId": "Sprite", "asset": "images/popup_swish.png" },
+    { "name": "PopupPerfect", "pluginId": "Sprite", "asset": "images/popup_perfect.png" },
+    { "name": "BtnRevive", "pluginId": "Sprite", "asset": "images/btn_revive.png" },
+    { "name": "SpeedLine", "pluginId": "Sprite", "asset": "images/speed_line.png" },
+    { "name": "ParticleSparkle", "pluginId": "Particles", "asset": "images/particle_sparkle.png" },
+    { "name": "ParticleFire", "pluginId": "Particles", "asset": "images/particle_fire.png" },
+    { "name": "TouchInput", "pluginId": "Touch" },
+    { "name": "MouseInput", "pluginId": "Mouse" },
+    { "name": "Audio", "pluginId": "Audio" },
+    { "name": "LocalStorage", "pluginId": "LocalStorage" }
+  ],
+  "audio": [
+    "whoosh.wav",
+    "swish.wav",
+    "rim_hit.wav",
+    "keep_it_up.wav",
+    "star_collect.wav",
+    "miss.wav",
+    "revive.wav",
+    "button_click.wav"
+  ],
+  "globalVariables": [
+    { "name": "Score", "type": "number", "initialValue": 0 },
+    { "name": "BestScore", "type": "number", "initialValue": 0 },
+    { "name": "Stars", "type": "number", "initialValue": 0 },
+    { "name": "Streak", "type": "number", "initialValue": 0 },
+    { "name": "Multiplier", "type": "number", "initialValue": 1 },
+    { "name": "HoopSpeed", "type": "number", "initialValue": 0 },
+    { "name": "ReviveTimer", "type": "number", "initialValue": 5.0 },
+    { "name": "IsRevived", "type": "boolean", "initialValue": false }
+  ]
+}
+
