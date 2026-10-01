@@ -1,0 +1,55 @@
+{
+  "project": {
+    "name": "Mad Snake",
+    "version": "1.0.0.0",
+    "author": "GameCooker",
+    "description": "Construct 3 Mad Snake Game with 1080x1920 layout, enemy snake AI, fireball projectiles, and world progression map.",
+    "viewport": {
+      "width": 1080,
+      "height": 1920,
+      "sampling": "linear",
+      "fullscreen": "letterbox-scale",
+      "orientation": "portrait"
+    },
+    "layouts": [
+      {
+        "name": "WorldMap",
+        "size": [1080, 3100],
+        "activeLayer": "Main"
+      },
+      {
+        "name": "GameLayout",
+        "size": [1080, 1920],
+        "activeLayer": "Board"
+      }
+    ],
+    "objectTypes": [
+      { "name": "PlayerSnakeHead", "pluginId": "Sprite", "texture": "images/sprites/snake_head.png" },
+      { "name": "PlayerSnakeBody", "pluginId": "Sprite", "texture": "images/sprites/snake_body.png" },
+      { "name": "EnemySnakeHead", "pluginId": "Sprite", "texture": "images/sprites/enemy_head.png" },
+      { "name": "EnemySnakeBody", "pluginId": "Sprite", "texture": "images/sprites/enemy_body.png" },
+      { "name": "AppleRed", "pluginId": "Sprite", "texture": "images/sprites/apple_red.png" },
+      { "name": "AppleGreen", "pluginId": "Sprite", "texture": "images/sprites/apple_green.png" },
+      { "name": "Taco", "pluginId": "Sprite", "texture": "images/sprites/taco.png" },
+      { "name": "Sushi", "pluginId": "Sprite", "texture": "images/sprites/sushi.png" },
+      { "name": "FireIcon", "pluginId": "Sprite", "texture": "images/sprites/fire_icon.png" },
+      { "name": "Fireball", "pluginId": "Sprite", "texture": "images/sprites/fireball.png" },
+      { "name": "ObstaclePlant", "pluginId": "Sprite", "texture": "images/sprites/obstacle_plant.png" },
+      { "name": "ObstacleCactus", "pluginId": "Sprite", "texture": "images/sprites/obstacle_cactus.png" },
+      { "name": "ObstacleSakura", "pluginId": "Sprite", "texture": "images/sprites/obstacle_sakura.png" },
+      { "name": "BtnFire", "pluginId": "Sprite", "texture": "images/ui/btn_fire.png" },
+      { "name": "BtnGamepad", "pluginId": "Sprite", "texture": "images/ui/btn_gamepad.png" },
+      { "name": "BtnPause", "pluginId": "Sprite", "texture": "images/ui/btn_pause.png" },
+      { "name": "Heart", "pluginId": "Sprite", "texture": "images/ui/heart.png" }
+    ],
+    "audio": [
+      { "name": "eat", "type": "procedural_webaudio" },
+      { "name": "bonus", "type": "procedural_webaudio" },
+      { "name": "fire", "type": "procedural_webaudio" },
+      { "name": "explode", "type": "procedural_webaudio" },
+      { "name": "hit", "type": "procedural_webaudio" },
+      { "name": "win", "type": "procedural_webaudio" },
+      { "name": "gameover", "type": "procedural_webaudio" }
+    ]
+  }
+}

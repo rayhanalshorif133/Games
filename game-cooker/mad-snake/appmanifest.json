@@ -1,0 +1,42 @@
+{
+  "name": "Mad Snake",
+  "short_name": "MadSnake",
+  "description": "Mad Snake Game - Full mobile arcade snake game inspired by Mad Mode Snake with fireball power-ups, AI enemy snake, and 13 world biomes.",
+  "start_url": "index.html",
+  "display": "fullscreen",
+  "orientation": "portrait",
+  "background_color": "#0d0d11",
+  "theme_color": "#16a34a",
+  "icons": [
+    {
+      "src": "images/icons/icon-16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "images/icons/icon-32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "images/icons/icon-64.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    },
+    {
+      "src": "images/icons/icon-128.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "images/icons/icon-256.png",
+      "sizes": "256x256",
+      "type": "image/png"
+    },
+    {
+      "src": "images/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
