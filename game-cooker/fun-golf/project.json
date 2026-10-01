@@ -1,0 +1,89 @@
+{
+  "name": "Fun Golf",
+  "author": "Game Cooker",
+  "version": "1.0.0.0",
+  "firstLayout": "MainLayout",
+  "viewportMode": "letterbox-scale",
+  "sampling": "bilinear",
+  "pixelRounding": false,
+  "orientations": "portrait",
+  "loaderStyle": "c3-logo",
+  "clearBackground": true,
+  "pauseOnBlur": false,
+  "bundleId": "com.gamecooker.fungolf",
+  "properties": {
+    "viewportWidth": 1080,
+    "viewportHeight": 1920
+  },
+  "layouts": {
+    "MainLayout": {
+      "name": "MainLayout",
+      "width": 1080,
+      "height": 1920,
+      "unboundedScrolling": false,
+      "layers": [
+        { "name": "Background", "parallaxX": 1, "parallaxY": 1, "transparent": false, "backgroundColor": [33, 68, 98] },
+        { "name": "Floors", "parallaxX": 1, "parallaxY": 1, "transparent": true },
+        { "name": "GamePlay", "parallaxX": 1, "parallaxY": 1, "transparent": true },
+        { "name": "Effects", "parallaxX": 1, "parallaxY": 1, "transparent": true },
+        { "name": "UI", "parallaxX": 0, "parallaxY": 0, "transparent": true }
+      ]
+    }
+  },
+  "objectTypes": {
+    "GolfBall": {
+      "plugin-id": "Sprite",
+      "animations": { "default": { "frames": ["images/ball.png"] } }
+    },
+    "GolfClub": {
+      "plugin-id": "Sprite",
+      "animations": { "default": { "frames": ["images/club.png"] } }
+    },
+    "Flag": {
+      "plugin-id": "Sprite",
+      "animations": { "default": { "frames": ["images/flag.png"] } }
+    },
+    "Hole": {
+      "plugin-id": "Sprite",
+      "animations": { "default": { "frames": ["images/hole.png"] } }
+    },
+    "ObstacleBlock": {
+      "plugin-id": "Sprite",
+      "animations": { "default": { "frames": ["images/obstacle.png"] } }
+    },
+    "GrassTuft": {
+      "plugin-id": "Sprite",
+      "animations": { "default": { "frames": ["images/grass_tuft.png"] } }
+    },
+    "UIBanner": {
+      "plugin-id": "Sprite",
+      "animations": { "default": { "frames": ["images/ui_banner.png"] } }
+    },
+    "UIBtnHome": {
+      "plugin-id": "Sprite",
+      "animations": { "default": { "frames": ["images/ui_btn_home.png"] } }
+    },
+    "UIBtnLevels": {
+      "plugin-id": "Sprite",
+      "animations": { "default": { "frames": ["images/ui_btn_levels.png"] } }
+    },
+    "UIBtnRestart": {
+      "plugin-id": "Sprite",
+      "animations": { "default": { "frames": ["images/ui_btn_restart.png"] } }
+    },
+    "UIHoldBadge": {
+      "plugin-id": "Sprite",
+      "animations": { "default": { "frames": ["images/ui_hold_badge.png"] } }
+    }
+  },
+  "audio": {
+    "sounds": [
+      "swing",
+      "hit",
+      "bounce",
+      "hole_in",
+      "victory",
+      "click"
+    ]
+  }
+}

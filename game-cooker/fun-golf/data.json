@@ -1,0 +1,30 @@
+{
+  "projectSettings": {
+    "viewportWidth": 1080,
+    "viewportHeight": 1920,
+    "gravity": 1450,
+    "friction": 0.982,
+    "restitution": 0.42
+  },
+  "levels": [
+    {
+      "id": 1,
+      "name": "Level 1 - Training Ground",
+      "par": 4,
+      "floors": 4
+    },
+    {
+      "id": 2,
+      "name": "Level 2 - Cascading Heights",
+      "par": 5,
+      "floors": 5,
+      "source": "demo.mp4"
+    },
+    {
+      "id": 3,
+      "name": "Level 3 - Double Hazard",
+      "par": 6,
+      "floors": 5
+    }
+  ]
+}
