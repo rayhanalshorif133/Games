@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ready to Go by Bus - Construct 3 Build</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#7ecb47">
+
+    <link rel="manifest" href="appmanifest.json">
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32.png">
+    <link rel="apple-touch-icon" sizes="128x128" href="icons/icon-128.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Construct 3 Loading Screen -->
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+        <div class="loading-text">Loading Ready to Go by Bus...</div>
+    </div>
+
+    <!-- Responsive Letterbox Canvas Container -->
+    <div id="canvas-container">
+        <canvas id="c3canvas" width="1080" height="1920"></canvas>
+    </div>
+
+    <!-- Construct 3 Game Scripts -->
+    <script src="scripts/supportcheck.js"></script>
+    <script src="scripts/offlineclient.js"></script>
+    <script src="c3runtime.js"></script>
+    <script src="scripts/audio.js"></script>
+    <script src="scripts/particleSystem.js"></script>
+    <script src="scripts/game.js"></script>
+    <script src="scripts/renderer.js"></script>
+    <script src="scripts/main.js"></script>
+</body>
+</html>

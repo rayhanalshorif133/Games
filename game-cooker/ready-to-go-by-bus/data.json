@@ -1,0 +1,75 @@
+{
+  "levels": [
+    {
+      "id": 1,
+      "name": "Level 1",
+      "totalQueue": 48,
+      "activeBays": 4,
+      "maxBays": 6,
+      "vehicles": [
+        { "id": "v1", "type": "car", "color": "red",    "x": 380, "y": 1150, "dir": "nw" },
+        { "id": "v2", "type": "car", "color": "blue",   "x": 560, "y": 1150, "dir": "ne" },
+        { "id": "v3", "type": "van", "color": "purple", "x": 470, "y": 1280, "dir": "sw" },
+        { "id": "v4", "type": "bus", "color": "red",    "x": 320, "y": 1380, "dir": "nw" },
+        { "id": "v5", "type": "bus", "color": "purple", "x": 620, "y": 1380, "dir": "se" },
+        { "id": "v6", "type": "van", "color": "pink",   "x": 470, "y": 1500, "dir": "ne" },
+        { "id": "v7", "type": "car", "color": "pink",   "x": 350, "y": 1620, "dir": "sw" },
+        { "id": "v8", "type": "car", "color": "blue",   "x": 590, "y": 1620, "dir": "se" }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Level 2",
+      "totalQueue": 338,
+      "activeBays": 4,
+      "maxBays": 7,
+      "vehicles": [
+        { "id": "v1",  "type": "car", "color": "green",  "x": 160, "y": 980,  "dir": "nw" },
+        { "id": "v2",  "type": "bus", "color": "red",    "x": 280, "y": 1040, "dir": "nw" },
+        { "id": "v3",  "type": "bus", "color": "green",  "x": 380, "y": 1020, "dir": "ne" },
+        { "id": "v4",  "type": "van", "color": "green",  "x": 480, "y": 1080, "dir": "ne" },
+        { "id": "v5",  "type": "bus", "color": "purple", "x": 590, "y": 990,  "dir": "ne" },
+        { "id": "v6",  "type": "bus", "color": "pink",   "x": 750, "y": 1030, "dir": "nw" },
+        { "id": "v7",  "type": "bus", "color": "blue",   "x": 810, "y": 1070, "dir": "nw" },
+        { "id": "v8",  "type": "car", "color": "blue",   "x": 880, "y": 980,  "dir": "ne" },
+        { "id": "v9",  "type": "car", "color": "pink",   "x": 880, "y": 1090, "dir": "se" },
+
+        { "id": "v10", "type": "van", "color": "blue",   "x": 170, "y": 1090, "dir": "nw" },
+        { "id": "v11", "type": "car", "color": "purple", "x": 150, "y": 1160, "dir": "se" },
+        { "id": "v12", "type": "bus", "color": "pink",   "x": 180, "y": 1230, "dir": "nw" },
+        { "id": "v13", "type": "bus", "color": "purple", "x": 270, "y": 1170, "dir": "nw" },
+        { "id": "v14", "type": "bus", "color": "red",    "x": 400, "y": 1140, "dir": "se" },
+        { "id": "v15", "type": "van", "color": "purple", "x": 540, "y": 1120, "dir": "ne" },
+        { "id": "v16", "type": "bus", "color": "purple", "x": 670, "y": 1140, "dir": "ne" },
+        { "id": "v17", "type": "bus", "color": "blue",   "x": 780, "y": 1180, "dir": "ne" },
+
+        { "id": "v18", "type": "bus", "color": "blue",   "x": 180, "y": 1330, "dir": "nw" },
+        { "id": "v19", "type": "car", "color": "green",  "x": 260, "y": 1370, "dir": "se" },
+        { "id": "v20", "type": "bus", "color": "blue",   "x": 310, "y": 1270, "dir": "ne" },
+        { "id": "v21", "type": "bus", "color": "red",    "x": 410, "y": 1260, "dir": "nw" },
+        { "id": "v22", "type": "van", "color": "green",  "x": 520, "y": 1240, "dir": "ne" },
+        { "id": "v23", "type": "van", "color": "maroon", "x": 620, "y": 1210, "dir": "se" },
+        { "id": "v24", "type": "bus", "color": "red",    "x": 720, "y": 1260, "dir": "se" },
+        { "id": "v25", "type": "van", "color": "maroon", "x": 830, "y": 1250, "dir": "se" },
+        { "id": "v26", "type": "car", "color": "pink",   "x": 870, "y": 1330, "dir": "se" },
+
+        { "id": "v27", "type": "car", "color": "green",  "x": 150, "y": 1420, "dir": "se" },
+        { "id": "v28", "type": "bus", "color": "red",    "x": 170, "y": 1480, "dir": "nw" },
+        { "id": "v29", "type": "bus", "color": "blue",   "x": 330, "y": 1430, "dir": "nw" },
+        { "id": "v30", "type": "van", "color": "pink",   "x": 380, "y": 1360, "dir": "se" },
+        { "id": "v31", "type": "van", "color": "pink",   "x": 440, "y": 1400, "dir": "nw" },
+        { "id": "v32", "type": "bus", "color": "pink",   "x": 660, "y": 1340, "dir": "se" },
+        { "id": "v33", "type": "van", "color": "green",  "x": 790, "y": 1370, "dir": "ne" },
+
+        { "id": "v34", "type": "car", "color": "pink",   "x": 180, "y": 1580, "dir": "se" },
+        { "id": "v35", "type": "car", "color": "blue",   "x": 280, "y": 1550, "dir": "se" },
+        { "id": "v36", "type": "bus", "color": "purple", "x": 460, "y": 1530, "dir": "nw" },
+        { "id": "v37", "type": "van", "color": "purple", "x": 540, "y": 1460, "dir": "se" },
+        { "id": "v38", "type": "car", "color": "purple", "x": 600, "y": 1540, "dir": "se" },
+        { "id": "v39", "type": "bus", "color": "red",    "x": 690, "y": 1480, "dir": "se" },
+        { "id": "v40", "type": "bus", "color": "maroon", "x": 810, "y": 1470, "dir": "nw" },
+        { "id": "v41", "type": "car", "color": "red",    "x": 860, "y": 1550, "dir": "se" }
+      ]
+    }
+  ]
+}

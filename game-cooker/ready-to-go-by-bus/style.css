@@ -1,0 +1,79 @@
+/* Construct 3 Responsive Letterbox Styling */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: #1a1e24;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    touch-action: none;
+}
+
+#canvas-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+canvas#c3canvas {
+    display: block;
+    background-color: #7ecb47;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    touch-action: none;
+}
+
+/* Construct 3 Loading Overlay */
+#loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at center, #2e7d32 0%, #1b5e20 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    color: #ffffff;
+    transition: opacity 0.4s ease-out;
+}
+
+.spinner {
+    width: 68px;
+    height: 68px;
+    border: 7px solid rgba(255, 255, 255, 0.25);
+    border-top: 7px solid #ffeb3b;
+    border-radius: 50%;
+    animation: c3spin 0.9s cubic-bezier(0.5, 0.1, 0.5, 0.9) infinite;
+    margin-bottom: 24px;
+}
+
+@keyframes c3spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
