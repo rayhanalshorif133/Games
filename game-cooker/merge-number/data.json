@@ -1,0 +1,71 @@
+{
+  "project": {
+    "name": "Merge Numbers",
+    "version": "1.0.0.0",
+    "description": "2248 Connect puzzle game with 3D squircle tiles, dynamic drag chains, gravity drop, and juicy combo synthesis",
+    "author": "GameCooker",
+    "uniqueId": "merge-numbers-c3-build",
+    "firstLayout": "Game",
+    "viewportWidth": 1080,
+    "viewportHeight": 1920,
+    "viewportScale": "letterbox-scale",
+    "orientation": "portrait",
+    "useLoaderLayout": false,
+    "fullscreenMode": "letterbox-scale",
+    "pixelRounding": false,
+    "sampling": "linear",
+    "framerateMode": "vsync",
+    "downscalingQuality": "high",
+    "flowDirection": "ltr"
+  },
+  "layouts": [
+    {
+      "name": "Game",
+      "width": 1080,
+      "height": 1920,
+      "unboundedScrolling": false,
+      "layers": [
+        { "name": "Background", "parallaxX": 1, "parallaxY": 1, "opacity": 1, "transparent": false, "visible": true },
+        { "name": "GridSlots", "parallaxX": 1, "parallaxY": 1, "opacity": 1, "transparent": true, "visible": true },
+        { "name": "Tiles", "parallaxX": 1, "parallaxY": 1, "opacity": 1, "transparent": true, "visible": true },
+        { "name": "Connections", "parallaxX": 1, "parallaxY": 1, "opacity": 1, "transparent": true, "visible": true },
+        { "name": "Particles", "parallaxX": 1, "parallaxY": 1, "opacity": 1, "transparent": true, "visible": true },
+        { "name": "BottomBanner", "parallaxX": 1, "parallaxY": 1, "opacity": 1, "transparent": true, "visible": true },
+        { "name": "Tutorial", "parallaxX": 1, "parallaxY": 1, "opacity": 1, "transparent": true, "visible": true },
+        { "name": "UI", "parallaxX": 1, "parallaxY": 1, "opacity": 1, "transparent": true, "visible": true },
+        { "name": "Popups", "parallaxX": 1, "parallaxY": 1, "opacity": 1, "transparent": true, "visible": true },
+        { "name": "Modal", "parallaxX": 1, "parallaxY": 1, "opacity": 1, "transparent": true, "visible": true }
+      ]
+    }
+  ],
+  "objectTypes": [
+    { "name": "Background", "pluginId": "Sprite", "asset": "images/background.png" },
+    { "name": "TileSlot", "pluginId": "Sprite", "asset": "images/tile_slot.png" },
+    { "name": "Tile_2", "pluginId": "Sprite", "asset": "images/tile_2.png" },
+    { "name": "Tile_4", "pluginId": "Sprite", "asset": "images/tile_4.png" },
+    { "name": "Tile_8", "pluginId": "Sprite", "asset": "images/tile_8.png" },
+    { "name": "Tile_16", "pluginId": "Sprite", "asset": "images/tile_16.png" },
+    { "name": "Tile_32", "pluginId": "Sprite", "asset": "images/tile_32.png" },
+    { "name": "Tile_64", "pluginId": "Sprite", "asset": "images/tile_64.png" },
+    { "name": "Tile_128", "pluginId": "Sprite", "asset": "images/tile_128.png" },
+    { "name": "Tile_256", "pluginId": "Sprite", "asset": "images/tile_256.png" },
+    { "name": "Tile_512", "pluginId": "Sprite", "asset": "images/tile_512.png" },
+    { "name": "Tile_1024", "pluginId": "Sprite", "asset": "images/tile_1024.png" },
+    { "name": "Tile_2048", "pluginId": "Sprite", "asset": "images/tile_2048.png" },
+    { "name": "Tile_4096", "pluginId": "Sprite", "asset": "images/tile_4096.png" },
+    { "name": "BottomBanner", "pluginId": "Sprite", "asset": "images/bottom_banner.png" },
+    { "name": "HandPointer", "pluginId": "Sprite", "asset": "images/hand_pointer.png" },
+    { "name": "ScoreCard", "pluginId": "Sprite", "asset": "images/score_card.png" },
+    { "name": "BtnRestart", "pluginId": "Sprite", "asset": "images/btn_restart.png" },
+    { "name": "BtnSoundOn", "pluginId": "Sprite", "asset": "images/btn_sound_on.png" },
+    { "name": "BtnSoundOff", "pluginId": "Sprite", "asset": "images/btn_sound_off.png" },
+    { "name": "BtnShuffle", "pluginId": "Sprite", "asset": "images/btn_shuffle.png" },
+    { "name": "BtnUndo", "pluginId": "Sprite", "asset": "images/btn_undo.png" },
+    { "name": "ParticleSparkle", "pluginId": "Particles", "asset": "images/particle_sparkle.png" },
+    { "name": "PopupGreat", "pluginId": "Sprite", "asset": "images/popup_great.png" },
+    { "name": "PopupAwesome", "pluginId": "Sprite", "asset": "images/popup_awesome.png" },
+    { "name": "PopupIncredible", "pluginId": "Sprite", "asset": "images/popup_incredible.png" },
+    { "name": "DialogPanel", "pluginId": "Sprite", "asset": "images/dialog_panel.png" }
+  ]
+}
+
