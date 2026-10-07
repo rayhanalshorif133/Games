@@ -42,6 +42,9 @@ class AttackToShipGame {
         this.isLeftPressed = false;
         this.isRightPressed = false;
         this.isBombPressed = false;
+        this.isDraggingShip = false;
+        this.dragPointerId = null;
+        this.dragOffsetX = 0;
     }
 
     startNewGame() {
@@ -56,6 +59,8 @@ class AttackToShipGame {
         this.sonarTimer = 5.0;
         this.bossSpawnScore = 120;
         this.bossActive = false;
+        this.isDraggingShip = false;
+        this.dragPointerId = null;
         this.state = 'PLAYING';
 
         // Pre-populate initial wave of submarines
@@ -176,9 +181,35 @@ class AttackToShipGame {
         // Check Touch Controls
         this.updateTouchInputs();
 
-        // Also allow tap anywhere on bottom right to drop bomb
+        // Bomb Button
         if (this.isPointInRect(x, y, this.controls.bombBtn)) {
             this.triggerBombDrop();
+            return;
+        }
+
+        // Tap or Drag to move ship directly on the ship or surface water lane
+        if (this.player && this.state === 'PLAYING') {
+            const shipHitbox = {
+                x: this.player.x - 50,
+                y: this.player.y - 70,
+                w: this.player.width + 100,
+                h: this.player.height + 150
+            };
+            const isNearSurface = (y >= 300 && y <= 750);
+
+            if (this.isPointInRect(x, y, shipHitbox) || isNearSurface) {
+                this.isDraggingShip = true;
+                this.dragPointerId = pointerId;
+
+                if (x >= this.player.x && x <= this.player.x + this.player.width) {
+                    this.dragOffsetX = x - this.player.x;
+                } else {
+                    this.dragOffsetX = this.player.width / 2;
+                    const minX = 20;
+                    const maxX = 1080 - this.player.width - 20;
+                    this.player.targetX = Math.max(minX, Math.min(maxX, x - this.dragOffsetX));
+                }
+            }
         }
     }
 
@@ -186,12 +217,26 @@ class AttackToShipGame {
         if (this.activePointers.has(pointerId)) {
             this.activePointers.set(pointerId, { x, y });
             this.updateTouchInputs();
+
+            // Direct dragging of ship follows finger/pointer smoothly
+            if (this.isDraggingShip && this.dragPointerId === pointerId && this.player) {
+                const targetX = x - this.dragOffsetX;
+                const minX = 20;
+                const maxX = 1080 - this.player.width - 20;
+                this.player.x = Math.max(minX, Math.min(maxX, targetX));
+                this.player.targetX = null;
+            }
         }
     }
 
     onPointerUp(pointerId) {
         this.activePointers.delete(pointerId);
         this.updateTouchInputs();
+
+        if (this.dragPointerId === pointerId) {
+            this.isDraggingShip = false;
+            this.dragPointerId = null;
+        }
     }
 
     updateTouchInputs() {
@@ -245,11 +290,17 @@ class AttackToShipGame {
             return;
         }
 
-        // Update player movement direction from inputs
-        if (this.isLeftPressed && !this.isRightPressed) {
-            this.player.moveDir = -1;
-        } else if (this.isRightPressed && !this.isLeftPressed) {
-            this.player.moveDir = 1;
+        // Update player movement direction from inputs (unless directly dragged)
+        if (!this.isDraggingShip) {
+            if (this.isLeftPressed && !this.isRightPressed) {
+                this.player.moveDir = -1;
+                this.player.targetX = null;
+            } else if (this.isRightPressed && !this.isLeftPressed) {
+                this.player.moveDir = 1;
+                this.player.targetX = null;
+            } else {
+                this.player.moveDir = 0;
+            }
         } else {
             this.player.moveDir = 0;
         }
@@ -643,7 +694,7 @@ class AttackToShipGame {
         ctx.fillText('HOW TO PLAY', 540, 890);
         ctx.font = "400 28px 'Segoe UI', sans-serif";
         ctx.fillStyle = '#eceff1';
-        ctx.fillText('• Move Ship: Left / Right Arrows or [A] / [D]', 540, 950);
+        ctx.fillText('• Move Ship: Tap/Drag directly on Ship or Arrows [A]/[D]', 540, 950);
         ctx.fillText('• Drop Depth Charge: Bomb Button or [SPACE]', 540, 1010);
         ctx.fillText('• 3 Lives (❤️ ❤️ ❤️): Dodge Enemy Torpedoes!', 540, 1070);
         ctx.fillText('• Collect Golden Badges for Energy Shield!', 540, 1130);

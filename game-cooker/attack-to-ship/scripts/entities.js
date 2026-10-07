@@ -189,6 +189,7 @@ class PlayerShip {
         this.bombCooldown = 0;
         this.maxBombCooldown = 0.42;
 
+        this.targetX = null;
         this.time = 0;
     }
 
@@ -215,8 +216,16 @@ class PlayerShip {
     update(dt) {
         this.time += dt;
 
-        // Move horizontally
-        if (this.moveDir !== 0) {
+        // Move horizontally (via target position from drag/tap, or keyboard/button direction)
+        if (this.targetX !== null) {
+            const diff = this.targetX - this.x;
+            if (Math.abs(diff) > 3) {
+                this.x += diff * Math.min(1.0, 16 * dt);
+            } else {
+                this.x = this.targetX;
+                this.targetX = null;
+            }
+        } else if (this.moveDir !== 0) {
             this.x += this.moveDir * this.speed * dt;
         }
 
