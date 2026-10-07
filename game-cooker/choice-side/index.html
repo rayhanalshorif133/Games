@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Choice Side - Canyon Wall Runner</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <!-- Construct 3 PWA & Mobile Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#2c170e">
+    <meta name="msapplication-TileColor" content="#ea580c">
+    
+    <link rel="manifest" href="appmanifest.json">
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/icon-16.png">
+    <link rel="apple-touch-icon" sizes="128x128" href="icons/icon-128.png">
+    
+    <!-- Game Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="c3-app-container">
+        <!-- Main Game Canvas (Virtual Layout: 1080 x 1920) -->
+        <canvas id="c3canvas" width="1080" height="1920"></canvas>
+
+        <!-- UI Overlay Layer -->
+        <div id="c3-ui-overlay">
+            
+            <!-- 1. Construct 3 Loading Screen -->
+            <div id="loading-screen" class="ui-screen">
+                <div class="loading-content">
+                    <img src="icons/loading-logo.png" alt="Loading" class="loading-logo">
+                    <div class="loading-bar-bg">
+                        <div id="loading-bar-fill" class="loading-bar-fill"></div>
+                    </div>
+                    <div id="loading-text" class="loading-text">LOADING...</div>
+                </div>
+            </div>
+
+            <!-- 2. Start Screen / Menu -->
+            <div id="start-screen" class="ui-screen ui-hidden">
+                <div class="game-title-container">
+                    <div class="game-badge">Canyon Wall Runner</div>
+                    <h1 class="game-title">CHOICE <span>SIDE</span></h1>
+                </div>
+
+                <div class="menu-center-action">
+                    <button id="btn-start" class="pulse-prompt">TAP TO PLAY</button>
+                </div>
+
+                <div class="menu-footer">
+                    <div class="stat-pill">BEST TIME: <span id="menu-best-time">00:00</span></div>
+                    <div class="stat-pill">APPLES: <span id="menu-apples">0</span></div>
+                    <button id="btn-menu-audio" class="ui-btn-circle" title="Toggle Sound">
+                        <img id="img-menu-audio" src="images/ui_audio.png" alt="Sound">
+                    </button>
+                </div>
+            </div>
+
+            <!-- 3. In-Game HUD (Exact match to demo.mp4) -->
+            <div id="hud-overlay" class="ui-screen ui-hidden">
+                <div class="hud-top-bar">
+                    <!-- Top Left: Home Button + Apple Counter -->
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <button id="btn-hud-home" class="ui-btn-circle" title="Pause / Home">
+                            <img src="images/ui_home.png" alt="Home">
+                        </button>
+                        
+                        <div class="hud-counter-group">
+                            <img src="images/ui_apple_badge.png" alt="Apple" class="hud-badge-icon">
+                            <span id="hud-apple-text" class="hud-counter-text">X0</span>
+                        </div>
+                    </div>
+
+                    <!-- Top Center: Big Red 3D Digital Survival Timer (00:00) -->
+                    <div class="hud-timer-container">
+                        <div id="hud-timer-text" class="hud-timer-digits">00:00</div>
+                    </div>
+
+                    <!-- Top Right: Lives Counter + Audio Toggle -->
+                    <div class="hud-right-group">
+                        <div class="hud-counter-group">
+                            <span id="hud-life-text" class="hud-counter-text">3X</span>
+                            <img src="images/ui_life_badge.png" alt="Life" class="hud-badge-icon">
+                        </div>
+
+                        <button id="btn-hud-audio" class="ui-btn-circle" title="Toggle Sound">
+                            <img id="img-hud-audio" src="images/ui_audio.png" alt="Sound">
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Game Over Modal Screen -->
+            <div id="gameover-screen" class="ui-screen ui-hidden">
+                <div class="modal-card">
+                    <div class="modal-header">GAME OVER</div>
+
+                    <div class="modal-stats-grid">
+                        <div class="stat-box">
+                            <div class="stat-label">TIME SURVIVED</div>
+                            <div id="go-time-val" class="stat-value">00:00</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">BEST TIME</div>
+                            <div id="go-best-time-val" class="stat-value">00:00</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">APPLES SLICED</div>
+                            <div id="go-apples-val" class="stat-value">0</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">TOTAL APPLES</div>
+                            <div id="go-total-apples-val" class="stat-value">0</div>
+                        </div>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button id="btn-restart" class="modal-btn btn-restart">PLAY AGAIN</button>
+                        <button id="btn-menu" class="modal-btn btn-menu">MAIN MENU</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. Pause Modal Screen -->
+            <div id="pause-screen" class="ui-screen ui-hidden">
+                <div class="modal-card">
+                    <div class="pause-title">PAUSED</div>
+                    <div class="modal-actions" style="flex-direction: column; width: 100%;">
+                        <button id="btn-resume" class="modal-btn btn-restart">RESUME</button>
+                        <button id="btn-pause-restart" class="modal-btn btn-menu">RESTART</button>
+                        <button id="btn-pause-menu" class="modal-btn btn-menu" style="background: #64748b; border-color: #475569;">MAIN MENU</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Scripts: Construct 3 runtime and game modules -->
+    <script src="c3runtime.js"></script>
+    <script src="scripts/audio.js"></script>
+    <script src="scripts/particles.js"></script>
+    <script src="scripts/obstacles.js"></script>
+    <script src="scripts/player.js"></script>
+    <script src="scripts/game.js"></script>
+    <script src="scripts/main.js"></script>
+</body>
+</html>
+

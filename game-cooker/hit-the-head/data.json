@@ -1,0 +1,46 @@
+{
+  "project": {
+    "name": "Hit The Head",
+    "version": "1.0.0.0",
+    "author": "Game Cooker",
+    "uniqueId": "hit-the-head-c3-game",
+    "viewportWidth": 1080,
+    "viewportHeight": 1920,
+    "pixelRounding": true,
+    "orientations": "portrait",
+    "sampling": "linear",
+    "useLoaderLayout": false,
+    "firstLayout": "GameLayout",
+    "layouts": [
+      {
+        "name": "GameLayout",
+        "width": 1080,
+        "height": 1920,
+        "eventSheet": "GameEvents"
+      }
+    ],
+    "objectTypes": [
+      { "name": "Background", "plugin-id": "Sprite" },
+      { "name": "HoleBack", "plugin-id": "Sprite" },
+      { "name": "HoleFront", "plugin-id": "Sprite" },
+      { "name": "Mole", "plugin-id": "Sprite" },
+      { "name": "Hammer", "plugin-id": "Sprite" },
+      { "name": "ScoreBadge", "plugin-id": "Sprite" },
+      { "name": "TimerBadge", "plugin-id": "Sprite" },
+      { "name": "UIBoard", "plugin-id": "Sprite" },
+      { "name": "StarParticle", "plugin-id": "Particles" },
+      { "name": "Audio", "plugin-id": "Audio" },
+      { "name": "Touch", "plugin-id": "Touch" },
+      { "name": "Mouse", "plugin-id": "Mouse" }
+    ],
+    "sounds": [
+      "bonk.wav",
+      "swing.wav",
+      "pop.wav",
+      "tick.wav",
+      "miss.wav",
+      "gameover.wav"
+    ]
+  }
+}
+

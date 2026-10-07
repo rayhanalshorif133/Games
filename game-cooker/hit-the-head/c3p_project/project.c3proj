@@ -1,0 +1,51 @@
+{
+	"name": "Hit The Head",
+	"version": "1.0.0.0",
+	"unique-id": "hit-the-head-c3",
+	"usedAddons": [
+		{
+			"type": "plugin",
+			"id": "Sprite"
+		},
+		{
+			"type": "plugin",
+			"id": "Text"
+		},
+		{
+			"type": "plugin",
+			"id": "Audio"
+		},
+		{
+			"type": "plugin",
+			"id": "Touch"
+		},
+		{
+			"type": "plugin",
+			"id": "Mouse"
+		},
+		{
+			"type": "plugin",
+			"id": "Particles"
+		}
+	],
+	"viewportWidth": 1080,
+	"viewportHeight": 1920,
+	"fullscreenQuality": "high",
+	"rendering": {
+		"linearColors": false,
+		"clearBackground": true,
+		"compositingMode": "standard"
+	},
+	"rootFileFolders": {
+		"items": [],
+		"subfolders": []
+	},
+	"firstLayout": "GameLayout",
+	"eventSheets": [
+		"GameEvents"
+	],
+	"layouts": [
+		"GameLayout"
+	]
+}
+

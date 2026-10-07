@@ -1,0 +1,99 @@
+{
+  "project": {
+    "name": "Square Shot",
+    "version": "1.0.0.0",
+    "author": "GameCooker",
+    "viewportWidth": 1080,
+    "viewportHeight": 1920,
+    "sampling": "linear",
+    "pixelRounding": false,
+    "useLoaderLayout": false,
+    "fullscreenMode": "letterbox-scale",
+    "orientations": "portrait",
+    "physicsEngine": "custom",
+    "firstLayout": "MainLayout"
+  },
+  "layouts": [
+    {
+      "name": "MainLayout",
+      "width": 1080,
+      "height": 1920,
+      "unboundedScrolling": false,
+      "layers": [
+        {
+          "name": "Background",
+          "isTransparent": false,
+          "parallaxX": 1,
+          "parallaxY": 1
+        },
+        {
+          "name": "Game",
+          "isTransparent": true,
+          "parallaxX": 1,
+          "parallaxY": 1
+        },
+        {
+          "name": "UI",
+          "isTransparent": true,
+          "parallaxX": 1,
+          "parallaxY": 1
+        }
+      ]
+    }
+  ],
+  "objectTypes": [
+    {
+      "name": "Player",
+      "pluginId": "Sprite",
+      "animations": [{ "name": "Default", "image": "images/player.png" }]
+    },
+    {
+      "name": "Arrow",
+      "pluginId": "Sprite",
+      "animations": [{ "name": "Default", "image": "images/arrow.png" }]
+    },
+    {
+      "name": "Obstacle",
+      "pluginId": "Sprite",
+      "animations": [{ "name": "Default", "image": "images/obstacle.png" }]
+    },
+    {
+      "name": "Target",
+      "pluginId": "Sprite",
+      "animations": [{ "name": "Default", "image": "images/target.png" }]
+    },
+    {
+      "name": "Particles",
+      "pluginId": "Particles",
+      "animations": [{ "name": "Default", "image": "images/particle.png" }]
+    },
+    {
+      "name": "ScoreText",
+      "pluginId": "Text"
+    },
+    {
+      "name": "Audio",
+      "pluginId": "Audio"
+    },
+    {
+      "name": "Touch",
+      "pluginId": "Touch"
+    },
+    {
+      "name": "Keyboard",
+      "pluginId": "Keyboard"
+    },
+    {
+      "name": "LocalStorage",
+      "pluginId": "LocalStorage"
+    }
+  ],
+  "audio": [
+    { "name": "shoot", "file": "media/shoot.wav" },
+    { "name": "wallhit", "file": "media/wallhit.wav" },
+    { "name": "collect", "file": "media/collect.wav" },
+    { "name": "gameover", "file": "media/gameover.wav" },
+    { "name": "click", "file": "media/click.wav" }
+  ]
+}
+

@@ -1,0 +1,33 @@
+{
+	"name": "GameEvents",
+	"events": [
+		{
+			"eventType": "variable",
+			"name": "Score",
+			"type": "number",
+			"initialValue": "0",
+			"comment": "Current game score",
+			"isStatic": false,
+			"isConstant": false
+		},
+		{
+			"eventType": "variable",
+			"name": "TimeRemaining",
+			"type": "number",
+			"initialValue": "30",
+			"comment": "Time remaining in seconds",
+			"isStatic": false,
+			"isConstant": false
+		},
+		{
+			"eventType": "variable",
+			"name": "Combo",
+			"type": "number",
+			"initialValue": "0",
+			"comment": "Consecutive hit combo streak",
+			"isStatic": false,
+			"isConstant": false
+		}
+	]
+}
+

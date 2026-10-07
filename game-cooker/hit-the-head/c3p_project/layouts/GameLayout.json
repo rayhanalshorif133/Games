@@ -1,0 +1,58 @@
+{
+	"name": "GameLayout",
+	"layers": [
+		{
+			"name": "Background",
+			"overriden": 0,
+			"subLayers": [],
+			"instances": [],
+			"visible": true,
+			"locked": false,
+			"parallaxX": 1,
+			"parallaxY": 1,
+			"scaleRate": 1,
+			"transparent": false
+		},
+		{
+			"name": "Holes",
+			"overriden": 0,
+			"subLayers": [],
+			"instances": [],
+			"visible": true,
+			"locked": false,
+			"parallaxX": 1,
+			"parallaxY": 1,
+			"scaleRate": 1,
+			"transparent": true
+		},
+		{
+			"name": "Entities",
+			"overriden": 0,
+			"subLayers": [],
+			"instances": [],
+			"visible": true,
+			"locked": false,
+			"parallaxX": 1,
+			"parallaxY": 1,
+			"scaleRate": 1,
+			"transparent": true
+		},
+		{
+			"name": "HUD",
+			"overriden": 0,
+			"subLayers": [],
+			"instances": [],
+			"visible": true,
+			"locked": false,
+			"parallaxX": 0,
+			"parallaxY": 0,
+			"scaleRate": 1,
+			"transparent": true
+		}
+	],
+	"width": 1080,
+	"height": 1920,
+	"unboundedScrolling": false,
+	"eventSheet": "GameEvents"
+}
+

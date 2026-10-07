@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Square Shot - Construct 3</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="generator" content="Construct 3">
+    <meta name="description" content="Hypercasual reflex arcade game inspired by Ketchapp">
+    <link rel="manifest" href="appmanifest.json">
+    <link rel="apple-touch-icon" sizes="128x128" href="icons/icon-128.png">
+    <link rel="apple-touch-icon" sizes="256x256" href="icons/icon-256.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="icons/icon-512.png">
+    <link rel="icon" type="image/png" href="icons/icon-32.png">
+    <meta name="theme-color" content="#2ECC71">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="canvas-container">
+        <canvas id="c3canvas" width="1080" height="1920"></canvas>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="c3-toast"></div>
+
+    <!-- Modal Dialog -->
+    <div id="modalBackdrop" class="c3-modal-backdrop">
+        <div class="c3-modal">
+            <h2 id="modalTitle">Title</h2>
+            <p id="modalText">Description</p>
+            <button id="modalBtn" class="c3-modal-btn">OK</button>
+        </div>
+    </div>
+
+    <!-- Construct 3 Runtime Scripts -->
+    <script src="scripts/supportcheck.js"></script>
+    <script src="scripts/offlineclient.js"></script>
+    <script src="scripts/c3runtime.js"></script>
+    <script src="scripts/main.js"></script>
+</body>
+</html>
+

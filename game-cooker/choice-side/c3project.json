@@ -1,0 +1,67 @@
+{
+  "name": "Choice Side",
+  "version": "1.0.0.0",
+  "author": "GameCooker",
+  "unique-id": "choice-side-c3-build",
+  "viewport-width": 1080,
+  "viewport-height": 1920,
+  "first-layout": "MainLayout",
+  "use-loader-layout": false,
+  "fullscreen-mode": "letterbox-scale",
+  "orientations": "portrait",
+  "pixel-rounding": false,
+  "pause-on-blur": true,
+  "sampling": "linear",
+  "clear-background": true,
+  "layouts": [
+    {
+      "name": "MainLayout",
+      "width": 1080,
+      "height": 1920,
+      "layers": [
+        { "name": "Background", "parallaxX": 0.45, "parallaxY": 0.45, "transparent": false },
+        { "name": "CanyonChasm", "parallaxX": 1, "parallaxY": 1, "transparent": true },
+        { "name": "Collectibles", "parallaxX": 1, "parallaxY": 1, "transparent": true },
+        { "name": "Hazards", "parallaxX": 1, "parallaxY": 1, "transparent": true },
+        { "name": "Player", "parallaxX": 1, "parallaxY": 1, "transparent": true },
+        { "name": "Effects", "parallaxX": 1, "parallaxY": 1, "transparent": true },
+        { "name": "CliffWalls", "parallaxX": 1, "parallaxY": 1, "transparent": true },
+        { "name": "HUD", "parallaxX": 0, "parallaxY": 0, "transparent": true }
+      ]
+    }
+  ],
+  "object-types": [
+    { "name": "BgCanyon", "plugin-id": "Sprite", "texture": "images/bg_canyon.png" },
+    { "name": "WallLeft", "plugin-id": "TiledBackground", "texture": "images/wall_left.png" },
+    { "name": "WallRight", "plugin-id": "TiledBackground", "texture": "images/wall_right.png" },
+    { "name": "PlayerClimb0", "plugin-id": "Sprite", "texture": "images/player_climb_0.png" },
+    { "name": "PlayerClimb1", "plugin-id": "Sprite", "texture": "images/player_climb_1.png" },
+    { "name": "PlayerJump", "plugin-id": "Sprite", "texture": "images/player_jump.png" },
+    { "name": "PlayerHurt", "plugin-id": "Sprite", "texture": "images/player_hurt.png" },
+    { "name": "SawBlade", "plugin-id": "Sprite", "texture": "images/saw_blade.png" },
+    { "name": "Boulder", "plugin-id": "Sprite", "texture": "images/boulder.png" },
+    { "name": "Fireball", "plugin-id": "Sprite", "texture": "images/fireball.png" },
+    { "name": "AppleGreen", "plugin-id": "Sprite", "texture": "images/apple_green.png" },
+    { "name": "AppleYellow", "plugin-id": "Sprite", "texture": "images/apple_yellow.png" },
+    { "name": "ApplePurple", "plugin-id": "Sprite", "texture": "images/apple_purple.png" },
+    { "name": "AppleSliceLeft", "plugin-id": "Sprite", "texture": "images/apple_slice_left.png" },
+    { "name": "AppleSliceRight", "plugin-id": "Sprite", "texture": "images/apple_slice_right.png" },
+    { "name": "Heart", "plugin-id": "Sprite", "texture": "images/heart.png" },
+    { "name": "SlashTrail", "plugin-id": "Sprite", "texture": "images/slash_trail.png" },
+    { "name": "UIHome", "plugin-id": "Sprite", "texture": "images/ui_home.png" },
+    { "name": "UIAudio", "plugin-id": "Sprite", "texture": "images/ui_audio.png" },
+    { "name": "UIAudioOff", "plugin-id": "Sprite", "texture": "images/ui_audio_off.png" },
+    { "name": "UIAppleBadge", "plugin-id": "Sprite", "texture": "images/ui_apple_badge.png" },
+    { "name": "UILifeBadge", "plugin-id": "Sprite", "texture": "images/ui_life_badge.png" }
+  ],
+  "audio": [
+    "media/jump.wav",
+    "media/slice.wav",
+    "media/hit.wav",
+    "media/heart.wav",
+    "media/gameover.wav",
+    "media/click.wav",
+    "media/bgm.wav"
+  ]
+}
+

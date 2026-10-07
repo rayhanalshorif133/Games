@@ -1,0 +1,62 @@
+{
+  "name": "Attack to Ship",
+  "version": "1.0.0.0",
+  "author": "GameCooker",
+  "unique-id": "attack-to-ship-c3-build",
+  "viewport-width": 1080,
+  "viewport-height": 1920,
+  "first-layout": "MainLayout",
+  "use-loader-layout": false,
+  "fullscreen-mode": "letterbox-scale",
+  "orientations": "portrait",
+  "pixel-rounding": false,
+  "pause-on-blur": true,
+  "sampling": "linear",
+  "clear-background": true,
+  "layouts": [
+    {
+      "name": "MainLayout",
+      "width": 1080,
+      "height": 1920,
+      "layers": [
+        { "name": "Background", "parallaxX": 1, "parallaxY": 1, "transparent": false },
+        { "name": "UnderwaterFX", "parallaxX": 1, "parallaxY": 1, "transparent": true },
+        { "name": "Submarines", "parallaxX": 1, "parallaxY": 1, "transparent": true },
+        { "name": "Projectiles", "parallaxX": 1, "parallaxY": 1, "transparent": true },
+        { "name": "SurfaceShip", "parallaxX": 1, "parallaxY": 1, "transparent": true },
+        { "name": "HUD", "parallaxX": 0, "parallaxY": 0, "transparent": true },
+        { "name": "TouchControls", "parallaxX": 0, "parallaxY": 0, "transparent": true }
+      ]
+    }
+  ],
+  "object-types": [
+    { "name": "PlayerShip", "plugin-id": "Sprite", "texture": "images/ship.png" },
+    { "name": "ShieldBubble", "plugin-id": "Sprite", "texture": "images/shield.png" },
+    { "name": "DepthCharge", "plugin-id": "Sprite", "texture": "images/bomb.png" },
+    { "name": "EnemyTorpedo", "plugin-id": "Sprite", "texture": "images/torpedo.png" },
+    { "name": "SubScout", "plugin-id": "Sprite", "texture": "images/sub_scout.png" },
+    { "name": "SubPatrol", "plugin-id": "Sprite", "texture": "images/sub_patrol.png" },
+    { "name": "SubMilitary", "plugin-id": "Sprite", "texture": "images/sub_military.png" },
+    { "name": "BossShark", "plugin-id": "Sprite", "texture": "images/boss_shark.png" },
+    { "name": "BossDreadnought", "plugin-id": "Sprite", "texture": "images/boss_dreadnought.png" },
+    { "name": "ShieldBadge", "plugin-id": "Sprite", "texture": "images/badge_shield.png" },
+    { "name": "ExplosionAnim", "plugin-id": "Sprite", "texture": "images/explosion.png" },
+    { "name": "TouchLeft", "plugin-id": "Sprite", "texture": "images/btn_left.png" },
+    { "name": "TouchRight", "plugin-id": "Sprite", "texture": "images/btn_right.png" },
+    { "name": "TouchBomb", "plugin-id": "Sprite", "texture": "images/btn_bomb.png" },
+    { "name": "BtnPause", "plugin-id": "Sprite", "texture": "images/btn_pause.png" },
+    { "name": "BtnGamepad", "plugin-id": "Sprite", "texture": "images/btn_gamepad.png" },
+    { "name": "HeartFull", "plugin-id": "Sprite", "texture": "images/heart.png" },
+    { "name": "HeartEmpty", "plugin-id": "Sprite", "texture": "images/heart_empty.png" }
+  ],
+  "audio": [
+    "media/sonar.wav",
+    "media/bomb_drop.wav",
+    "media/torpedo_launch.wav",
+    "media/explosion.wav",
+    "media/shield_hit.wav",
+    "media/powerup.wav",
+    "media/gameover.wav"
+  ]
+}
+

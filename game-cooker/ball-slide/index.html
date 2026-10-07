@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ball Slide - Construct 3 Build</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <!-- Construct 3 PWA & Mobile Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#2d2d2d">
+    <meta name="msapplication-TileColor" content="#79c25c">
+    
+    <link rel="manifest" href="appmanifest.json">
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/icon-16.png">
+    <link rel="apple-touch-icon" sizes="128x128" href="icons/icon-128.png">
+    
+    <!-- Game Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="c3-app-container">
+        <!-- Main Game Canvas (Virtual Layout: 1080 x 1920) -->
+        <canvas id="c3canvas" width="1080" height="1920"></canvas>
+
+        <!-- UI Overlay Layer -->
+        <div id="c3-ui-overlay">
+            
+            <!-- 1. Construct 3 Loading Screen -->
+            <div id="loading-screen" class="ui-screen">
+                <div class="loading-content">
+                    <img src="icons/loading-logo.png" alt="Loading" class="loading-logo">
+                    <div class="loading-bar-bg">
+                        <div id="loading-bar-fill" class="loading-bar-fill"></div>
+                    </div>
+                    <div id="loading-text" class="loading-text">LOADING...</div>
+                </div>
+            </div>
+
+            <!-- 2. Start Screen / Menu -->
+            <div id="start-screen" class="ui-screen ui-hidden">
+                <div class="game-title-container">
+                    <div class="game-badge">Arcade Dodger</div>
+                    <h1 class="game-title">BALL <span>SLIDE</span></h1>
+                </div>
+
+                <div class="menu-center-action">
+                    <div id="start-prompt" class="pulse-prompt">TAP OR DRAG TO PLAY</div>
+
+                    <div class="skin-selector">
+                        <button class="skin-btn active" data-skin="square" title="Cyan Cube">
+                            <img src="images/player_square.png" alt="Square">
+                        </button>
+                        <button class="skin-btn" data-skin="ball" title="Neon Ball">
+                            <img src="images/player_ball.png" alt="Ball">
+                        </button>
+                        <button class="skin-btn" data-skin="star" title="Golden Star">
+                            <img src="images/player_star.png" alt="Star">
+                        </button>
+                    </div>
+                </div>
+
+                <div class="menu-footer">
+                    <div class="stat-pill">BEST: <span id="menu-highscore-val">0</span></div>
+                    <div class="stat-pill">GEMS: <span id="menu-gems-val">0</span></div>
+                    <button id="btn-audio-toggle" class="icon-btn" title="Toggle Sound">🔊</button>
+                </div>
+            </div>
+
+            <!-- 3. In-Game HUD -->
+            <div id="hud-overlay" class="ui-screen ui-hidden">
+                <div class="hud-top">
+                    <!-- Snowflake Slow-Mo Active Indicator -->
+                    <div id="powerup-indicator" class="powerup-indicator">
+                        <img src="images/snowflake.png" alt="Freeze">
+                        <div class="powerup-bar">
+                            <div id="powerup-progress" class="powerup-progress"></div>
+                        </div>
+                    </div>
+
+                    <!-- Gems Counter -->
+                    <div class="gem-counter">
+                        <img src="images/gem.png" alt="Gem">
+                        <span id="gem-count-val">0</span>
+                    </div>
+                </div>
+
+                <!-- Big Bottom Score Counter (Exact Match to demo.mp4) -->
+                <div id="hud-bottom-score" class="hud-bottom-score">0</div>
+            </div>
+
+            <!-- 4. Game Over Modal Screen -->
+            <div id="gameover-screen" class="ui-screen ui-hidden">
+                <div class="gameover-card">
+                    <div class="gameover-badge">CRASHED!</div>
+                    <div id="gameover-score" class="gameover-score-big">0</div>
+
+                    <div class="score-stats-grid">
+                        <div class="stat-box">
+                            <div class="label">BEST SCORE</div>
+                            <div class="val">
+                                <span id="gameover-best">0</span>
+                                <span id="new-best-badge" class="new-best-flag" style="display: none;">NEW</span>
+                            </div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="label">GEMS EARNED</div>
+                            <div class="val" id="gameover-gems-earned">+0</div>
+                        </div>
+                    </div>
+
+                    <button id="btn-replay" class="replay-btn">PLAY AGAIN</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Engine Scripts (Construct 3 Build Structure) -->
+    <script src="c3runtime.js"></script>
+    <script src="scripts/audio.js"></script>
+    <script src="scripts/particles.js"></script>
+    <script src="scripts/obstacles.js"></script>
+    <script src="scripts/game.js"></script>
+    <script src="scripts/main.js"></script>
+
+</body>
+</html>
+

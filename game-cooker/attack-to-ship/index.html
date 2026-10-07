@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Attack to Ship - Construct 3 Build</title>
+    <link rel="manifest" href="appmanifest.json">
+    <link rel="icon" type="image/png" href="images/icon-128.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="loading-screen">
+        <img class="c3-logo" src="images/icon-128.png" alt="Attack to Ship Logo">
+        <h1 class="c3-title">Attack to Ship</h1>
+        <p class="c3-subtitle">Construct 3 Mobile Build (1080x1920)</p>
+        <div class="progress-container">
+            <div id="progress-bar" class="progress-bar"></div>
+        </div>
+    </div>
+
+    <div id="canvas-container">
+        <canvas id="c3canvas" width="1080" height="1920"></canvas>
+    </div>
+
+    <!-- Game Scripts -->
+    <script src="scripts/audio.js"></script>
+    <script src="scripts/entities.js"></script>
+    <script src="scripts/main.js"></script>
+    <script src="scripts/c3runtime.js"></script>
+
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            const progressBar = document.getElementById('progress-bar');
+            const loadingScreen = document.getElementById('loading-screen');
+
+            // Initialize Construct 3 runtime
+            window.c3Runtime.init('c3canvas', window.attackToShipGame);
+
+            // Asset manifest
+            const manifest = {
+                'bg_sky_water': 'images/bg_sky_water.png',
+                'ship': 'images/ship.png',
+                'shield': 'images/shield.png',
+                'bomb': 'images/bomb.png',
+                'torpedo': 'images/torpedo.png',
+                'sub_scout': 'images/sub_scout.png',
+                'sub_patrol': 'images/sub_patrol.png',
+                'sub_military': 'images/sub_military.png',
+                'boss_shark': 'images/boss_shark.png',
+                'boss_dreadnought': 'images/boss_dreadnought.png',
+                'badge_shield': 'images/badge_shield.png',
+                'explosion': 'images/explosion.png',
+                'btn_left': 'images/btn_left.png',
+                'btn_right': 'images/btn_right.png',
+                'btn_bomb': 'images/btn_bomb.png',
+                'btn_gamepad': 'images/btn_gamepad.png',
+                'btn_pause': 'images/btn_pause.png',
+                'heart': 'images/heart.png',
+                'heart_empty': 'images/heart_empty.png'
+            };
+
+            // Preload all assets
+            window.c3Runtime.loadAssets(manifest, (progress) => {
+                progressBar.style.width = `${Math.floor(progress * 100)}%`;
+            }, () => {
+                // Done loading
+                setTimeout(() => {
+                    loadingScreen.classList.add('hidden');
+                    window.c3Runtime.start();
+                }, 300);
+            });
+        });
+    </script>
+</body>
+</html>
+
