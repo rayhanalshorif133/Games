@@ -1,0 +1,13 @@
+{
+  "name": "Puck",
+  "plugin-id": "Sprite",
+  "animations": [
+    {
+      "frames": [
+        {
+          "image": "images/puck.png"
+        }
+      ]
+    }
+  ]
+}

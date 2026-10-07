@@ -1,0 +1,13 @@
+{
+  "name": "MalletAI",
+  "plugin-id": "Sprite",
+  "animations": [
+    {
+      "frames": [
+        {
+          "image": "images/mallet_ai.png"
+        }
+      ]
+    }
+  ]
+}

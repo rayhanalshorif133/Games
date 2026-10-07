@@ -1,0 +1,50 @@
+{
+  "project": {
+    "name": "Ninja River Run",
+    "version": "1.0.0.0",
+    "author": "Antigravity Game Studio",
+    "uniqueId": "com.antigravity.ninjariverrun",
+    "firstLayout": "MainLayout",
+    "viewportWidth": 1080,
+    "viewportHeight": 1920,
+    "useLoaderLayout": false,
+    "pixelRounding": false,
+    "sampling": "bilinear",
+    "framerateMode": "vsync",
+    "layouts": [
+      {
+        "name": "MainLayout",
+        "width": 1080,
+        "height": 1920,
+        "unboundedScrolling": true,
+        "layers": [
+          { "name": "Background", "parallaxX": 0.2, "parallaxY": 0.2, "isTransparent": false },
+          { "name": "RiverAndTrack", "parallaxX": 1.0, "parallaxY": 1.0, "isTransparent": true },
+          { "name": "GameEntities", "parallaxX": 1.0, "parallaxY": 1.0, "isTransparent": true },
+          { "name": "Particles", "parallaxX": 1.0, "parallaxY": 1.0, "isTransparent": true },
+          { "name": "HUD_UI", "parallaxX": 0.0, "parallaxY": 0.0, "isTransparent": true }
+        ]
+      }
+    ],
+    "objectTypes": [
+      { "name": "PlayerNinja", "plugin": "Sprite", "behavior": ["Runner3D", "BoundToLanes"] },
+      { "name": "SunCoin", "plugin": "Sprite", "behavior": ["SineRotate", "MagnetPull"] },
+      { "name": "HurdleJump", "plugin": "Sprite", "behavior": ["Obstacle"] },
+      { "name": "BarrierSlide", "plugin": "Sprite", "behavior": ["Obstacle"] },
+      { "name": "StoneBoulder", "plugin": "Sprite", "behavior": ["Obstacle"] },
+      { "name": "LumberTruck", "plugin": "Sprite", "behavior": ["Obstacle", "Solid"] },
+      { "name": "TrainLogWagon", "plugin": "Sprite", "behavior": ["Obstacle", "Solid"] },
+      { "name": "JumpRamp", "plugin": "Sprite", "behavior": ["RampLauncher"] },
+      { "name": "PurpleCrates", "plugin": "Sprite", "behavior": ["Obstacle"] },
+      { "name": "FloatingLog", "plugin": "Sprite", "behavior": ["PlatformWater"] },
+      { "name": "SuspensionBridge", "plugin": "Sprite", "behavior": ["PlatformBridge"] },
+      { "name": "PowerupRocket", "plugin": "Sprite", "behavior": ["Collectible"] },
+      { "name": "Powerup2X", "plugin": "Sprite", "behavior": ["Collectible"] },
+      { "name": "PowerupMagnet", "plugin": "Sprite", "behavior": ["Collectible"] },
+      { "name": "HUD_Pause", "plugin": "Sprite", "behavior": ["Button"] },
+      { "name": "HUD_Score", "plugin": "Text", "behavior": ["Anchor"] },
+      { "name": "AudioEngine", "plugin": "Audio", "behavior": ["ProceduralSynthesizer"] }
+    ]
+  }
+}
+

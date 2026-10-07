@@ -1,0 +1,45 @@
+{
+  "name": "Glow Pong Ball",
+  "version": "1.0.0.0",
+  "author": "GameCooker",
+  "uniqueId": "com.gamecooker.glowpongball",
+  "exportFormat": "html5",
+  "c3version": "r380",
+  "canvas": {
+    "width": 1080,
+    "height": 1920,
+    "fullscreenMode": "letterbox-integer-scale",
+    "orientations": ["portrait"]
+  },
+  "layouts": [
+    {
+      "name": "MainGame",
+      "width": 1080,
+      "height": 1920,
+      "backgroundColor": [0, 0, 0],
+      "layers": [
+        { "name": "Background", "parallaxX": 1, "parallaxY": 1, "isTransparent": false },
+        { "name": "Court", "parallaxX": 1, "parallaxY": 1, "isTransparent": true },
+        { "name": "Entities", "parallaxX": 1, "parallaxY": 1, "isTransparent": true },
+        { "name": "Effects", "parallaxX": 1, "parallaxY": 1, "isTransparent": true },
+        { "name": "HUD", "parallaxX": 0, "parallaxY": 0, "isTransparent": true }
+      ]
+    }
+  ],
+  "objectTypes": [
+    { "name": "TableBackground", "plugin": "Sprite", "texture": "images/table_bg.png" },
+    { "name": "MalletPlayer", "plugin": "Sprite", "texture": "images/mallet_player.png" },
+    { "name": "MalletAI", "plugin": "Sprite", "texture": "images/mallet_ai.png" },
+    { "name": "Puck", "plugin": "Sprite", "texture": "images/puck.png" },
+    { "name": "GoalBanner", "plugin": "Sprite", "texture": "images/goal_banner.png" },
+    { "name": "BtnSoundOn", "plugin": "Sprite", "texture": "images/btn_sound_on.png" },
+    { "name": "BtnSoundOff", "plugin": "Sprite", "texture": "images/btn_sound_off.png" },
+    { "name": "BtnClose", "plugin": "Sprite", "texture": "images/btn_close.png" },
+    { "name": "BtnRestart", "plugin": "Sprite", "texture": "images/btn_restart.png" },
+    { "name": "LedBlue", "plugin": "Sprite", "texture": "images/led_blue.png" },
+    { "name": "LedRed", "plugin": "Sprite", "texture": "images/led_red.png" },
+    { "name": "Spark", "plugin": "Particles", "texture": "images/spark.png" },
+    { "name": "Audio", "plugin": "Audio" }
+  ]
+}
+

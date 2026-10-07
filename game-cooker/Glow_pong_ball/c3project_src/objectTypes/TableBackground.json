@@ -1,0 +1,13 @@
+{
+  "name": "TableBackground",
+  "plugin-id": "Sprite",
+  "animations": [
+    {
+      "frames": [
+        {
+          "image": "images/table_bg.png"
+        }
+      ]
+    }
+  ]
+}

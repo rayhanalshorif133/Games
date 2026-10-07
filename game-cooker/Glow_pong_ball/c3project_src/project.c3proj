@@ -1,0 +1,33 @@
+{
+  "name": "Glow Pong Ball",
+  "version": "1.0.0.0",
+  "author": "GameCooker",
+  "uniqueId": "glow-pong-ball-c3",
+  "firstLayout": "MainGame",
+  "viewportWidth": 1080,
+  "viewportHeight": 1920,
+  "pixelRounding": false,
+  "useLoaderLayout": false,
+  "bundleId": "com.gamecooker.glowpongball",
+  "layouts": [
+    "layouts/MainGame.json"
+  ],
+  "eventSheets": [
+    "eventSheets/MainSheet.json"
+  ],
+  "scripts": [
+    "scripts/main.js",
+    "scripts/physics.js",
+    "scripts/ai.js",
+    "scripts/audio.js",
+    "scripts/effects.js",
+    "scripts/ui.js"
+  ],
+  "objectTypes": [
+    "objectTypes/TableBackground.json",
+    "objectTypes/MalletPlayer.json",
+    "objectTypes/MalletAI.json",
+    "objectTypes/Puck.json",
+    "objectTypes/GoalBanner.json"
+  ]
+}

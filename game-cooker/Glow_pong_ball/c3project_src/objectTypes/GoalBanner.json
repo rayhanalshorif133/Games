@@ -1,0 +1,13 @@
+{
+  "name": "GoalBanner",
+  "plugin-id": "Sprite",
+  "animations": [
+    {
+      "frames": [
+        {
+          "image": "images/goal_banner.png"
+        }
+      ]
+    }
+  ]
+}

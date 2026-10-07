@@ -1,0 +1,57 @@
+{
+  "name": "MainGame",
+  "width": 1080,
+  "height": 1920,
+  "unboundedScrolling": false,
+  "eventSheet": "MainSheet",
+  "layers": [
+    {
+      "name": "Background",
+      "overriden": 0,
+      "instances": [
+        {
+          "type": "TableBackground",
+          "properties": {
+            "x": 540,
+            "y": 960,
+            "width": 1080,
+            "height": 1920
+          }
+        }
+      ]
+    },
+    {
+      "name": "GameObjects",
+      "overriden": 0,
+      "instances": [
+        {
+          "type": "MalletPlayer",
+          "properties": {
+            "x": 540,
+            "y": 1450,
+            "width": 172,
+            "height": 172
+          }
+        },
+        {
+          "type": "MalletAI",
+          "properties": {
+            "x": 540,
+            "y": 450,
+            "width": 172,
+            "height": 172
+          }
+        },
+        {
+          "type": "Puck",
+          "properties": {
+            "x": 540,
+            "y": 960,
+            "width": 88,
+            "height": 88
+          }
+        }
+      ]
+    }
+  ]
+}

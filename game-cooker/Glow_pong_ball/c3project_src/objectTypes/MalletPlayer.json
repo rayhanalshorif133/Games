@@ -1,0 +1,13 @@
+{
+  "name": "MalletPlayer",
+  "plugin-id": "Sprite",
+  "animations": [
+    {
+      "frames": [
+        {
+          "image": "images/mallet_player.png"
+        }
+      ]
+    }
+  ]
+}
