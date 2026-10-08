@@ -321,17 +321,72 @@ html, body {
 /* Big Bottom Score matching demo.mp4 */
 .hud-bottom-score {
     position: absolute;
-    bottom: 90px;
+    bottom: 30px;
     left: 0;
     width: 100%;
     text-align: center;
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 140px;
-    line-height: 1;
+    font-size: 130px;
+    line-height: 84px;
     color: #ffffff;
-    text-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
     pointer-events: none;
     transition: transform 0.12s ease;
+    z-index: 22;
+}
+
+/* Bottom Left / Right Controls */
+.hud-bottom-controls {
+    position: absolute;
+    bottom: 30px;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 28px;
+    pointer-events: none;
+    z-index: 25;
+}
+
+.control-btn {
+    pointer-events: auto;
+    width: 84px;
+    height: 84px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 2px solid rgba(82, 221, 249, 0.5);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    transition: transform 0.1s ease, background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+    outline: none;
+}
+
+.control-btn svg {
+    width: 42px;
+    height: 42px;
+    stroke: #ffffff;
+    transition: stroke 0.15s ease, transform 0.1s ease;
+}
+
+.control-btn:active, .control-btn.pressed {
+    background: rgba(82, 221, 249, 0.35);
+    border-color: #52ddf9;
+    transform: scale(0.9);
+    box-shadow: 0 0 25px rgba(82, 221, 249, 0.7);
+}
+
+.control-btn:active svg, .control-btn.pressed svg {
+    stroke: #52ddf9;
 }
 
 /* Game Over Screen */

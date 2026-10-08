@@ -86,7 +86,7 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     function handlePointerMove(clientX, clientY) {
-        if (!game.input.pointerDown && game.state !== 'PLAYING') return;
+        if (!game.input.pointerDown) return;
         const coords = getGameCoords(clientX, clientY);
         game.input.pointerX = coords.x;
         game.input.isDragging = true;
@@ -99,10 +99,11 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // Pointer Events (Mouse, Touch, Stylus unified)
     container.addEventListener('pointerdown', (e) => {
-        // Prevent default touch dragging
-        if (e.target.tagName !== 'BUTTON' && !e.target.closest('.skin-btn')) {
-            e.preventDefault();
+        // Prevent default touch dragging when touching controls or buttons
+        if (e.target.closest('button') || e.target.closest('.control-btn') || e.target.closest('.skin-btn')) {
+            return;
         }
+        e.preventDefault();
         handlePointerStart(e.clientX, e.clientY);
     });
 
@@ -112,6 +113,43 @@ window.addEventListener('DOMContentLoaded', () => {
 
     window.addEventListener('pointerup', handlePointerEnd);
     window.addEventListener('pointercancel', handlePointerEnd);
+
+    // In-game Bottom Control Buttons (Left & Right)
+    const btnLeft = document.getElementById('btn-control-left');
+    const btnRight = document.getElementById('btn-control-right');
+
+    function bindDirectionButton(btn, directionKey) {
+        if (!btn) return;
+
+        const press = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            game.input[directionKey] = true;
+            btn.classList.add('pressed');
+            if (btn.setPointerCapture && e.pointerId) {
+                try { btn.setPointerCapture(e.pointerId); } catch (_) {}
+            }
+            if (game.state === 'MENU') {
+                game.startGame();
+            }
+        };
+
+        const release = (e) => {
+            game.input[directionKey] = false;
+            btn.classList.remove('pressed');
+            if (btn.releasePointerCapture && e.pointerId) {
+                try { btn.releasePointerCapture(e.pointerId); } catch (_) {}
+            }
+        };
+
+        btn.addEventListener('pointerdown', press);
+        btn.addEventListener('pointerup', release);
+        btn.addEventListener('pointercancel', release);
+        btn.addEventListener('pointerleave', release);
+    }
+
+    bindDirectionButton(btnLeft, 'btnLeft');
+    bindDirectionButton(btnRight, 'btnRight');
 
     // Keyboard controls
     window.addEventListener('keydown', (e) => {

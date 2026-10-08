@@ -63,6 +63,8 @@ class BallSlideGame {
             pointerX: 540,
             keyLeft: false,
             keyRight: false,
+            btnLeft: false,
+            btnRight: false,
             isDragging: false
         };
 
@@ -307,9 +309,12 @@ class BallSlideGame {
 
         // Player Movement Controls
         const moveSpeed = 1600;
-        if (this.input.keyLeft) {
+        const isMovingLeft = this.input.keyLeft || this.input.btnLeft;
+        const isMovingRight = this.input.keyRight || this.input.btnRight;
+
+        if (isMovingLeft) {
             this.player.targetX -= moveSpeed * dt;
-        } else if (this.input.keyRight) {
+        } else if (isMovingRight) {
             this.player.targetX += moveSpeed * dt;
         } else if (this.input.isDragging) {
             this.player.targetX = this.input.pointerX;
