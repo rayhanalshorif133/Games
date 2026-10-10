@@ -39,16 +39,17 @@ class AttackToShipGame {
         ];
 
         // Touch & UI control buttons geometry
+        // Touch & UI control buttons geometry matching demo.jpg
         this.controls = {
             // HUD Top Bar Buttons
-            gamepadBtn: { x: 40, y: 35, w: 90, h: 90 },
-            soundBtn: { x: 835, y: 35, w: 90, h: 90 },
-            pauseBtn: { x: 950, y: 35, w: 90, h: 90 },
+            gamepadBtn: { x: 36, y: 32, w: 90, h: 90 },
+            soundBtn: { x: 780, y: 16, w: 130, h: 126 },
+            pauseBtn: { x: 934, y: 32, w: 90, h: 90 },
 
-            // Bottom Gameplay Touch Controls
-            leftBtn: { x: 35, y: 1680, w: 180, h: 180 },
-            rightBtn: { x: 235, y: 1680, w: 180, h: 180 },
-            bombBtn: { x: 840, y: 1680, w: 190, h: 190 },
+            // Bottom Gameplay Touch Controls (Chevron Steer Arrows & Hex Bomb)
+            leftBtn: { x: 35, y: 1660, w: 175, h: 175 },
+            rightBtn: { x: 235, y: 1660, w: 175, h: 175 },
+            bombBtn: { x: 825, y: 1630, w: 215, h: 215 },
 
             // Menu Screen Button
             menuStartBtn: { x: 290, y: 1330, w: 500, h: 110 },
@@ -723,181 +724,187 @@ class AttackToShipGame {
     renderHUD(ctx, images) {
         ctx.save();
 
-        // 1. Tactical Naval Bridge Command Console Container
-        const hudX = 20, hudY = 18, hudW = 1040, hudH = 130, hudR = 26;
+        const hudX = 20, hudY = 20, hudW = 1040, hudH = 126, hudR = 24;
 
-        // Glowing outer neon ambiance
+        // --- 1. TOP CONSOLE BAR BACKGROUND (matching demo.jpg) ---
         ctx.shadowColor = 'rgba(0, 229, 255, 0.45)';
         ctx.shadowBlur = 18;
 
-        // Cyber-naval titanium console gradient
         const hudGrad = ctx.createLinearGradient(hudX, hudY, hudX, hudY + hudH);
-        hudGrad.addColorStop(0, '#05101c');
-        hudGrad.addColorStop(0.5, '#0a1a2e');
-        hudGrad.addColorStop(1, '#030810');
+        hudGrad.addColorStop(0, '#0c2438');
+        hudGrad.addColorStop(0.5, '#071624');
+        hudGrad.addColorStop(1, '#030a12');
         ctx.fillStyle = hudGrad;
         ctx.roundRect(hudX, hudY, hudW, hudH, hudR);
         ctx.fill();
 
-        // High-contrast Cyber-Cyan neon border
         ctx.strokeStyle = '#00e5ff';
         ctx.lineWidth = 2.5;
         ctx.roundRect(hudX, hudY, hudW, hudH, hudR);
         ctx.stroke();
         ctx.shadowBlur = 0;
 
-        // Sleek top curved glass specular highlight
-        const rimGrad = ctx.createLinearGradient(hudX + 60, hudY, hudX + hudW - 60, hudY);
+        // Top Glass highlight line
+        const rimGrad = ctx.createLinearGradient(hudX + 50, hudY, hudX + hudW - 50, hudY);
         rimGrad.addColorStop(0, 'rgba(0, 229, 255, 0)');
-        rimGrad.addColorStop(0.5, 'rgba(0, 229, 255, 0.4)');
+        rimGrad.addColorStop(0.5, 'rgba(0, 229, 255, 0.5)');
         rimGrad.addColorStop(1, 'rgba(0, 229, 255, 0)');
         ctx.strokeStyle = rimGrad;
         ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.moveTo(hudX + 40, hudY + 4);
-        ctx.lineTo(hudX + hudW - 40, hudY + 4);
+        ctx.moveTo(hudX + 50, hudY + 3);
+        ctx.lineTo(hudX + hudW - 50, hudY + 3);
         ctx.stroke();
 
-        // Tactical Corner Bracket Accents [  ]
-        ctx.strokeStyle = 'rgba(0, 229, 255, 0.7)';
-        ctx.lineWidth = 2;
-        // Top-left
+        // --- 2. TOP CENTER TRAPEZOID TECH TAB (\\\ • TACTICAL RADAR ONLINE ///) ---
+        const tabW = 380, tabH = 22, tabTopY = hudY - 14;
+        ctx.save();
         ctx.beginPath();
-        ctx.moveTo(hudX + 10, hudY + 28);
-        ctx.lineTo(hudX + 10, hudY + 10);
-        ctx.lineTo(hudX + 28, hudY + 10);
-        ctx.stroke();
-        // Top-right
-        ctx.beginPath();
-        ctx.moveTo(hudX + hudW - 28, hudY + 10);
-        ctx.lineTo(hudX + hudW - 10, hudY + 10);
-        ctx.lineTo(hudX + hudW - 10, hudY + 28);
-        ctx.stroke();
-        // Bottom-left
-        ctx.beginPath();
-        ctx.moveTo(hudX + 10, hudY + hudH - 28);
-        ctx.lineTo(hudX + 10, hudY + hudH - 10);
-        ctx.lineTo(hudX + 28, hudY + hudH - 10);
-        ctx.stroke();
-        // Bottom-right
-        ctx.beginPath();
-        ctx.moveTo(hudX + hudW - 28, hudY + hudH - 10);
-        ctx.lineTo(hudX + hudW - 10, hudY + hudH - 10);
-        ctx.lineTo(hudX + hudW - 10, hudY + hudH - 28);
-        ctx.stroke();
-
-        // Top Left: Gamepad / Tactical Briefing Button (Naval titanium button)
-        const padImg = images['btn_gamepad'];
-        const padBtn = this.controls.gamepadBtn;
-        const padGrad = ctx.createLinearGradient(padBtn.x, padBtn.y, padBtn.x, padBtn.y + padBtn.h);
-        padGrad.addColorStop(0, '#091b2c');
-        padGrad.addColorStop(1, '#040b14');
-        ctx.fillStyle = padGrad;
-        ctx.roundRect(padBtn.x, padBtn.y, padBtn.w, padBtn.h, 20);
+        ctx.moveTo(540 - tabW / 2 + 20, tabTopY);
+        ctx.lineTo(540 + tabW / 2 - 20, tabTopY);
+        ctx.lineTo(540 + tabW / 2, hudY + 2);
+        ctx.lineTo(540 - tabW / 2, hudY + 2);
+        ctx.closePath();
+        ctx.fillStyle = '#091e30';
         ctx.fill();
         ctx.strokeStyle = '#00e5ff';
         ctx.lineWidth = 2;
-        ctx.roundRect(padBtn.x, padBtn.y, padBtn.w, padBtn.h, 20);
         ctx.stroke();
 
-        if (padImg && padImg.complete) {
-            ctx.drawImage(padImg, padBtn.x + 12, padBtn.y + 12, padBtn.w - 24, padBtn.h - 24);
-        } else {
-            ctx.font = "40px sans-serif";
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('🎮', padBtn.x + padBtn.w / 2, padBtn.y + padBtn.h / 2);
-        }
-
-        // Top Right: SOUND BUTTON (Naval radio/sonar button)
-        this.renderSoundButton(ctx, this.controls.soundBtn.x, this.controls.soundBtn.y, this.controls.soundBtn.w, this.controls.soundBtn.h);
-
-        // Top Right: PAUSE BUTTON (Naval titanium button)
-        const pauseImg = images['btn_pause'];
-        const pauseBtn = this.controls.pauseBtn;
-        const pauseGrad = ctx.createLinearGradient(pauseBtn.x, pauseBtn.y, pauseBtn.x, pauseBtn.y + pauseBtn.h);
-        pauseGrad.addColorStop(0, '#091b2c');
-        pauseGrad.addColorStop(1, '#040b14');
-        ctx.fillStyle = pauseGrad;
-        ctx.roundRect(pauseBtn.x, pauseBtn.y, pauseBtn.w, pauseBtn.h, 20);
-        ctx.fill();
+        // Angled slashes on left \\\ and right ///
         ctx.strokeStyle = '#00e5ff';
-        ctx.lineWidth = 2;
-        ctx.roundRect(pauseBtn.x, pauseBtn.y, pauseBtn.w, pauseBtn.h, 20);
-        ctx.stroke();
-
-        if (pauseImg && pauseImg.complete) {
-            ctx.drawImage(pauseImg, pauseBtn.x + 12, pauseBtn.y + 12, pauseBtn.w - 24, pauseBtn.h - 24);
-        } else {
-            ctx.fillStyle = '#00e5ff';
-            ctx.fillRect(pauseBtn.x + 30, pauseBtn.y + 25, 10, 40);
-            ctx.fillRect(pauseBtn.x + 50, pauseBtn.y + 25, 10, 40);
+        ctx.lineWidth = 2.5;
+        for (let i = 0; i < 3; i++) {
+            // Left \\\
+            const lx = 540 - tabW / 2 + 30 + i * 8;
+            ctx.beginPath();
+            ctx.moveTo(lx + 6, tabTopY + 4);
+            ctx.lineTo(lx, tabTopY + 16);
+            ctx.stroke();
+            // Right ///
+            const rx = 540 + tabW / 2 - 30 - i * 8;
+            ctx.beginPath();
+            ctx.moveTo(rx - 6, tabTopY + 4);
+            ctx.lineTo(rx, tabTopY + 16);
+            ctx.stroke();
         }
 
-        // Center HUD: Tactical Radar Callout above Score
+        // Tab Text
         ctx.font = "800 15px 'Segoe UI', Impact, Arial, sans-serif";
         ctx.fillStyle = '#00e5ff';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        const pulseLive = (Math.sin(performance.now() * 0.005) > 0);
-        ctx.fillText(pulseLive ? '● TACTICAL RADAR ONLINE' : '○ TACTICAL RADAR ONLINE', 540, hudY + 26);
+        ctx.fillText('• TACTICAL RADAR ONLINE', 540, tabTopY + tabH / 2);
+        ctx.restore();
 
-        // Center HUD: Score Display - Bold Glowing White (#ffffff)
-        ctx.font = "900 56px 'Impact', 'Segoe UI', Arial Black, sans-serif";
-        ctx.fillStyle = '#ffffff';
-        ctx.shadowColor = 'rgba(0, 229, 255, 0.75)';
-        ctx.shadowBlur = 12;
-        ctx.fillText(`SCORE: ${this.score}`, 540, hudY + 76);
+        // --- 3. TOP LEFT: GAMEPAD / BRIEFING BUTTON MODULE ---
+        const gBtn = this.controls.gamepadBtn;
+        ctx.save();
+        ctx.fillStyle = '#091c2c';
+        ctx.roundRect(gBtn.x, gBtn.y, gBtn.w, gBtn.h, 20);
+        ctx.fill();
+        ctx.strokeStyle = '#00e5ff';
+        ctx.lineWidth = 2.5;
+        ctx.roundRect(gBtn.x, gBtn.y, gBtn.w, gBtn.h, 20);
+        ctx.stroke();
+
+        const padImg = images['btn_gamepad'];
+        if (padImg && padImg.complete) {
+            ctx.drawImage(padImg, gBtn.x + 14, gBtn.y + 14, gBtn.w - 28, gBtn.h - 28);
+        } else {
+            ctx.font = "42px sans-serif";
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('🎮', gBtn.x + gBtn.w / 2, gBtn.y + gBtn.h / 2);
+        }
+        ctx.restore();
+
+        // --- 4. TOP RIGHT: AUDIO BUTTON MODULE (Raised Mechanical Chassis matching demo.jpg) ---
+        this.renderSoundButton(ctx, this.controls.soundBtn.x, this.controls.soundBtn.y, this.controls.soundBtn.w, this.controls.soundBtn.h);
+
+        // --- 5. TOP RIGHT: PAUSE BUTTON MODULE ---
+        const pBtn = this.controls.pauseBtn;
+        ctx.save();
+        ctx.fillStyle = '#091c2c';
+        ctx.roundRect(pBtn.x, pBtn.y, pBtn.w, pBtn.h, 20);
+        ctx.fill();
+        ctx.strokeStyle = '#00e5ff';
+        ctx.lineWidth = 2.5;
+        ctx.roundRect(pBtn.x, pBtn.y, pBtn.w, pBtn.h, 20);
+        ctx.stroke();
+
+        const pauseImg = images['btn_pause'];
+        if (pauseImg && pauseImg.complete) {
+            ctx.drawImage(pauseImg, pBtn.x + 14, pBtn.y + 14, pBtn.w - 28, pBtn.h - 28);
+        } else {
+            ctx.fillStyle = '#00e5ff';
+            ctx.fillRect(pBtn.x + 28, pBtn.y + 26, 12, 38);
+            ctx.fillRect(pBtn.x + 50, pBtn.y + 26, 12, 38);
+        }
+        ctx.restore();
+
+        // --- 6. CENTER HUD: SCORE: 30 (Gradient Block Text matching demo.jpg) ---
+        ctx.save();
+        ctx.font = "900 64px 'Impact', 'Rajdhani', Arial Black, sans-serif";
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'alphabetic';
+
+        // Gradient from White to Bright Icy Cyan
+        const scoreGrad = ctx.createLinearGradient(540, hudY + 34, 540, hudY + 88);
+        scoreGrad.addColorStop(0, '#ffffff');
+        scoreGrad.addColorStop(0.5, '#ffffff');
+        scoreGrad.addColorStop(1, '#9cecfb');
+
+        ctx.shadowColor = 'rgba(0, 229, 255, 0.85)';
+        ctx.shadowBlur = 16;
+        ctx.fillStyle = scoreGrad;
+        ctx.fillText(`SCORE: ${this.score}`, 540, hudY + 80);
         ctx.shadowBlur = 0;
 
-        // Center HUD Subtitle directly under Score: Tactical Badge
+        // Subtitle: 🏆 BEST: 270 (matching demo.jpg)
         ctx.font = "800 24px 'Segoe UI', Impact, Arial, sans-serif";
         ctx.fillStyle = '#ffffff';
         let subText = `🏆 BEST: ${this.highScore}`;
         if (this.comboCount > 1 && this.comboTimer > 0) {
-            subText += `   |   🔥 COMBO x${this.comboCount}`;
+            subText += `   |   🔥 x${this.comboCount}`;
         }
         ctx.fillText(subText, 540, hudY + 114);
+        ctx.restore();
 
-        // 2. Underneath HUD: Naval Hull Integrity Container
+        // --- 7. UPPER SLOT: HULL / LIVES CONTAINER (matching demo.jpg middle slot) ---
         if (this.player) {
             const heartImg = images['heart'];
             const emptyHeartImg = images['heart_empty'];
-            const heartSize = 52;
-            const gap = 16;
-            const totalW = this.player.maxHealth * heartSize + (this.player.maxHealth - 1) * gap;
-            const heartContainerW = totalW + 210;
-            const heartContainerH = 68;
-            const startX = 540 - heartContainerW / 2;
-            const heartY = 164;
+            const slotW = 420, slotH = 58;
+            const slotX = 540 - slotW / 2, slotY = 164;
 
-            // Deep cyber-naval panel
-            const hGrad = ctx.createLinearGradient(startX, heartY, startX, heartY + heartContainerH);
-            hGrad.addColorStop(0, '#061322');
-            hGrad.addColorStop(1, '#030812');
-            ctx.fillStyle = hGrad;
-            ctx.roundRect(startX, heartY, heartContainerW, heartContainerH, 20);
+            ctx.save();
+            const slotGrad = ctx.createLinearGradient(slotX, slotY, slotX, slotY + slotH);
+            slotGrad.addColorStop(0, '#0a2236');
+            slotGrad.addColorStop(1, '#05111c');
+            ctx.fillStyle = slotGrad;
+            ctx.roundRect(slotX, slotY, slotW, slotH, 18);
             ctx.fill();
 
-            // Glowing border (Cyan when healthy, Red when critical 1 HP)
             const isCritical = (this.player.health === 1);
             ctx.strokeStyle = isCritical ? '#ff1744' : '#00e5ff';
             ctx.lineWidth = 2.5;
             ctx.shadowColor = isCritical ? 'rgba(255, 23, 68, 0.5)' : 'rgba(0, 229, 255, 0.4)';
-            ctx.shadowBlur = isCritical ? 14 : 10;
-            ctx.roundRect(startX, heartY, heartContainerW, heartContainerH, 20);
+            ctx.shadowBlur = 10;
+            ctx.roundRect(slotX, slotY, slotW, slotH, 18);
             ctx.stroke();
             ctx.shadowBlur = 0;
 
-            // Tactical Label
-            ctx.font = "900 24px 'Segoe UI', Impact, Arial, sans-serif";
+            // Label on left
+            ctx.font = "900 22px 'Segoe UI', Impact, Arial, sans-serif";
             ctx.fillStyle = isCritical ? '#ff5252' : '#00e5ff';
             ctx.textAlign = 'left';
             ctx.textBaseline = 'middle';
-            ctx.fillText('🛡️ HULL:', startX + 24, heartY + heartContainerH / 2);
+            ctx.fillText('🛡️ HULL:', slotX + 26, slotY + slotH / 2);
 
-            // Render Hearts
-            const heartsStartX = startX + 155;
+            // 3 Hearts on right
+            const heartSize = 46, gap = 14;
+            const heartsStartX = slotX + 155;
             for (let i = 0; i < this.player.maxHealth; i++) {
                 const hx = heartsStartX + i * (heartSize + gap);
                 const isAlive = i < this.player.health;
@@ -910,7 +917,7 @@ class AttackToShipGame {
                     pulse = 1.0 + Math.sin(this.player.time * pulseSpeed + i * 0.45) * pulseIntensity;
                 }
 
-                ctx.translate(hx + heartSize / 2, heartY + heartContainerH / 2);
+                ctx.translate(hx + heartSize / 2, slotY + slotH / 2);
                 ctx.scale(pulse, pulse);
 
                 const currentImg = isAlive ? heartImg : emptyHeartImg;
@@ -918,104 +925,141 @@ class AttackToShipGame {
                     ctx.drawImage(currentImg, -heartSize / 2, -heartSize / 2, heartSize, heartSize);
                 } else {
                     ctx.fillStyle = isAlive ? '#ff1744' : 'rgba(120, 130, 140, 0.4)';
-                    ctx.font = "42px sans-serif";
+                    ctx.font = "38px sans-serif";
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
                     ctx.fillText(isAlive ? '❤️' : '🖤', 0, 0);
                 }
                 ctx.restore();
             }
+            ctx.restore();
 
-            // 3. Shield Status UI Widget (Directly underneath Lives)
-            if (this.player.hasShield) {
-                const sPct = Math.max(0, Math.min(1, this.player.shieldTimer / this.player.maxShieldTime));
-                const isDamaged = (this.player.shieldHp === 1);
-                const isLowTime = (this.player.shieldTimer < 3.0);
-                const flash = (isDamaged || isLowTime) && (Math.sin(this.player.time * 16) > 0);
-                const borderColor = isDamaged ? '#ff1744' : (isLowTime && flash ? '#ff5252' : '#00e5ff');
+            // --- 8. SCI-FI TECH SHIELD DEFLECTOR FRAME (matching demo.jpg) ---
+            const frameW = 680, frameH = 82;
+            const frameX = 540 - frameW / 2, frameY = 240;
+            const hasShield = this.player.hasShield;
+            const sPct = hasShield ? Math.max(0, Math.min(1, this.player.shieldTimer / this.player.maxShieldTime)) : 0;
+            const isDamaged = hasShield && (this.player.shieldHp === 1);
+            const isLowTime = hasShield && (this.player.shieldTimer < 3.0);
+            const flash = (isDamaged || isLowTime) && (Math.sin(this.player.time * 16) > 0);
+            const frameColor = isDamaged ? '#ff1744' : (isLowTime && flash ? '#ff5252' : '#00e5ff');
 
-                const pillW = 660;
-                const pillH = 82;
-                const pillX = 540 - pillW / 2;
-                const pillY = 246;
+            ctx.save();
 
-                ctx.save();
+            // Sci-fi outer polygon with notched/chamfered corners
+            const ch = 18; // chamfer size
+            ctx.beginPath();
+            ctx.moveTo(frameX + ch, frameY);
+            ctx.lineTo(frameX + frameW - ch, frameY);
+            ctx.lineTo(frameX + frameW, frameY + ch);
+            ctx.lineTo(frameX + frameW, frameY + frameH - ch);
+            ctx.lineTo(frameX + frameW - ch, frameY + frameH);
+            ctx.lineTo(frameX + ch, frameY + frameH);
+            ctx.lineTo(frameX, frameY + frameH - ch);
+            ctx.lineTo(frameX, frameY + ch);
+            ctx.closePath();
 
-                // Cyber-naval deflector panel
-                const sGrad = ctx.createLinearGradient(pillX, pillY, pillX, pillY + pillH);
-                sGrad.addColorStop(0, '#061324');
-                sGrad.addColorStop(1, '#020812');
-                ctx.fillStyle = sGrad;
-                ctx.roundRect(pillX, pillY, pillW, pillH, 20);
-                ctx.fill();
+            const fGrad = ctx.createLinearGradient(frameX, frameY, frameX, frameY + frameH);
+            fGrad.addColorStop(0, '#0b2034');
+            fGrad.addColorStop(0.5, '#061424');
+            fGrad.addColorStop(1, '#020912');
+            ctx.fillStyle = fGrad;
+            ctx.fill();
 
-                // Glowing neon border (Cyan for 2 hits, Red for 1 hit)
-                ctx.strokeStyle = borderColor;
-                ctx.lineWidth = 3;
-                ctx.shadowColor = borderColor;
-                ctx.shadowBlur = (isDamaged || isLowTime) ? 18 : 12;
-                ctx.roundRect(pillX, pillY, pillW, pillH, 20);
+            ctx.strokeStyle = frameColor;
+            ctx.lineWidth = 2.8;
+            ctx.shadowColor = frameColor;
+            ctx.shadowBlur = hasShield ? 16 : 8;
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+
+            // Left & Right Sci-Fi Wings with 3 horizontal vent slats (matching demo.jpg!)
+            ctx.strokeStyle = frameColor;
+            ctx.lineWidth = 3;
+            for (let v = 0; v < 3; v++) {
+                const vy = frameY + 24 + v * 16;
+                // Left slats
+                ctx.beginPath();
+                ctx.moveTo(frameX + 16, vy);
+                ctx.lineTo(frameX + 38, vy);
                 ctx.stroke();
-                ctx.shadowBlur = 0;
+                // Right slats
+                ctx.beginPath();
+                ctx.moveTo(frameX + frameW - 38, vy);
+                ctx.lineTo(frameX + frameW - 16, vy);
+                ctx.stroke();
+            }
 
-                // Left: Deflector Status & Hit Counter in pure white & cyan/red
-                ctx.textAlign = 'left';
-                ctx.textBaseline = 'middle';
-                ctx.font = "900 28px 'Segoe UI', Impact, Arial, sans-serif";
+            // Top Status Line inside Frame
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'middle';
+            ctx.font = "900 20px 'Segoe UI', Impact, Arial, sans-serif";
+            if (hasShield) {
                 if (isDamaged) {
                     ctx.fillStyle = '#ff5252';
-                    ctx.fillText('⚠️ DEFLECTOR: 1 HIT LEFT!', pillX + 24, pillY + 30);
+                    ctx.fillText('⚠️ DEFLECTOR: 1 HIT LEFT!', frameX + 56, frameY + 24);
                 } else {
-                    ctx.fillStyle = '#ffffff';
-                    ctx.fillText('⚡ DEFLECTOR: 2/2 HITS', pillX + 24, pillY + 30);
+                    ctx.fillStyle = '#00e5ff';
+                    ctx.fillText('⚡ DEFLECTOR: 2/2 HITS', frameX + 56, frameY + 24);
                 }
-
-                // Right: Giant, crystal clear Countdown Timer in PURE WHITE with cyan/red glow
+                // Right Countdown text
                 ctx.textAlign = 'right';
-                ctx.font = "900 34px 'Impact', 'Segoe UI', Arial Black, sans-serif";
+                ctx.font = "900 24px 'Impact', 'Segoe UI', Arial Black, sans-serif";
                 ctx.fillStyle = '#ffffff';
-                ctx.shadowColor = borderColor;
-                ctx.shadowBlur = 8;
-                const secondsLeft = Math.ceil(this.player.shieldTimer);
-                ctx.fillText(`⏱ ${secondsLeft} SECONDS`, pillX + pillW - 24, pillY + 30);
-                ctx.shadowBlur = 0;
-
-                // Bottom Line: High-tech Progress Bar of Timer
-                const barX = pillX + 24;
-                const barY = pillY + 54;
-                const barW = pillW - 48;
-                const barH = 16;
-
-                // Slot Background
-                ctx.fillStyle = '#020810';
-                ctx.roundRect(barX, barY, barW, barH, 8);
-                ctx.fill();
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
-                ctx.lineWidth = 1;
-                ctx.roundRect(barX, barY, barW, barH, 8);
-                ctx.stroke();
-
-                // Bar Fill with gradient
-                if (sPct > 0) {
-                    const fillW = Math.max(16, barW * sPct);
-                    const fillGrad = ctx.createLinearGradient(barX, barY, barX + fillW, barY);
-                    if (isDamaged) {
-                        fillGrad.addColorStop(0, '#ff1744');
-                        fillGrad.addColorStop(1, '#ff9100');
-                    } else if (isLowTime) {
-                        fillGrad.addColorStop(0, '#ff5252');
-                        fillGrad.addColorStop(1, '#ffb300');
-                    } else {
-                        fillGrad.addColorStop(0, '#00e5ff');
-                        fillGrad.addColorStop(1, '#0091ea');
-                    }
-                    ctx.fillStyle = fillGrad;
-                    ctx.roundRect(barX, barY, fillW, barH, 8);
-                    ctx.fill();
-                }
-
-                ctx.restore();
+                ctx.fillText(`⏱ ${Math.ceil(this.player.shieldTimer)}s REMAINING`, frameX + frameW - 56, frameY + 24);
+            } else {
+                ctx.fillStyle = 'rgba(0, 229, 255, 0.5)';
+                ctx.fillText('DEFLECTOR SYSTEM [STANDBY]', frameX + 56, frameY + 24);
+                ctx.textAlign = 'right';
+                ctx.font = "700 18px 'Segoe UI', sans-serif";
+                ctx.fillText('READY', frameX + frameW - 56, frameY + 24);
             }
+
+            // Inner Glowing Energy Beam Track Slot (matching demo.jpg!)
+            const slotTrackX = frameX + 54;
+            const slotTrackY = frameY + 44;
+            const slotTrackW = frameW - 108;
+            const slotTrackH = 22;
+
+            ctx.fillStyle = '#030d18';
+            ctx.roundRect(slotTrackX, slotTrackY, slotTrackW, slotTrackH, 11);
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(0, 229, 255, 0.4)';
+            ctx.lineWidth = 1.5;
+            ctx.roundRect(slotTrackX, slotTrackY, slotTrackW, slotTrackH, 11);
+            ctx.stroke();
+
+            // Glowing Cyan Energy Laser Beam Fill
+            if (hasShield && sPct > 0) {
+                const fillW = Math.max(22, slotTrackW * sPct);
+                const beamGrad = ctx.createLinearGradient(slotTrackX, slotTrackY, slotTrackX + fillW, slotTrackY);
+                if (isDamaged) {
+                    beamGrad.addColorStop(0, '#ff1744');
+                    beamGrad.addColorStop(0.8, '#ff9100');
+                    beamGrad.addColorStop(1, '#ffffff');
+                } else {
+                    beamGrad.addColorStop(0, '#0091ea');
+                    beamGrad.addColorStop(0.7, '#00e5ff');
+                    beamGrad.addColorStop(0.95, '#b2ebf2');
+                    beamGrad.addColorStop(1, '#ffffff');
+                }
+                ctx.fillStyle = beamGrad;
+                ctx.shadowColor = frameColor;
+                ctx.shadowBlur = 14;
+                ctx.roundRect(slotTrackX, slotTrackY, fillW, slotTrackH, 11);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            } else if (!hasShield) {
+                // Subtle ambient glow in standby
+                const idleBeam = ctx.createLinearGradient(slotTrackX, slotTrackY, slotTrackX + 80, slotTrackY);
+                idleBeam.addColorStop(0, 'rgba(0, 229, 255, 0.4)');
+                idleBeam.addColorStop(1, 'rgba(0, 229, 255, 0)');
+                ctx.fillStyle = idleBeam;
+                ctx.roundRect(slotTrackX, slotTrackY, 80, slotTrackH, 11);
+                ctx.fill();
+            }
+
+            ctx.restore();
         }
 
         ctx.restore();
@@ -1025,66 +1069,118 @@ class AttackToShipGame {
         ctx.save();
         const isMuted = window.soundEngine.isMuted();
 
-        // Tactical Naval Radio / Sonar Button Base
-        const sGrad = ctx.createLinearGradient(x, y, x, y + h);
-        sGrad.addColorStop(0, '#091b2c');
-        sGrad.addColorStop(1, '#040b14');
-        ctx.fillStyle = sGrad;
-        ctx.roundRect(x, y, w, h, 20);
-        ctx.fill();
+        // 1. Raised Industrial Chassis (matching demo.jpg)
+        const chX = x, chY = y, chW = w, chH = h;
+        const bGrad = ctx.createLinearGradient(chX, chY, chX, chY + chH);
+        bGrad.addColorStop(0, '#223448');
+        bGrad.addColorStop(0.5, '#172535');
+        bGrad.addColorStop(1, '#0e1824');
 
+        // Beveled Chassis Polygon
+        ctx.beginPath();
+        ctx.moveTo(chX + 16, chY);
+        ctx.lineTo(chX + chW - 16, chY);
+        ctx.lineTo(chX + chW, chY + 16);
+        ctx.lineTo(chX + chW, chY + chH - 24);
+        ctx.lineTo(chX + chW - 24, chY + chH);
+        ctx.lineTo(chX + 16, chY + chH);
+        ctx.lineTo(chX, chY + chH - 16);
+        ctx.lineTo(chX, chY + 16);
+        ctx.closePath();
+
+        ctx.fillStyle = bGrad;
+        ctx.fill();
+        ctx.strokeStyle = '#374f68';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // 4 Rivet Screws at corners
+        ctx.fillStyle = '#64748b';
+        const rivets = [
+            { rx: chX + 10, ry: chY + 14 },
+            { rx: chX + chW - 10, ry: chY + 14 },
+            { rx: chX + 10, ry: chY + chH - 14 },
+            { rx: chX + chW - 14, ry: chY + chH - 14 }
+        ];
+        for (const rv of rivets) {
+            ctx.beginPath();
+            ctx.arc(rv.rx, rv.ry, 3, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // 4 Diagonal Ridges at bottom-right notch (matching demo.jpg!)
+        ctx.strokeStyle = '#0f1722';
+        ctx.lineWidth = 2.5;
+        for (let r = 0; r < 4; r++) {
+            const rx = chX + chW - 26 + r * 6;
+            ctx.beginPath();
+            ctx.moveTo(rx, chY + chH - 8);
+            ctx.lineTo(rx + 6, chY + chH - 2);
+            ctx.stroke();
+        }
+
+        // 2. Inner Speaker Screen Box
+        const scW = chW - 32, scH = 64;
+        const scX = chX + 16, scY = chY + 12;
+        ctx.fillStyle = '#081e32';
+        ctx.roundRect(scX, scY, scW, scH, 12);
+        ctx.fill();
         ctx.strokeStyle = isMuted ? '#ff1744' : '#00e5ff';
         ctx.lineWidth = 2;
         ctx.shadowColor = isMuted ? 'rgba(255, 23, 68, 0.4)' : 'rgba(0, 229, 255, 0.4)';
         ctx.shadowBlur = 8;
-        ctx.roundRect(x, y, w, h, 20);
+        ctx.roundRect(scX, scY, scW, scH, 12);
         ctx.stroke();
         ctx.shadowBlur = 0;
 
-        const cx = x + w / 2;
-        const cy = y + h / 2 - 8;
+        const cx = scX + scW / 2;
+        const cy = scY + scH / 2;
 
-        // Speaker cone
+        // Speaker icon
         ctx.fillStyle = isMuted ? '#ff5252' : '#ffffff';
         ctx.beginPath();
-        ctx.fillRect(cx - 20, cy - 8, 10, 16);
-        ctx.moveTo(cx - 10, cy - 8);
-        ctx.lineTo(cx + 2, cy - 18);
-        ctx.lineTo(cx + 2, cy + 18);
-        ctx.lineTo(cx - 10, cy + 8);
+        ctx.fillRect(cx - 18, cy - 8, 9, 16);
+        ctx.moveTo(cx - 9, cy - 8);
+        ctx.lineTo(cx + 2, cy - 16);
+        ctx.lineTo(cx + 2, cy + 16);
+        ctx.lineTo(cx - 9, cy + 8);
         ctx.closePath();
         ctx.fill();
 
         if (!isMuted) {
-            // Glowing cyber soundwaves
             ctx.strokeStyle = '#00e5ff';
-            ctx.lineWidth = 3;
+            ctx.lineWidth = 2.5;
             ctx.lineCap = 'round';
             // Wave 1
             ctx.beginPath();
-            ctx.arc(cx + 2, cy, 12, -Math.PI / 3, Math.PI / 3);
+            ctx.arc(cx + 2, cy, 10, -Math.PI / 3, Math.PI / 3);
             ctx.stroke();
             // Wave 2
             ctx.beginPath();
-            ctx.arc(cx + 2, cy, 20, -Math.PI / 3, Math.PI / 3);
+            ctx.arc(cx + 2, cy, 18, -Math.PI / 3, Math.PI / 3);
             ctx.stroke();
         } else {
-            // Red mute slash
             ctx.strokeStyle = '#ff1744';
-            ctx.lineWidth = 3.5;
+            ctx.lineWidth = 3;
             ctx.lineCap = 'round';
             ctx.beginPath();
-            ctx.moveTo(cx - 22, cy - 18);
-            ctx.lineTo(cx + 22, cy + 18);
+            ctx.moveTo(cx - 18, cy - 14);
+            ctx.lineTo(cx + 18, cy + 14);
             ctx.stroke();
         }
 
-        // High-contrast indicator label underneath
+        // 3. Lower Status Capsule (AUDIO ON / AUDIO OFF matching demo.jpg)
+        const pillW = scW, pillH = 26;
+        const pillX = scX, pillY = scY + scH + 8;
+        ctx.fillStyle = isMuted ? '#ff1744' : '#00e5ff';
+        ctx.roundRect(pillX, pillY, pillW, pillH, 12);
+        ctx.fill();
+
         ctx.font = "900 13px 'Segoe UI', Impact, Arial, sans-serif";
-        ctx.fillStyle = isMuted ? '#ff5252' : '#00e5ff';
+        ctx.fillStyle = isMuted ? '#ffffff' : '#051828';
         ctx.textAlign = 'center';
-        ctx.textBaseline = 'alphabetic';
-        ctx.fillText(isMuted ? 'MUTED' : 'AUDIO ON', cx, y + h - 8);
+        ctx.textBaseline = 'middle';
+        ctx.fillText(isMuted ? 'AUDIO OFF' : 'AUDIO ON', pillX + pillW / 2, pillY + pillH / 2 + 1);
 
         ctx.restore();
     }
@@ -1092,101 +1188,230 @@ class AttackToShipGame {
     renderTouchControls(ctx, images) {
         ctx.save();
 
-        // 1. Left Arrow Button
-        const leftImg = images['btn_left'];
-        ctx.save();
-        if (this.isLeftPressed) {
-            ctx.translate(this.controls.leftBtn.x + this.controls.leftBtn.w / 2, this.controls.leftBtn.y + this.controls.leftBtn.h / 2);
-            ctx.scale(0.92, 0.92);
-            ctx.translate(-(this.controls.leftBtn.x + this.controls.leftBtn.w / 2), -(this.controls.leftBtn.y + this.controls.leftBtn.h / 2));
-        }
-        if (leftImg && leftImg.complete) {
-            ctx.globalAlpha = this.isLeftPressed ? 1.0 : 0.88;
-            ctx.drawImage(leftImg, this.controls.leftBtn.x, this.controls.leftBtn.y, this.controls.leftBtn.w, this.controls.leftBtn.h);
-        }
-        ctx.restore();
+        // 1. Left Steer Button (Glowing Chevron Arrow matching demo.jpg)
+        const lBtn = this.controls.leftBtn;
+        const lCx = lBtn.x + lBtn.w / 2;
+        const lCy = lBtn.y + lBtn.h / 2 - 10;
+        this.drawChevronArrow(ctx, lCx, lCy, -1, this.isLeftPressed);
 
-        // Sleek Cyber-Naval Badge underneath Left Button: ◀ STEER LEFT
-        const lPillX = this.controls.leftBtn.x;
-        const lPillY = this.controls.leftBtn.y + this.controls.leftBtn.h + 4;
-        const lPillW = this.controls.leftBtn.w;
-        const lPillH = 30;
-        ctx.fillStyle = 'rgba(6, 18, 32, 0.9)';
+        // Pill underneath Left Button: ◀ STEER LEFT
+        const lPillX = lBtn.x;
+        const lPillY = lBtn.y + lBtn.h + 2;
+        const lPillW = lBtn.w;
+        const lPillH = 32;
+        ctx.fillStyle = '#061524';
         ctx.roundRect(lPillX, lPillY, lPillW, lPillH, 12);
         ctx.fill();
-        ctx.strokeStyle = 'rgba(0, 229, 255, 0.6)';
-        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = 'rgba(0, 229, 255, 0.75)';
+        ctx.lineWidth = 1.8;
         ctx.roundRect(lPillX, lPillY, lPillW, lPillH, 12);
         ctx.stroke();
-        ctx.font = "800 17px 'Segoe UI', Impact, sans-serif";
+        ctx.font = "900 17px 'Segoe UI', Impact, Arial, sans-serif";
         ctx.fillStyle = '#ffffff';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText('◀ STEER LEFT', lPillX + lPillW / 2, lPillY + lPillH / 2 + 1);
 
-        // 2. Right Arrow Button
-        const rightImg = images['btn_right'];
-        ctx.save();
-        if (this.isRightPressed) {
-            ctx.translate(this.controls.rightBtn.x + this.controls.rightBtn.w / 2, this.controls.rightBtn.y + this.controls.rightBtn.h / 2);
-            ctx.scale(0.92, 0.92);
-            ctx.translate(-(this.controls.rightBtn.x + this.controls.rightBtn.w / 2), -(this.controls.rightBtn.y + this.controls.rightBtn.h / 2));
-        }
-        if (rightImg && rightImg.complete) {
-            ctx.globalAlpha = this.isRightPressed ? 1.0 : 0.88;
-            ctx.drawImage(rightImg, this.controls.rightBtn.x, this.controls.rightBtn.y, this.controls.rightBtn.w, this.controls.rightBtn.h);
-        }
-        ctx.restore();
+        // 2. Right Steer Button (Glowing Chevron Arrow matching demo.jpg)
+        const rBtn = this.controls.rightBtn;
+        const rCx = rBtn.x + rBtn.w / 2;
+        const rCy = rBtn.y + rBtn.h / 2 - 10;
+        this.drawChevronArrow(ctx, rCx, rCy, 1, this.isRightPressed);
 
-        // Sleek Cyber-Naval Badge underneath Right Button: STEER RIGHT ▶
-        const rPillX = this.controls.rightBtn.x;
-        const rPillY = this.controls.rightBtn.y + this.controls.rightBtn.h + 4;
-        const rPillW = this.controls.rightBtn.w;
-        const rPillH = 30;
-        ctx.fillStyle = 'rgba(6, 18, 32, 0.9)';
+        // Pill underneath Right Button: STEER RIGHT ▶
+        const rPillX = rBtn.x;
+        const rPillY = rBtn.y + rBtn.h + 2;
+        const rPillW = rBtn.w;
+        const rPillH = 32;
+        ctx.fillStyle = '#061524';
         ctx.roundRect(rPillX, rPillY, rPillW, rPillH, 12);
         ctx.fill();
-        ctx.strokeStyle = 'rgba(0, 229, 255, 0.6)';
-        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = 'rgba(0, 229, 255, 0.75)';
+        ctx.lineWidth = 1.8;
         ctx.roundRect(rPillX, rPillY, rPillW, rPillH, 12);
         ctx.stroke();
-        ctx.font = "800 17px 'Segoe UI', Impact, sans-serif";
+        ctx.font = "900 17px 'Segoe UI', Impact, Arial, sans-serif";
         ctx.fillStyle = '#ffffff';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText('STEER RIGHT ▶', rPillX + rPillW / 2, rPillY + rPillH / 2 + 1);
 
-        // 3. Bomb Button
-        const bombImg = images['btn_bomb'];
-        ctx.save();
-        if (this.isBombPressed) {
-            ctx.translate(this.controls.bombBtn.x + this.controls.bombBtn.w / 2, this.controls.bombBtn.y + this.controls.bombBtn.h / 2);
-            ctx.scale(0.92, 0.92);
-            ctx.translate(-(this.controls.bombBtn.x + this.controls.bombBtn.w / 2), -(this.controls.bombBtn.y + this.controls.bombBtn.h / 2));
-        }
-        if (bombImg && bombImg.complete) {
-            ctx.globalAlpha = this.isBombPressed ? 1.0 : 0.92;
-            ctx.drawImage(bombImg, this.controls.bombBtn.x, this.controls.bombBtn.y, this.controls.bombBtn.w, this.controls.bombBtn.h);
-        }
-        ctx.restore();
+        // 3. Bomb Button (Regular Hexagon with Purple/Cyan Neon & Bomb Icon matching demo.jpg)
+        const bBtn = this.controls.bombBtn;
+        const bCx = bBtn.x + bBtn.w / 2;
+        const bCy = bBtn.y + bBtn.h / 2 - 14;
+        this.drawHexBombButton(ctx, bCx, bCy, this.isBombPressed);
 
-        // Sleek Cyber-Naval Badge underneath Bomb Button: 💣 DEPTH CHARGE
-        const bPillX = this.controls.bombBtn.x;
-        const bPillY = this.controls.bombBtn.y + this.controls.bombBtn.h + 4;
-        const bPillW = this.controls.bombBtn.w;
-        const bPillH = 30;
-        ctx.fillStyle = 'rgba(6, 18, 32, 0.9)';
+        // Pill underneath Bomb Button: ● DEPTH CHARGE
+        const bPillX = bBtn.x;
+        const bPillY = bBtn.y + bBtn.h + 2;
+        const bPillW = bBtn.w;
+        const bPillH = 32;
+        ctx.fillStyle = '#061524';
         ctx.roundRect(bPillX, bPillY, bPillW, bPillH, 12);
         ctx.fill();
-        ctx.strokeStyle = 'rgba(0, 229, 255, 0.7)';
-        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = 'rgba(179, 136, 255, 0.8)';
+        ctx.lineWidth = 1.8;
         ctx.roundRect(bPillX, bPillY, bPillW, bPillH, 12);
         ctx.stroke();
-        ctx.font = "800 17px 'Segoe UI', Impact, sans-serif";
+
+        // Purple glowing LED dot + Text
+        ctx.fillStyle = '#b388ff';
+        ctx.shadowColor = '#b388ff';
+        ctx.shadowBlur = 8;
+        ctx.beginPath();
+        ctx.arc(bPillX + 24, bPillY + bPillH / 2, 5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        ctx.font = "900 17px 'Segoe UI', Impact, Arial, sans-serif";
         ctx.fillStyle = '#ffffff';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText('💣 DEPTH CHARGE', bPillX + bPillW / 2, bPillY + bPillH / 2 + 1);
+        ctx.fillText('DEPTH CHARGE', bPillX + bPillW / 2 + 10, bPillY + bPillH / 2 + 1);
+
+        ctx.restore();
+    }
+
+    drawChevronArrow(ctx, cx, cy, dir, isPressed) {
+        ctx.save();
+        const scale = isPressed ? 0.92 : 1.0;
+        ctx.translate(cx, cy);
+        ctx.scale(scale, scale);
+
+        // Thick chevron polygon matching demo.jpg
+        const w2 = 65, h2 = 46, notch = 36;
+        ctx.beginPath();
+        if (dir === -1) {
+            // Pointing Left
+            ctx.moveTo(-w2, 0);
+            ctx.lineTo(-w2 + notch, -h2);
+            ctx.lineTo(w2, -h2);
+            ctx.lineTo(w2 - notch, 0);
+            ctx.lineTo(w2, h2);
+            ctx.lineTo(-w2 + notch, h2);
+        } else {
+            // Pointing Right
+            ctx.moveTo(w2, 0);
+            ctx.lineTo(w2 - notch, -h2);
+            ctx.lineTo(-w2, -h2);
+            ctx.lineTo(-w2 + notch, 0);
+            ctx.lineTo(-w2, h2);
+            ctx.lineTo(w2 - notch, h2);
+        }
+        ctx.closePath();
+
+        const aGrad = ctx.createLinearGradient(-w2, 0, w2, 0);
+        aGrad.addColorStop(0, isPressed ? 'rgba(0, 229, 255, 0.45)' : 'rgba(0, 229, 255, 0.22)');
+        aGrad.addColorStop(1, isPressed ? 'rgba(0, 160, 220, 0.6)' : 'rgba(0, 140, 200, 0.32)');
+        ctx.fillStyle = aGrad;
+        ctx.fill();
+
+        ctx.strokeStyle = '#00e5ff';
+        ctx.lineWidth = 3.5;
+        ctx.shadowColor = '#00e5ff';
+        ctx.shadowBlur = isPressed ? 24 : 16;
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+
+        // Inner embossed highlight line
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        if (dir === -1) {
+            ctx.moveTo(-w2 + 14, 0);
+            ctx.lineTo(-w2 + notch + 8, -h2 + 10);
+            ctx.moveTo(-w2 + 14, 0);
+            ctx.lineTo(-w2 + notch + 8, h2 - 10);
+        } else {
+            ctx.moveTo(w2 - 14, 0);
+            ctx.lineTo(w2 - notch - 8, -h2 + 10);
+            ctx.moveTo(w2 - 14, 0);
+            ctx.lineTo(w2 - notch - 8, h2 - 10);
+        }
+        ctx.stroke();
+
+        ctx.restore();
+    }
+
+    drawHexBombButton(ctx, cx, cy, isPressed) {
+        ctx.save();
+        const scale = isPressed ? 0.92 : 1.0;
+        ctx.translate(cx, cy);
+        ctx.scale(scale, scale);
+
+        const r = 84;
+        // Regular vertical hexagon with flat top/bottom, pointed left/right matching demo.jpg
+        const hexPath = new Path2D();
+        for (let i = 0; i < 6; i++) {
+            const angle = (i * Math.PI) / 3;
+            const px = r * Math.cos(angle);
+            const py = r * Math.sin(angle);
+            if (i === 0) hexPath.moveTo(px, py);
+            else hexPath.lineTo(px, py);
+        }
+        hexPath.closePath();
+
+        ctx.fillStyle = isPressed ? 'rgba(28, 18, 54, 0.95)' : 'rgba(12, 16, 40, 0.85)';
+        ctx.fill(hexPath);
+
+        const hexGrad = ctx.createLinearGradient(-r, -r, r, r);
+        hexGrad.addColorStop(0, '#b388ff');
+        hexGrad.addColorStop(0.5, '#7c4dff');
+        hexGrad.addColorStop(1, '#00e5ff');
+
+        ctx.strokeStyle = hexGrad;
+        ctx.lineWidth = 4;
+        ctx.shadowColor = isPressed ? '#00e5ff' : '#7c4dff';
+        ctx.shadowBlur = isPressed ? 28 : 20;
+        ctx.stroke(hexPath);
+        ctx.shadowBlur = 0;
+
+        // Inner Cyan Accent Hexagon
+        const rInner = r - 10;
+        ctx.beginPath();
+        for (let i = 0; i < 6; i++) {
+            const angle = (i * Math.PI) / 3;
+            const px = rInner * Math.cos(angle);
+            const py = rInner * Math.sin(angle);
+            if (i === 0) ctx.moveTo(px, py);
+            else ctx.lineTo(px, py);
+        }
+        ctx.closePath();
+        ctx.strokeStyle = 'rgba(0, 229, 255, 0.65)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Vector Depth Charge Bomb Icon matching demo.jpg
+        const bombW = 34, bombH = 68;
+        ctx.fillStyle = '#00e5ff';
+        ctx.beginPath();
+        ctx.moveTo(0, -bombH / 2);
+        ctx.quadraticCurveTo(-bombW / 2, -bombH / 4, -bombW / 2, 0);
+        ctx.lineTo(bombW / 2, 0);
+        ctx.quadraticCurveTo(bombW / 2, -bombH / 4, 0, -bombH / 2);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.fillStyle = '#38bdf8';
+        ctx.fillRect(-bombW / 2, 0, bombW, bombH / 3);
+
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(-bombW / 2, bombH / 10, bombW, 4);
+
+        ctx.fillStyle = '#0284c7';
+        ctx.fillRect(-bombW / 2 + 4, bombH / 3, bombW - 8, bombH / 6);
+
+        ctx.fillStyle = '#00e5ff';
+        ctx.beginPath();
+        ctx.moveTo(-bombW / 2, bombH / 4);
+        ctx.lineTo(-bombW / 2 - 8, bombH / 2);
+        ctx.lineTo(-bombW / 2 + 4, bombH / 2);
+        ctx.moveTo(bombW / 2, bombH / 4);
+        ctx.lineTo(bombW / 2 + 8, bombH / 2);
+        ctx.lineTo(bombW / 2 - 4, bombH / 2);
+        ctx.closePath();
+        ctx.fill();
 
         ctx.restore();
     }

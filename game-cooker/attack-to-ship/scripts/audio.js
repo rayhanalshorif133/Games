@@ -5,7 +5,7 @@
 class SoundEngine {
     constructor() {
         this.ctx = null;
-        this.muted = false;
+        this.muted = (typeof localStorage !== 'undefined' && localStorage.getItem('attack_to_ship_muted') === 'true');
         this.initialized = false;
         this.audioCache = {};
         
@@ -50,6 +50,108 @@ class SoundEngine {
         if (this.ctx && this.ctx.state === 'suspended') {
             this.ctx.resume();
         }
+    }
+
+    toggleMute() {
+        this.unlock();
+        this.muted = !this.muted;
+        try {
+            if (typeof localStorage !== 'undefined') {
+                localStorage.setItem('attack_to_ship_muted', this.muted ? 'true' : 'false');
+            }
+        } catch (e) {}
+        if (!this.muted) {
+            this.playUIClick();
+        }
+        return this.muted;
+    }
+
+    isMuted() {
+        return this.muted;
+    }
+
+    playUIClick() {
+        if (this.muted) return;
+        this.unlock();
+        if (!this.ctx) return;
+        try {
+            const now = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(800, now);
+            osc.frequency.exponentialRampToValueAtTime(1400, now + 0.05);
+            gain.gain.setValueAtTime(0.2, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.07);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now);
+            osc.stop(now + 0.07);
+        } catch (e) {}
+    }
+
+    playCombo(multiplier = 2) {
+        if (this.muted) return;
+        this.unlock();
+        if (!this.ctx) return;
+        try {
+            const now = this.ctx.currentTime;
+            const baseFreq = 440 * Math.pow(1.15, Math.min(8, multiplier));
+            const chord = [baseFreq, baseFreq * 1.25, baseFreq * 1.5];
+            chord.forEach((freq, idx) => {
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(freq, now + idx * 0.04);
+                gain.gain.setValueAtTime(0.18, now + idx * 0.04);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.04 + 0.18);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now + idx * 0.04);
+                osc.stop(now + idx * 0.04 + 0.18);
+            });
+        } catch (e) {}
+    }
+
+    playBossWarning() {
+        if (this.muted) return;
+        this.unlock();
+        if (!this.ctx) return;
+        try {
+            const now = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(320, now);
+            osc.frequency.linearRampToValueAtTime(480, now + 0.2);
+            osc.frequency.linearRampToValueAtTime(320, now + 0.4);
+            gain.gain.setValueAtTime(0.25, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.45);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now);
+            osc.stop(now + 0.45);
+        } catch (e) {}
+    }
+
+    playWaterSplash() {
+        if (this.muted) return;
+        this.unlock();
+        if (!this.ctx) return;
+        try {
+            const now = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(300, now);
+            osc.frequency.exponentialRampToValueAtTime(90, now + 0.15);
+            gain.gain.setValueAtTime(0.2, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now);
+            osc.stop(now + 0.15);
+        } catch (e) {}
     }
 
     playFile(key, volume = 1.0) {

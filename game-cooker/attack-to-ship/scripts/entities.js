@@ -519,7 +519,26 @@ class PlayerShip {
             ctx.ellipse(cx, cy, rx - 6, ry - 6, 0, 0, Math.PI * 2);
             ctx.stroke();
 
-            // 4. Orbiting energy spark nodes (2 nodes if full, 1 rapid red node if 1 hit left)
+            // 4. Concentric holographic radar orientation ticks around perimeter
+            ctx.save();
+            ctx.strokeStyle = isDamaged ? 'rgba(255, 50, 80, 0.7)' : 'rgba(0, 229, 255, 0.6)';
+            ctx.lineWidth = 2.0;
+            for (let a = 0; a < 8; a++) {
+                const angle = a * (Math.PI / 4);
+                const cosA = Math.cos(angle);
+                const sinA = Math.sin(angle);
+                const p1x = cx + cosA * (rx - 4);
+                const p1y = cy + sinA * (ry - 4);
+                const p2x = cx + cosA * (rx + 7);
+                const p2y = cy + sinA * (ry + 7);
+                ctx.beginPath();
+                ctx.moveTo(p1x, p1y);
+                ctx.lineTo(p2x, p2y);
+                ctx.stroke();
+            }
+            ctx.restore();
+
+            // 5. Orbiting energy spark nodes (2 nodes if full, 1 rapid red node if 1 hit left)
             const orbitCount = this.shieldHp;
             const orbitSpeed = this.time * (isDamaged ? 4.8 : 2.8);
             for (let i = 0; i < orbitCount; i++) {
@@ -534,8 +553,8 @@ class PlayerShip {
                 ctx.fill();
             }
 
-            // 5. Floating Timer & HP Badge directly above boat forcefield
-            // Cyber-Naval Tactical Styling matching the ship forcefield
+            // 6. Floating Timer & HP Badge directly above boat forcefield
+            // Cyber-Naval Tactical Styling matching demo.jpg
             const timerPillW = 230;
             const timerPillH = 52;
             const timerPillX = cx - timerPillW / 2;
