@@ -535,39 +535,45 @@ class PlayerShip {
             }
 
             // 5. Floating Timer & HP Badge directly above boat forcefield
-            // Solid Black Background, Pure White Text, Highly Visible Timer
-            const timerPillW = 240;
-            const timerPillH = 54;
+            // Cyber-Naval Tactical Styling matching the ship forcefield
+            const timerPillW = 230;
+            const timerPillH = 52;
             const timerPillX = cx - timerPillW / 2;
             const timerPillY = cy - ry - 60;
 
-            // Solid Black Badge Background
-            ctx.fillStyle = '#000000';
+            // Cyber-Naval Titanium Base Gradient
+            const bGrad = ctx.createLinearGradient(timerPillX, timerPillY, timerPillX, timerPillY + timerPillH);
+            bGrad.addColorStop(0, '#061424');
+            bGrad.addColorStop(1, '#020812');
+            ctx.fillStyle = bGrad;
             ctx.roundRect(timerPillX, timerPillY, timerPillW, timerPillH, 18);
             ctx.fill();
 
-            // High-contrast border (Cyan if 2 hits, Red if 1 hit)
+            // Glowing neon border (Cyan if 2 hits, Red if 1 hit)
             ctx.strokeStyle = shieldColor;
-            ctx.lineWidth = 3;
+            ctx.lineWidth = 2.5;
+            ctx.shadowColor = shieldColor;
+            ctx.shadowBlur = 12;
             ctx.roundRect(timerPillX, timerPillY, timerPillW, timerPillH, 18);
             ctx.stroke();
+            ctx.shadowBlur = 0;
 
-            // Large, Bold Pure White Timer Text
+            // Large, Bold Pure White Timer Text with neon drop shadow
             ctx.font = "900 28px 'Impact', 'Segoe UI', Arial Black, sans-serif";
             ctx.fillStyle = '#ffffff';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             const hitLabel = (this.shieldHp === 2) ? '🛡️ 2/2' : '⚠️ 1/2';
-            ctx.fillText(`⏱ ${Math.ceil(this.shieldTimer)}s   ${hitLabel}`, cx, timerPillY + 22);
+            ctx.fillText(`⏱ ${Math.ceil(this.shieldTimer)}s   ${hitLabel}`, cx, timerPillY + 21);
 
             // Mini depletion progress gauge at bottom of badge
             const miniBarW = timerPillW - 32;
-            const miniBarH = 6;
+            const miniBarH = 5;
             const miniBarX = timerPillX + 16;
-            const miniBarY = timerPillY + timerPillH - 12;
+            const miniBarY = timerPillY + timerPillH - 11;
             const sPct = Math.max(0, Math.min(1, this.shieldTimer / this.maxShieldTime));
 
-            ctx.fillStyle = '#222222';
+            ctx.fillStyle = '#020810';
             ctx.roundRect(miniBarX, miniBarY, miniBarW, miniBarH, 3);
             ctx.fill();
 

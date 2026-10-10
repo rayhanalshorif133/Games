@@ -723,101 +723,181 @@ class AttackToShipGame {
     renderHUD(ctx, images) {
         ctx.save();
 
-        // 1. Top HUD Header Container: Solid Black Background (#000000), Pure White Border
-        ctx.fillStyle = '#000000';
-        ctx.roundRect(20, 18, 1040, 130, 24);
+        // 1. Tactical Naval Bridge Command Console Container
+        const hudX = 20, hudY = 18, hudW = 1040, hudH = 130, hudR = 26;
+
+        // Glowing outer neon ambiance
+        ctx.shadowColor = 'rgba(0, 229, 255, 0.45)';
+        ctx.shadowBlur = 18;
+
+        // Cyber-naval titanium console gradient
+        const hudGrad = ctx.createLinearGradient(hudX, hudY, hudX, hudY + hudH);
+        hudGrad.addColorStop(0, '#05101c');
+        hudGrad.addColorStop(0.5, '#0a1a2e');
+        hudGrad.addColorStop(1, '#030810');
+        ctx.fillStyle = hudGrad;
+        ctx.roundRect(hudX, hudY, hudW, hudH, hudR);
         ctx.fill();
-        ctx.strokeStyle = '#ffffff';
+
+        // High-contrast Cyber-Cyan neon border
+        ctx.strokeStyle = '#00e5ff';
         ctx.lineWidth = 2.5;
-        ctx.roundRect(20, 18, 1040, 130, 24);
+        ctx.roundRect(hudX, hudY, hudW, hudH, hudR);
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+
+        // Sleek top curved glass specular highlight
+        const rimGrad = ctx.createLinearGradient(hudX + 60, hudY, hudX + hudW - 60, hudY);
+        rimGrad.addColorStop(0, 'rgba(0, 229, 255, 0)');
+        rimGrad.addColorStop(0.5, 'rgba(0, 229, 255, 0.4)');
+        rimGrad.addColorStop(1, 'rgba(0, 229, 255, 0)');
+        ctx.strokeStyle = rimGrad;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(hudX + 40, hudY + 4);
+        ctx.lineTo(hudX + hudW - 40, hudY + 4);
         ctx.stroke();
 
-        // Top Left: Gamepad / Tactical Briefing Button (Solid black container, white border)
-        const padImg = images['btn_gamepad'];
-        ctx.fillStyle = '#000000';
-        ctx.roundRect(this.controls.gamepadBtn.x, this.controls.gamepadBtn.y, this.controls.gamepadBtn.w, this.controls.gamepadBtn.h, 20);
-        ctx.fill();
-        ctx.strokeStyle = '#ffffff';
+        // Tactical Corner Bracket Accents [  ]
+        ctx.strokeStyle = 'rgba(0, 229, 255, 0.7)';
         ctx.lineWidth = 2;
-        ctx.roundRect(this.controls.gamepadBtn.x, this.controls.gamepadBtn.y, this.controls.gamepadBtn.w, this.controls.gamepadBtn.h, 20);
+        // Top-left
+        ctx.beginPath();
+        ctx.moveTo(hudX + 10, hudY + 28);
+        ctx.lineTo(hudX + 10, hudY + 10);
+        ctx.lineTo(hudX + 28, hudY + 10);
+        ctx.stroke();
+        // Top-right
+        ctx.beginPath();
+        ctx.moveTo(hudX + hudW - 28, hudY + 10);
+        ctx.lineTo(hudX + hudW - 10, hudY + 10);
+        ctx.lineTo(hudX + hudW - 10, hudY + 28);
+        ctx.stroke();
+        // Bottom-left
+        ctx.beginPath();
+        ctx.moveTo(hudX + 10, hudY + hudH - 28);
+        ctx.lineTo(hudX + 10, hudY + hudH - 10);
+        ctx.lineTo(hudX + 28, hudY + hudH - 10);
+        ctx.stroke();
+        // Bottom-right
+        ctx.beginPath();
+        ctx.moveTo(hudX + hudW - 28, hudY + hudH - 10);
+        ctx.lineTo(hudX + hudW - 10, hudY + hudH - 10);
+        ctx.lineTo(hudX + hudW - 10, hudY + hudH - 28);
+        ctx.stroke();
+
+        // Top Left: Gamepad / Tactical Briefing Button (Naval titanium button)
+        const padImg = images['btn_gamepad'];
+        const padBtn = this.controls.gamepadBtn;
+        const padGrad = ctx.createLinearGradient(padBtn.x, padBtn.y, padBtn.x, padBtn.y + padBtn.h);
+        padGrad.addColorStop(0, '#091b2c');
+        padGrad.addColorStop(1, '#040b14');
+        ctx.fillStyle = padGrad;
+        ctx.roundRect(padBtn.x, padBtn.y, padBtn.w, padBtn.h, 20);
+        ctx.fill();
+        ctx.strokeStyle = '#00e5ff';
+        ctx.lineWidth = 2;
+        ctx.roundRect(padBtn.x, padBtn.y, padBtn.w, padBtn.h, 20);
         ctx.stroke();
 
         if (padImg && padImg.complete) {
-            ctx.drawImage(padImg, this.controls.gamepadBtn.x + 12, this.controls.gamepadBtn.y + 12, this.controls.gamepadBtn.w - 24, this.controls.gamepadBtn.h - 24);
+            ctx.drawImage(padImg, padBtn.x + 12, padBtn.y + 12, padBtn.w - 24, padBtn.h - 24);
         } else {
             ctx.font = "40px sans-serif";
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText('🎮', this.controls.gamepadBtn.x + 45, this.controls.gamepadBtn.y + 45);
+            ctx.fillText('🎮', padBtn.x + padBtn.w / 2, padBtn.y + padBtn.h / 2);
         }
 
-        // Top Right: SOUND BUTTON (Solid black, pure white text/icon)
+        // Top Right: SOUND BUTTON (Naval radio/sonar button)
         this.renderSoundButton(ctx, this.controls.soundBtn.x, this.controls.soundBtn.y, this.controls.soundBtn.w, this.controls.soundBtn.h);
 
-        // Top Right: PAUSE BUTTON (Solid black container, white border)
+        // Top Right: PAUSE BUTTON (Naval titanium button)
         const pauseImg = images['btn_pause'];
-        ctx.fillStyle = '#000000';
-        ctx.roundRect(this.controls.pauseBtn.x, this.controls.pauseBtn.y, this.controls.pauseBtn.w, this.controls.pauseBtn.h, 20);
+        const pauseBtn = this.controls.pauseBtn;
+        const pauseGrad = ctx.createLinearGradient(pauseBtn.x, pauseBtn.y, pauseBtn.x, pauseBtn.y + pauseBtn.h);
+        pauseGrad.addColorStop(0, '#091b2c');
+        pauseGrad.addColorStop(1, '#040b14');
+        ctx.fillStyle = pauseGrad;
+        ctx.roundRect(pauseBtn.x, pauseBtn.y, pauseBtn.w, pauseBtn.h, 20);
         ctx.fill();
-        ctx.strokeStyle = '#ffffff';
+        ctx.strokeStyle = '#00e5ff';
         ctx.lineWidth = 2;
-        ctx.roundRect(this.controls.pauseBtn.x, this.controls.pauseBtn.y, this.controls.pauseBtn.w, this.controls.pauseBtn.h, 20);
+        ctx.roundRect(pauseBtn.x, pauseBtn.y, pauseBtn.w, pauseBtn.h, 20);
         ctx.stroke();
 
         if (pauseImg && pauseImg.complete) {
-            ctx.drawImage(pauseImg, this.controls.pauseBtn.x + 12, this.controls.pauseBtn.y + 12, this.controls.pauseBtn.w - 24, this.controls.pauseBtn.h - 24);
+            ctx.drawImage(pauseImg, pauseBtn.x + 12, pauseBtn.y + 12, pauseBtn.w - 24, pauseBtn.h - 24);
         } else {
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(this.controls.pauseBtn.x + 30, this.controls.pauseBtn.y + 25, 10, 40);
-            ctx.fillRect(this.controls.pauseBtn.x + 50, this.controls.pauseBtn.y + 25, 10, 40);
+            ctx.fillStyle = '#00e5ff';
+            ctx.fillRect(pauseBtn.x + 30, pauseBtn.y + 25, 10, 40);
+            ctx.fillRect(pauseBtn.x + 50, pauseBtn.y + 25, 10, 40);
         }
 
-        // Center HUD: Score Display - Bold Pure White (#ffffff)
-        ctx.font = "900 54px 'Impact', 'Segoe UI', Arial Black, sans-serif";
-        ctx.fillStyle = '#ffffff';
+        // Center HUD: Tactical Radar Callout above Score
+        ctx.font = "800 15px 'Segoe UI', Impact, Arial, sans-serif";
+        ctx.fillStyle = '#00e5ff';
         ctx.textAlign = 'center';
-        ctx.textBaseline = 'alphabetic';
-        ctx.fillText(`SCORE: ${this.score}`, 540, 74);
+        ctx.textBaseline = 'middle';
+        const pulseLive = (Math.sin(performance.now() * 0.005) > 0);
+        ctx.fillText(pulseLive ? '● TACTICAL RADAR ONLINE' : '○ TACTICAL RADAR ONLINE', 540, hudY + 26);
 
-        // Center HUD Subtitle directly under Score: Pure White (#ffffff), Bold, High Contrast
-        ctx.font = "800 28px 'Segoe UI', Impact, Arial, sans-serif";
+        // Center HUD: Score Display - Bold Glowing White (#ffffff)
+        ctx.font = "900 56px 'Impact', 'Segoe UI', Arial Black, sans-serif";
         ctx.fillStyle = '#ffffff';
-        let subText = `BEST RECORD: ${this.highScore}`;
+        ctx.shadowColor = 'rgba(0, 229, 255, 0.75)';
+        ctx.shadowBlur = 12;
+        ctx.fillText(`SCORE: ${this.score}`, 540, hudY + 76);
+        ctx.shadowBlur = 0;
+
+        // Center HUD Subtitle directly under Score: Tactical Badge
+        ctx.font = "800 24px 'Segoe UI', Impact, Arial, sans-serif";
+        ctx.fillStyle = '#ffffff';
+        let subText = `🏆 BEST: ${this.highScore}`;
         if (this.comboCount > 1 && this.comboTimer > 0) {
             subText += `   |   🔥 COMBO x${this.comboCount}`;
         }
-        ctx.fillText(subText, 540, 118);
+        ctx.fillText(subText, 540, hudY + 114);
 
-        // 2. Underneath HUD: Player Lives / Hearts Container (Solid Black #000000)
+        // 2. Underneath HUD: Naval Hull Integrity Container
         if (this.player) {
             const heartImg = images['heart'];
             const emptyHeartImg = images['heart_empty'];
-            const heartSize = 54;
+            const heartSize = 52;
             const gap = 16;
             const totalW = this.player.maxHealth * heartSize + (this.player.maxHealth - 1) * gap;
-            const heartContainerW = totalW + 160;
+            const heartContainerW = totalW + 210;
             const heartContainerH = 68;
             const startX = 540 - heartContainerW / 2;
             const heartY = 164;
 
-            // Solid Black Container for Hearts
-            ctx.fillStyle = '#000000';
+            // Deep cyber-naval panel
+            const hGrad = ctx.createLinearGradient(startX, heartY, startX, heartY + heartContainerH);
+            hGrad.addColorStop(0, '#061322');
+            hGrad.addColorStop(1, '#030812');
+            ctx.fillStyle = hGrad;
             ctx.roundRect(startX, heartY, heartContainerW, heartContainerH, 20);
             ctx.fill();
-            ctx.strokeStyle = this.player.health === 1 ? '#ff1744' : '#ffffff';
+
+            // Glowing border (Cyan when healthy, Red when critical 1 HP)
+            const isCritical = (this.player.health === 1);
+            ctx.strokeStyle = isCritical ? '#ff1744' : '#00e5ff';
             ctx.lineWidth = 2.5;
+            ctx.shadowColor = isCritical ? 'rgba(255, 23, 68, 0.5)' : 'rgba(0, 229, 255, 0.4)';
+            ctx.shadowBlur = isCritical ? 14 : 10;
             ctx.roundRect(startX, heartY, heartContainerW, heartContainerH, 20);
             ctx.stroke();
+            ctx.shadowBlur = 0;
 
-            // Clear Pure White Label inside container
-            ctx.font = "900 26px 'Segoe UI', Impact, Arial, sans-serif";
-            ctx.fillStyle = '#ffffff';
+            // Tactical Label
+            ctx.font = "900 24px 'Segoe UI', Impact, Arial, sans-serif";
+            ctx.fillStyle = isCritical ? '#ff5252' : '#00e5ff';
             ctx.textAlign = 'left';
             ctx.textBaseline = 'middle';
-            ctx.fillText('LIVES:', startX + 22, heartY + heartContainerH / 2);
+            ctx.fillText('🛡️ HULL:', startX + 24, heartY + heartContainerH / 2);
 
             // Render Hearts
-            const heartsStartX = startX + 130;
+            const heartsStartX = startX + 155;
             for (let i = 0; i < this.player.maxHealth; i++) {
                 const hx = heartsStartX + i * (heartSize + gap);
                 const isAlive = i < this.player.health;
@@ -825,8 +905,8 @@ class AttackToShipGame {
                 ctx.save();
                 let pulse = 1.0;
                 if (isAlive) {
-                    const pulseSpeed = this.player.health === 1 ? 12 : 4.5;
-                    const pulseIntensity = this.player.health === 1 ? 0.16 : 0.08;
+                    const pulseSpeed = isCritical ? 12 : 4.5;
+                    const pulseIntensity = isCritical ? 0.16 : 0.08;
                     pulse = 1.0 + Math.sin(this.player.time * pulseSpeed + i * 0.45) * pulseIntensity;
                 }
 
@@ -847,7 +927,6 @@ class AttackToShipGame {
             }
 
             // 3. Shield Status UI Widget (Directly underneath Lives)
-            // Solid Black Background, Pure White Text, Huge Clear Timer
             if (this.player.hasShield) {
                 const sPct = Math.max(0, Math.min(1, this.player.shieldTimer / this.player.maxShieldTime));
                 const isDamaged = (this.player.shieldHp === 1);
@@ -855,55 +934,82 @@ class AttackToShipGame {
                 const flash = (isDamaged || isLowTime) && (Math.sin(this.player.time * 16) > 0);
                 const borderColor = isDamaged ? '#ff1744' : (isLowTime && flash ? '#ff5252' : '#00e5ff');
 
-                const pillW = 640;
+                const pillW = 660;
                 const pillH = 82;
                 const pillX = 540 - pillW / 2;
                 const pillY = 246;
 
                 ctx.save();
 
-                // Solid Black Shield Card
-                ctx.fillStyle = '#000000';
+                // Cyber-naval deflector panel
+                const sGrad = ctx.createLinearGradient(pillX, pillY, pillX, pillY + pillH);
+                sGrad.addColorStop(0, '#061324');
+                sGrad.addColorStop(1, '#020812');
+                ctx.fillStyle = sGrad;
                 ctx.roundRect(pillX, pillY, pillW, pillH, 20);
                 ctx.fill();
 
                 // Glowing neon border (Cyan for 2 hits, Red for 1 hit)
                 ctx.strokeStyle = borderColor;
-                ctx.lineWidth = 3.5;
+                ctx.lineWidth = 3;
+                ctx.shadowColor = borderColor;
+                ctx.shadowBlur = (isDamaged || isLowTime) ? 18 : 12;
                 ctx.roundRect(pillX, pillY, pillW, pillH, 20);
                 ctx.stroke();
+                ctx.shadowBlur = 0;
 
-                // Top Line: Left Status & Hits Left in BOLD WHITE TEXT
+                // Left: Deflector Status & Hit Counter in pure white & cyan/red
                 ctx.textAlign = 'left';
                 ctx.textBaseline = 'middle';
                 ctx.font = "900 28px 'Segoe UI', Impact, Arial, sans-serif";
-                ctx.fillStyle = '#ffffff';
-                const statusIcon = isDamaged ? '⚠️' : '🛡️';
-                const hitLabel = isDamaged ? 'SHIELD: 1 HIT LEFT!' : 'SHIELD: 2/2 HITS';
-                ctx.fillText(`${statusIcon} ${hitLabel}`, pillX + 24, pillY + 30);
+                if (isDamaged) {
+                    ctx.fillStyle = '#ff5252';
+                    ctx.fillText('⚠️ DEFLECTOR: 1 HIT LEFT!', pillX + 24, pillY + 30);
+                } else {
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillText('⚡ DEFLECTOR: 2/2 HITS', pillX + 24, pillY + 30);
+                }
 
-                // Top Line: Right Countdown Timer in GIANT BOLD WHITE TEXT
+                // Right: Giant, crystal clear Countdown Timer in PURE WHITE with cyan/red glow
                 ctx.textAlign = 'right';
                 ctx.font = "900 34px 'Impact', 'Segoe UI', Arial Black, sans-serif";
                 ctx.fillStyle = '#ffffff';
+                ctx.shadowColor = borderColor;
+                ctx.shadowBlur = 8;
                 const secondsLeft = Math.ceil(this.player.shieldTimer);
                 ctx.fillText(`⏱ ${secondsLeft} SECONDS`, pillX + pillW - 24, pillY + 30);
+                ctx.shadowBlur = 0;
 
-                // Bottom Line: Progress Bar of Timer
+                // Bottom Line: High-tech Progress Bar of Timer
                 const barX = pillX + 24;
                 const barY = pillY + 54;
                 const barW = pillW - 48;
                 const barH = 16;
 
                 // Slot Background
-                ctx.fillStyle = '#222222';
+                ctx.fillStyle = '#020810';
                 ctx.roundRect(barX, barY, barW, barH, 8);
                 ctx.fill();
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+                ctx.lineWidth = 1;
+                ctx.roundRect(barX, barY, barW, barH, 8);
+                ctx.stroke();
 
-                // Bar Fill
+                // Bar Fill with gradient
                 if (sPct > 0) {
                     const fillW = Math.max(16, barW * sPct);
-                    ctx.fillStyle = isDamaged ? '#ff1744' : (isLowTime ? '#ff9100' : '#00e5ff');
+                    const fillGrad = ctx.createLinearGradient(barX, barY, barX + fillW, barY);
+                    if (isDamaged) {
+                        fillGrad.addColorStop(0, '#ff1744');
+                        fillGrad.addColorStop(1, '#ff9100');
+                    } else if (isLowTime) {
+                        fillGrad.addColorStop(0, '#ff5252');
+                        fillGrad.addColorStop(1, '#ffb300');
+                    } else {
+                        fillGrad.addColorStop(0, '#00e5ff');
+                        fillGrad.addColorStop(1, '#0091ea');
+                    }
+                    ctx.fillStyle = fillGrad;
                     ctx.roundRect(barX, barY, fillW, barH, 8);
                     ctx.fill();
                 }
@@ -919,22 +1025,28 @@ class AttackToShipGame {
         ctx.save();
         const isMuted = window.soundEngine.isMuted();
 
-        // Solid Black Button Container with Crisp Border
-        ctx.fillStyle = '#000000';
+        // Tactical Naval Radio / Sonar Button Base
+        const sGrad = ctx.createLinearGradient(x, y, x, y + h);
+        sGrad.addColorStop(0, '#091b2c');
+        sGrad.addColorStop(1, '#040b14');
+        ctx.fillStyle = sGrad;
         ctx.roundRect(x, y, w, h, 20);
         ctx.fill();
-        ctx.strokeStyle = isMuted ? '#ff1744' : '#ffffff';
-        ctx.lineWidth = 2.5;
+
+        ctx.strokeStyle = isMuted ? '#ff1744' : '#00e5ff';
+        ctx.lineWidth = 2;
+        ctx.shadowColor = isMuted ? 'rgba(255, 23, 68, 0.4)' : 'rgba(0, 229, 255, 0.4)';
+        ctx.shadowBlur = 8;
         ctx.roundRect(x, y, w, h, 20);
         ctx.stroke();
+        ctx.shadowBlur = 0;
 
         const cx = x + w / 2;
         const cy = y + h / 2 - 8;
 
-        // Speaker cone trapezoid
+        // Speaker cone
         ctx.fillStyle = isMuted ? '#ff5252' : '#ffffff';
         ctx.beginPath();
-        // Speaker body
         ctx.fillRect(cx - 20, cy - 8, 10, 16);
         ctx.moveTo(cx - 10, cy - 8);
         ctx.lineTo(cx + 2, cy - 18);
@@ -944,8 +1056,8 @@ class AttackToShipGame {
         ctx.fill();
 
         if (!isMuted) {
-            // Sound waves in crisp white
-            ctx.strokeStyle = '#ffffff';
+            // Glowing cyber soundwaves
+            ctx.strokeStyle = '#00e5ff';
             ctx.lineWidth = 3;
             ctx.lineCap = 'round';
             // Wave 1
@@ -957,7 +1069,7 @@ class AttackToShipGame {
             ctx.arc(cx + 2, cy, 20, -Math.PI / 3, Math.PI / 3);
             ctx.stroke();
         } else {
-            // Red mute slash line
+            // Red mute slash
             ctx.strokeStyle = '#ff1744';
             ctx.lineWidth = 3.5;
             ctx.lineCap = 'round';
@@ -967,12 +1079,12 @@ class AttackToShipGame {
             ctx.stroke();
         }
 
-        // Bold Pure White indicator text underneath
-        ctx.font = "900 15px 'Segoe UI', Impact, Arial, sans-serif";
-        ctx.fillStyle = isMuted ? '#ff5252' : '#ffffff';
+        // High-contrast indicator label underneath
+        ctx.font = "900 13px 'Segoe UI', Impact, Arial, sans-serif";
+        ctx.fillStyle = isMuted ? '#ff5252' : '#00e5ff';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'alphabetic';
-        ctx.fillText(isMuted ? 'SOUND OFF' : 'SOUND ON', cx, y + h - 10);
+        ctx.fillText(isMuted ? 'MUTED' : 'AUDIO ON', cx, y + h - 8);
 
         ctx.restore();
     }
@@ -994,19 +1106,23 @@ class AttackToShipGame {
         }
         ctx.restore();
 
-        // Solid Black Control Label underneath Left Button: ◀ LEFT
-        ctx.fillStyle = '#000000';
-        ctx.roundRect(this.controls.leftBtn.x, this.controls.leftBtn.y + this.controls.leftBtn.h + 4, this.controls.leftBtn.w, 30, 10);
+        // Sleek Cyber-Naval Badge underneath Left Button: ◀ STEER LEFT
+        const lPillX = this.controls.leftBtn.x;
+        const lPillY = this.controls.leftBtn.y + this.controls.leftBtn.h + 4;
+        const lPillW = this.controls.leftBtn.w;
+        const lPillH = 30;
+        ctx.fillStyle = 'rgba(6, 18, 32, 0.9)';
+        ctx.roundRect(lPillX, lPillY, lPillW, lPillH, 12);
         ctx.fill();
-        ctx.strokeStyle = '#ffffff';
+        ctx.strokeStyle = 'rgba(0, 229, 255, 0.6)';
         ctx.lineWidth = 1.5;
-        ctx.roundRect(this.controls.leftBtn.x, this.controls.leftBtn.y + this.controls.leftBtn.h + 4, this.controls.leftBtn.w, 30, 10);
+        ctx.roundRect(lPillX, lPillY, lPillW, lPillH, 12);
         ctx.stroke();
-        ctx.font = "800 18px 'Segoe UI', Impact, sans-serif";
+        ctx.font = "800 17px 'Segoe UI', Impact, sans-serif";
         ctx.fillStyle = '#ffffff';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText('◀ LEFT', this.controls.leftBtn.x + this.controls.leftBtn.w / 2, this.controls.leftBtn.y + this.controls.leftBtn.h + 19);
+        ctx.fillText('◀ STEER LEFT', lPillX + lPillW / 2, lPillY + lPillH / 2 + 1);
 
         // 2. Right Arrow Button
         const rightImg = images['btn_right'];
@@ -1022,19 +1138,23 @@ class AttackToShipGame {
         }
         ctx.restore();
 
-        // Solid Black Control Label underneath Right Button: RIGHT ▶
-        ctx.fillStyle = '#000000';
-        ctx.roundRect(this.controls.rightBtn.x, this.controls.rightBtn.y + this.controls.rightBtn.h + 4, this.controls.rightBtn.w, 30, 10);
+        // Sleek Cyber-Naval Badge underneath Right Button: STEER RIGHT ▶
+        const rPillX = this.controls.rightBtn.x;
+        const rPillY = this.controls.rightBtn.y + this.controls.rightBtn.h + 4;
+        const rPillW = this.controls.rightBtn.w;
+        const rPillH = 30;
+        ctx.fillStyle = 'rgba(6, 18, 32, 0.9)';
+        ctx.roundRect(rPillX, rPillY, rPillW, rPillH, 12);
         ctx.fill();
-        ctx.strokeStyle = '#ffffff';
+        ctx.strokeStyle = 'rgba(0, 229, 255, 0.6)';
         ctx.lineWidth = 1.5;
-        ctx.roundRect(this.controls.rightBtn.x, this.controls.rightBtn.y + this.controls.rightBtn.h + 4, this.controls.rightBtn.w, 30, 10);
+        ctx.roundRect(rPillX, rPillY, rPillW, rPillH, 12);
         ctx.stroke();
-        ctx.font = "800 18px 'Segoe UI', Impact, sans-serif";
+        ctx.font = "800 17px 'Segoe UI', Impact, sans-serif";
         ctx.fillStyle = '#ffffff';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText('RIGHT ▶', this.controls.rightBtn.x + this.controls.rightBtn.w / 2, this.controls.rightBtn.y + this.controls.rightBtn.h + 19);
+        ctx.fillText('STEER RIGHT ▶', rPillX + rPillW / 2, rPillY + rPillH / 2 + 1);
 
         // 3. Bomb Button
         const bombImg = images['btn_bomb'];
@@ -1050,19 +1170,23 @@ class AttackToShipGame {
         }
         ctx.restore();
 
-        // Solid Black Control Label underneath Bomb Button: 💣 DROP BOMB
-        ctx.fillStyle = '#000000';
-        ctx.roundRect(this.controls.bombBtn.x, this.controls.bombBtn.y + this.controls.bombBtn.h + 4, this.controls.bombBtn.w, 30, 10);
+        // Sleek Cyber-Naval Badge underneath Bomb Button: 💣 DEPTH CHARGE
+        const bPillX = this.controls.bombBtn.x;
+        const bPillY = this.controls.bombBtn.y + this.controls.bombBtn.h + 4;
+        const bPillW = this.controls.bombBtn.w;
+        const bPillH = 30;
+        ctx.fillStyle = 'rgba(6, 18, 32, 0.9)';
+        ctx.roundRect(bPillX, bPillY, bPillW, bPillH, 12);
         ctx.fill();
-        ctx.strokeStyle = '#ffffff';
+        ctx.strokeStyle = 'rgba(0, 229, 255, 0.7)';
         ctx.lineWidth = 1.5;
-        ctx.roundRect(this.controls.bombBtn.x, this.controls.bombBtn.y + this.controls.bombBtn.h + 4, this.controls.bombBtn.w, 30, 10);
+        ctx.roundRect(bPillX, bPillY, bPillW, bPillH, 12);
         ctx.stroke();
-        ctx.font = "800 18px 'Segoe UI', Impact, sans-serif";
+        ctx.font = "800 17px 'Segoe UI', Impact, sans-serif";
         ctx.fillStyle = '#ffffff';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText('💣 DROP BOMB', this.controls.bombBtn.x + this.controls.bombBtn.w / 2, this.controls.bombBtn.y + this.controls.bombBtn.h + 19);
+        ctx.fillText('💣 DEPTH CHARGE', bPillX + bPillW / 2, bPillY + bPillH / 2 + 1);
 
         ctx.restore();
     }
@@ -1087,18 +1211,24 @@ class AttackToShipGame {
         ctx.font = "700 34px 'Segoe UI', sans-serif";
         ctx.fillText('TACTICAL NAVAL DESTROYER COMBAT', 540, 730);
 
-        // Instructions Card - Solid Black Background, Pure White Text
-        ctx.fillStyle = '#000000';
+        // Instructions Card - Cyber-Naval Tactical Styling
+        const mGrad = ctx.createLinearGradient(120, 810, 120, 1250);
+        mGrad.addColorStop(0, '#061424');
+        mGrad.addColorStop(1, '#030810');
+        ctx.fillStyle = mGrad;
         ctx.roundRect(120, 810, 840, 440, 24);
         ctx.fill();
-        ctx.strokeStyle = '#ffffff';
+        ctx.strokeStyle = '#00e5ff';
         ctx.lineWidth = 2.5;
+        ctx.shadowColor = 'rgba(0, 229, 255, 0.4)';
+        ctx.shadowBlur = 16;
         ctx.roundRect(120, 810, 840, 440, 24);
         ctx.stroke();
+        ctx.shadowBlur = 0;
 
         ctx.font = "900 34px 'Segoe UI', Impact, sans-serif";
-        ctx.fillStyle = '#ffffff';
-        ctx.fillText('MISSION BRIEFING', 540, 875);
+        ctx.fillStyle = '#00e5ff';
+        ctx.fillText('⚡ MISSION BRIEFING ⚡', 540, 875);
 
         ctx.font = "700 28px 'Segoe UI', sans-serif";
         ctx.fillStyle = '#ffffff';
@@ -1111,7 +1241,7 @@ class AttackToShipGame {
 
         // High Score display
         ctx.font = "800 32px 'Segoe UI', sans-serif";
-        ctx.fillStyle = '#ffffff';
+        ctx.fillStyle = '#ffd54f';
         ctx.fillText(`🏆 BEST RECORD: ${this.highScore}`, 540, 1290);
 
         // Tap to Start Button
@@ -1233,25 +1363,31 @@ class AttackToShipGame {
             }
         }
 
-        // Stats Card Container - Solid Black Background, Pure White Text
-        ctx.fillStyle = '#000000';
+        // Stats Card Container - Cyber-Naval Tactical Styling
+        const goGrad = ctx.createLinearGradient(160, 800, 160, 1030);
+        goGrad.addColorStop(0, '#081728');
+        goGrad.addColorStop(1, '#030812');
+        ctx.fillStyle = goGrad;
         ctx.roundRect(160, 800, 760, 230, 24);
         ctx.fill();
-        ctx.strokeStyle = '#ffffff';
+        ctx.strokeStyle = '#00e5ff';
         ctx.lineWidth = 2.5;
+        ctx.shadowColor = 'rgba(0, 229, 255, 0.4)';
+        ctx.shadowBlur = 14;
         ctx.roundRect(160, 800, 760, 230, 24);
         ctx.stroke();
+        ctx.shadowBlur = 0;
 
         ctx.fillStyle = '#ffffff';
         ctx.font = "900 48px 'Impact', 'Segoe UI', Arial Black, sans-serif";
         ctx.fillText(`FINAL SCORE: ${this.score}`, 540, 865);
 
-        ctx.fillStyle = '#ffffff';
+        ctx.fillStyle = '#ffd54f';
         ctx.font = "800 36px 'Segoe UI', Impact, sans-serif";
         const isNewRecord = (this.score >= this.highScore && this.score > 0);
         ctx.fillText(`BEST SCORE: ${this.highScore} ${isNewRecord ? '🏆 NEW RECORD!' : ''}`, 540, 930);
 
-        ctx.fillStyle = '#ffffff';
+        ctx.fillStyle = '#80deea';
         ctx.font = "700 30px 'Segoe UI', sans-serif";
         ctx.fillText(`SHIPS SUNK: ${this.enemiesDestroyed}`, 540, 985);
 
